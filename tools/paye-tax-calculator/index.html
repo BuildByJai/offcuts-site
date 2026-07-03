@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAYE Tax Calculator UK 2025/26 — Offcuts</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
+  :root {
+    --paper: #FAFAF8; --ink: #181818; --ink-soft: #5C5C58;
+    --line: #E3E1DA; --accent: #156534; --accent-soft: #E9F3ED;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Inter', system-ui, sans-serif; line-height: 1.55; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 0 24px 100px; }
+  .crumb { padding: 32px 0 0; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink-soft); }
+  .crumb a { color: var(--accent); text-decoration: none; }
+  .crumb a:hover { text-decoration: underline; }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; margin: 16px 0 10px; }
+  .tag-inline { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent); background:var(--accent-soft); padding:3px 9px; border-radius:4px; vertical-align:middle; margin-left:8px; transform: translateY(-2px); }
+  .lede { font-size: 16px; color: var(--ink-soft); margin: 0 0 28px; max-width: 480px; }
+  .panel { border: 1px solid var(--line); border-radius: 10px; padding: 24px; margin-bottom: 24px; background: #fff; }
+  label { display:block; font-family:'JetBrains Mono',monospace; font-size:12px; color: var(--ink-soft); margin-bottom:6px; }
+  input[type=text], input[type=number], select {
+    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px;
+    font-family:'Inter',sans-serif; font-size:15px; background:#fff; color:var(--ink);
+  }
+  input:focus, select:focus { outline:none; border-color:var(--accent); }
+  .field { margin-bottom:16px; }
+  .row-inline { display:flex; gap:10px; flex-wrap:wrap; }
+  .row-inline .field { flex:1; min-width:140px; }
+  .choice-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .choice-btn {
+    padding:8px 14px; border:1px solid var(--line); border-radius:20px; background:#fff;
+    font-family:'JetBrains Mono',monospace; font-size:12px; cursor:pointer; color:var(--ink-soft);
+  }
+  .choice-btn.active { border-color:var(--accent); background:var(--accent); color:#fff; }
+  .btn {
+    padding:11px 20px; border-radius:8px; border:1px solid var(--accent); background:var(--accent);
+    color:#fff; font-family:'Inter',sans-serif; font-size:15px; font-weight:600; cursor:pointer;
+  }
+  .btn:hover { opacity:0.92; }
+  .btn.ghost { background:transparent; color:var(--ink); border-color:var(--line); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .error { color:#A32D2D; font-size:13px; margin: 6px 0 0; }
+  .results { border-top:1px solid var(--line); margin-top:20px; padding-top:20px; }
+  .result-row { display:flex; justify-content:space-between; align-items:baseline; padding:8px 0; }
+  .result-row .label { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft); margin:0; }
+  .result-row .value { font-size:20px; font-weight:700; }
+  .result-row.hero .value { font-size:28px; color:var(--accent); }
+  section.copy { margin: 36px 0; }
+  section.copy h2 { font-size:19px; font-weight:700; margin:0 0 10px; }
+  section.copy p { color: var(--ink-soft); margin: 0 0 14px; font-size:15px; }
+  .example { background: var(--accent-soft); border-radius:10px; padding:18px 20px; margin: 14px 0; }
+  .example p { margin:0 0 8px; color: var(--ink); font-size:14px; }
+  .example p:last-child { margin-bottom:0; }
+  .faq h3 { font-size:15px; font-weight:600; margin:0 0 4px; }
+  .faq p { color:var(--ink-soft); font-size:14px; margin:0 0 18px; }
+  .disclaimer { font-size:12.5px; color: var(--ink-soft); border-top:1px solid var(--line); padding-top:18px; margin-top:36px; font-family:'JetBrains Mono',monospace; }
+  footer { border-top: 1px solid var(--line); padding: 28px 0 60px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft); }
+  .switchrow { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .switchrow input[type=checkbox] { width:16px; height:16px; accent-color: var(--accent); }
+  .switchrow label { margin:0; font-family:'Inter',sans-serif; font-size:14px; color:var(--ink); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="crumb"><a href="../../">offcuts</a> / tools / paye-tax-calculator</p>
+  <h1>PAYE Tax Calculator<span class="tag-inline">finance</span></h1>
+  <p class="lede">Detailed PAYE breakdown for 2025/26 — annual, monthly and weekly take-home.</p>
+
+  <div class="panel">
+    <div class="field">
+      <label for="salary">Annual salary (£)</label>
+      <input type="number" id="salary" placeholder="35000" step="100">
+    </div>
+    <button class="btn" id="calc-btn">Calculate</button>
+    <p class="error" id="error" style="display:none;"></p>
+    <div class="results" id="results" style="display:none;">
+      <div class="result-row"><p class="label">Annual income tax</p><p class="value" id="r-tax">£0.00</p></div>
+      <div class="result-row"><p class="label">Average tax rate</p><p class="value" id="r-avg">0%</p></div>
+      <div class="result-row hero"><p class="label">Annual take-home</p><p class="value" id="r-annual">£0.00</p></div>
+      <div class="result-row"><p class="label">Monthly take-home</p><p class="value" id="r-monthly">£0.00</p></div>
+      <div class="result-row"><p class="label">Weekly take-home</p><p class="value" id="r-weekly">£0.00</p></div>
+    </div>
+  </div>
+
+  <section class="copy">
+    <p>Enter your annual salary to see a PAYE breakdown for the 2025/26 tax year, split into annual, monthly and weekly take-home figures.</p>
+    <h2>What this includes</h2>
+    <p>The calculator focuses on income tax only and does not include National Insurance, student loans, pensions or other deductions. Treat the results as an estimate to help with planning rather than a personalised tax calculation.</p>
+  </section>
+
+  <section class="copy faq">
+    <h2>Common questions</h2>
+    <h3>Why might my real payslip differ from this?</h3>
+    <p>Real PAYE calculations may differ due to tax code adjustments, benefits, pension contributions, student loans, and how your employer spreads tax across pay periods.</p>
+  </section>
+
+  <p class="disclaimer">Estimate only, income tax only. Not a substitute for a personalised tax calculation.</p>
+  <footer>offcuts.buildbyjai.workers.dev</footer>
+</div>
+
+<script>
+  function calculateIncomeTax(income) {
+    const PA = 12570;
+    if (income <= PA) return 0;
+    if (income <= 50270) return 0.20 * (income - PA);
+    if (income <= 100000) {
+      const basicBandTax = 0.20 * (50270 - PA);
+      const higherBandTax = 0.40 * (income - 50270);
+      return basicBandTax + higherBandTax;
+    }
+    if (income <= 125140) {
+      const basicBandTax = 0.20 * (50270 - PA);
+      const higherBandTax = 0.40 * (100000 - 50270);
+      const taxAt100k = basicBandTax + higherBandTax;
+      return taxAt100k + 0.60 * (income - 100000);
+    }
+    const basicBandTax = 0.20 * (50270 - PA);
+    const higherBandTax = 0.40 * (100000 - 50270);
+    const taxAt100k = basicBandTax + higherBandTax;
+    const taxAt125140 = taxAt100k + 0.60 * (125140 - 100000);
+    return taxAt125140 + 0.45 * (income - 125140);
+  }
+
+  document.getElementById("calc-btn").addEventListener("click", () => {
+    const salary = parseFloat(document.getElementById("salary").value);
+    const errorEl = document.getElementById("error");
+    const resultsEl = document.getElementById("results");
+
+    if (!salary || salary < 0) {
+      errorEl.textContent = "Please enter a valid annual salary of at least £0.";
+      errorEl.style.display = "block";
+      resultsEl.style.display = "none";
+      return;
+    }
+    errorEl.style.display = "none";
+
+    const annualIncomeTax = calculateIncomeTax(salary);
+    const annualTakeHome = salary - annualIncomeTax;
+    const monthlyTakeHome = annualTakeHome / 12;
+    const weeklyTakeHome = annualTakeHome / 52;
+    const avgRate = salary > 0 ? (annualIncomeTax / salary) * 100 : 0;
+
+    document.getElementById("r-tax").textContent = "£" + annualIncomeTax.toFixed(2);
+    document.getElementById("r-avg").textContent = avgRate.toFixed(1) + "%";
+    document.getElementById("r-annual").textContent = "£" + annualTakeHome.toFixed(2);
+    document.getElementById("r-monthly").textContent = "£" + monthlyTakeHome.toFixed(2);
+    document.getElementById("r-weekly").textContent = "£" + weeklyTakeHome.toFixed(2);
+    resultsEl.style.display = "block";
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Truth or Dare — Offcuts</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
+  :root {
+    --paper: #FAFAF8; --ink: #181818; --ink-soft: #5C5C58;
+    --line: #E3E1DA; --accent: #156534; --accent-soft: #E9F3ED;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Inter', system-ui, sans-serif; line-height: 1.55; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 0 24px 100px; }
+  .crumb { padding: 32px 0 0; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink-soft); }
+  .crumb a { color: var(--accent); text-decoration: none; }
+  .crumb a:hover { text-decoration: underline; }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; margin: 16px 0 10px; }
+  .tag-inline { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent); background:var(--accent-soft); padding:3px 9px; border-radius:4px; vertical-align:middle; margin-left:8px; transform: translateY(-2px); }
+  .lede { font-size: 16px; color: var(--ink-soft); margin: 0 0 28px; max-width: 480px; }
+  .panel { border: 1px solid var(--line); border-radius: 10px; padding: 24px; margin-bottom: 24px; background: #fff; }
+  label { display:block; font-family:'JetBrains Mono',monospace; font-size:12px; color: var(--ink-soft); margin-bottom:6px; }
+  input[type=text], input[type=number], select {
+    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px;
+    font-family:'Inter',sans-serif; font-size:15px; background:#fff; color:var(--ink);
+  }
+  input:focus, select:focus { outline:none; border-color:var(--accent); }
+  .field { margin-bottom:16px; }
+  .row-inline { display:flex; gap:10px; flex-wrap:wrap; }
+  .row-inline .field { flex:1; min-width:140px; }
+  .choice-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .choice-btn {
+    padding:8px 14px; border:1px solid var(--line); border-radius:20px; background:#fff;
+    font-family:'JetBrains Mono',monospace; font-size:12px; cursor:pointer; color:var(--ink-soft);
+  }
+  .choice-btn.active { border-color:var(--accent); background:var(--accent); color:#fff; }
+  .btn {
+    padding:11px 20px; border-radius:8px; border:1px solid var(--accent); background:var(--accent);
+    color:#fff; font-family:'Inter',sans-serif; font-size:15px; font-weight:600; cursor:pointer;
+  }
+  .btn:hover { opacity:0.92; }
+  .btn.ghost { background:transparent; color:var(--ink); border-color:var(--line); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .error { color:#A32D2D; font-size:13px; margin: 6px 0 0; }
+  .results { border-top:1px solid var(--line); margin-top:20px; padding-top:20px; }
+  .result-row { display:flex; justify-content:space-between; align-items:baseline; padding:8px 0; }
+  .result-row .label { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft); margin:0; }
+  .result-row .value { font-size:20px; font-weight:700; }
+  .result-row.hero .value { font-size:28px; color:var(--accent); }
+  section.copy { margin: 36px 0; }
+  section.copy h2 { font-size:19px; font-weight:700; margin:0 0 10px; }
+  section.copy p { color: var(--ink-soft); margin: 0 0 14px; font-size:15px; }
+  .example { background: var(--accent-soft); border-radius:10px; padding:18px 20px; margin: 14px 0; }
+  .example p { margin:0 0 8px; color: var(--ink); font-size:14px; }
+  .example p:last-child { margin-bottom:0; }
+  .faq h3 { font-size:15px; font-weight:600; margin:0 0 4px; }
+  .faq p { color:var(--ink-soft); font-size:14px; margin:0 0 18px; }
+  .disclaimer { font-size:12.5px; color: var(--ink-soft); border-top:1px solid var(--line); padding-top:18px; margin-top:36px; font-family:'JetBrains Mono',monospace; }
+  footer { border-top: 1px solid var(--line); padding: 28px 0 60px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft); }
+  .switchrow { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .switchrow input[type=checkbox] { width:16px; height:16px; accent-color: var(--accent); }
+  .switchrow label { margin:0; font-family:'Inter',sans-serif; font-size:14px; color:var(--ink); }
+</style>
+<style>
+  .promptcard { margin-top:18px; background: var(--accent-soft); border-radius:10px; padding:20px; }
+  .promptcard .type { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; color:var(--accent); border:1px solid var(--accent); border-radius:999px; padding:3px 10px; margin-bottom:12px; }
+  .promptcard p.text { font-size:18px; font-weight:600; margin:0 0 16px; }
+  .smallbtns { display:flex; gap:8px; flex-wrap:wrap; }
+  .smallbtn { padding:7px 13px; border-radius:6px; border:1px solid var(--line); background:#fff; font-family:'JetBrains Mono',monospace; font-size:12px; cursor:pointer; color:var(--ink); }
+  .smallbtn:hover { border-color: var(--accent); color: var(--accent); }
+  .penalty { margin-top:12px; background:#FAEEDA; color:#633806; font-weight:600; padding:12px; border-radius:8px; text-align:center; font-size:13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="crumb"><a href="../../">offcuts</a> / tools / truth-or-dare</p>
+  <h1>Family Truth or Dare<span class="tag-inline">games</span></h1>
+  <p class="lede">Kid-safe Truth or Dare prompts for families. Mixed, ages 5–8, or ages 9–12.</p>
+
+  <div class="panel">
+    <label>Mode</label>
+    <div class="choice-row" id="mode-row">
+      <button class="choice-btn active" data-mode="mixed">Mixed Family</button>
+      <button class="choice-btn" data-mode="5-8">Ages 5-8</button>
+      <button class="choice-btn" data-mode="9-12">Ages 9-12</button>
+    </div>
+    <label>Type</label>
+    <div class="choice-row" id="type-row">
+      <button class="choice-btn active" data-type="both">Both</button>
+      <button class="choice-btn" data-type="truth">Truth only</button>
+      <button class="choice-btn" data-type="dare">Dare only</button>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:6px;">
+      <button class="btn" id="btn-truth" style="flex:1;">Get a Truth</button>
+      <button class="btn" id="btn-dare" style="flex:1;">Get a Dare</button>
+    </div>
+    <div id="promptwrap" style="display:none;">
+      <div class="promptcard">
+        <span class="type" id="prompt-type">Truth</span>
+        <p class="text" id="prompt-text"></p>
+        <div class="smallbtns">
+          <button class="smallbtn" id="btn-copy">Copy</button>
+          <button class="smallbtn" id="btn-swap">Swap</button>
+          <button class="smallbtn" id="btn-skip">Skip</button>
+        </div>
+      </div>
+      <div class="penalty" id="penalty" style="display:none;">Skip penalty: Do the Chicken Dance for 10 seconds.</div>
+    </div>
+  </div>
+
+  <section class="copy">
+    <p>Clean, age-appropriate prompts for kids, parents, and mixed groups. No awkward, flirty, or embarrassing questions.</p>
+  </section>
+
+  <section class="copy faq">
+    <h2>Common questions</h2>
+    <h3>What age is this appropriate for?</h3>
+    <p>From around age 5, using the Ages 5-8 filter, with dares kept simple and optional.</p>
+    <h3>Can you play over video call?</h3>
+    <p>Yes — share your screen with the generator, or copy and paste each prompt into the call chat.</p>
+  </section>
+
+  <p class="disclaimer">Entertainment only. Adult supervision recommended for younger children.</p>
+  <footer>offcuts.buildbyjai.workers.dev</footer>
+</div>
+
+<script>
+const truths = [
+  {id:"T001",mode:"5-8",text:"What is your favourite colour and why?"},
+  {id:"T002",mode:"5-8",text:"If you could have any pet, what would you choose?"},
+  {id:"T003",mode:"5-8",text:"What is the funniest sound you can make?"},
+  {id:"T004",mode:"5-8",text:"What is your favourite food to eat at home?"},
+  {id:"T005",mode:"5-8",text:"If you could be a superhero, what would your power be?"},
+  {id:"T006",mode:"5-8",text:"What is your favourite cartoon or movie right now?"},
+  {id:"T007",mode:"5-8",text:"What is something you are really good at?"},
+  {id:"T008",mode:"5-8",text:"If you could eat one snack forever, what would it be?"},
+  {id:"T009",mode:"5-8",text:"What is your favourite game to play with family?"},
+  {id:"T010",mode:"5-8",text:"What is one thing that always makes you laugh?"},
+  {id:"T011",mode:"5-8",text:"If you could be any animal, what would you be?"},
+  {id:"T012",mode:"5-8",text:"What is your favourite thing to do on weekends?"},
+  {id:"T013",mode:"5-8",text:"What is your favourite ice cream flavour?"},
+  {id:"T014",mode:"5-8",text:"What is one kind thing you did recently?"},
+  {id:"T015",mode:"5-8",text:"What is your favourite book or story?"},
+  {id:"T016",mode:"5-8",text:"If you could build a treehouse, what would be inside it?"},
+  {id:"T017",mode:"5-8",text:"What is your favourite song to sing?"},
+  {id:"T018",mode:"5-8",text:"What is one thing you want to learn to do?"},
+  {id:"T019",mode:"5-8",text:"What is your favourite thing about your home?"},
+  {id:"T020",mode:"5-8",text:"What is the silliest face you can pull?"},
+  {id:"T021",mode:"9-12",text:"What is the funniest thing that happened at school this year?"},
+  {id:"T022",mode:"9-12",text:"If you could invent a new holiday, what would it be?"},
+  {id:"T023",mode:"9-12",text:"What is a talent you wish you had?"},
+  {id:"T024",mode:"9-12",text:"What is the best advice you have ever received?"},
+  {id:"T025",mode:"9-12",text:"If you could swap lives with someone for a day, who would it be?"},
+  {id:"T026",mode:"9-12",text:"What is your biggest pet peeve at home?"},
+  {id:"T027",mode:"9-12",text:"If you could be amazing at one sport or game, which would you choose?"},
+  {id:"T028",mode:"9-12",text:"What is a food you used to dislike but like now?"},
+  {id:"T029",mode:"9-12",text:"What is the weirdest dream you can remember?"},
+  {id:"T030",mode:"9-12",text:"What is something you are proud of this year?"},
+  {id:"T031",mode:"9-12",text:"If you could make one house rule, what would it be?"},
+  {id:"T032",mode:"9-12",text:"Who in your family makes you laugh the hardest?"},
+  {id:"T033",mode:"9-12",text:"If you were invisible for a day, what would you do?"},
+  {id:"T034",mode:"9-12",text:"What is the most unusual food you have ever tried?"},
+  {id:"T035",mode:"9-12",text:"What is the silliest thing you are currently afraid of?"},
+  {id:"T036",mode:"9-12",text:"What is the best day you have had recently, and why?"},
+  {id:"T037",mode:"9-12",text:"If you could have a robot, what would you want it to do?"},
+  {id:"T038",mode:"9-12",text:"What is your most embarrassing nickname (or a silly one)?"},
+  {id:"T039",mode:"9-12",text:"What is one goal you want to achieve this year?"},
+  {id:"T040",mode:"9-12",text:"What is the best board game or card game to play as a family?"},
+  {id:"T041",mode:"mixed",text:"Who is your favourite superhero and why?"},
+  {id:"T042",mode:"mixed",text:"Do you have a secret stash of snacks hidden somewhere?"},
+  {id:"T043",mode:"mixed",text:"Do you sing or dance when you are on your own?"},
+  {id:"T044",mode:"mixed",text:"What is the silliest prank you have ever pulled?"},
+  {id:"T045",mode:"mixed",text:"Have you ever worn mismatched socks on purpose?"},
+  {id:"T046",mode:"mixed",text:"If you became a billionaire overnight, what is the first thing you would buy?"},
+  {id:"T047",mode:"mixed",text:"Which family member would survive a zombie apocalypse the longest?"},
+  {id:"T048",mode:"mixed",text:"What is one household rule you wish you could change?"},
+  {id:"T049",mode:"mixed",text:"What is the strangest thing you have ever eaten?"},
+  {id:"T050",mode:"mixed",text:"Have you ever given a compliment just to be kind?"},
+  {id:"T051",mode:"mixed",text:"What is your favourite family tradition?"},
+  {id:"T052",mode:"mixed",text:"What is your favourite thing to do together as a family?"},
+  {id:"T053",mode:"mixed",text:"If you could visit any country tomorrow, where would you go?"},
+  {id:"T054",mode:"mixed",text:"What is the funniest joke you know (clean)?"},
+  {id:"T055",mode:"mixed",text:"If you could design your dream bedroom, what would it look like?"},
+  {id:"T056",mode:"mixed",text:"What is one thing you would like to get better at?"},
+  {id:"T057",mode:"mixed",text:"What is the best meal someone in your family makes?"},
+  {id:"T058",mode:"mixed",text:"What is the funniest family moment you can remember?"},
+  {id:"T059",mode:"mixed",text:"If you could have any magical item, what would you choose?"},
+  {id:"T060",mode:"mixed",text:"What is one kind thing someone did for you recently?"}
+];
+const dares = [
+  {id:"D001",mode:"5-8",text:"Do your best animal impression for 10 seconds."},
+  {id:"D002",mode:"5-8",text:"Hop like a bunny across the room and back."},
+  {id:"D003",mode:"5-8",text:"Make a silly face and hold it for 10 seconds."},
+  {id:"D004",mode:"5-8",text:"Spin around five times, then walk in a straight line."},
+  {id:"D005",mode:"5-8",text:"Pretend you are a robot for your next turn."},
+  {id:"D006",mode:"5-8",text:"Clap a simple rhythm and have everyone copy it."},
+  {id:"D007",mode:"5-8",text:"Do 5 star jumps."},
+  {id:"D008",mode:"5-8",text:"Whisper a silly message to the group (something funny and clean)."},
+  {id:"D009",mode:"5-8",text:"Walk like a penguin to the door and back."},
+  {id:"D010",mode:"5-8",text:"Sing 'Happy Birthday' like an opera singer."},
+  {id:"D011",mode:"5-8",text:"Balance a spoon on your nose for 5 seconds (or try!)."},
+  {id:"D012",mode:"5-8",text:"Do the Chicken Dance for 10 seconds."},
+  {id:"D013",mode:"5-8",text:"Act like a dinosaur until your next turn."},
+  {id:"D014",mode:"5-8",text:"Make up a short silly dance and teach it to everyone."},
+  {id:"D015",mode:"5-8",text:"Talk in a squeaky voice for the next round."},
+  {id:"D016",mode:"5-8",text:"Pretend you are an aeroplane for 10 seconds."},
+  {id:"D017",mode:"5-8",text:"Do 5 slow-motion jumps."},
+  {id:"D018",mode:"5-8",text:"Do your best lion roar."},
+  {id:"D019",mode:"5-8",text:"Walk like a crab across the room and back."},
+  {id:"D020",mode:"5-8",text:"Wave like you are on a parade float for 10 seconds."},
+  {id:"D021",mode:"9-12",text:"Talk in a robot voice for your next three turns."},
+  {id:"D022",mode:"9-12",text:"Do 10 jumping jacks."},
+  {id:"D023",mode:"9-12",text:"Give a 15-second weather report for the room you are in."},
+  {id:"D024",mode:"9-12",text:"Act like an alien visiting Earth for the first time for 20 seconds."},
+  {id:"D025",mode:"9-12",text:"Speak with a funny accent until your next turn."},
+  {id:"D026",mode:"9-12",text:"Do your best impression of a teacher or parent (kindly)."},
+  {id:"D027",mode:"9-12",text:"Hold a funny face for 20 seconds without laughing."},
+  {id:"D028",mode:"9-12",text:"Mime being stuck in an invisible box for 20 seconds."},
+  {id:"D029",mode:"9-12",text:"Walk around like a duck for 15 seconds."},
+  {id:"D030",mode:"9-12",text:"Do an army crawl across the living room (safely) and back."},
+  {id:"D031",mode:"9-12",text:"Sing the chorus of a Disney song loudly."},
+  {id:"D032",mode:"9-12",text:"Let the person to your left style your hair (30 seconds)."},
+  {id:"D033",mode:"9-12",text:"Wear your socks on your hands until your next turn."},
+  {id:"D034",mode:"9-12",text:"Make only animal sounds for one full round."},
+  {id:"D035",mode:"9-12",text:"Pretend your batteries are dying and move in slow motion for 15 seconds."},
+  {id:"D036",mode:"9-12",text:"Try to balance a book on your head for 10 seconds."},
+  {id:"D037",mode:"9-12",text:"Tell a clean joke in your best dramatic voice."},
+  {id:"D038",mode:"9-12",text:"Do your best movie trailer voice for 15 seconds."},
+  {id:"D039",mode:"9-12",text:"Create a 10-second victory dance for the next player."},
+  {id:"D040",mode:"9-12",text:"Pretend you are a news presenter and announce a 'breaking news' story about snacks."},
+  {id:"D041",mode:"mixed",text:"Do your best Chicken Dance for 30 seconds."},
+  {id:"D042",mode:"mixed",text:"Try to balance a spoon on your nose for 10 seconds."},
+  {id:"D043",mode:"mixed",text:"Walk like a crab across the room and back."},
+  {id:"D044",mode:"mixed",text:"Pretend to be a mime stuck in a giant invisible box."},
+  {id:"D045",mode:"mixed",text:"Speak in a high-pitched squeaky voice until the next round."},
+  {id:"D046",mode:"mixed",text:"Give a detailed weather report for the room you are in."},
+  {id:"D047",mode:"mixed",text:"Act like a duck and do one lap around the room."},
+  {id:"D048",mode:"mixed",text:"Make a silly dance and teach it to everyone."},
+  {id:"D049",mode:"mixed",text:"Do 10 jumping jacks while counting out loud."},
+  {id:"D050",mode:"mixed",text:"Talk like a robot for your next three turns."},
+  {id:"D051",mode:"mixed",text:"Do your best impression of someone making a cup of tea (silent acting)."},
+  {id:"D052",mode:"mixed",text:"Pretend you are a superhero landing dramatically (safely)."},
+  {id:"D053",mode:"mixed",text:"Do your best lion roar, then bow like you are on stage."},
+  {id:"D054",mode:"mixed",text:"Speak only in questions until your next turn."},
+  {id:"D055",mode:"mixed",text:"Pretend you are an alien visiting Earth for the first time for 20 seconds."},
+  {id:"D056",mode:"mixed",text:"Do an army crawl across the room and back (safely)."},
+  {id:"D057",mode:"mixed",text:"Sing the chorus of a song you know (keep it clean)."},
+  {id:"D058",mode:"mixed",text:"Make only animal sounds for one full round."},
+  {id:"D059",mode:"mixed",text:"Hold a funny face for 30 seconds without laughing."},
+  {id:"D060",mode:"mixed",text:"Walk around the room like a penguin for 15 seconds."}
+];
+
+let mode="mixed", typeFilter="both", currentPrompt=null, currentType=null, lastTruthId=null, lastDareId=null;
+const modeRow=document.getElementById("mode-row"), typeRow=document.getElementById("type-row");
+const btnTruth=document.getElementById("btn-truth"), btnDare=document.getElementById("btn-dare");
+const promptwrap=document.getElementById("promptwrap"), promptTypeEl=document.getElementById("prompt-type"), promptTextEl=document.getElementById("prompt-text");
+const penaltyEl=document.getElementById("penalty"), btnCopy=document.getElementById("btn-copy"), btnSwap=document.getElementById("btn-swap"), btnSkip=document.getElementById("btn-skip");
+
+function getFiltered(type, modeFilter){ const list=type==="truth"?truths:dares; return list.filter(p=>modeFilter==="mixed"?true:(p.mode===modeFilter||p.mode==="mixed")); }
+function getRandom(type, modeFilter, excludeId){ const filtered=getFiltered(type,modeFilter); const available=excludeId?filtered.filter(p=>p.id!==excludeId):filtered; const pool=available.length?available:filtered; if(!pool.length) return null; return pool[Math.floor(Math.random()*pool.length)]; }
+function showPrompt(p,type){ currentPrompt=p; currentType=type; promptTypeEl.textContent=type==="truth"?"Truth":"Dare"; promptTextEl.textContent=p.text; promptwrap.style.display="block"; penaltyEl.style.display="none"; }
+function getTruth(){ const p=getRandom("truth",mode,lastTruthId); if(p){ lastTruthId=p.id; showPrompt(p,"truth"); } }
+function getDare(){ const p=getRandom("dare",mode,lastDareId); if(p){ lastDareId=p.id; showPrompt(p,"dare"); } }
+
+modeRow.addEventListener("click", e=>{ const btn=e.target.closest(".choice-btn"); if(!btn) return; mode=btn.dataset.mode; [...modeRow.children].forEach(b=>b.classList.toggle("active",b===btn)); });
+typeRow.addEventListener("click", e=>{ const btn=e.target.closest(".choice-btn"); if(!btn) return; typeFilter=btn.dataset.type; [...typeRow.children].forEach(b=>b.classList.toggle("active",b===btn)); btnTruth.disabled=typeFilter==="dare"; btnDare.disabled=typeFilter==="truth"; });
+btnTruth.addEventListener("click", getTruth);
+btnDare.addEventListener("click", getDare);
+btnSwap.addEventListener("click", ()=>{ if(!currentType) return; currentType==="truth"?getTruth():getDare(); });
+btnSkip.addEventListener("click", ()=>{ penaltyEl.style.display="block"; });
+btnCopy.addEventListener("click", async ()=>{ if(!currentPrompt) return; try{ await navigator.clipboard.writeText(currentPrompt.text); btnCopy.textContent="Copied"; setTimeout(()=>{btnCopy.textContent="Copy";},2000); }catch(e){} });
+</script>
+</body>
+</html>

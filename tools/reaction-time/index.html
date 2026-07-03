@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reaction Time Test — Offcuts</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
+  :root {
+    --paper: #FAFAF8; --ink: #181818; --ink-soft: #5C5C58;
+    --line: #E3E1DA; --accent: #156534; --accent-soft: #E9F3ED;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Inter', system-ui, sans-serif; line-height: 1.55; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 0 24px 100px; }
+  .crumb { padding: 32px 0 0; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink-soft); }
+  .crumb a { color: var(--accent); text-decoration: none; }
+  .crumb a:hover { text-decoration: underline; }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; margin: 16px 0 10px; }
+  .tag-inline { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent); background:var(--accent-soft); padding:3px 9px; border-radius:4px; vertical-align:middle; margin-left:8px; transform: translateY(-2px); }
+  .lede { font-size: 16px; color: var(--ink-soft); margin: 0 0 28px; max-width: 480px; }
+  .panel { border: 1px solid var(--line); border-radius: 10px; padding: 24px; margin-bottom: 24px; background: #fff; }
+  label { display:block; font-family:'JetBrains Mono',monospace; font-size:12px; color: var(--ink-soft); margin-bottom:6px; }
+  input[type=text], input[type=number], select {
+    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px;
+    font-family:'Inter',sans-serif; font-size:15px; background:#fff; color:var(--ink);
+  }
+  input:focus, select:focus { outline:none; border-color:var(--accent); }
+  .field { margin-bottom:16px; }
+  .row-inline { display:flex; gap:10px; flex-wrap:wrap; }
+  .row-inline .field { flex:1; min-width:140px; }
+  .choice-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .choice-btn {
+    padding:8px 14px; border:1px solid var(--line); border-radius:20px; background:#fff;
+    font-family:'JetBrains Mono',monospace; font-size:12px; cursor:pointer; color:var(--ink-soft);
+  }
+  .choice-btn.active { border-color:var(--accent); background:var(--accent); color:#fff; }
+  .btn {
+    padding:11px 20px; border-radius:8px; border:1px solid var(--accent); background:var(--accent);
+    color:#fff; font-family:'Inter',sans-serif; font-size:15px; font-weight:600; cursor:pointer;
+  }
+  .btn:hover { opacity:0.92; }
+  .btn.ghost { background:transparent; color:var(--ink); border-color:var(--line); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .error { color:#A32D2D; font-size:13px; margin: 6px 0 0; }
+  .results { border-top:1px solid var(--line); margin-top:20px; padding-top:20px; }
+  .result-row { display:flex; justify-content:space-between; align-items:baseline; padding:8px 0; }
+  .result-row .label { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft); margin:0; }
+  .result-row .value { font-size:20px; font-weight:700; }
+  .result-row.hero .value { font-size:28px; color:var(--accent); }
+  section.copy { margin: 36px 0; }
+  section.copy h2 { font-size:19px; font-weight:700; margin:0 0 10px; }
+  section.copy p { color: var(--ink-soft); margin: 0 0 14px; font-size:15px; }
+  .example { background: var(--accent-soft); border-radius:10px; padding:18px 20px; margin: 14px 0; }
+  .example p { margin:0 0 8px; color: var(--ink); font-size:14px; }
+  .example p:last-child { margin-bottom:0; }
+  .faq h3 { font-size:15px; font-weight:600; margin:0 0 4px; }
+  .faq p { color:var(--ink-soft); font-size:14px; margin:0 0 18px; }
+  .disclaimer { font-size:12.5px; color: var(--ink-soft); border-top:1px solid var(--line); padding-top:18px; margin-top:36px; font-family:'JetBrains Mono',monospace; }
+  footer { border-top: 1px solid var(--line); padding: 28px 0 60px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft); }
+  .switchrow { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .switchrow input[type=checkbox] { width:16px; height:16px; accent-color: var(--accent); }
+  .switchrow label { margin:0; font-family:'Inter',sans-serif; font-size:14px; color:var(--ink); }
+</style>
+<style>
+  #test-area {
+    border-radius:10px; padding:60px 20px; text-align:center; cursor:pointer; user-select:none;
+    min-height:240px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background: var(--accent-soft); transition: background-color .1s ease; margin-top:14px;
+  }
+  #test-area.waiting { background:#BA7517; color:#fff; }
+  #test-area.go { background: var(--accent); color:#fff; }
+  #test-area.false-start { background:#A32D2D; color:#fff; }
+  #test-status { font-family:'JetBrains Mono',monospace; font-size:clamp(20px,5vw,28px); font-weight:700; margin:0; }
+  #test-hint { margin:8px 0 0; font-size:13px; opacity:0.85; }
+  .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:16px 0; }
+  .stat { background: var(--accent-soft); border-radius:8px; padding:12px; text-align:center; }
+  .stat .label { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft); margin-bottom:4px; }
+  .stat .value { font-size:20px; font-weight:700; }
+  .attempts { display:flex; flex-wrap:wrap; gap:6px; }
+  .attempt-badge { border:1px solid var(--line); border-radius:999px; padding:3px 10px; font-family:'JetBrains Mono',monospace; font-size:12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="crumb"><a href="../../">offcuts</a> / tools / reaction-time</p>
+  <h1>Reaction Time Test<span class="tag-inline">games</span></h1>
+  <p class="lede">Test your visual reaction speed in milliseconds. Click when it turns green.</p>
+
+  <div class="panel">
+    <div class="timer-controls" style="display:flex; gap:10px;">
+      <button class="btn" id="btn-start">Start</button>
+      <button class="btn ghost" id="btn-reset" style="display:none;">Reset</button>
+    </div>
+    <div id="test-area">
+      <p id="test-status">Click Start to begin</p>
+      <p id="test-hint" style="display:none;"></p>
+    </div>
+  </div>
+
+  <div class="panel" id="results" style="display:none;">
+    <div class="stats">
+      <div class="stat"><div class="label">Average</div><div class="value" id="stat-average">0 ms</div></div>
+      <div class="stat"><div class="label">Best</div><div class="value" id="stat-best">0 ms</div></div>
+      <div class="stat"><div class="label">Attempts</div><div class="value" id="stat-count">0</div></div>
+    </div>
+    <label style="margin-bottom:8px;">Recent attempts</label>
+    <div class="attempts" id="attempts-list"></div>
+  </div>
+
+  <section class="copy">
+    <p>When the box turns green, click or tap it as fast as you can. After a random delay, the tool measures the gap between the stimulus and your click, in milliseconds.</p>
+    <h2>How it works</h2>
+    <p>Click Start and wait. After a random delay between 1.5 and 4.5 seconds, the box turns green. Click before it turns green and it's a false start — it doesn't count.</p>
+  </section>
+
+  <section class="copy faq">
+    <h2>Common questions</h2>
+    <h3>What is a good reaction time?</h3>
+    <p>Around 250ms is average for a visual stimulus. Under 200ms is fast; competitive gamers often hit 150–200ms.</p>
+  </section>
+
+  <p class="disclaimer">For entertainment only. Not medical or professional advice.</p>
+  <footer>offcuts.buildbyjai.workers.dev</footer>
+</div>
+
+<script>
+  let gameState="IDLE", attempts=[], stimulusTime=0, pendingTimeout=null;
+  const btnStart=document.getElementById("btn-start"), btnReset=document.getElementById("btn-reset");
+  const testArea=document.getElementById("test-area"), testStatus=document.getElementById("test-status"), testHint=document.getElementById("test-hint");
+  const resultsCard=document.getElementById("results"), statAverage=document.getElementById("stat-average"), statBest=document.getElementById("stat-best");
+  const statCount=document.getElementById("stat-count"), attemptsList=document.getElementById("attempts-list");
+
+  function clearPending(){ if(pendingTimeout){ clearTimeout(pendingTimeout); pendingTimeout=null; } }
+
+  function render(){
+    testArea.classList.remove("waiting","go","false-start");
+    testHint.style.display="none"; btnStart.style.display="inline-block";
+    btnStart.textContent = gameState==="IDLE" ? "Start" : "Try Again";
+    btnReset.style.display = attempts.length ? "inline-block" : "none";
+    if(gameState==="IDLE"){ testStatus.textContent="Click Start to begin"; }
+    else if(gameState==="WAITING"){ testArea.classList.add("waiting"); testStatus.textContent="Wait..."; testHint.textContent="Click when it turns green"; testHint.style.display="block"; btnStart.style.display="none"; }
+    else if(gameState==="GO"){ testArea.classList.add("go"); testStatus.textContent="CLICK!"; btnStart.style.display="none"; }
+    else if(gameState==="FALSE_START"){ testArea.classList.add("false-start"); testStatus.textContent="Too soon!"; testHint.textContent="Wait for green before clicking"; testHint.style.display="block"; }
+    else if(gameState==="RESULT"){ const last=attempts[0]; testStatus.textContent = last ? `Your time: ${last.time} ms` : "Click Start to begin"; }
+
+    if(attempts.length){
+      resultsCard.style.display="block";
+      const avg=Math.round(attempts.reduce((s,a)=>s+a.time,0)/attempts.length);
+      const best=Math.min(...attempts.map(a=>a.time));
+      statAverage.textContent=avg+" ms"; statBest.textContent=best+" ms"; statCount.textContent=attempts.length;
+      attemptsList.innerHTML="";
+      attempts.slice(0,10).forEach(a=>{ const el=document.createElement("span"); el.className="attempt-badge"; el.textContent=a.time+" ms"; attemptsList.appendChild(el); });
+      if(attempts.length>10){ const el=document.createElement("span"); el.className="attempt-badge"; el.textContent="+"+(attempts.length-10)+" more"; attemptsList.appendChild(el); }
+    } else { resultsCard.style.display="none"; }
+  }
+
+  function startGame(){
+    clearPending(); gameState="WAITING"; render();
+    const delay=Math.random()*3000+1500;
+    pendingTimeout=setTimeout(()=>{ stimulusTime=performance.now(); gameState="GO"; render(); }, delay);
+  }
+
+  testArea.addEventListener("click", ()=>{
+    if(gameState==="WAITING"){ clearPending(); gameState="FALSE_START"; render(); }
+    else if(gameState==="GO"){
+      const clickTime=performance.now();
+      const reactionTime=Math.round(clickTime-stimulusTime);
+      attempts=[{id:attempts.length+1,time:reactionTime}, ...attempts];
+      gameState="RESULT"; render();
+    }
+  });
+
+  btnStart.addEventListener("click", startGame);
+  btnReset.addEventListener("click", ()=>{ clearPending(); gameState="IDLE"; attempts=[]; render(); });
+
+  render();
+</script>
+</body>
+</html>

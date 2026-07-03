@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Do Nothing Timer — Offcuts</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
+  :root {
+    --paper: #FAFAF8; --ink: #181818; --ink-soft: #5C5C58;
+    --line: #E3E1DA; --accent: #156534; --accent-soft: #E9F3ED;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Inter', system-ui, sans-serif; line-height: 1.55; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 0 24px 100px; }
+  .crumb { padding: 32px 0 0; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink-soft); }
+  .crumb a { color: var(--accent); text-decoration: none; }
+  .crumb a:hover { text-decoration: underline; }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; margin: 16px 0 10px; }
+  .tag-inline { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent); background:var(--accent-soft); padding:3px 9px; border-radius:4px; vertical-align:middle; margin-left:8px; transform: translateY(-2px); }
+  .lede { font-size: 16px; color: var(--ink-soft); margin: 0 0 28px; max-width: 480px; }
+  .panel { border: 1px solid var(--line); border-radius: 10px; padding: 24px; margin-bottom: 24px; background: #fff; }
+  label { display:block; font-family:'JetBrains Mono',monospace; font-size:12px; color: var(--ink-soft); margin-bottom:6px; }
+  input[type=text], input[type=number], select {
+    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px;
+    font-family:'Inter',sans-serif; font-size:15px; background:#fff; color:var(--ink);
+  }
+  input:focus, select:focus { outline:none; border-color:var(--accent); }
+  .field { margin-bottom:16px; }
+  .row-inline { display:flex; gap:10px; flex-wrap:wrap; }
+  .row-inline .field { flex:1; min-width:140px; }
+  .choice-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .choice-btn {
+    padding:8px 14px; border:1px solid var(--line); border-radius:20px; background:#fff;
+    font-family:'JetBrains Mono',monospace; font-size:12px; cursor:pointer; color:var(--ink-soft);
+  }
+  .choice-btn.active { border-color:var(--accent); background:var(--accent); color:#fff; }
+  .btn {
+    padding:11px 20px; border-radius:8px; border:1px solid var(--accent); background:var(--accent);
+    color:#fff; font-family:'Inter',sans-serif; font-size:15px; font-weight:600; cursor:pointer;
+  }
+  .btn:hover { opacity:0.92; }
+  .btn.ghost { background:transparent; color:var(--ink); border-color:var(--line); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .error { color:#A32D2D; font-size:13px; margin: 6px 0 0; }
+  .results { border-top:1px solid var(--line); margin-top:20px; padding-top:20px; }
+  .result-row { display:flex; justify-content:space-between; align-items:baseline; padding:8px 0; }
+  .result-row .label { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft); margin:0; }
+  .result-row .value { font-size:20px; font-weight:700; }
+  .result-row.hero .value { font-size:28px; color:var(--accent); }
+  section.copy { margin: 36px 0; }
+  section.copy h2 { font-size:19px; font-weight:700; margin:0 0 10px; }
+  section.copy p { color: var(--ink-soft); margin: 0 0 14px; font-size:15px; }
+  .example { background: var(--accent-soft); border-radius:10px; padding:18px 20px; margin: 14px 0; }
+  .example p { margin:0 0 8px; color: var(--ink); font-size:14px; }
+  .example p:last-child { margin-bottom:0; }
+  .faq h3 { font-size:15px; font-weight:600; margin:0 0 4px; }
+  .faq p { color:var(--ink-soft); font-size:14px; margin:0 0 18px; }
+  .disclaimer { font-size:12.5px; color: var(--ink-soft); border-top:1px solid var(--line); padding-top:18px; margin-top:36px; font-family:'JetBrains Mono',monospace; }
+  footer { border-top: 1px solid var(--line); padding: 28px 0 60px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft); }
+  .switchrow { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .switchrow input[type=checkbox] { width:16px; height:16px; accent-color: var(--accent); }
+  .switchrow label { margin:0; font-family:'Inter',sans-serif; font-size:14px; color:var(--ink); }
+</style>
+<style>
+  #timer { font-family:'JetBrains Mono',monospace; font-size:clamp(48px,12vw,64px); font-weight:700; text-align:center; }
+  #tree-wrap { display:flex; justify-content:center; margin:10px 0; }
+  #status-text { text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft); min-height:18px; }
+  #best-text { text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft); margin-bottom:16px; }
+  .timer-controls { display:flex; gap:10px; justify-content:center; }
+  details { margin: 20px 0; border:1px solid var(--line); border-radius:10px; background:#fff; overflow:hidden; }
+  summary { cursor:pointer; padding:14px 18px; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft); list-style:none; display:flex; justify-content:space-between; }
+  summary::-webkit-details-marker{display:none;}
+  .options { padding: 0 18px 18px; }
+  .opt-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-top:1px solid var(--line); font-size:14px; }
+  .opt-row:first-child{ border-top:none; }
+  .opt-row input[type=checkbox]{ width:16px;height:16px;accent-color:var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="crumb"><a href="../../">offcuts</a> / tools / do-nothing-timer</p>
+  <h1>Do Nothing Timer<span class="tag-inline">boredom</span></h1>
+  <p class="lede">Track how long you can stay completely idle. Any interaction resets the timer.</p>
+
+  <div class="panel" data-control>
+    <div id="timer">00:00</div>
+    <div id="tree-wrap"></div>
+    <div id="status-text"></div>
+    <div id="best-text">Best: 00:00</div>
+    <div class="timer-controls">
+      <button class="btn" id="btn-start">Start</button>
+      <button class="btn ghost" id="btn-pause" style="display:none;">Pause</button>
+      <button class="btn ghost" id="btn-reset" style="display:none;">Reset</button>
+    </div>
+  </div>
+
+  <details id="advanced">
+    <summary>Advanced options <span>▾</span></summary>
+    <div class="options">
+      <div class="opt-row"><label for="opt-keyboard">Reset on keyboard</label><input type="checkbox" id="opt-keyboard" checked></div>
+      <div class="opt-row"><label for="opt-click">Reset on click/tap</label><input type="checkbox" id="opt-click" checked></div>
+      <div class="opt-row"><label for="opt-scroll">Reset on scroll</label><input type="checkbox" id="opt-scroll" checked></div>
+      <div class="opt-row"><label for="opt-mouse">Reset on mouse movement</label><input type="checkbox" id="opt-mouse" checked></div>
+      <div class="opt-row"><label for="opt-tab">Reset on tab switch</label><input type="checkbox" id="opt-tab" checked></div>
+      <div class="opt-row"><label for="opt-grace">3-second grace period</label><input type="checkbox" id="opt-grace" checked></div>
+      <div class="opt-row"><label for="opt-tree">Show tree visual</label><input type="checkbox" id="opt-tree" checked></div>
+      <div class="opt-row"><label for="opt-minimal">Minimal mode (timer only)</label><input type="checkbox" id="opt-minimal"></div>
+    </div>
+  </details>
+
+  <section class="copy">
+    <h2>How this works</h2>
+    <p>When you click Start, the timer begins counting. Any activity — clicking, scrolling, typing, moving the mouse, or switching tabs — resets it. Beat your best time and it's saved automatically. The timer restarts right away so you can try again.</p>
+  </section>
+
+  <section class="copy faq">
+    <h2>Common questions</h2>
+    <h3>Is my best time saved?</h3>
+    <p>Yes, in your browser's local storage. Clearing your browser data will reset it.</p>
+  </section>
+
+  <p class="disclaimer">Runs entirely in your browser. No data is sent to any server.</p>
+  <footer>offcuts.buildbyjai.workers.dev</footer>
+</div>
+
+<script>
+  const STORAGE_KEY = "do_nothing_best_ms";
+  const TREE_STATES = [
+    {name:"seed", minMs:0}, {name:"sprout", minMs:30000}, {name:"sapling", minMs:60000},
+    {name:"tree", minMs:120000}, {name:"mature", minMs:300000}
+  ];
+  function getTreeState(ms){ for (let i=TREE_STATES.length-1;i>=0;i--){ if (ms>=TREE_STATES[i].minMs) return TREE_STATES[i].name; } return "seed"; }
+  function formatTime(ms){
+    const s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+    const p=n=>n.toString().padStart(2,"0");
+    return h>0 ? `${p(h)}:${p(m)}:${p(sec)}` : `${p(m)}:${p(sec)}`;
+  }
+  const trees = {
+    seed: `<svg viewBox="0 0 64 64" width="70" height="70"><ellipse cx="32" cy="48" rx="8" ry="4" fill="#156534" opacity="0.35"/><ellipse cx="32" cy="44" rx="6" ry="8" fill="#156534"/></svg>`,
+    sprout: `<svg viewBox="0 0 64 64" width="70" height="70"><ellipse cx="32" cy="56" rx="12" ry="4" fill="#156534" opacity="0.35"/><path d="M32 56 L32 40" stroke="#156534" stroke-width="2"/><ellipse cx="32" cy="36" rx="6" ry="8" fill="#156534"/></svg>`,
+    sapling: `<svg viewBox="0 0 64 64" width="70" height="70"><ellipse cx="32" cy="58" rx="14" ry="4" fill="#156534" opacity="0.35"/><path d="M32 58 L32 30" stroke="#156534" stroke-width="3" opacity="0.7"/><circle cx="32" cy="22" r="12" fill="#156534"/></svg>`,
+    tree: `<svg viewBox="0 0 64 64" width="70" height="70"><ellipse cx="32" cy="60" rx="16" ry="4" fill="#156534" opacity="0.35"/><path d="M32 60 L32 28" stroke="#156534" stroke-width="4" opacity="0.6"/><circle cx="32" cy="18" r="16" fill="#156534"/><circle cx="22" cy="26" r="8" fill="#156534"/><circle cx="42" cy="26" r="8" fill="#156534"/></svg>`,
+    mature: `<svg viewBox="0 0 64 64" width="70" height="70"><ellipse cx="32" cy="62" rx="18" ry="4" fill="#156534" opacity="0.35"/><path d="M32 62 L32 24" stroke="#156534" stroke-width="5" opacity="0.5"/><circle cx="32" cy="14" r="14" fill="#156534"/><circle cx="18" cy="22" r="10" fill="#156534"/><circle cx="46" cy="22" r="10" fill="#156534"/><circle cx="24" cy="32" r="8" fill="#156534"/><circle cx="40" cy="32" r="8" fill="#156534"/></svg>`
+  };
+
+  let timerState="IDLE", elapsedMs=0, bestMs=0, statusMessage=null, treeState="seed";
+  let startTime=0, intervalId=null, graceEnd=0, prevTreeState="seed", activityHandlers=[];
+
+  const opts = {
+    keyboard: document.getElementById("opt-keyboard"), click: document.getElementById("opt-click"),
+    scroll: document.getElementById("opt-scroll"), mouse: document.getElementById("opt-mouse"),
+    tab: document.getElementById("opt-tab"), grace: document.getElementById("opt-grace"),
+    tree: document.getElementById("opt-tree"), minimal: document.getElementById("opt-minimal")
+  };
+  const timerEl=document.getElementById("timer"), treeWrap=document.getElementById("tree-wrap");
+  const statusEl=document.getElementById("status-text"), bestEl=document.getElementById("best-text");
+  const btnStart=document.getElementById("btn-start"), btnPause=document.getElementById("btn-pause"), btnReset=document.getElementById("btn-reset");
+
+  try { const stored=localStorage.getItem(STORAGE_KEY); if(stored){ const p=parseInt(stored,10); if(!isNaN(p)) bestMs=p; } } catch(e){}
+
+  function updateBest(newMs){ if(newMs>bestMs){ bestMs=newMs; try{localStorage.setItem(STORAGE_KEY,newMs.toString());}catch(e){} return true;} return false; }
+  function statusText(){ if(statusMessage==="running") return "Timer running"; if(statusMessage==="broken") return "Timer reset — restarting"; if(statusMessage==="newBest") return "New best time"; return ""; }
+
+  function render(){
+    timerEl.textContent = formatTime(elapsedMs);
+    bestEl.textContent = "Best: " + formatTime(bestMs);
+    const minimal = opts.minimal.checked;
+    treeWrap.style.display = (!minimal && opts.tree.checked) ? "block" : "none";
+    treeWrap.innerHTML = trees[treeState] || trees.seed;
+    statusEl.style.display = (!minimal && statusMessage) ? "block" : "none";
+    statusEl.textContent = statusText();
+    btnStart.style.display = timerState==="IDLE" ? "inline-block" : "none";
+    btnPause.style.display = timerState==="RUNNING" ? "inline-block" : "none";
+    if (timerState==="PAUSED"){ btnStart.style.display="inline-block"; btnStart.textContent="Resume"; } else { btnStart.textContent="Start"; }
+    btnReset.style.display = (timerState==="RUNNING"||timerState==="PAUSED") ? "inline-block" : "none";
+  }
+
+  function startTimer(){
+    startTime=Date.now(); graceEnd=opts.grace.checked?Date.now()+3000:0;
+    timerState="RUNNING"; elapsedMs=0; statusMessage="running"; treeState="seed"; prevTreeState="seed";
+    render(); attachActivityListeners(); startInterval();
+  }
+  function pauseTimer(){ timerState="PAUSED"; statusMessage=null; clearInterval(intervalId); detachActivityListeners(); render(); }
+  function clearTimer(){ timerState="IDLE"; elapsedMs=0; statusMessage=null; treeState="seed"; clearInterval(intervalId); detachActivityListeners(); render(); }
+  function resetOnActivity(){
+    if (timerState!=="RUNNING") return;
+    if (opts.grace.checked && Date.now()<graceEnd) return;
+    const finalElapsed=Date.now()-startTime;
+    const isNewBest=updateBest(finalElapsed);
+    statusMessage=isNewBest?"newBest":"broken";
+    elapsedMs=0; treeState="seed"; prevTreeState="seed"; startTime=Date.now(); graceEnd=opts.grace.checked?Date.now()+3000:0;
+    render();
+    setTimeout(()=>{ if(timerState==="RUNNING"){ statusMessage="running"; render(); } },1500);
+  }
+  function startInterval(){
+    intervalId=setInterval(()=>{
+      const now=Date.now(); elapsedMs=now-startTime;
+      const nts=getTreeState(elapsedMs);
+      if(nts!==prevTreeState){ treeState=nts; prevTreeState=nts; }
+      render();
+    },250);
+  }
+  function attachActivityListeners(){
+    detachActivityListeners();
+    const inControl=e=>e.target.closest("[data-control]");
+    if(opts.keyboard.checked){ const h=()=>resetOnActivity(); document.addEventListener("keydown",h); activityHandlers.push(["keydown",h,false]); }
+    if(opts.click.checked){ const h=e=>{ if(inControl(e)) return; resetOnActivity(); }; document.addEventListener("mousedown",h); document.addEventListener("touchstart",h); activityHandlers.push(["mousedown",h,false]); activityHandlers.push(["touchstart",h,false]); }
+    if(opts.scroll.checked){ const h=()=>resetOnActivity(); document.addEventListener("scroll",h,true); activityHandlers.push(["scroll",h,true]); }
+    if(opts.mouse.checked){ const h=()=>resetOnActivity(); document.addEventListener("mousemove",h); activityHandlers.push(["mousemove",h,false]); }
+    if(opts.tab.checked){ const h=()=>{ if(document.hidden) resetOnActivity(); }; document.addEventListener("visibilitychange",h); activityHandlers.push(["visibilitychange",h,false]); }
+  }
+  function detachActivityListeners(){ activityHandlers.forEach(([e,h,c])=>document.removeEventListener(e,h,c)); activityHandlers=[]; }
+
+  btnStart.addEventListener("click", startTimer);
+  btnPause.addEventListener("click", pauseTimer);
+  btnReset.addEventListener("click", clearTimer);
+  opts.tree.addEventListener("change", render);
+  opts.minimal.addEventListener("change", ()=>{ opts.tree.disabled=opts.minimal.checked; render(); });
+
+  render();
+</script>
+</body>
+</html>

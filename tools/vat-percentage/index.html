@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VAT Percentage UK — Offcuts</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
+  :root {
+    --paper: #FAFAF8; --ink: #181818; --ink-soft: #5C5C58;
+    --line: #E3E1DA; --accent: #156534; --accent-soft: #E9F3ED;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Inter', system-ui, sans-serif; line-height: 1.55; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 0 24px 100px; }
+  .crumb { padding: 32px 0 0; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink-soft); }
+  .crumb a { color: var(--accent); text-decoration: none; }
+  .crumb a:hover { text-decoration: underline; }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; margin: 16px 0 10px; }
+  .tag-inline { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent); background:var(--accent-soft); padding:3px 9px; border-radius:4px; vertical-align:middle; margin-left:8px; transform: translateY(-2px); }
+  .lede { font-size: 16px; color: var(--ink-soft); margin: 0 0 28px; max-width: 480px; }
+  .panel { border: 1px solid var(--line); border-radius: 10px; padding: 24px; margin-bottom: 24px; background: #fff; }
+  label { display:block; font-family:'JetBrains Mono',monospace; font-size:12px; color: var(--ink-soft); margin-bottom:6px; }
+  input[type=text], input[type=number], select {
+    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px;
+    font-family:'Inter',sans-serif; font-size:15px; background:#fff; color:var(--ink);
+  }
+  input:focus, select:focus { outline:none; border-color:var(--accent); }
+  .field { margin-bottom:16px; }
+  .row-inline { display:flex; gap:10px; flex-wrap:wrap; }
+  .row-inline .field { flex:1; min-width:140px; }
+  .choice-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .choice-btn {
+    padding:8px 14px; border:1px solid var(--line); border-radius:20px; background:#fff;
+    font-family:'JetBrains Mono',monospace; font-size:12px; cursor:pointer; color:var(--ink-soft);
+  }
+  .choice-btn.active { border-color:var(--accent); background:var(--accent); color:#fff; }
+  .btn {
+    padding:11px 20px; border-radius:8px; border:1px solid var(--accent); background:var(--accent);
+    color:#fff; font-family:'Inter',sans-serif; font-size:15px; font-weight:600; cursor:pointer;
+  }
+  .btn:hover { opacity:0.92; }
+  .btn.ghost { background:transparent; color:var(--ink); border-color:var(--line); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .error { color:#A32D2D; font-size:13px; margin: 6px 0 0; }
+  .results { border-top:1px solid var(--line); margin-top:20px; padding-top:20px; }
+  .result-row { display:flex; justify-content:space-between; align-items:baseline; padding:8px 0; }
+  .result-row .label { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft); margin:0; }
+  .result-row .value { font-size:20px; font-weight:700; }
+  .result-row.hero .value { font-size:28px; color:var(--accent); }
+  section.copy { margin: 36px 0; }
+  section.copy h2 { font-size:19px; font-weight:700; margin:0 0 10px; }
+  section.copy p { color: var(--ink-soft); margin: 0 0 14px; font-size:15px; }
+  .example { background: var(--accent-soft); border-radius:10px; padding:18px 20px; margin: 14px 0; }
+  .example p { margin:0 0 8px; color: var(--ink); font-size:14px; }
+  .example p:last-child { margin-bottom:0; }
+  .faq h3 { font-size:15px; font-weight:600; margin:0 0 4px; }
+  .faq p { color:var(--ink-soft); font-size:14px; margin:0 0 18px; }
+  .disclaimer { font-size:12.5px; color: var(--ink-soft); border-top:1px solid var(--line); padding-top:18px; margin-top:36px; font-family:'JetBrains Mono',monospace; }
+  footer { border-top: 1px solid var(--line); padding: 28px 0 60px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft); }
+  .switchrow { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .switchrow input[type=checkbox] { width:16px; height:16px; accent-color: var(--accent); }
+  .switchrow label { margin:0; font-family:'Inter',sans-serif; font-size:14px; color:var(--ink); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="crumb"><a href="../../">offcuts</a> / tools / vat-percentage</p>
+  <h1>VAT Percentage UK<span class="tag-inline">finance</span></h1>
+  <p class="lede">Current UK VAT rates explained. Find the implied VAT rate from your figures.</p>
+
+  <section class="copy" style="margin-top:0;">
+    <p>The standard UK VAT rate is 20% for most goods and services. There are also reduced rates (5%, e.g. domestic energy), zero-rated supplies (e.g. most food, children's clothes), and exempt supplies (e.g. insurance, education).</p>
+  </section>
+
+  <div class="panel">
+    <label style="margin-bottom:14px;">VAT percentage helper — find the implied rate from a net and VAT amount</label>
+    <div class="row-inline">
+      <div class="field">
+        <label for="net">Net amount (£)</label>
+        <input type="number" id="net" placeholder="100.00" step="0.01">
+      </div>
+      <div class="field">
+        <label for="vat">VAT amount (£)</label>
+        <input type="number" id="vat" placeholder="20.00" step="0.01">
+      </div>
+    </div>
+    <button class="btn" id="calc-btn">Calculate</button>
+    <p class="error" id="error" style="display:none;"></p>
+    <div class="results" id="results" style="display:none;">
+      <div class="result-row hero"><p class="label">Implied VAT rate</p><p class="value" id="r-rate">0%</p></div>
+    </div>
+  </div>
+
+  <section class="copy">
+    <h2>How it works</h2>
+    <p>The calculator divides the VAT amount by the net amount and multiplies by 100 to give you the implied VAT rate as a percentage. For example, net £100 and VAT £20 gives (20 ÷ 100) × 100 = 20%.</p>
+  </section>
+
+  <section class="copy faq">
+    <h2>Common questions</h2>
+    <h3>What is the standard VAT percentage in the UK?</h3>
+    <p>20%, for most goods and services.</p>
+    <h3>Can these rates change and should I check HMRC?</h3>
+    <p>Yes — VAT rates and category treatment can change in government budgets. Always check current HMRC guidance for anything that matters financially.</p>
+  </section>
+
+  <p class="disclaimer">For estimation purposes only. Always confirm VAT treatment with HMRC guidance or an accountant for anything that matters.</p>
+  <footer>offcuts.buildbyjai.workers.dev</footer>
+</div>
+
+<script>
+  document.getElementById("calc-btn").addEventListener("click", () => {
+    const net = parseFloat(document.getElementById("net").value);
+    const vat = parseFloat(document.getElementById("vat").value);
+    const errorEl = document.getElementById("error");
+    const resultsEl = document.getElementById("results");
+
+    if (!net || net <= 0 || isNaN(vat) || vat < 0) {
+      errorEl.textContent = "Please enter a valid net amount and VAT amount.";
+      errorEl.style.display = "block";
+      resultsEl.style.display = "none";
+      return;
+    }
+    errorEl.style.display = "none";
+
+    const ratePercent = (vat / net) * 100;
+    document.getElementById("r-rate").textContent = ratePercent.toFixed(1) + "%";
+    resultsEl.style.display = "block";
+  });
+</script>
+</body>
+</html>

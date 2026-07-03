@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offcuts</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --paper: #FAFAF8;
+    --ink: #181818;
+    --ink-soft: #5C5C58;
+    --line: #E3E1DA;
+    --accent: #156534;
+    --accent-soft: #E9F3ED;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    line-height: 1.5;
+  }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+
+  header { padding: 72px 0 40px; border-bottom: 1px solid var(--line); }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    margin: 0 0 14px;
+  }
+
+  h1 { font-size: 40px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 12px; }
+
+  .sub { font-size: 16px; color: var(--ink-soft); margin: 0; max-width: 480px; }
+
+  .count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 28px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .count .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); display: inline-block;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+  main { padding: 8px 0 100px; }
+
+  .empty { padding: 64px 0; text-align: center; color: var(--ink-soft); }
+  .empty p:first-child { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); margin-bottom: 8px; }
+
+  .row {
+    display: flex; align-items: baseline; gap: 20px;
+    padding: 22px 0; border-bottom: 1px solid var(--line);
+    text-decoration: none; color: var(--ink);
+    opacity: 0; animation: rise 0.5s ease forwards;
+  }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .row:hover .name { color: var(--accent); }
+  .row:hover .arrow { transform: translateX(3px); opacity: 1; }
+
+  .row-meta {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft);
+    white-space: nowrap; width: 84px; flex-shrink: 0; padding-top: 2px;
+  }
+
+  .row-body { flex: 1; min-width: 0; }
+  .name { font-size: 17px; font-weight: 600; margin: 0 0 4px; transition: color 0.15s ease; }
+  .desc { font-size: 14px; color: var(--ink-soft); margin: 0; }
+
+  .tag {
+    display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--accent); background: var(--accent-soft); padding: 2px 8px;
+    border-radius: 4px; margin-left: 8px; vertical-align: middle; transform: translateY(-1px);
+  }
+
+  .arrow {
+    font-family: 'JetBrains Mono', monospace; color: var(--ink-soft);
+    flex-shrink: 0; opacity: 0.5; transition: all 0.15s ease; padding-top: 2px;
+  }
+
+  footer {
+    border-top: 1px solid var(--line); padding: 28px 0 60px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft);
+  }
+
+  .cat-nav {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    padding: 20px 0 0; border-top: 1px solid var(--line); margin-top: 0;
+  }
+
+  .cat-btn {
+    padding: 6px 14px; border: 1.5px solid var(--line); border-radius: 20px;
+    background: #fff; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    cursor: pointer; color: var(--ink-soft); transition: all 0.15s;
+  }
+
+  .cat-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .cat-btn.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+
+  @media (max-width: 540px) {
+    header { padding: 48px 0 32px; }
+    h1 { font-size: 32px; }
+    .row { gap: 14px; }
+    .row-meta { width: 60px; font-size: 11px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .row, .count .dot { animation: none; opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">offcuts /</p>
+    <h1>Random tools, built on request.</h1>
+    <p class="sub">A running log of small, single-purpose things — finance calculators, football stats, games, whatever comes up. No theme. Newest first.</p>
+    <p class="count"><span class="dot"></span><span id="tool-count">8</span> tools built</p>
+  </header>
+
+  <nav class="cat-nav" id="cat-nav"></nav>
+
+  <main id="tool-list"></main>
+
+  <footer>offcuts.buildbyjai.workers.dev</footer>
+</div>
+
+<script>
+  const tools = [
+    { name: "PAYE Tax Calculator",    desc: "Detailed PAYE breakdown for 2025/26 — annual, monthly and weekly take-home.", tag: "finance", date: "Jun 2026", href: "tools/paye-tax-calculator/" },
+    { name: "Tax Calculator UK",      desc: "Estimate your income tax and take-home pay for the 2025/26 tax year.",        tag: "finance", date: "Jun 2026", href: "tools/tax-calculator/" },
+    { name: "VAT Percentage UK",      desc: "Current UK VAT rates explained. Find the implied VAT rate from your figures.", tag: "finance", date: "Jun 2026", href: "tools/vat-percentage/" },
+    { name: "Reverse VAT Calculator", desc: "Extract the net price and VAT element from any VAT-inclusive amount.",        tag: "finance", date: "Jun 2026", href: "tools/reverse-vat-calculator/" },
+    { name: "VAT Calculator UK",      desc: "Add or remove VAT from any amount. Standard 20% rate or custom.",             tag: "finance", date: "Jun 2026", href: "tools/vat-calculator/" },
+    { name: "Do Nothing Timer",       desc: "Track how long you can stay completely idle. Any interaction resets the timer.", tag: "boredom", date: "Jun 2026", href: "tools/do-nothing-timer/" },
+    { name: "Reaction Time Test",     desc: "Test your visual reaction speed in milliseconds. Click when it turns green.",  tag: "games",   date: "Jun 2026", href: "tools/reaction-time/" },
+    { name: "Family Truth or Dare",   desc: "Kid-safe Truth or Dare prompts for families. Mixed, ages 5–8, or ages 9–12.", tag: "games",   date: "Jun 2026", href: "tools/truth-or-dare/" }
+  ];
+
+  const CATS = ['all', 'finance', 'football', 'games', 'boredom'];
+  const CAT_LABELS = { all: 'All', finance: 'Finance', football: 'Football', games: 'Games', boredom: 'Boredom' };
+  let activeCat = 'all';
+
+  const listEl  = document.getElementById('tool-list');
+  const countEl = document.getElementById('tool-count');
+  const catNav  = document.getElementById('cat-nav');
+
+  countEl.textContent = tools.length;
+
+  catNav.innerHTML = CATS.map(c => `<button class="cat-btn${c==='all'?' active':''}" onclick="filterCat('${c}')">${CAT_LABELS[c]}</button>`).join('');
+
+  function filterCat(cat) {
+    activeCat = cat;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.cat-btn[onclick="filterCat('${cat}')"]`).classList.add('active');
+    render();
+  }
+
+  function render() {
+    const filtered = activeCat === 'all' ? tools : tools.filter(t => t.tag === activeCat);
+    if (filtered.length === 0) {
+      listEl.innerHTML = '<div class="empty"><p>// nothing here yet</p><p>First tool in this category coming soon.</p></div>';
+      return;
+    }
+    listEl.innerHTML = filtered.map((t, i) => `
+      <a class="row" href="${t.href}" style="animation-delay:${i*0.04}s">
+        <span class="row-meta">${t.date}</span>
+        <span class="row-body">
+          <p class="name">${t.name}<span class="tag">${t.tag}</span></p>
+          <p class="desc">${t.desc}</p>
+        </span>
+        <span class="arrow">&rarr;</span>
+      </a>
+    `).join('');
+  }
+
+  render();
+</script>
+
+</body>
+</html>
