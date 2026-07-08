@@ -32,6 +32,7 @@
   .btn {
     padding:11px 20px; border-radius:8px; border:1px solid var(--accent); background:var(--accent);
     color:#fff; font-family:'Inter',sans-serif; font-size:15px; font-weight:600; cursor:pointer;
+    text-decoration:none; display:inline-block;
   }
   .btn:hover { opacity:0.92; }
   .btn.ghost { background:transparent; color:var(--ink); border-color:var(--line); }
@@ -54,6 +55,9 @@
   .rules-table td.pts { font-family:'JetBrains Mono',monospace; font-weight:700; }
   .pts.pos { color: var(--accent); }
   .pts.neg { color: var(--warn); }
+
+  /* tab nav (reuses chip look) */
+  .tab-nav { margin-bottom: 20px; }
 
   /* squad tray */
   .tray-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:12px; }
@@ -84,7 +88,7 @@
   }
   .slot.filled:hover .remove { color:var(--warn); }
 
-  /* team filter chips */
+  /* team filter chips / tab nav */
   .chip-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
   .chip {
     padding:6px 13px; border:1px solid var(--line); border-radius:20px; background:#fff;
@@ -121,10 +125,31 @@
   .summary-row { display:flex; justify-content:space-between; align-items:center; background:#fff; border-radius:8px; padding:10px 14px; }
   .summary-row .pname { font-weight:600; font-size:14.5px; }
   .summary-row .pteam { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft); }
-  .summary-note { font-size:13.5px; color: var(--ink-soft); margin:0; }
+  .summary-note { font-size:13.5px; color: var(--ink-soft); margin:0 0 16px; }
+
+  /* squad hero (saved squad view) */
+  .squad-hero { display:flex; gap:12px; margin: 4px 0 20px; }
+  .hero-stat { flex:1; background:#fff; border-radius:10px; padding:16px; text-align:center; }
+  .hero-stat .hero-value { font-size:28px; font-weight:800; color:var(--accent); }
+  .hero-stat .hero-label { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft); margin-top:4px; }
+  .share-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:4px; }
+
+  /* leaderboard */
+  .lb-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:8px; }
+  .lb-head .count { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft); }
+  .lb-list { border-top:1px solid var(--line); }
+  .lb-row {
+    display:flex; align-items:center; gap:12px; padding:12px 2px; border-bottom:1px solid var(--line);
+    text-decoration:none; color:var(--ink);
+  }
+  .lb-row:hover .lb-name { color:var(--accent); }
+  .lb-rank { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft); width:32px; flex-shrink:0; }
+  .lb-name { flex:1; font-weight:600; font-size:14.5px; min-width:0; }
+  .lb-points { font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:var(--accent); flex-shrink:0; }
 
   @media (max-width: 480px) {
     .tray { grid-template-columns:repeat(auto-fill,minmax(105px,1fr)); }
+    .squad-hero { flex-direction:column; }
   }
 </style>
 </head>
@@ -134,45 +159,66 @@
   <h1>World Cup Fantasy Draft<span class="tag-inline">football</span></h1>
   <p class="lede">Draft a 5-player squad from the 8 teams left in the tournament. Earn points for goals and assists, lose points for cards. Build it, share it, see who beats it.</p>
 
-  <div class="panel">
-    <div class="field">
-      <label for="squad-name">Squad name</label>
-      <input type="text" id="squad-name" placeholder="e.g. Jai's XI" maxlength="40">
+  <nav class="tab-nav chip-row" id="tab-nav">
+    <button class="chip active" data-tab="draft">Draft</button>
+    <button class="chip" data-tab="leaderboard">Leaderboard</button>
+  </nav>
+
+  <div id="view-draft">
+    <div class="panel">
+      <div class="field">
+        <label for="squad-name">Squad name</label>
+        <input type="text" id="squad-name" placeholder="e.g. Jai's XI" maxlength="40">
+      </div>
+
+      <div class="tray-head">
+        <label style="margin:0;">Your squad</label>
+        <span class="count" id="tray-count">0 / 5</span>
+      </div>
+      <div class="tray" id="tray"></div>
+
+      <div class="budget-head">
+        <span class="budget-label">Budget</span>
+        <span class="budget-value" id="budget-value">65 credits remaining</span>
+      </div>
+      <div class="budget-bar"><div class="budget-bar-fill" id="budget-bar-fill" style="width:0%"></div></div>
+
+      <p class="error" id="squad-error" style="display:none;"></p>
     </div>
 
-    <div class="tray-head">
-      <label style="margin:0;">Your squad</label>
-      <span class="count" id="tray-count">0 / 5</span>
-    </div>
-    <div class="tray" id="tray"></div>
+    <div class="panel">
+      <label>Filter by team</label>
+      <div class="chip-row" id="team-chips"></div>
 
-    <div class="budget-head">
-      <span class="budget-label">Budget</span>
-      <span class="budget-value" id="budget-value">0 / 65 credits used</span>
-    </div>
-    <div class="budget-bar"><div class="budget-bar-fill" id="budget-bar-fill" style="width:0%"></div></div>
+      <div class="field" style="margin-bottom:0;">
+        <label for="search">Search players</label>
+        <input type="text" id="search" placeholder="Search by name...">
+      </div>
 
-    <p class="error" id="squad-error" style="display:none;"></p>
+      <div class="player-list" id="player-list"></div>
+    </div>
+
+    <div class="panel summary-panel" id="summary-panel" style="display:none;">
+      <p class="eyebrow">// squad ready</p>
+      <h2 id="summary-name"></h2>
+      <div class="summary-list" id="summary-list"></div>
+      <p class="summary-note">Locking in submits your squad and generates a shareable link. This can't be undone — no edits once it's in.</p>
+      <button class="btn" id="submit-btn">Lock in my squad</button>
+      <p class="error" id="submit-error" style="display:none;"></p>
+    </div>
   </div>
 
-  <div class="panel">
-    <label>Filter by team</label>
-    <div class="chip-row" id="team-chips"></div>
-
-    <div class="field" style="margin-bottom:0;">
-      <label for="search">Search players</label>
-      <input type="text" id="search" placeholder="Search by name...">
+  <div id="view-leaderboard" style="display:none;">
+    <div class="panel">
+      <div class="lb-head">
+        <label style="margin:0;">Leaderboard</label>
+        <span class="count" id="lb-count"></span>
+      </div>
+      <div class="lb-list" id="lb-list"></div>
     </div>
-
-    <div class="player-list" id="player-list"></div>
   </div>
 
-  <div class="panel summary-panel" id="summary-panel" style="display:none;">
-    <p class="eyebrow">// squad locked in</p>
-    <h2 id="summary-name"></h2>
-    <div class="summary-list" id="summary-list"></div>
-    <p class="summary-note">This is a local preview — saving and a shareable link are coming in the next update. Nothing here is submitted anywhere yet.</p>
-  </div>
+  <div id="view-squad" style="display:none;"></div>
 
   <section class="copy">
     <h2>How scoring works</h2>
@@ -321,10 +367,16 @@
   const summaryPanelEl = document.getElementById('summary-panel');
   const summaryNameEl = document.getElementById('summary-name');
   const summaryListEl = document.getElementById('summary-list');
+  const submitBtnEl = document.getElementById('submit-btn');
+  const submitErrorEl = document.getElementById('submit-error');
 
   function playerById(id) { return PLAYER_POOL.find(p => p.id === id); }
   function teamCount(team) { return squad.filter(id => playerById(id).team === team).length; }
   function budgetUsed() { return squad.reduce((sum, id) => sum + playerById(id).cost, 0); }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
 
   function togglePlayer(id) {
     const idx = squad.indexOf(id);
@@ -384,12 +436,13 @@
 
   function renderBudget() {
     const used = budgetUsed();
+    const remaining = BUDGET_CAP - used;
     const pct = Math.min(100, (used / BUDGET_CAP) * 100);
-    budgetValueEl.textContent = `${used} / ${BUDGET_CAP} credits used`;
-    budgetValueEl.classList.toggle('full', used === BUDGET_CAP);
-    budgetValueEl.classList.toggle('tight', used < BUDGET_CAP && used >= BUDGET_CAP * 0.85);
+    budgetValueEl.textContent = `${remaining} credit${remaining === 1 ? '' : 's'} remaining`;
+    budgetValueEl.classList.toggle('full', remaining === 0);
+    budgetValueEl.classList.toggle('tight', remaining > 0 && remaining <= BUDGET_CAP * 0.15);
     budgetBarFillEl.style.width = `${pct}%`;
-    budgetBarFillEl.classList.toggle('tight', used >= BUDGET_CAP * 0.85);
+    budgetBarFillEl.classList.toggle('tight', remaining > 0 && remaining <= BUDGET_CAP * 0.15);
   }
 
   function renderChips() {
@@ -450,6 +503,7 @@
     const name = squadNameEl.value.trim();
     const isComplete = squad.length === MAX_SQUAD && name.length > 0;
     summaryPanelEl.style.display = isComplete ? 'block' : 'none';
+    submitErrorEl.style.display = 'none';
     if (!isComplete) return;
 
     summaryNameEl.textContent = name;
@@ -474,7 +528,130 @@
   squadNameEl.addEventListener('input', renderSummary);
   searchEl.addEventListener('input', (e) => { searchTerm = e.target.value; render(); });
 
-  render();
+  async function submitSquad() {
+    submitErrorEl.style.display = 'none';
+    submitBtnEl.disabled = true;
+    submitBtnEl.textContent = 'Locking in...';
+    try {
+      const res = await fetch('/api/draft', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ displayName: squadNameEl.value.trim(), playerIds: squad }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Something went wrong — try again.');
+      window.location.search = `?squad=${encodeURIComponent(data.squadId)}`;
+    } catch (err) {
+      submitErrorEl.textContent = err.message;
+      submitErrorEl.style.display = 'block';
+      submitBtnEl.disabled = false;
+      submitBtnEl.textContent = 'Lock in my squad';
+    }
+  }
+
+  submitBtnEl.addEventListener('click', submitSquad);
+
+  // ---- tabs (draft / leaderboard) ----
+  const tabNavEl = document.getElementById('tab-nav');
+  const viewDraftEl = document.getElementById('view-draft');
+  const viewLeaderboardEl = document.getElementById('view-leaderboard');
+  const viewSquadEl = document.getElementById('view-squad');
+  let leaderboardLoaded = false;
+
+  function showTab(tab) {
+    tabNavEl.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    viewDraftEl.style.display = tab === 'draft' ? 'block' : 'none';
+    viewLeaderboardEl.style.display = tab === 'leaderboard' ? 'block' : 'none';
+    if (tab === 'leaderboard' && !leaderboardLoaded) {
+      leaderboardLoaded = true;
+      loadLeaderboard();
+    }
+  }
+
+  tabNavEl.querySelectorAll('.chip').forEach(btn => {
+    btn.addEventListener('click', () => showTab(btn.dataset.tab));
+  });
+
+  async function loadLeaderboard() {
+    const lbListEl = document.getElementById('lb-list');
+    const lbCountEl = document.getElementById('lb-count');
+    lbListEl.innerHTML = `<p class="no-results">Loading leaderboard...</p>`;
+    try {
+      const res = await fetch('/api/leaderboard');
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      lbCountEl.textContent = `${data.length} squad${data.length === 1 ? '' : 's'}`;
+      if (data.length === 0) {
+        lbListEl.innerHTML = `<p class="no-results">No squads yet — be the first to draft one.</p>`;
+        return;
+      }
+      lbListEl.innerHTML = data.map(entry => `
+        <a class="lb-row" href="?squad=${encodeURIComponent(entry.squadId)}">
+          <span class="lb-rank">#${entry.rank}</span>
+          <span class="lb-name">${escapeHtml(entry.displayName)}</span>
+          <span class="lb-points">${entry.points} pts</span>
+        </a>`).join('');
+    } catch {
+      lbListEl.innerHTML = `<p class="no-results">Couldn't load the leaderboard — try again shortly.</p>`;
+    }
+  }
+
+  // ---- saved squad view ----
+  async function loadSquadView(squadId) {
+    viewSquadEl.innerHTML = `<p class="no-results">Loading squad...</p>`;
+    try {
+      const res = await fetch(`/api/squad/${encodeURIComponent(squadId)}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Squad not found.');
+      renderSquadView(data);
+    } catch (err) {
+      viewSquadEl.innerHTML = `
+        <div class="panel">
+          <p class="error" style="display:block;">${escapeHtml(err.message)}</p>
+          <a class="btn ghost" href="./">Build your own squad</a>
+        </div>`;
+    }
+  }
+
+  function renderSquadView(data) {
+    const rankText = data.rank ? `#${data.rank}` : '—';
+    const shareText = `My World Cup fantasy squad is sitting at ${data.points} pts${data.rank ? `, ranked #${data.rank}` : ''} — think you can beat it?`;
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(window.location.href)}`;
+
+    viewSquadEl.innerHTML = `
+      <div class="panel summary-panel">
+        <p class="eyebrow">// ${escapeHtml(data.displayName)}</p>
+        <h2>${escapeHtml(data.displayName)}</h2>
+        <div class="squad-hero">
+          <div class="hero-stat"><div class="hero-value">${data.points}</div><div class="hero-label">points</div></div>
+          <div class="hero-stat"><div class="hero-value">${rankText}</div><div class="hero-label">rank${data.totalSquads ? ' of ' + data.totalSquads : ''}</div></div>
+        </div>
+        <div class="summary-list">
+          ${data.players.map(p => `
+            <div class="summary-row">
+              <span class="pname">${escapeHtml(p.name)}</span>
+              <span class="pteam">${escapeHtml(p.team)} · ${p.points} pts</span>
+            </div>`).join('')}
+        </div>
+        <div class="share-row">
+          <a class="btn" href="${tweetUrl}" target="_blank" rel="noopener">Share on X</a>
+          <a class="btn ghost" href="./">Build your own squad</a>
+        </div>
+      </div>`;
+  }
+
+  // ---- init ----
+  const squadIdParam = new URLSearchParams(window.location.search).get('squad');
+  if (squadIdParam) {
+    tabNavEl.style.display = 'none';
+    viewDraftEl.style.display = 'none';
+    viewLeaderboardEl.style.display = 'none';
+    viewSquadEl.style.display = 'block';
+    loadSquadView(squadIdParam);
+  } else {
+    render();
+    showTab('draft');
+  }
 </script>
 </body>
 </html>
