@@ -16,15 +16,15 @@
   "kv_namespaces": [
     {
       "binding": "FANTASY_SQUADS",
-      "id": "REPLACE_WITH_FANTASY_SQUADS_NAMESPACE_ID"
+      "id": "49e9459ede7a4e888faebea4f6ad4d35"
     },
     {
       "binding": "FANTASY_PLAYER_STATS",
-      "id": "REPLACE_WITH_FANTASY_PLAYER_STATS_NAMESPACE_ID"
+      "id": "abbbbf970a31488a8c7e4e6483ceedda"
     },
     {
       "binding": "FANTASY_LEADERBOARD_CACHE",
-      "id": "REPLACE_WITH_FANTASY_LEADERBOARD_CACHE_NAMESPACE_ID"
+      "id": "4957f81e28784db097635870c5055b29"
     }
   ]
 }
