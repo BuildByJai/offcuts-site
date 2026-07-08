@@ -1,14 +1,30 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "offcuts-site",
+  "main": "src/api.js",
   "compatibility_date": "2026-07-03",
   "observability": {
     "enabled": true
   },
   "assets": {
-    "directory": "."
+    "directory": ".",
+    "binding": "ASSETS"
   },
   "compatibility_flags": [
     "nodejs_compat"
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "FANTASY_SQUADS",
+      "id": "REPLACE_WITH_FANTASY_SQUADS_NAMESPACE_ID"
+    },
+    {
+      "binding": "FANTASY_PLAYER_STATS",
+      "id": "REPLACE_WITH_FANTASY_PLAYER_STATS_NAMESPACE_ID"
+    },
+    {
+      "binding": "FANTASY_LEADERBOARD_CACHE",
+      "id": "REPLACE_WITH_FANTASY_LEADERBOARD_CACHE_NAMESPACE_ID"
+    }
   ]
 }
