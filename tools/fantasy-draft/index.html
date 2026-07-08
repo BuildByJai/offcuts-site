@@ -59,6 +59,15 @@
   .tray-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:12px; }
   .tray-head .count { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft); }
   .tray-head .count.full { color:var(--accent); font-weight:700; }
+
+  .budget-head { display:flex; align-items:baseline; justify-content:space-between; margin: 12px 0 6px; }
+  .budget-head .budget-label { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft); }
+  .budget-head .budget-value { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft); }
+  .budget-head .budget-value.tight { color:#BA7517; font-weight:700; }
+  .budget-head .budget-value.full { color:var(--accent); font-weight:700; }
+  .budget-bar { height:6px; border-radius:3px; background:var(--line); overflow:hidden; margin-bottom:4px; }
+  .budget-bar-fill { height:100%; background:var(--accent); border-radius:3px; transition: width 0.15s ease; }
+  .budget-bar-fill.tight { background:#BA7517; }
   .tray { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px; margin-bottom:6px; }
   .slot {
     border:1.5px dashed var(--line); border-radius:8px; padding:12px 10px; min-height:64px;
@@ -136,6 +145,13 @@
       <span class="count" id="tray-count">0 / 5</span>
     </div>
     <div class="tray" id="tray"></div>
+
+    <div class="budget-head">
+      <span class="budget-label">Budget</span>
+      <span class="budget-value" id="budget-value">0 / 65 credits used</span>
+    </div>
+    <div class="budget-bar"><div class="budget-bar-fill" id="budget-bar-fill" style="width:0%"></div></div>
+
     <p class="error" id="squad-error" style="display:none;"></p>
   </div>
 
@@ -175,6 +191,8 @@
     <p>Exactly 5, from the pool of players across the 8 remaining teams.</p>
     <h3>Can I stack one team?</h3>
     <p>Max 2 players from the same team — stops everyone just drafting one favourite side.</p>
+    <h3>Is there a budget?</h3>
+    <p>Yes — every player has a credit cost, and your 5 picks have to fit inside a 65-credit budget. Star names cost more, so it's a trade-off between big names and squad depth.</p>
     <h3>Can I change my squad later?</h3>
     <p>Once a draft is submitted it's locked for the rest of the tournament — quarterfinals through the Final. No edits, no do-overs.</p>
   </section>
@@ -186,104 +204,105 @@
 <script>
   const PLAYER_POOL = [
     // France
-    { id: "maignan", name: "Mike Maignan", team: "France" },
-    { id: "saliba", name: "William Saliba", team: "France" },
-    { id: "upamecano", name: "Dayot Upamecano", team: "France" },
-    { id: "tchouameni", name: "Aurélien Tchouaméni", team: "France" },
-    { id: "rabiot", name: "Adrien Rabiot", team: "France" },
-    { id: "mbappe", name: "Kylian Mbappé", team: "France" },
-    { id: "dembele", name: "Ousmane Dembélé", team: "France" },
-    { id: "olise", name: "Michael Olise", team: "France" },
-    { id: "thuram", name: "Marcus Thuram", team: "France" },
-    { id: "doue", name: "Désiré Doué", team: "France" },
+    { id: "maignan", name: "Mike Maignan", team: "France", cost: 4 },
+    { id: "saliba", name: "William Saliba", team: "France", cost: 6 },
+    { id: "upamecano", name: "Dayot Upamecano", team: "France", cost: 6 },
+    { id: "tchouameni", name: "Aurélien Tchouaméni", team: "France", cost: 9 },
+    { id: "rabiot", name: "Adrien Rabiot", team: "France", cost: 9 },
+    { id: "mbappe", name: "Kylian Mbappé", team: "France", cost: 18 },
+    { id: "dembele", name: "Ousmane Dembélé", team: "France", cost: 12 },
+    { id: "olise", name: "Michael Olise", team: "France", cost: 12 },
+    { id: "thuram", name: "Marcus Thuram", team: "France", cost: 12 },
+    { id: "doue", name: "Désiré Doué", team: "France", cost: 12 },
 
     // Morocco
-    { id: "bounou", name: "Yassine Bounou", team: "Morocco" },
-    { id: "hakimi", name: "Achraf Hakimi", team: "Morocco" },
-    { id: "aguerd", name: "Nayef Aguerd", team: "Morocco" },
-    { id: "amrabat", name: "Sofyan Amrabat", team: "Morocco" },
-    { id: "ounahi", name: "Azzedine Ounahi", team: "Morocco" },
-    { id: "elkhannouss", name: "Bilal El Khannouss", team: "Morocco" },
-    { id: "elkaabi", name: "Ayoub El Kaabi", team: "Morocco" },
-    { id: "brahim", name: "Brahim Díaz", team: "Morocco" },
-    { id: "rahimi", name: "Soufiane Rahimi", team: "Morocco" },
-    { id: "ezzalzouli", name: "Abde Ezzalzouli", team: "Morocco" },
+    { id: "bounou", name: "Yassine Bounou", team: "Morocco", cost: 4 },
+    { id: "hakimi", name: "Achraf Hakimi", team: "Morocco", cost: 6 },
+    { id: "aguerd", name: "Nayef Aguerd", team: "Morocco", cost: 6 },
+    { id: "amrabat", name: "Sofyan Amrabat", team: "Morocco", cost: 9 },
+    { id: "ounahi", name: "Azzedine Ounahi", team: "Morocco", cost: 9 },
+    { id: "elkhannouss", name: "Bilal El Khannouss", team: "Morocco", cost: 9 },
+    { id: "elkaabi", name: "Ayoub El Kaabi", team: "Morocco", cost: 12 },
+    { id: "brahim", name: "Brahim Díaz", team: "Morocco", cost: 12 },
+    { id: "rahimi", name: "Soufiane Rahimi", team: "Morocco", cost: 12 },
+    { id: "ezzalzouli", name: "Abde Ezzalzouli", team: "Morocco", cost: 9 },
 
     // Spain
-    { id: "unaisimon", name: "Unai Simón", team: "Spain" },
-    { id: "porro", name: "Pedro Porro", team: "Spain" },
-    { id: "laporte", name: "Aymeric Laporte", team: "Spain" },
-    { id: "rodri", name: "Rodri", team: "Spain" },
-    { id: "pedri", name: "Pedri", team: "Spain" },
-    { id: "gavi", name: "Gavi", team: "Spain" },
-    { id: "merino", name: "Mikel Merino", team: "Spain" },
-    { id: "yamal", name: "Lamine Yamal", team: "Spain" },
-    { id: "nicowilliams", name: "Nico Williams", team: "Spain" },
-    { id: "olmo", name: "Dani Olmo", team: "Spain" },
+    { id: "unaisimon", name: "Unai Simón", team: "Spain", cost: 4 },
+    { id: "porro", name: "Pedro Porro", team: "Spain", cost: 6 },
+    { id: "laporte", name: "Aymeric Laporte", team: "Spain", cost: 6 },
+    { id: "rodri", name: "Rodri", team: "Spain", cost: 9 },
+    { id: "pedri", name: "Pedri", team: "Spain", cost: 12 },
+    { id: "gavi", name: "Gavi", team: "Spain", cost: 12 },
+    { id: "merino", name: "Mikel Merino", team: "Spain", cost: 9 },
+    { id: "yamal", name: "Lamine Yamal", team: "Spain", cost: 15 },
+    { id: "nicowilliams", name: "Nico Williams", team: "Spain", cost: 12 },
+    { id: "olmo", name: "Dani Olmo", team: "Spain", cost: 15 },
 
     // Belgium
-    { id: "courtois", name: "Thibaut Courtois", team: "Belgium" },
-    { id: "debast", name: "Zeno Debast", team: "Belgium" },
-    { id: "kdb", name: "Kevin De Bruyne", team: "Belgium" },
-    { id: "tielemans", name: "Youri Tielemans", team: "Belgium" },
-    { id: "onana", name: "Amadou Onana", team: "Belgium" },
-    { id: "lukaku", name: "Romelu Lukaku", team: "Belgium" },
-    { id: "doku", name: "Jérémy Doku", team: "Belgium" },
-    { id: "trossard", name: "Leandro Trossard", team: "Belgium" },
-    { id: "dektelaere", name: "Charles De Ketelaere", team: "Belgium" },
-    { id: "witsel", name: "Axel Witsel", team: "Belgium" },
+    { id: "courtois", name: "Thibaut Courtois", team: "Belgium", cost: 4 },
+    { id: "debast", name: "Zeno Debast", team: "Belgium", cost: 6 },
+    { id: "kdb", name: "Kevin De Bruyne", team: "Belgium", cost: 15 },
+    { id: "tielemans", name: "Youri Tielemans", team: "Belgium", cost: 12 },
+    { id: "onana", name: "Amadou Onana", team: "Belgium", cost: 9 },
+    { id: "lukaku", name: "Romelu Lukaku", team: "Belgium", cost: 15 },
+    { id: "doku", name: "Jérémy Doku", team: "Belgium", cost: 15 },
+    { id: "trossard", name: "Leandro Trossard", team: "Belgium", cost: 12 },
+    { id: "dektelaere", name: "Charles De Ketelaere", team: "Belgium", cost: 9 },
+    { id: "witsel", name: "Axel Witsel", team: "Belgium", cost: 9 },
 
     // Norway
-    { id: "nyland", name: "Ørjan Nyland", team: "Norway" },
-    { id: "ajer", name: "Kristoffer Ajer", team: "Norway" },
-    { id: "odegaard", name: "Martin Ødegaard", team: "Norway" },
-    { id: "berge", name: "Sander Berge", team: "Norway" },
-    { id: "haaland", name: "Erling Haaland", team: "Norway" },
-    { id: "sorloth", name: "Alexander Sørloth", team: "Norway" },
-    { id: "strandlarsen", name: "Jørgen Strand Larsen", team: "Norway" },
-    { id: "nusa", name: "Antonio Nusa", team: "Norway" },
-    { id: "bobb", name: "Oscar Bobb", team: "Norway" },
-    { id: "aasgaard", name: "Thelo Aasgaard", team: "Norway" },
+    { id: "nyland", name: "Ørjan Nyland", team: "Norway", cost: 4 },
+    { id: "ajer", name: "Kristoffer Ajer", team: "Norway", cost: 6 },
+    { id: "odegaard", name: "Martin Ødegaard", team: "Norway", cost: 15 },
+    { id: "berge", name: "Sander Berge", team: "Norway", cost: 9 },
+    { id: "haaland", name: "Erling Haaland", team: "Norway", cost: 18 },
+    { id: "sorloth", name: "Alexander Sørloth", team: "Norway", cost: 12 },
+    { id: "strandlarsen", name: "Jørgen Strand Larsen", team: "Norway", cost: 9 },
+    { id: "nusa", name: "Antonio Nusa", team: "Norway", cost: 12 },
+    { id: "bobb", name: "Oscar Bobb", team: "Norway", cost: 9 },
+    { id: "aasgaard", name: "Thelo Aasgaard", team: "Norway", cost: 9 },
 
     // England
-    { id: "pickford", name: "Jordan Pickford", team: "England" },
-    { id: "stones", name: "John Stones", team: "England" },
-    { id: "rice", name: "Declan Rice", team: "England" },
-    { id: "bellingham", name: "Jude Bellingham", team: "England" },
-    { id: "kane", name: "Harry Kane", team: "England" },
-    { id: "saka", name: "Bukayo Saka", team: "England" },
-    { id: "rashford", name: "Marcus Rashford", team: "England" },
-    { id: "watkins", name: "Ollie Watkins", team: "England" },
-    { id: "eze", name: "Eberechi Eze", team: "England" },
-    { id: "gordon", name: "Anthony Gordon", team: "England" },
+    { id: "pickford", name: "Jordan Pickford", team: "England", cost: 4 },
+    { id: "stones", name: "John Stones", team: "England", cost: 6 },
+    { id: "rice", name: "Declan Rice", team: "England", cost: 9 },
+    { id: "bellingham", name: "Jude Bellingham", team: "England", cost: 18 },
+    { id: "kane", name: "Harry Kane", team: "England", cost: 18 },
+    { id: "saka", name: "Bukayo Saka", team: "England", cost: 15 },
+    { id: "rashford", name: "Marcus Rashford", team: "England", cost: 15 },
+    { id: "watkins", name: "Ollie Watkins", team: "England", cost: 12 },
+    { id: "eze", name: "Eberechi Eze", team: "England", cost: 12 },
+    { id: "gordon", name: "Anthony Gordon", team: "England", cost: 12 },
 
     // Argentina
-    { id: "dibumartinez", name: "Emiliano Martínez", team: "Argentina" },
-    { id: "romero", name: "Cristian Romero", team: "Argentina" },
-    { id: "depaul", name: "Rodrigo De Paul", team: "Argentina" },
-    { id: "enzo", name: "Enzo Fernández", team: "Argentina" },
-    { id: "macallister", name: "Alexis Mac Allister", team: "Argentina" },
-    { id: "messi", name: "Lionel Messi", team: "Argentina" },
-    { id: "julianalvarez", name: "Julián Álvarez", team: "Argentina" },
-    { id: "lautaro", name: "Lautaro Martínez", team: "Argentina" },
-    { id: "nicogonzalez", name: "Nicolás González", team: "Argentina" },
-    { id: "locelso", name: "Giovani Lo Celso", team: "Argentina" },
+    { id: "dibumartinez", name: "Emiliano Martínez", team: "Argentina", cost: 4 },
+    { id: "romero", name: "Cristian Romero", team: "Argentina", cost: 6 },
+    { id: "depaul", name: "Rodrigo De Paul", team: "Argentina", cost: 9 },
+    { id: "enzo", name: "Enzo Fernández", team: "Argentina", cost: 9 },
+    { id: "macallister", name: "Alexis Mac Allister", team: "Argentina", cost: 9 },
+    { id: "messi", name: "Lionel Messi", team: "Argentina", cost: 18 },
+    { id: "julianalvarez", name: "Julián Álvarez", team: "Argentina", cost: 15 },
+    { id: "lautaro", name: "Lautaro Martínez", team: "Argentina", cost: 15 },
+    { id: "nicogonzalez", name: "Nicolás González", team: "Argentina", cost: 9 },
+    { id: "locelso", name: "Giovani Lo Celso", team: "Argentina", cost: 9 },
 
     // Switzerland
-    { id: "kobel", name: "Gregor Kobel", team: "Switzerland" },
-    { id: "akanji", name: "Manuel Akanji", team: "Switzerland" },
-    { id: "xhaka", name: "Granit Xhaka", team: "Switzerland" },
-    { id: "freuler", name: "Remo Freuler", team: "Switzerland" },
-    { id: "embolo", name: "Breel Embolo", team: "Switzerland" },
-    { id: "ndoye", name: "Dan Ndoye", team: "Switzerland" },
-    { id: "vargas", name: "Rubén Vargas", team: "Switzerland" },
-    { id: "amdouni", name: "Zeki Amdouni", team: "Switzerland" },
-    { id: "zakaria", name: "Denis Zakaria", team: "Switzerland" },
-    { id: "manzambi", name: "Johan Manzambi", team: "Switzerland" },
+    { id: "kobel", name: "Gregor Kobel", team: "Switzerland", cost: 4 },
+    { id: "akanji", name: "Manuel Akanji", team: "Switzerland", cost: 6 },
+    { id: "xhaka", name: "Granit Xhaka", team: "Switzerland", cost: 9 },
+    { id: "freuler", name: "Remo Freuler", team: "Switzerland", cost: 9 },
+    { id: "embolo", name: "Breel Embolo", team: "Switzerland", cost: 12 },
+    { id: "ndoye", name: "Dan Ndoye", team: "Switzerland", cost: 9 },
+    { id: "vargas", name: "Rubén Vargas", team: "Switzerland", cost: 9 },
+    { id: "amdouni", name: "Zeki Amdouni", team: "Switzerland", cost: 9 },
+    { id: "zakaria", name: "Denis Zakaria", team: "Switzerland", cost: 9 },
+    { id: "manzambi", name: "Johan Manzambi", team: "Switzerland", cost: 9 },
   ];
 
   const MAX_SQUAD = 5;
   const MAX_PER_TEAM = 2;
+  const BUDGET_CAP = 65;
   const TEAMS = [...new Set(PLAYER_POOL.map(p => p.team))];
 
   let squad = [];       // array of player ids, in pick order
@@ -293,6 +312,8 @@
   const squadNameEl = document.getElementById('squad-name');
   const trayEl = document.getElementById('tray');
   const trayCountEl = document.getElementById('tray-count');
+  const budgetValueEl = document.getElementById('budget-value');
+  const budgetBarFillEl = document.getElementById('budget-bar-fill');
   const squadErrorEl = document.getElementById('squad-error');
   const teamChipsEl = document.getElementById('team-chips');
   const searchEl = document.getElementById('search');
@@ -303,6 +324,7 @@
 
   function playerById(id) { return PLAYER_POOL.find(p => p.id === id); }
   function teamCount(team) { return squad.filter(id => playerById(id).team === team).length; }
+  function budgetUsed() { return squad.reduce((sum, id) => sum + playerById(id).cost, 0); }
 
   function togglePlayer(id) {
     const idx = squad.indexOf(id);
@@ -319,6 +341,10 @@
     const player = playerById(id);
     if (teamCount(player.team) >= MAX_PER_TEAM) {
       showError(`Max ${MAX_PER_TEAM} players from ${player.team} — remove one before adding another.`);
+      return;
+    }
+    if (budgetUsed() + player.cost > BUDGET_CAP) {
+      showError(`Adding ${player.name} (${player.cost}cr) would push you over the ${BUDGET_CAP}-credit budget — remove someone first.`);
       return;
     }
     squad.push(id);
@@ -344,7 +370,7 @@
           <div class="slot filled" data-id="${id}" title="Remove ${p.name}">
             <span class="remove">&times;</span>
             <span class="pname">${p.name}</span>
-            <span class="pteam">${p.team}</span>
+            <span class="pteam">${p.team} · ${p.cost}cr</span>
           </div>`);
       } else {
         slots.push(`<div class="slot">Empty slot</div>`);
@@ -354,6 +380,16 @@
     trayEl.querySelectorAll('.slot.filled').forEach(el => {
       el.addEventListener('click', () => togglePlayer(el.dataset.id));
     });
+  }
+
+  function renderBudget() {
+    const used = budgetUsed();
+    const pct = Math.min(100, (used / BUDGET_CAP) * 100);
+    budgetValueEl.textContent = `${used} / ${BUDGET_CAP} credits used`;
+    budgetValueEl.classList.toggle('full', used === BUDGET_CAP);
+    budgetValueEl.classList.toggle('tight', used < BUDGET_CAP && used >= BUDGET_CAP * 0.85);
+    budgetBarFillEl.style.width = `${pct}%`;
+    budgetBarFillEl.classList.toggle('tight', used >= BUDGET_CAP * 0.85);
   }
 
   function renderChips() {
@@ -385,16 +421,19 @@
       return;
     }
 
+    const squadFull = squad.length >= MAX_SQUAD;
+    const remainingBudget = BUDGET_CAP - budgetUsed();
+
     playerListEl.innerHTML = filtered.map(p => {
       const selected = squad.includes(p.id);
-      const squadFull = squad.length >= MAX_SQUAD;
       const teamFull = teamCount(p.team) >= MAX_PER_TEAM;
-      const disabled = !selected && (squadFull || teamFull);
+      const overBudget = p.cost > remainingBudget;
+      const disabled = !selected && (squadFull || teamFull || overBudget);
       return `
         <div class="player-row">
           <div class="info">
             <p class="pname">${p.name}</p>
-            <p class="pteam">${p.team}</p>
+            <p class="pteam">${p.team} · ${p.cost}cr</p>
           </div>
           <button class="pick-btn${selected ? ' selected' : ''}" data-id="${p.id}" ${disabled ? 'disabled' : ''}>
             ${selected ? 'Remove' : 'Add'}
@@ -419,13 +458,14 @@
       return `
         <div class="summary-row">
           <span class="pname">${p.name}</span>
-          <span class="pteam">${p.team}</span>
+          <span class="pteam">${p.team} · ${p.cost}cr</span>
         </div>`;
     }).join('');
   }
 
   function render() {
     renderTray();
+    renderBudget();
     renderChips();
     renderPlayerList();
     renderSummary();
