@@ -74,6 +74,38 @@ function scorePlayer(stats) {
   return s.goals * 4 + s.assists * 2 - s.yellow * 1 - s.red * 3;
 }
 
+// Falls back to this when FANTASY_LEADERBOARD_CACHE is empty, i.e. before the
+// scheduled sync worker (Phase 4) exists to populate it. Once that worker is
+// writing to the cache, its precomputed version is used instead (see callers).
+async function computeLiveLeaderboard(env) {
+  const list = await env.FANTASY_SQUADS.list();
+  const squads = await Promise.all(
+    list.keys.map(async (key) => {
+      const raw = await env.FANTASY_SQUADS.get(key.name);
+      return raw ? { squadId: key.name, ...JSON.parse(raw) } : null;
+    })
+  );
+
+  const scored = await Promise.all(
+    squads.filter(Boolean).map(async (squad) => {
+      const statsEntries = await Promise.all(
+        squad.players.map((p) => env.FANTASY_PLAYER_STATS.get(p.id, "json"))
+      );
+      const points = statsEntries.reduce((sum, s) => sum + scorePlayer(s), 0);
+      return { squadId: squad.squadId, displayName: squad.displayName, points, createdAt: squad.createdAt };
+    })
+  );
+
+  scored.sort((a, b) => b.points - a.points || new Date(a.createdAt) - new Date(b.createdAt));
+  return scored.map((entry, i) => ({ squadId: entry.squadId, displayName: entry.displayName, points: entry.points, rank: i + 1 }));
+}
+
+async function getLeaderboard(env) {
+  const cached = await env.FANTASY_LEADERBOARD_CACHE.get("latest", "json");
+  if (cached && cached.length > 0) return cached;
+  return computeLiveLeaderboard(env);
+}
+
 async function handleGetSquad(squadId, env) {
   const raw = await env.FANTASY_SQUADS.get(squadId);
   if (!raw) return json({ error: "Squad not found" }, 404);
@@ -90,7 +122,7 @@ async function handleGetSquad(squadId, env) {
     return { ...p, stats: statsEntries[i] || { goals: 0, assists: 0, yellow: 0, red: 0 }, points: playerPoints };
   });
 
-  const leaderboard = (await env.FANTASY_LEADERBOARD_CACHE.get("latest", "json")) || [];
+  const leaderboard = await getLeaderboard(env);
   const entry = leaderboard.find((e) => e.squadId === squadId);
 
   return json({
@@ -105,8 +137,7 @@ async function handleGetSquad(squadId, env) {
 }
 
 async function handleLeaderboard(env) {
-  const leaderboard = (await env.FANTASY_LEADERBOARD_CACHE.get("latest", "json")) || [];
-  return json(leaderboard);
+  return json(await getLeaderboard(env));
 }
 
 export default {
