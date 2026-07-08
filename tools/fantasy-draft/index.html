@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Cup Fantasy Draft — Offcuts</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
+  :root {
+    --paper: #FAFAF8; --ink: #181818; --ink-soft: #5C5C58;
+    --line: #E3E1DA; --accent: #156534; --accent-soft: #E9F3ED;
+    --warn: #A32D2D; --warn-soft: #F7EAEA;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Inter', system-ui, sans-serif; line-height: 1.55; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 24px 100px; }
+  .crumb { padding: 32px 0 0; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink-soft); }
+  .crumb a { color: var(--accent); text-decoration: none; }
+  .crumb a:hover { text-decoration: underline; }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; margin: 16px 0 10px; }
+  .tag-inline { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent); background:var(--accent-soft); padding:3px 9px; border-radius:4px; vertical-align:middle; margin-left:8px; transform: translateY(-2px); }
+  .lede { font-size: 16px; color: var(--ink-soft); margin: 0 0 28px; max-width: 520px; }
+  .panel { border: 1px solid var(--line); border-radius: 10px; padding: 24px; margin-bottom: 24px; background: #fff; }
+  label { display:block; font-family:'JetBrains Mono',monospace; font-size:12px; color: var(--ink-soft); margin-bottom:6px; }
+  input[type=text] {
+    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px;
+    font-family:'Inter',sans-serif; font-size:15px; background:#fff; color:var(--ink);
+  }
+  input:focus { outline:none; border-color:var(--accent); }
+  .field { margin-bottom:16px; }
+  .btn {
+    padding:11px 20px; border-radius:8px; border:1px solid var(--accent); background:var(--accent);
+    color:#fff; font-family:'Inter',sans-serif; font-size:15px; font-weight:600; cursor:pointer;
+  }
+  .btn:hover { opacity:0.92; }
+  .btn.ghost { background:transparent; color:var(--ink); border-color:var(--line); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn:disabled:hover { opacity:0.4; }
+  .error { color:var(--warn); font-size:13px; margin: 6px 0 0; }
+  section.copy { margin: 36px 0; }
+  section.copy h2 { font-size:19px; font-weight:700; margin:0 0 10px; }
+  section.copy p { color: var(--ink-soft); margin: 0 0 14px; font-size:15px; }
+  .faq h3 { font-size:15px; font-weight:600; margin:0 0 4px; }
+  .faq p { color:var(--ink-soft); font-size:14px; margin:0 0 18px; }
+  .disclaimer { font-size:12.5px; color: var(--ink-soft); border-top:1px solid var(--line); padding-top:18px; margin-top:36px; font-family:'JetBrains Mono',monospace; }
+  footer { border-top: 1px solid var(--line); padding: 28px 0 60px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft); }
+
+  /* rules table */
+  .rules-table { width:100%; border-collapse:collapse; margin:10px 0 0; }
+  .rules-table th, .rules-table td { text-align:left; padding:8px 0; font-size:14px; border-bottom:1px solid var(--line); }
+  .rules-table th { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft); font-weight:500; }
+  .rules-table td.pts { font-family:'JetBrains Mono',monospace; font-weight:700; }
+  .pts.pos { color: var(--accent); }
+  .pts.neg { color: var(--warn); }
+
+  /* squad tray */
+  .tray-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:12px; }
+  .tray-head .count { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft); }
+  .tray-head .count.full { color:var(--accent); font-weight:700; }
+
+  .budget-head { display:flex; align-items:baseline; justify-content:space-between; margin: 12px 0 6px; }
+  .budget-head .budget-label { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft); }
+  .budget-head .budget-value { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft); }
+  .budget-head .budget-value.tight { color:#BA7517; font-weight:700; }
+  .budget-head .budget-value.full { color:var(--accent); font-weight:700; }
+  .budget-bar { height:6px; border-radius:3px; background:var(--line); overflow:hidden; margin-bottom:4px; }
+  .budget-bar-fill { height:100%; background:var(--accent); border-radius:3px; transition: width 0.15s ease; }
+  .budget-bar-fill.tight { background:#BA7517; }
+  .tray { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px; margin-bottom:6px; }
+  .slot {
+    border:1.5px dashed var(--line); border-radius:8px; padding:12px 10px; min-height:64px;
+    display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft);
+  }
+  .slot.filled {
+    border-style:solid; border-color:var(--accent); background:var(--accent-soft); position:relative; cursor:pointer;
+  }
+  .slot.filled .pname { font-family:'Inter',sans-serif; font-size:13px; font-weight:600; color:var(--ink); margin-bottom:2px; }
+  .slot.filled .pteam { font-size:11px; color:var(--ink-soft); }
+  .slot.filled .remove {
+    position:absolute; top:4px; right:6px; font-size:14px; color:var(--ink-soft); line-height:1;
+  }
+  .slot.filled:hover .remove { color:var(--warn); }
+
+  /* team filter chips */
+  .chip-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .chip {
+    padding:6px 13px; border:1px solid var(--line); border-radius:20px; background:#fff;
+    font-family:'JetBrains Mono',monospace; font-size:12px; cursor:pointer; color:var(--ink-soft);
+    display:flex; align-items:center; gap:6px;
+  }
+  .chip .n { opacity:0.7; }
+  .chip.active { border-color:var(--accent); background:var(--accent); color:#fff; }
+  .chip.maxed:not(.active) { color: var(--warn); border-color: #E9D3D3; }
+
+  /* player list */
+  .player-list { border-top:1px solid var(--line); margin-top:4px; }
+  .player-row {
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:12px 2px; border-bottom:1px solid var(--line);
+  }
+  .player-row .info { min-width:0; }
+  .player-row .pname { font-size:14.5px; font-weight:600; }
+  .player-row .pteam { font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--ink-soft); }
+  .pick-btn {
+    flex-shrink:0; padding:6px 14px; border-radius:20px; border:1px solid var(--accent);
+    background:#fff; color:var(--accent); font-family:'JetBrains Mono',monospace; font-size:12px;
+    font-weight:600; cursor:pointer;
+  }
+  .pick-btn.selected { background:var(--accent); color:#fff; }
+  .pick-btn:disabled { border-color:var(--line); color:var(--ink-soft); cursor:not-allowed; opacity:0.6; }
+  .no-results { padding:24px 2px; color:var(--ink-soft); font-size:14px; text-align:center; }
+
+  /* summary */
+  .summary-panel { border-color: var(--accent); background: var(--accent-soft); }
+  .summary-panel .eyebrow { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--accent); margin:0 0 6px; }
+  .summary-panel h2 { font-size:22px; font-weight:800; margin:0 0 16px; }
+  .summary-list { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+  .summary-row { display:flex; justify-content:space-between; align-items:center; background:#fff; border-radius:8px; padding:10px 14px; }
+  .summary-row .pname { font-weight:600; font-size:14.5px; }
+  .summary-row .pteam { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft); }
+  .summary-note { font-size:13.5px; color: var(--ink-soft); margin:0; }
+
+  @media (max-width: 480px) {
+    .tray { grid-template-columns:repeat(auto-fill,minmax(105px,1fr)); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="crumb"><a href="../../">offcuts</a> / tools / fantasy-draft</p>
+  <h1>World Cup Fantasy Draft<span class="tag-inline">football</span></h1>
+  <p class="lede">Draft a 5-player squad from the 8 teams left in the tournament. Earn points for goals and assists, lose points for cards. Build it, share it, see who beats it.</p>
+
+  <div class="panel">
+    <div class="field">
+      <label for="squad-name">Squad name</label>
+      <input type="text" id="squad-name" placeholder="e.g. Jai's XI" maxlength="40">
+    </div>
+
+    <div class="tray-head">
+      <label style="margin:0;">Your squad</label>
+      <span class="count" id="tray-count">0 / 5</span>
+    </div>
+    <div class="tray" id="tray"></div>
+
+    <div class="budget-head">
+      <span class="budget-label">Budget</span>
+      <span class="budget-value" id="budget-value">0 / 65 credits used</span>
+    </div>
+    <div class="budget-bar"><div class="budget-bar-fill" id="budget-bar-fill" style="width:0%"></div></div>
+
+    <p class="error" id="squad-error" style="display:none;"></p>
+  </div>
+
+  <div class="panel">
+    <label>Filter by team</label>
+    <div class="chip-row" id="team-chips"></div>
+
+    <div class="field" style="margin-bottom:0;">
+      <label for="search">Search players</label>
+      <input type="text" id="search" placeholder="Search by name...">
+    </div>
+
+    <div class="player-list" id="player-list"></div>
+  </div>
+
+  <div class="panel summary-panel" id="summary-panel" style="display:none;">
+    <p class="eyebrow">// squad locked in</p>
+    <h2 id="summary-name"></h2>
+    <div class="summary-list" id="summary-list"></div>
+    <p class="summary-note">This is a local preview — saving and a shareable link are coming in the next update. Nothing here is submitted anywhere yet.</p>
+  </div>
+
+  <section class="copy">
+    <h2>How scoring works</h2>
+    <table class="rules-table">
+      <tr><th>Event</th><th>Points</th></tr>
+      <tr><td>Goal</td><td class="pts pos">+4</td></tr>
+      <tr><td>Assist</td><td class="pts pos">+2</td></tr>
+      <tr><td>Yellow card</td><td class="pts neg">−1</td></tr>
+      <tr><td>Red card</td><td class="pts neg">−3</td></tr>
+    </table>
+  </section>
+
+  <section class="copy faq">
+    <h2>Squad rules</h2>
+    <h3>How many players do I pick?</h3>
+    <p>Exactly 5, from the pool of players across the 8 remaining teams.</p>
+    <h3>Can I stack one team?</h3>
+    <p>Max 2 players from the same team — stops everyone just drafting one favourite side.</p>
+    <h3>Is there a budget?</h3>
+    <p>Yes — every player has a credit cost, and your 5 picks have to fit inside a 65-credit budget. Star names cost more, so it's a trade-off between big names and squad depth.</p>
+    <h3>Can I change my squad later?</h3>
+    <p>Once a draft is submitted it's locked for the rest of the tournament — quarterfinals through the Final. No edits, no do-overs.</p>
+  </section>
+
+  <p class="disclaimer">Unofficial fan tool. Not affiliated with FIFA or any national football association.</p>
+  <footer>offcuts.buildbyjai.workers.dev</footer>
+</div>
+
+<script>
+  const PLAYER_POOL = [
+    // France
+    { id: "maignan", name: "Mike Maignan", team: "France", cost: 4 },
+    { id: "saliba", name: "William Saliba", team: "France", cost: 6 },
+    { id: "upamecano", name: "Dayot Upamecano", team: "France", cost: 6 },
+    { id: "tchouameni", name: "Aurélien Tchouaméni", team: "France", cost: 9 },
+    { id: "rabiot", name: "Adrien Rabiot", team: "France", cost: 9 },
+    { id: "mbappe", name: "Kylian Mbappé", team: "France", cost: 18 },
+    { id: "dembele", name: "Ousmane Dembélé", team: "France", cost: 12 },
+    { id: "olise", name: "Michael Olise", team: "France", cost: 12 },
+    { id: "thuram", name: "Marcus Thuram", team: "France", cost: 12 },
+    { id: "doue", name: "Désiré Doué", team: "France", cost: 12 },
+
+    // Morocco
+    { id: "bounou", name: "Yassine Bounou", team: "Morocco", cost: 4 },
+    { id: "hakimi", name: "Achraf Hakimi", team: "Morocco", cost: 6 },
+    { id: "aguerd", name: "Nayef Aguerd", team: "Morocco", cost: 6 },
+    { id: "amrabat", name: "Sofyan Amrabat", team: "Morocco", cost: 9 },
+    { id: "ounahi", name: "Azzedine Ounahi", team: "Morocco", cost: 9 },
+    { id: "elkhannouss", name: "Bilal El Khannouss", team: "Morocco", cost: 9 },
+    { id: "elkaabi", name: "Ayoub El Kaabi", team: "Morocco", cost: 12 },
+    { id: "brahim", name: "Brahim Díaz", team: "Morocco", cost: 12 },
+    { id: "rahimi", name: "Soufiane Rahimi", team: "Morocco", cost: 12 },
+    { id: "ezzalzouli", name: "Abde Ezzalzouli", team: "Morocco", cost: 9 },
+
+    // Spain
+    { id: "unaisimon", name: "Unai Simón", team: "Spain", cost: 4 },
+    { id: "porro", name: "Pedro Porro", team: "Spain", cost: 6 },
+    { id: "laporte", name: "Aymeric Laporte", team: "Spain", cost: 6 },
+    { id: "rodri", name: "Rodri", team: "Spain", cost: 9 },
+    { id: "pedri", name: "Pedri", team: "Spain", cost: 12 },
+    { id: "gavi", name: "Gavi", team: "Spain", cost: 12 },
+    { id: "merino", name: "Mikel Merino", team: "Spain", cost: 9 },
+    { id: "yamal", name: "Lamine Yamal", team: "Spain", cost: 15 },
+    { id: "nicowilliams", name: "Nico Williams", team: "Spain", cost: 12 },
+    { id: "olmo", name: "Dani Olmo", team: "Spain", cost: 15 },
+
+    // Belgium
+    { id: "courtois", name: "Thibaut Courtois", team: "Belgium", cost: 4 },
+    { id: "debast", name: "Zeno Debast", team: "Belgium", cost: 6 },
+    { id: "kdb", name: "Kevin De Bruyne", team: "Belgium", cost: 15 },
+    { id: "tielemans", name: "Youri Tielemans", team: "Belgium", cost: 12 },
+    { id: "onana", name: "Amadou Onana", team: "Belgium", cost: 9 },
+    { id: "lukaku", name: "Romelu Lukaku", team: "Belgium", cost: 15 },
+    { id: "doku", name: "Jérémy Doku", team: "Belgium", cost: 15 },
+    { id: "trossard", name: "Leandro Trossard", team: "Belgium", cost: 12 },
+    { id: "dektelaere", name: "Charles De Ketelaere", team: "Belgium", cost: 9 },
+    { id: "witsel", name: "Axel Witsel", team: "Belgium", cost: 9 },
+
+    // Norway
+    { id: "nyland", name: "Ørjan Nyland", team: "Norway", cost: 4 },
+    { id: "ajer", name: "Kristoffer Ajer", team: "Norway", cost: 6 },
+    { id: "odegaard", name: "Martin Ødegaard", team: "Norway", cost: 15 },
+    { id: "berge", name: "Sander Berge", team: "Norway", cost: 9 },
+    { id: "haaland", name: "Erling Haaland", team: "Norway", cost: 18 },
+    { id: "sorloth", name: "Alexander Sørloth", team: "Norway", cost: 12 },
+    { id: "strandlarsen", name: "Jørgen Strand Larsen", team: "Norway", cost: 9 },
+    { id: "nusa", name: "Antonio Nusa", team: "Norway", cost: 12 },
+    { id: "bobb", name: "Oscar Bobb", team: "Norway", cost: 9 },
+    { id: "aasgaard", name: "Thelo Aasgaard", team: "Norway", cost: 9 },
+
+    // England
+    { id: "pickford", name: "Jordan Pickford", team: "England", cost: 4 },
+    { id: "stones", name: "John Stones", team: "England", cost: 6 },
+    { id: "rice", name: "Declan Rice", team: "England", cost: 9 },
+    { id: "bellingham", name: "Jude Bellingham", team: "England", cost: 18 },
+    { id: "kane", name: "Harry Kane", team: "England", cost: 18 },
+    { id: "saka", name: "Bukayo Saka", team: "England", cost: 15 },
+    { id: "rashford", name: "Marcus Rashford", team: "England", cost: 15 },
+    { id: "watkins", name: "Ollie Watkins", team: "England", cost: 12 },
+    { id: "eze", name: "Eberechi Eze", team: "England", cost: 12 },
+    { id: "gordon", name: "Anthony Gordon", team: "England", cost: 12 },
+
+    // Argentina
+    { id: "dibumartinez", name: "Emiliano Martínez", team: "Argentina", cost: 4 },
+    { id: "romero", name: "Cristian Romero", team: "Argentina", cost: 6 },
+    { id: "depaul", name: "Rodrigo De Paul", team: "Argentina", cost: 9 },
+    { id: "enzo", name: "Enzo Fernández", team: "Argentina", cost: 9 },
+    { id: "macallister", name: "Alexis Mac Allister", team: "Argentina", cost: 9 },
+    { id: "messi", name: "Lionel Messi", team: "Argentina", cost: 18 },
+    { id: "julianalvarez", name: "Julián Álvarez", team: "Argentina", cost: 15 },
+    { id: "lautaro", name: "Lautaro Martínez", team: "Argentina", cost: 15 },
+    { id: "nicogonzalez", name: "Nicolás González", team: "Argentina", cost: 9 },
+    { id: "locelso", name: "Giovani Lo Celso", team: "Argentina", cost: 9 },
+
+    // Switzerland
+    { id: "kobel", name: "Gregor Kobel", team: "Switzerland", cost: 4 },
+    { id: "akanji", name: "Manuel Akanji", team: "Switzerland", cost: 6 },
+    { id: "xhaka", name: "Granit Xhaka", team: "Switzerland", cost: 9 },
+    { id: "freuler", name: "Remo Freuler", team: "Switzerland", cost: 9 },
+    { id: "embolo", name: "Breel Embolo", team: "Switzerland", cost: 12 },
+    { id: "ndoye", name: "Dan Ndoye", team: "Switzerland", cost: 9 },
+    { id: "vargas", name: "Rubén Vargas", team: "Switzerland", cost: 9 },
+    { id: "amdouni", name: "Zeki Amdouni", team: "Switzerland", cost: 9 },
+    { id: "zakaria", name: "Denis Zakaria", team: "Switzerland", cost: 9 },
+    { id: "manzambi", name: "Johan Manzambi", team: "Switzerland", cost: 9 },
+  ];
+
+  const MAX_SQUAD = 5;
+  const MAX_PER_TEAM = 2;
+  const BUDGET_CAP = 65;
+  const TEAMS = [...new Set(PLAYER_POOL.map(p => p.team))];
+
+  let squad = [];       // array of player ids, in pick order
+  let teamFilter = 'all';
+  let searchTerm = '';
+
+  const squadNameEl = document.getElementById('squad-name');
+  const trayEl = document.getElementById('tray');
+  const trayCountEl = document.getElementById('tray-count');
+  const budgetValueEl = document.getElementById('budget-value');
+  const budgetBarFillEl = document.getElementById('budget-bar-fill');
+  const squadErrorEl = document.getElementById('squad-error');
+  const teamChipsEl = document.getElementById('team-chips');
+  const searchEl = document.getElementById('search');
+  const playerListEl = document.getElementById('player-list');
+  const summaryPanelEl = document.getElementById('summary-panel');
+  const summaryNameEl = document.getElementById('summary-name');
+  const summaryListEl = document.getElementById('summary-list');
+
+  function playerById(id) { return PLAYER_POOL.find(p => p.id === id); }
+  function teamCount(team) { return squad.filter(id => playerById(id).team === team).length; }
+  function budgetUsed() { return squad.reduce((sum, id) => sum + playerById(id).cost, 0); }
+
+  function togglePlayer(id) {
+    const idx = squad.indexOf(id);
+    if (idx !== -1) {
+      squad.splice(idx, 1);
+      squadErrorEl.style.display = 'none';
+      render();
+      return;
+    }
+    if (squad.length >= MAX_SQUAD) {
+      showError(`Your squad is full — remove a player before adding another.`);
+      return;
+    }
+    const player = playerById(id);
+    if (teamCount(player.team) >= MAX_PER_TEAM) {
+      showError(`Max ${MAX_PER_TEAM} players from ${player.team} — remove one before adding another.`);
+      return;
+    }
+    if (budgetUsed() + player.cost > BUDGET_CAP) {
+      showError(`Adding ${player.name} (${player.cost}cr) would push you over the ${BUDGET_CAP}-credit budget — remove someone first.`);
+      return;
+    }
+    squad.push(id);
+    squadErrorEl.style.display = 'none';
+    render();
+  }
+
+  function showError(msg) {
+    squadErrorEl.textContent = msg;
+    squadErrorEl.style.display = 'block';
+  }
+
+  function renderTray() {
+    trayCountEl.textContent = `${squad.length} / ${MAX_SQUAD}`;
+    trayCountEl.classList.toggle('full', squad.length === MAX_SQUAD);
+
+    const slots = [];
+    for (let i = 0; i < MAX_SQUAD; i++) {
+      const id = squad[i];
+      if (id) {
+        const p = playerById(id);
+        slots.push(`
+          <div class="slot filled" data-id="${id}" title="Remove ${p.name}">
+            <span class="remove">&times;</span>
+            <span class="pname">${p.name}</span>
+            <span class="pteam">${p.team} · ${p.cost}cr</span>
+          </div>`);
+      } else {
+        slots.push(`<div class="slot">Empty slot</div>`);
+      }
+    }
+    trayEl.innerHTML = slots.join('');
+    trayEl.querySelectorAll('.slot.filled').forEach(el => {
+      el.addEventListener('click', () => togglePlayer(el.dataset.id));
+    });
+  }
+
+  function renderBudget() {
+    const used = budgetUsed();
+    const pct = Math.min(100, (used / BUDGET_CAP) * 100);
+    budgetValueEl.textContent = `${used} / ${BUDGET_CAP} credits used`;
+    budgetValueEl.classList.toggle('full', used === BUDGET_CAP);
+    budgetValueEl.classList.toggle('tight', used < BUDGET_CAP && used >= BUDGET_CAP * 0.85);
+    budgetBarFillEl.style.width = `${pct}%`;
+    budgetBarFillEl.classList.toggle('tight', used >= BUDGET_CAP * 0.85);
+  }
+
+  function renderChips() {
+    const chips = ['all', ...TEAMS].map(team => {
+      const label = team === 'all' ? 'All teams' : team;
+      const n = team === 'all' ? '' : `<span class="n">${teamCount(team)}/${MAX_PER_TEAM}</span>`;
+      const maxed = team !== 'all' && teamCount(team) >= MAX_PER_TEAM;
+      return `<button class="chip${teamFilter === team ? ' active' : ''}${maxed ? ' maxed' : ''}" data-team="${team}">${label} ${n}</button>`;
+    }).join('');
+    teamChipsEl.innerHTML = chips;
+    teamChipsEl.querySelectorAll('.chip').forEach(el => {
+      el.addEventListener('click', () => {
+        teamFilter = el.dataset.team;
+        render();
+      });
+    });
+  }
+
+  function renderPlayerList() {
+    const term = searchTerm.trim().toLowerCase();
+    const filtered = PLAYER_POOL.filter(p => {
+      const matchesTeam = teamFilter === 'all' || p.team === teamFilter;
+      const matchesSearch = !term || p.name.toLowerCase().includes(term);
+      return matchesTeam && matchesSearch;
+    });
+
+    if (filtered.length === 0) {
+      playerListEl.innerHTML = `<p class="no-results">No players match your search.</p>`;
+      return;
+    }
+
+    const squadFull = squad.length >= MAX_SQUAD;
+    const remainingBudget = BUDGET_CAP - budgetUsed();
+
+    playerListEl.innerHTML = filtered.map(p => {
+      const selected = squad.includes(p.id);
+      const teamFull = teamCount(p.team) >= MAX_PER_TEAM;
+      const overBudget = p.cost > remainingBudget;
+      const disabled = !selected && (squadFull || teamFull || overBudget);
+      return `
+        <div class="player-row">
+          <div class="info">
+            <p class="pname">${p.name}</p>
+            <p class="pteam">${p.team} · ${p.cost}cr</p>
+          </div>
+          <button class="pick-btn${selected ? ' selected' : ''}" data-id="${p.id}" ${disabled ? 'disabled' : ''}>
+            ${selected ? 'Remove' : 'Add'}
+          </button>
+        </div>`;
+    }).join('');
+
+    playerListEl.querySelectorAll('.pick-btn').forEach(el => {
+      el.addEventListener('click', () => togglePlayer(el.dataset.id));
+    });
+  }
+
+  function renderSummary() {
+    const name = squadNameEl.value.trim();
+    const isComplete = squad.length === MAX_SQUAD && name.length > 0;
+    summaryPanelEl.style.display = isComplete ? 'block' : 'none';
+    if (!isComplete) return;
+
+    summaryNameEl.textContent = name;
+    summaryListEl.innerHTML = squad.map(id => {
+      const p = playerById(id);
+      return `
+        <div class="summary-row">
+          <span class="pname">${p.name}</span>
+          <span class="pteam">${p.team} · ${p.cost}cr</span>
+        </div>`;
+    }).join('');
+  }
+
+  function render() {
+    renderTray();
+    renderBudget();
+    renderChips();
+    renderPlayerList();
+    renderSummary();
+  }
+
+  squadNameEl.addEventListener('input', renderSummary);
+  searchEl.addEventListener('input', (e) => { searchTerm = e.target.value; render(); });
+
+  render();
+</script>
+</body>
+</html>
