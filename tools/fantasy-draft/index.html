@@ -179,7 +179,7 @@
 
       <div class="budget-head">
         <span class="budget-label">Budget</span>
-        <span class="budget-value" id="budget-value">65 credits remaining</span>
+        <span class="budget-value" id="budget-value">65 credits remaining, 5 slots left</span>
       </div>
       <div class="budget-bar"><div class="budget-bar-fill" id="budget-bar-fill" style="width:0%"></div></div>
 
@@ -349,6 +349,7 @@
   const MAX_SQUAD = 5;
   const MAX_PER_TEAM = 2;
   const BUDGET_CAP = 65;
+  const MIN_COST = Math.min(...PLAYER_POOL.map(p => p.cost));
   const TEAMS = [...new Set(PLAYER_POOL.map(p => p.team))];
 
   let squad = [];       // array of player ids, in pick order
@@ -374,6 +375,14 @@
   function teamCount(team) { return squad.filter(id => playerById(id).team === team).length; }
   function budgetUsed() { return squad.reduce((sum, id) => sum + playerById(id).cost, 0); }
 
+  // True if taking this player wouldn't leave enough budget to fill the remaining slots
+  // (each of which costs at least MIN_COST), even with the cheapest possible picks.
+  function wouldStrand(player) {
+    const remainingAfterPick = BUDGET_CAP - budgetUsed() - player.cost;
+    const slotsAfterPick = MAX_SQUAD - squad.length - 1;
+    return remainingAfterPick < MIN_COST * slotsAfterPick;
+  }
+
   function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
@@ -397,6 +406,10 @@
     }
     if (budgetUsed() + player.cost > BUDGET_CAP) {
       showError(`Adding ${player.name} (${player.cost}cr) would push you over the ${BUDGET_CAP}-credit budget — remove someone first.`);
+      return;
+    }
+    if (wouldStrand(player)) {
+      showError(`Picking ${player.name} would leave you unable to afford your remaining picks.`);
       return;
     }
     squad.push(id);
@@ -437,12 +450,16 @@
   function renderBudget() {
     const used = budgetUsed();
     const remaining = BUDGET_CAP - used;
+    const slotsLeft = MAX_SQUAD - squad.length;
     const pct = Math.min(100, (used / BUDGET_CAP) * 100);
-    budgetValueEl.textContent = `${remaining} credit${remaining === 1 ? '' : 's'} remaining`;
-    budgetValueEl.classList.toggle('full', remaining === 0);
-    budgetValueEl.classList.toggle('tight', remaining > 0 && remaining <= BUDGET_CAP * 0.15);
+    budgetValueEl.textContent = `${remaining} credit${remaining === 1 ? '' : 's'} remaining, ${slotsLeft} slot${slotsLeft === 1 ? '' : 's'} left`;
+    // "Tight" once every remaining slot has to be filled at minimum cost — the point
+    // where a wrong pick would strand the squad below MAX_SQUAD players.
+    const tight = slotsLeft > 0 && remaining <= MIN_COST * slotsLeft;
+    budgetValueEl.classList.toggle('full', slotsLeft === 0);
+    budgetValueEl.classList.toggle('tight', tight);
     budgetBarFillEl.style.width = `${pct}%`;
-    budgetBarFillEl.classList.toggle('tight', remaining > 0 && remaining <= BUDGET_CAP * 0.15);
+    budgetBarFillEl.classList.toggle('tight', tight);
   }
 
   function renderChips() {
@@ -481,7 +498,8 @@
       const selected = squad.includes(p.id);
       const teamFull = teamCount(p.team) >= MAX_PER_TEAM;
       const overBudget = p.cost > remainingBudget;
-      const disabled = !selected && (squadFull || teamFull || overBudget);
+      const stranding = !overBudget && wouldStrand(p);
+      const disabled = !selected && (squadFull || teamFull || overBudget || stranding);
       return `
         <div class="player-row">
           <div class="info">
