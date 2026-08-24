@@ -13,7 +13,6 @@
     font-size: clamp(20px, 6vw, 30px); font-weight: 700; padding: 4px; text-align: center; overflow: hidden;
     transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
   }
-  .mm-card .mm-word { font-family: 'JetBrains Mono', monospace; font-size: clamp(11px, 3.4vw, 15px); }
   .mm-card.face-down { background: var(--accent); color: transparent; }
   .mm-card.face-down::after { content: "?"; color: #fff; font-size: 22px; }
   .mm-card.matched { background: #fff; border-color: var(--accent); opacity: 0.55; cursor: default; }
@@ -83,13 +82,8 @@
     const pool = WG.shuffle(getWordList(band, theme)).slice(0, pairs);
     const deck = [];
     pool.forEach((entry, i) => {
-      if (band === "littleExplorer") {
-        deck.push({ pairId: i, type: "emoji", display: entry.emoji });
-        deck.push({ pairId: i, type: "emoji", display: entry.emoji });
-      } else {
-        deck.push({ pairId: i, type: "emoji", display: entry.emoji });
-        deck.push({ pairId: i, type: "word", display: entry.word.toUpperCase() });
-      }
+      deck.push({ pairId: i, display: entry.emoji });
+      deck.push({ pairId: i, display: entry.emoji });
     });
     return WG.shuffle(deck).map((c, i) => Object.assign({ id: i, faceUp: false, matched: false }, c));
   }
@@ -108,9 +102,7 @@
       const classes = ["mm-card"];
       if (!c.faceUp && !c.matched) classes.push("face-down");
       if (c.matched) classes.push("matched");
-      const inner = (c.faceUp || c.matched)
-        ? (c.type === "word" ? `<span class="mm-word">${c.display}</span>` : c.display)
-        : "";
+      const inner = (c.faceUp || c.matched) ? c.display : "";
       return `<div class="${classes.join(" ")}" data-id="${c.id}">${inner}</div>`;
     }).join("");
     gridEl.querySelectorAll(".mm-card").forEach(el => el.addEventListener("click", onFlip));
