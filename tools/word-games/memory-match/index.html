@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memory Match — Offcuts</title>
+<link rel="stylesheet" href="../word-games.css">
+<style>
+  .mm-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 6px; }
+  .mm-card {
+    aspect-ratio: 1 / 1; border-radius: 10px; border: 1px solid var(--line); background: var(--accent-soft);
+    display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none;
+    font-size: clamp(20px, 6vw, 30px); font-weight: 700; padding: 4px; text-align: center; overflow: hidden;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .mm-card .mm-word { font-family: 'JetBrains Mono', monospace; font-size: clamp(11px, 3.4vw, 15px); }
+  .mm-card.face-down { background: var(--accent); color: transparent; }
+  .mm-card.face-down::after { content: "?"; color: #fff; font-size: 22px; }
+  .mm-card.matched { background: #fff; border-color: var(--accent); opacity: 0.55; cursor: default; }
+  .mm-card.wrong { border-color: #BA7517; }
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+  <p class="crumb"><a href="../../../">offcuts</a> / tools / memory-match</p>
+  <h1>Memory Match<span class="tag-inline">games</span></h1>
+  <p class="lede">Flip two cards at a time and find every matching pair.</p>
+
+  <div class="wg-toprow">
+    <div></div>
+    <button class="wg-sound-btn" id="sound-toggle">🔊 Sound on</button>
+  </div>
+
+  <div class="panel">
+    <label>Age band</label>
+    <div class="wg-age-picker" id="age-picker"></div>
+  </div>
+
+  <div class="panel">
+    <label>Theme</label>
+    <div class="choice-row" id="theme-row"></div>
+
+    <div class="wg-hud">
+      <div class="wg-hud-item"><div class="wg-hud-label">Pairs found</div><div class="wg-hud-value" id="hud-matched">0/0</div></div>
+      <div class="wg-hud-item"><div class="wg-hud-label">Flips</div><div class="wg-hud-value" id="hud-flips">0</div></div>
+    </div>
+
+    <div class="mm-grid" id="mm-grid"></div>
+    <p class="wg-feedback" id="feedback"></p>
+
+    <div id="result"></div>
+
+    <div style="margin-top:16px; display:flex; gap:10px;">
+      <button class="btn" id="btn-newgame">New Game</button>
+    </div>
+  </div>
+
+  <section class="copy faq">
+    <h2>How to play</h2>
+    <p>Tap a card to flip it, then tap a second card. If they match, they stay face up. If not, they flip back — remember where things were for next time.</p>
+  </section>
+
+  <footer>offcuts.buildbyjai.workers.dev</footer>
+</div>
+
+<script src="../word-bank.js"></script>
+<script src="../shared-ui.js"></script>
+<script>
+  const PAIRS_BY_BAND = { littleExplorer: 4, wordWhiz: 6, wordMaster: 8 };
+  let band = WG.getAgeBand();
+  let theme = "animals";
+  let cards = [], flipped = [], matchedCount = 0, flipCount = 0, locked = false;
+
+  const gridEl = document.getElementById("mm-grid");
+  const feedbackEl = document.getElementById("feedback");
+  const resultEl = document.getElementById("result");
+  const hudMatched = document.getElementById("hud-matched");
+  const hudFlips = document.getElementById("hud-flips");
+  const themeRow = document.getElementById("theme-row");
+
+  function buildDeck() {
+    const pairs = PAIRS_BY_BAND[band];
+    const pool = WG.shuffle(getWordList(band, theme)).slice(0, pairs);
+    const deck = [];
+    pool.forEach((entry, i) => {
+      if (band === "littleExplorer") {
+        deck.push({ pairId: i, type: "emoji", display: entry.emoji });
+        deck.push({ pairId: i, type: "emoji", display: entry.emoji });
+      } else {
+        deck.push({ pairId: i, type: "emoji", display: entry.emoji });
+        deck.push({ pairId: i, type: "word", display: entry.word.toUpperCase() });
+      }
+    });
+    return WG.shuffle(deck).map((c, i) => Object.assign({ id: i, faceUp: false, matched: false }, c));
+  }
+
+  function newGame() {
+    cards = buildDeck();
+    flipped = []; matchedCount = 0; flipCount = 0; locked = false;
+    resultEl.innerHTML = ""; feedbackEl.textContent = "";
+    render();
+  }
+
+  function render() {
+    hudMatched.textContent = `${matchedCount}/${cards.length / 2}`;
+    hudFlips.textContent = flipCount;
+    gridEl.innerHTML = cards.map(c => {
+      const classes = ["mm-card"];
+      if (!c.faceUp && !c.matched) classes.push("face-down");
+      if (c.matched) classes.push("matched");
+      const inner = (c.faceUp || c.matched)
+        ? (c.type === "word" ? `<span class="mm-word">${c.display}</span>` : c.display)
+        : "";
+      return `<div class="${classes.join(" ")}" data-id="${c.id}">${inner}</div>`;
+    }).join("");
+    gridEl.querySelectorAll(".mm-card").forEach(el => el.addEventListener("click", onFlip));
+  }
+
+  function onFlip(e) {
+    if (locked) return;
+    const id = parseInt(e.currentTarget.dataset.id, 10);
+    const card = cards.find(c => c.id === id);
+    if (!card || card.faceUp || card.matched) return;
+    card.faceUp = true;
+    flipped.push(card);
+    render();
+    if (flipped.length === 2) {
+      flipCount++;
+      locked = true;
+      const [a, b] = flipped;
+      if (a.pairId === b.pairId) {
+        a.matched = true; b.matched = true;
+        matchedCount++;
+        feedbackEl.textContent = "Match!"; feedbackEl.className = "wg-feedback good";
+        WG.playTapSound();
+        flipped = [];
+        locked = false;
+        render();
+        if (matchedCount === cards.length / 2) finishWin();
+      } else {
+        feedbackEl.textContent = band === "littleExplorer" ? "Not quite — try again!" : "No match.";
+        feedbackEl.className = "wg-feedback bad";
+        setTimeout(() => {
+          a.faceUp = false; b.faceUp = false;
+          flipped = []; locked = false;
+          render();
+        }, 700);
+      }
+    }
+  }
+
+  function finishWin() {
+    WG.playWinSound();
+    WG.celebrate(document.querySelector(".panel"));
+    resultEl.innerHTML = `
+      <div class="wg-result-card win">
+        <p class="big">All pairs found! 🎉</p>
+        <p class="small">${flipCount} flips it took to clear the board.</p>
+      </div>`;
+  }
+
+  document.getElementById("age-picker").innerHTML = "";
+  WG.renderAgeBandPicker(document.getElementById("age-picker"), { active: band, onSelect: id => { band = id; newGame(); } });
+  WG.renderThemeRow(themeRow, { active: theme, onSelect: t => { theme = t; newGame(); } });
+  WG.initSoundToggle(document.getElementById("sound-toggle"));
+  document.getElementById("btn-newgame").addEventListener("click", newGame);
+
+  newGame();
+</script>
+</body>
+</html>
