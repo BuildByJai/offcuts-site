@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Search — Offcuts</title>
+<link rel="stylesheet" href="../word-games.css">
+<style>
+  .ws-grid { display: grid; gap: 2px; user-select: none; touch-action: none; max-width: 440px; margin: 0 auto; }
+  .ws-cell {
+    aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; background: #fff;
+    border: 1px solid var(--line); border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-weight: 700;
+    font-size: clamp(9px, 2.6vw, 16px); cursor: pointer; color: var(--ink);
+  }
+  .ws-cell.selecting { background: var(--accent-soft); border-color: var(--accent); }
+  .ws-cell.found { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .ws-wordlist { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 4px; }
+  .ws-word-chip {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 5px 11px; border-radius: 20px;
+    border: 1px solid var(--line); color: var(--ink-soft); background: #fff;
+  }
+  .ws-word-chip.found { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); text-decoration: line-through; }
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+  <p class="crumb"><a href="../../../">offcuts</a> / tools / <a href="../">word-games</a> / word-search</p>
+  <h1>Word Search<span class="tag-inline">games</span></h1>
+  <p class="lede">Find every hidden word in the grid. Drag from the first letter to the last.</p>
+
+  <div class="wg-toprow">
+    <div></div>
+    <button class="wg-sound-btn" id="sound-toggle">🔊 Sound on</button>
+  </div>
+
+  <div class="panel">
+    <label>Age band</label>
+    <div class="wg-age-picker" id="age-picker"></div>
+  </div>
+
+  <div class="panel">
+    <div class="wg-hud">
+      <div class="wg-hud-item"><div class="wg-hud-label">Found</div><div class="wg-hud-value" id="hud-found">0/0</div></div>
+      <div class="wg-hud-item"><div class="wg-hud-label">Puzzles won</div><div class="wg-hud-value" id="hud-won">0</div></div>
+    </div>
+
+    <div class="ws-grid" id="ws-grid"></div>
+    <div class="ws-wordlist" id="ws-wordlist"></div>
+    <p class="wg-feedback" id="feedback"></p>
+    <div id="result"></div>
+
+    <div style="margin-top:16px; display:flex; gap:10px;">
+      <button class="btn" id="btn-newpuzzle">New Puzzle</button>
+    </div>
+  </div>
+
+  <section class="copy faq">
+    <h2>How to play</h2>
+    <p>Press down on the first letter of a hidden word, drag in a straight line to its last letter, then release. Found words are struck through in the list below the grid.</p>
+  </section>
+
+  <footer>offcuts.buildbyjai.workers.dev</footer>
+</div>
+
+<script src="../word-bank.js"></script>
+<script src="../shared-ui.js"></script>
+<script>
+  const CONFIG = {
+    littleExplorer: { size: 6, count: 4, directions: [{dr:0,dc:1},{dr:1,dc:0}] },
+    wordWhiz:        { size: 10, count: 8, directions: [{dr:0,dc:1},{dr:1,dc:0},{dr:1,dc:1},{dr:1,dc:-1}] },
+    wordMaster:      { size: 14, count: 12, directions: [
+      {dr:0,dc:1},{dr:0,dc:-1},{dr:1,dc:0},{dr:-1,dc:0},
+      {dr:1,dc:1},{dr:1,dc:-1},{dr:-1,dc:1},{dr:-1,dc:-1}
+    ] }
+  };
+
+  let band = WG.getAgeBand();
+  let size = 0, grid = [], targetWords = [], foundWords = new Set(), wonCount = 0;
+  let dragging = false, startCell = null, currentPath = [];
+
+  const gridEl = document.getElementById("ws-grid");
+  const wordlistEl = document.getElementById("ws-wordlist");
+  const feedbackEl = document.getElementById("feedback");
+  const resultEl = document.getElementById("result");
+  const hudFound = document.getElementById("hud-found");
+  const hudWon = document.getElementById("hud-won");
+
+  function inBounds(r, c) { return r >= 0 && r < size && c < size; }
+
+  function buildGrid() {
+    const cfg = CONFIG[band];
+    size = cfg.size;
+    grid = Array.from({ length: size }, () => Array(size).fill(null));
+    const words = WG.pickRandom(getAllWords(band), cfg.count);
+    const placed = [];
+
+    words.sort((a, b) => b.word.length - a.word.length).forEach(entry => {
+      const w = entry.word.toUpperCase();
+      let success = false;
+      for (let attempt = 0; attempt < 400 && !success; attempt++) {
+        const dir = cfg.directions[Math.floor(Math.random() * cfg.directions.length)];
+        const len = w.length;
+        let rowMin, rowMax, colMin, colMax;
+        if (dir.dr === 1) { rowMin = 0; rowMax = size - 1 - (len - 1); }
+        else if (dir.dr === -1) { rowMin = len - 1; rowMax = size - 1; }
+        else { rowMin = 0; rowMax = size - 1; }
+        if (dir.dc === 1) { colMin = 0; colMax = size - 1 - (len - 1); }
+        else if (dir.dc === -1) { colMin = len - 1; colMax = size - 1; }
+        else { colMin = 0; colMax = size - 1; }
+        if (rowMin > rowMax || colMin > colMax) continue;
+        const row = rowMin + Math.floor(Math.random() * (rowMax - rowMin + 1));
+        const col = colMin + Math.floor(Math.random() * (colMax - colMin + 1));
+        let fits = true;
+        for (let i = 0; i < len; i++) {
+          const r = row + dir.dr * i, c = col + dir.dc * i;
+          if (grid[r][c] !== null && grid[r][c] !== w[i]) { fits = false; break; }
+        }
+        if (!fits) continue;
+        for (let i = 0; i < len; i++) {
+          const r = row + dir.dr * i, c = col + dir.dc * i;
+          grid[r][c] = w[i];
+        }
+        placed.push({ word: w, entry, row, col, dir });
+        success = true;
+      }
+    });
+
+    for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) {
+      if (grid[r][c] === null) grid[r][c] = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+    }
+    return placed;
+  }
+
+  function newPuzzle() {
+    const placed = buildGrid();
+    targetWords = placed.map(p => p.word);
+    foundWords = new Set();
+    resultEl.innerHTML = ""; feedbackEl.textContent = "";
+    renderGrid();
+    renderWordList();
+  }
+
+  function renderGrid() {
+    gridEl.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+    gridEl.innerHTML = "";
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        const cell = document.createElement("div");
+        cell.className = "ws-cell";
+        cell.dataset.row = r; cell.dataset.col = c;
+        cell.textContent = grid[r][c];
+        gridEl.appendChild(cell);
+      }
+    }
+    hudFound.textContent = `${foundWords.size}/${targetWords.length}`;
+    hudWon.textContent = wonCount;
+  }
+
+  function renderWordList() {
+    wordlistEl.innerHTML = targetWords.map(w => `<span class="ws-word-chip${foundWords.has(w)?" found":""}">${w}</span>`).join("");
+  }
+
+  function cellAt(r, c) { return gridEl.querySelector(`.ws-cell[data-row="${r}"][data-col="${c}"]`); }
+
+  function clearSelectionStyle() {
+    gridEl.querySelectorAll(".ws-cell.selecting").forEach(el => el.classList.remove("selecting"));
+  }
+
+  function pathTo(row, col) {
+    const dRow = row - startCell.row, dCol = col - startCell.col;
+    const straight = dRow === 0 || dCol === 0 || Math.abs(dRow) === Math.abs(dCol);
+    if (!straight) return currentPath;
+    const steps = Math.max(Math.abs(dRow), Math.abs(dCol));
+    const stepR = steps === 0 ? 0 : dRow / steps, stepC = steps === 0 ? 0 : dCol / steps;
+    const path = [];
+    for (let i = 0; i <= steps; i++) {
+      const r = startCell.row + Math.round(stepR * i), c = startCell.col + Math.round(stepC * i);
+      if (!inBounds(r, c)) return currentPath;
+      path.push({ row: r, col: c });
+    }
+    return path;
+  }
+
+  function highlightPath(path) {
+    clearSelectionStyle();
+    path.forEach(p => { const el = cellAt(p.row, p.col); if (el) el.classList.add("selecting"); });
+  }
+
+  function onDown(e) {
+    const cell = e.target.closest(".ws-cell");
+    if (!cell) return;
+    dragging = true;
+    startCell = { row: parseInt(cell.dataset.row, 10), col: parseInt(cell.dataset.col, 10) };
+    currentPath = [startCell];
+    highlightPath(currentPath);
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    const point = e.touches ? e.touches[0] : e;
+    const el = document.elementFromPoint(point.clientX, point.clientY);
+    const cell = el && el.closest && el.closest(".ws-cell");
+    if (!cell) return;
+    const row = parseInt(cell.dataset.row, 10), col = parseInt(cell.dataset.col, 10);
+    currentPath = pathTo(row, col);
+    highlightPath(currentPath);
+  }
+
+  function onUp() {
+    if (!dragging) return;
+    dragging = false;
+    if (currentPath.length > 1) checkSelection(currentPath);
+    clearSelectionStyle();
+  }
+
+  function checkSelection(path) {
+    const forward = path.map(p => grid[p.row][p.col]).join("");
+    const backward = forward.split("").reverse().join("");
+    const match = targetWords.find(w => (w === forward || w === backward) && !foundWords.has(w));
+    if (match) {
+      foundWords.add(match);
+      WG.playTapSound();
+      path.forEach(p => { const el = cellAt(p.row, p.col); if (el) el.classList.add("found"); });
+      feedbackEl.textContent = "Found it!"; feedbackEl.className = "wg-feedback good";
+      renderWordList();
+      hudFound.textContent = `${foundWords.size}/${targetWords.length}`;
+      if (foundWords.size === targetWords.length) finishWin();
+    } else {
+      feedbackEl.textContent = band === "littleExplorer" ? "Not that one — keep looking!" : "";
+      feedbackEl.className = "wg-feedback";
+    }
+  }
+
+  function finishWin() {
+    wonCount++;
+    WG.playWinSound();
+    WG.celebrate(document.querySelector(".panel"));
+    resultEl.innerHTML = `
+      <div class="wg-result-card win">
+        <p class="big">All words found! 🎉</p>
+        <p class="small">Puzzle ${wonCount} cleared.</p>
+      </div>`;
+    hudWon.textContent = wonCount;
+  }
+
+  gridEl.addEventListener("pointerdown", onDown);
+  document.addEventListener("pointermove", onMove);
+  document.addEventListener("pointerup", onUp);
+  document.addEventListener("pointercancel", onUp);
+
+  document.getElementById("age-picker").innerHTML = "";
+  WG.renderAgeBandPicker(document.getElementById("age-picker"), { active: band, onSelect: id => { band = id; newPuzzle(); } });
+  WG.initSoundToggle(document.getElementById("sound-toggle"));
+  document.getElementById("btn-newpuzzle").addEventListener("click", newPuzzle);
+
+  newPuzzle();
+</script>
+</body>
+</html>

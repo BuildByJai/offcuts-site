@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Games — Offcuts</title>
+<link rel="stylesheet" href="word-games.css">
+</head>
+<body>
+<div class="wrap">
+  <p class="crumb"><a href="../../">offcuts</a> / tools / word-games</p>
+  <h1>Word Games<span class="tag-inline">games</span></h1>
+  <p class="lede">7 word games for every age, from picture matching to speed spelling. Pick an age band, pick a game, play.</p>
+
+  <div class="panel">
+    <label>Age bands</label>
+    <div class="wg-band-explainer" id="band-explainer"></div>
+    <p style="font-size:13px; color:var(--ink-soft); margin:10px 0 0;">Every game asks you to pick a band before you start. Your choice is remembered for the rest of this visit — pick it once here, or in any game.</p>
+  </div>
+
+  <div class="game-grid" id="game-grid"></div>
+
+  <section class="copy faq">
+    <h2>Common questions</h2>
+    <h3>Do I need to make an account?</h3>
+    <p>No. Nothing is saved beyond your browser tab — no logins, no leaderboards, no data sent anywhere.</p>
+    <h3>Which game should we start with?</h3>
+    <p>Rhyme Time and Memory Match are the gentlest starting points for younger kids. Word Search and Word Builder suit older kids and adults who want more of a challenge.</p>
+  </section>
+
+  <footer>offcuts.buildbyjai.workers.dev</footer>
+</div>
+
+<script src="word-bank.js"></script>
+<script src="shared-ui.js"></script>
+<script>
+  const BAND_DESC = {
+    littleExplorer: "Picture-led, short words, no timers, no penalties for a wrong guess.",
+    wordWhiz: "Standard reading level, moderate timers, light scoring.",
+    wordMaster: "Longer words, tighter timers, hints off, speed rewarded."
+  };
+
+  document.getElementById("band-explainer").innerHTML = WG.AGE_BANDS.map(b => `
+    <div class="wg-band-card">
+      <span class="wg-age-label">${b.label}</span>
+      <span class="wg-age-range" style="display:block; margin-bottom:2px;">${b.range}</span>
+      <p>${BAND_DESC[b.id]}</p>
+    </div>
+  `).join("");
+
+  const GAMES = [
+    { icon: "🧠", name: "Memory Match", desc: "Flip cards and find every matching pair.", href: "memory-match/" },
+    { icon: "🌱", name: "Hangman Reimagined", desc: "Guess the word letter by letter — no gallows, just a growing plant.", href: "hangman/" },
+    { icon: "🔤", name: "Word Scramble", desc: "Unscramble the jumbled letters to find the word.", href: "scramble/" },
+    { icon: "😀", name: "Emoji Word Guess", desc: "Work out the word from an emoji clue.", href: "emoji-guess/" },
+    { icon: "🎈", name: "Word Builder", desc: "Pop the letters in the right order before time's up.", href: "word-builder/" },
+    { icon: "🔍", name: "Word Search", desc: "Find every hidden word in the letter grid.", href: "word-search/" },
+    { icon: "🎵", name: "Rhyme Time", desc: "Pick the word that rhymes — great for phonics.", href: "rhyme-time/" }
+  ];
+
+  document.getElementById("game-grid").innerHTML = GAMES.map(g => `
+    <a class="game-card" href="${g.href}">
+      <span class="icon">${g.icon}</span>
+      <p class="name">${g.name}</p>
+      <p class="desc">${g.desc}</p>
+    </a>
+  `).join("");
+</script>
+</body>
+</html>

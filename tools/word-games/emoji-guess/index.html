@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emoji Word Guess — Offcuts</title>
+<link rel="stylesheet" href="../word-games.css">
+<style>
+  .eg-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+  .eg-option {
+    padding: 14px 10px; border-radius: 8px; border: 1.5px solid var(--line); background: #fff;
+    font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 700; cursor: pointer; color: var(--ink);
+  }
+  .eg-option:hover:not(:disabled) { border-color: var(--accent); }
+  .eg-option.correct { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .eg-option.wrong { background: #FAEEDA; border-color: #BA7517; color: #BA7517; }
+  .eg-input-row { display: flex; gap: 10px; margin-top: 14px; }
+  .eg-input-row input {
+    flex: 1; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px;
+    font-family: 'Inter', sans-serif; font-size: 16px; background: #fff; color: var(--ink);
+  }
+  .eg-input-row input:focus { outline: none; border-color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+  <p class="crumb"><a href="../../../">offcuts</a> / tools / <a href="../">word-games</a> / emoji-guess</p>
+  <h1>Emoji Word Guess<span class="tag-inline">games</span></h1>
+  <p class="lede">Work out the word from the emoji clue.</p>
+
+  <div class="wg-toprow">
+    <div></div>
+    <button class="wg-sound-btn" id="sound-toggle">🔊 Sound on</button>
+  </div>
+
+  <div class="panel">
+    <label>Age band</label>
+    <div class="wg-age-picker" id="age-picker"></div>
+  </div>
+
+  <div class="panel">
+    <label>Theme</label>
+    <div class="choice-row" id="theme-row"></div>
+
+    <div class="wg-hud">
+      <div class="wg-hud-item"><div class="wg-hud-label">Correct</div><div class="wg-hud-value" id="hud-correct">0</div></div>
+      <div class="wg-hud-item"><div class="wg-hud-label">Streak</div><div class="wg-hud-value" id="hud-streak">0</div></div>
+    </div>
+
+    <div class="wg-frame">
+      <div class="wg-clue-emoji" id="clue-emoji"></div>
+      <div id="answer-area"></div>
+      <p class="wg-feedback" id="feedback"></p>
+      <div id="result"></div>
+    </div>
+
+    <div style="margin-top:16px; display:flex; gap:10px;">
+      <button class="btn" id="btn-newword">New Word</button>
+    </div>
+  </div>
+
+  <section class="copy faq">
+    <h2>How to play</h2>
+    <p>An emoji appears as a clue — guess the word it represents. Little Explorer band shows multiple-choice options; older bands type the answer in.</p>
+  </section>
+
+  <footer>offcuts.buildbyjai.workers.dev</footer>
+</div>
+
+<script src="../word-bank.js"></script>
+<script src="../shared-ui.js"></script>
+<script>
+  let band = WG.getAgeBand();
+  let theme = "animals";
+  let word = "", correctCount = 0, streak = 0, over = false;
+
+  const clueEl = document.getElementById("clue-emoji");
+  const answerArea = document.getElementById("answer-area");
+  const feedbackEl = document.getElementById("feedback");
+  const resultEl = document.getElementById("result");
+  const hudCorrect = document.getElementById("hud-correct");
+  const hudStreak = document.getElementById("hud-streak");
+  const themeRow = document.getElementById("theme-row");
+
+  function renderThemeRow() {
+    themeRow.innerHTML = WORD_THEMES.map(t => `<button class="choice-btn${t===theme?" active":""}" data-theme="${t}">${WORD_THEME_LABELS[t]}</button>`).join("");
+    themeRow.querySelectorAll(".choice-btn").forEach(b => b.addEventListener("click", () => { theme = b.dataset.theme; newWord(); }));
+  }
+
+  function newWord() {
+    const pool = getWordList(band, theme);
+    const entry = pool[Math.floor(Math.random() * pool.length)];
+    word = entry.word.toLowerCase();
+    over = false;
+    resultEl.innerHTML = ""; feedbackEl.textContent = "";
+    clueEl.textContent = entry.emoji;
+    renderAnswerArea(pool, entry);
+  }
+
+  function renderAnswerArea(pool, entry) {
+    if (band === "littleExplorer") {
+      const distractors = WG.shuffle(pool.filter(w => w.word !== entry.word)).slice(0, 3);
+      const options = WG.shuffle([entry, ...distractors]);
+      answerArea.innerHTML = `<div class="eg-options">${options.map(o => `<button class="eg-option" data-word="${o.word}">${o.word.toUpperCase()}</button>`).join("")}</div>`;
+      answerArea.querySelectorAll(".eg-option").forEach(b => b.addEventListener("click", onOptionClick));
+    } else {
+      answerArea.innerHTML = `<div class="eg-input-row"><input type="text" id="guess-input" placeholder="Type the word..." autocomplete="off"><button class="btn" id="btn-submit">Guess</button></div>`;
+      const input = document.getElementById("guess-input");
+      document.getElementById("btn-submit").addEventListener("click", () => checkGuess(input.value));
+      input.addEventListener("keydown", e => { if (e.key === "Enter") checkGuess(input.value); });
+      input.focus();
+    }
+  }
+
+  function onOptionClick(e) {
+    if (over) return;
+    const guess = e.currentTarget.dataset.word;
+    answerArea.querySelectorAll(".eg-option").forEach(b => {
+      b.disabled = true;
+      if (b.dataset.word === word) b.classList.add("correct");
+      else if (b === e.currentTarget) b.classList.add("wrong");
+    });
+    settleGuess(guess === word);
+  }
+
+  function checkGuess(value) {
+    if (over) return;
+    settleGuess(value.trim().toLowerCase() === word);
+  }
+
+  function settleGuess(isCorrect) {
+    over = true;
+    if (isCorrect) {
+      correctCount++; streak++;
+      WG.playWinSound();
+      feedbackEl.textContent = "Correct!"; feedbackEl.className = "wg-feedback good";
+      resultEl.innerHTML = `<div class="wg-result-card win"><p class="big">Nice one! ${clueEl.textContent}</p><p class="small">"${word.toUpperCase()}" — streak of ${streak}.</p></div>`;
+    } else {
+      streak = 0;
+      WG.playLoseSound();
+      feedbackEl.textContent = ""; feedbackEl.className = "wg-feedback";
+      resultEl.innerHTML = `<div class="wg-result-card lose"><p class="big">Not quite</p><p class="small">It was "${word.toUpperCase()}" ${clueEl.textContent}. ${WG.tryAgainMessage(band)}</p></div>`;
+    }
+    hudCorrect.textContent = correctCount;
+    hudStreak.textContent = streak;
+  }
+
+  document.getElementById("age-picker").innerHTML = "";
+  WG.renderAgeBandPicker(document.getElementById("age-picker"), { active: band, onSelect: id => { band = id; streak = 0; newWord(); } });
+  renderThemeRow();
+  WG.initSoundToggle(document.getElementById("sound-toggle"));
+  document.getElementById("btn-newword").addEventListener("click", newWord);
+
+  newWord();
+</script>
+</body>
+</html>

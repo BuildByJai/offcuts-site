@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rhyme Time — Offcuts</title>
+<link rel="stylesheet" href="../word-games.css">
+<style>
+  .rt-word { font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: clamp(32px, 9vw, 48px); text-align: center; margin: 10px 0 18px; color: var(--accent); }
+  .rt-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+  .rt-option {
+    padding: 16px 10px; border-radius: 10px; border: 1.5px solid var(--line); background: #fff;
+    font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; cursor: pointer; color: var(--ink);
+  }
+  .rt-option:hover:not(:disabled) { border-color: var(--accent); }
+  .rt-option.correct { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .rt-option.wrong { background: #FAEEDA; border-color: #BA7517; color: #BA7517; }
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+  <p class="crumb"><a href="../../../">offcuts</a> / tools / <a href="../">word-games</a> / rhyme-time</p>
+  <h1>Rhyme Time<span class="tag-inline">games</span></h1>
+  <p class="lede">Which word rhymes? Great for phonics — pick the option that sounds right.</p>
+
+  <div class="wg-toprow">
+    <div></div>
+    <button class="wg-sound-btn" id="sound-toggle">🔊 Sound on</button>
+  </div>
+
+  <div class="panel">
+    <label>Age band</label>
+    <div class="wg-age-picker" id="age-picker"></div>
+  </div>
+
+  <div class="panel">
+    <div class="wg-hud">
+      <div class="wg-hud-item"><div class="wg-hud-label">Correct</div><div class="wg-hud-value" id="hud-correct">0</div></div>
+      <div class="wg-hud-item"><div class="wg-hud-label">Streak</div><div class="wg-hud-value" id="hud-streak">0</div></div>
+    </div>
+
+    <p style="text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft); margin:0;">What rhymes with...</p>
+    <div class="rt-word" id="rt-word"></div>
+    <div class="rt-options" id="rt-options"></div>
+    <p class="wg-feedback" id="feedback"></p>
+    <div id="result"></div>
+
+    <div style="margin-top:16px; display:flex; gap:10px;">
+      <button class="btn" id="btn-next">Next Word</button>
+    </div>
+  </div>
+
+  <section class="copy faq">
+    <h2>How to play</h2>
+    <p>A word appears — tap the option that rhymes with it. It's multiple choice all the way through, which makes it a good one for pre-readers and phonics practice alike.</p>
+  </section>
+
+  <footer>offcuts.buildbyjai.workers.dev</footer>
+</div>
+
+<script src="../word-bank.js"></script>
+<script src="../shared-ui.js"></script>
+<script>
+  let band = WG.getAgeBand();
+  let current = null, correctCount = 0, streak = 0, over = false, lastWord = null;
+
+  const wordEl = document.getElementById("rt-word");
+  const optionsEl = document.getElementById("rt-options");
+  const feedbackEl = document.getElementById("feedback");
+  const resultEl = document.getElementById("result");
+  const hudCorrect = document.getElementById("hud-correct");
+  const hudStreak = document.getElementById("hud-streak");
+
+  function newRound() {
+    const set = getRhymeSet(band);
+    let pool = set.filter(r => r.word !== lastWord);
+    if (!pool.length) pool = set;
+    current = pool[Math.floor(Math.random() * pool.length)];
+    lastWord = current.word;
+    over = false;
+    resultEl.innerHTML = ""; feedbackEl.textContent = "";
+    wordEl.textContent = current.word;
+    const options = WG.shuffle(current.options);
+    optionsEl.innerHTML = options.map(o => `<button class="rt-option" data-opt="${o}">${o}</button>`).join("");
+    optionsEl.querySelectorAll(".rt-option").forEach(b => b.addEventListener("click", onOption));
+  }
+
+  function onOption(e) {
+    if (over) return;
+    over = true;
+    const guess = e.currentTarget.dataset.opt;
+    optionsEl.querySelectorAll(".rt-option").forEach(b => {
+      b.disabled = true;
+      if (b.dataset.opt === current.answer) b.classList.add("correct");
+      else if (b === e.currentTarget) b.classList.add("wrong");
+    });
+    hudCorrect_update();
+    if (guess === current.answer) {
+      correctCount++; streak++;
+      WG.playWinSound();
+      resultEl.innerHTML = `<div class="wg-result-card win"><p class="big">Correct!</p><p class="small">"${current.word}" rhymes with "${current.answer}" — streak of ${streak}.</p></div>`;
+    } else {
+      streak = 0;
+      WG.playLoseSound();
+      resultEl.innerHTML = `<div class="wg-result-card lose"><p class="big">Not quite</p><p class="small">"${current.word}" rhymes with "${current.answer}". ${WG.tryAgainMessage(band)}</p></div>`;
+    }
+    hudCorrect_update();
+  }
+
+  function hudCorrect_update() {
+    hudCorrect.textContent = correctCount;
+    hudStreak.textContent = streak;
+  }
+
+  document.getElementById("age-picker").innerHTML = "";
+  WG.renderAgeBandPicker(document.getElementById("age-picker"), { active: band, onSelect: id => { band = id; streak = 0; newRound(); } });
+  WG.initSoundToggle(document.getElementById("sound-toggle"));
+  document.getElementById("btn-next").addEventListener("click", newRound);
+
+  newRound();
+</script>
+</body>
+</html>

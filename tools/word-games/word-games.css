@@ -1,0 +1,138 @@
+/* Offcuts Word Games — shared styles for the hub + all 7 games.
+   Mirrors the base look every /tools/ page inlines (vars, .wrap, .crumb, .panel, .btn)
+   since the site has no single shared tool.css to extend — this file is that shared
+   layer for this bundle, loaded once via <link> instead of copy-pasted per game. */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --paper: #FAFAF8; --ink: #181818; --ink-soft: #5C5C58;
+  --line: #E3E1DA; --accent: #156534; --accent-soft: #E9F3ED;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Inter', system-ui, sans-serif; line-height: 1.55; }
+
+.wrap { max-width: 720px; margin: 0 auto; padding: 0 24px 100px; }
+.wrap.narrow { max-width: 640px; }
+
+.crumb { padding: 32px 0 0; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink-soft); }
+.crumb a { color: var(--accent); text-decoration: none; }
+.crumb a:hover { text-decoration: underline; }
+
+h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; margin: 16px 0 10px; }
+.tag-inline {
+  display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--accent); background: var(--accent-soft); padding: 3px 9px; border-radius: 4px;
+  vertical-align: middle; margin-left: 8px; transform: translateY(-2px);
+}
+.lede { font-size: 16px; color: var(--ink-soft); margin: 0 0 24px; max-width: 520px; }
+
+.panel { border: 1px solid var(--line); border-radius: 10px; padding: 24px; margin-bottom: 24px; background: #fff; }
+
+label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft); margin-bottom: 6px; }
+
+.choice-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.choice-btn {
+  padding: 8px 14px; border: 1px solid var(--line); border-radius: 20px; background: #fff;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; cursor: pointer; color: var(--ink-soft);
+}
+.choice-btn.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+
+.btn {
+  padding: 11px 20px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent);
+  color: #fff; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer;
+}
+.btn:hover { opacity: 0.92; }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn:disabled { opacity: 0.5; cursor: default; }
+
+section.copy { margin: 36px 0; }
+section.copy h2 { font-size: 19px; font-weight: 700; margin: 0 0 10px; }
+section.copy p { color: var(--ink-soft); margin: 0 0 14px; font-size: 15px; }
+.faq h3 { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
+.faq p { color: var(--ink-soft); font-size: 14px; margin: 0 0 18px; }
+
+footer { border-top: 1px solid var(--line); padding: 28px 0 60px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft); }
+
+/* ---- age band picker ---- */
+.wg-age-picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 4px; }
+.wg-age-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 14px 8px; border: 1.5px solid var(--line); border-radius: 10px; background: #fff;
+  cursor: pointer; text-align: center; transition: all 0.15s ease;
+}
+.wg-age-btn:hover { border-color: var(--accent); }
+.wg-age-btn.active { border-color: var(--accent); background: var(--accent-soft); }
+.wg-age-label { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--ink); }
+.wg-age-range { font-size: 12px; color: var(--ink-soft); }
+
+/* ---- top hud bar shared by every game ---- */
+.wg-toprow { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 4px 0 18px; }
+.wg-sound-btn {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft);
+  background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 6px 12px; cursor: pointer;
+}
+.wg-sound-btn:hover { border-color: var(--accent); color: var(--accent); }
+.wg-sound-btn.muted { color: var(--ink-soft); }
+
+.wg-hud { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.wg-hud-item { background: var(--accent-soft); border-radius: 8px; padding: 8px 14px; text-align: center; flex: 1; min-width: 90px; }
+.wg-hud-item .wg-hud-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; }
+.wg-hud-item .wg-hud-value { font-size: 18px; font-weight: 700; margin-top: 2px; }
+
+/* ---- generic game frame ---- */
+.wg-frame { text-align: center; }
+.wg-feedback { min-height: 24px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink-soft); margin: 12px 0 0; }
+.wg-feedback.good { color: var(--accent); }
+.wg-feedback.bad { color: #BA7517; }
+.wg-clue-emoji { font-size: clamp(48px, 14vw, 72px); line-height: 1; margin: 6px 0 12px; }
+
+/* ---- hub grid ---- */
+.wg-band-explainer { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 18px 0 8px; }
+.wg-band-card { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; background: #fff; }
+.wg-band-card .wg-age-label { display: block; margin-bottom: 2px; }
+.wg-band-card p { margin: 4px 0 0; font-size: 13px; color: var(--ink-soft); }
+
+.game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin: 24px 0 8px; }
+.game-card {
+  display: block; text-decoration: none; color: var(--ink); border: 1px solid var(--line); border-radius: 12px;
+  padding: 20px; background: #fff; transition: all 0.15s ease;
+}
+.game-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(21,101,52,0.08); }
+.game-card .icon { font-size: 30px; margin-bottom: 10px; display: block; }
+.game-card .name { font-size: 16px; font-weight: 700; margin: 0 0 6px; }
+.game-card .desc { font-size: 13px; color: var(--ink-soft); margin: 0; }
+
+/* ---- confetti ---- */
+.wg-confetti-layer { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 999; }
+.wg-confetti-piece {
+  position: absolute; top: -12px; width: 8px; height: 14px; opacity: 0.9;
+  animation-name: wg-confetti-fall; animation-timing-function: ease-in; animation-fill-mode: forwards;
+}
+@keyframes wg-confetti-fall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0.4; }
+}
+
+/* ---- win / lose card ---- */
+.wg-result-card { border-radius: 10px; padding: 20px; text-align: center; margin-top: 16px; }
+.wg-result-card.win { background: var(--accent-soft); }
+.wg-result-card.lose { background: #FAEEDA; }
+.wg-result-card p.big { font-size: 20px; font-weight: 700; margin: 0 0 6px; }
+.wg-result-card p.small { font-size: 13px; color: var(--ink-soft); margin: 0 0 14px; }
+
+@media (max-width: 540px) {
+  h1 { font-size: 26px; }
+  .wg-age-picker { grid-template-columns: 1fr; }
+  .game-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 380px) {
+  .game-grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wg-confetti-piece { animation: none; display: none; }
+}

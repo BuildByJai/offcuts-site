@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Builder — Offcuts</title>
+<link rel="stylesheet" href="../word-games.css">
+<style>
+  .wb-progress { font-family: 'JetBrains Mono', monospace; font-size: clamp(22px, 6vw, 32px); font-weight: 700; letter-spacing: 0.12em; text-align: center; margin: 8px 0 16px; }
+  .wb-progress .blank { color: var(--line); }
+  .wb-field { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 10px 0; min-height: 120px; align-content: flex-start; }
+  .wb-pop {
+    width: 48px; height: 48px; border-radius: 50%; border: none; background: var(--accent); color: #fff;
+    font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 3px 8px rgba(21,101,52,0.25); animation: wb-bounce-in 0.3s ease;
+  }
+  .wb-pop.decoy { background: #E9A23B; }
+  .wb-pop.popped { animation: wb-pop-out 0.25s ease forwards; pointer-events: none; }
+  .wb-pop.shake { animation: wb-shake 0.3s ease; }
+  @keyframes wb-bounce-in { from { transform: scale(0); } to { transform: scale(1); } }
+  @keyframes wb-pop-out { to { transform: scale(1.6); opacity: 0; } }
+  @keyframes wb-shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+  .wb-timer { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink-soft); text-align: center; margin-top: 4px; }
+  .wb-timer.low { color: #BA7517; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+  <p class="crumb"><a href="../../../">offcuts</a> / tools / <a href="../">word-games</a> / word-builder</p>
+  <h1>Word Builder<span class="tag-inline">games</span></h1>
+  <p class="lede">Pop the letters in the right order to spell the word before time runs out.</p>
+
+  <div class="wg-toprow">
+    <div></div>
+    <button class="wg-sound-btn" id="sound-toggle">🔊 Sound on</button>
+  </div>
+
+  <div class="panel">
+    <label>Age band</label>
+    <div class="wg-age-picker" id="age-picker"></div>
+  </div>
+
+  <div class="panel">
+    <label>Theme</label>
+    <div class="choice-row" id="theme-row"></div>
+
+    <div class="wg-hud">
+      <div class="wg-hud-item"><div class="wg-hud-label">Built</div><div class="wg-hud-value" id="hud-built">0</div></div>
+      <div class="wg-hud-item"><div class="wg-hud-label">Streak</div><div class="wg-hud-value" id="hud-streak">0</div></div>
+    </div>
+
+    <div class="wg-clue-emoji" id="clue-emoji"></div>
+    <div class="wb-progress" id="progress"></div>
+    <div class="wb-field" id="field"></div>
+    <p class="wb-timer" id="timer-text"></p>
+    <p class="wg-feedback" id="feedback"></p>
+    <div id="result"></div>
+
+    <div style="margin-top:16px; display:flex; gap:10px;">
+      <button class="btn" id="btn-newword">New Word</button>
+    </div>
+  </div>
+
+  <section class="copy faq">
+    <h2>How to play</h2>
+    <p>Letters pop onto the board, some real, some decoys. Tap them in the right order to spell the target word — quick and arcade-y.</p>
+  </section>
+
+  <footer>offcuts.buildbyjai.workers.dev</footer>
+</div>
+
+<script src="../word-bank.js"></script>
+<script src="../shared-ui.js"></script>
+<script>
+  const ROUND_SECONDS = { littleExplorer: 0, wordWhiz: 30, wordMaster: 18 };
+  const DECOYS = { littleExplorer: 2, wordWhiz: 3, wordMaster: 4 };
+  let band = WG.getAgeBand();
+  let theme = "animals";
+  let word = "", emoji = "", pops = [], nextIndex = 0, built = 0, streak = 0, over = false;
+  let timeLeft = 0, timerId = null;
+
+  const progressEl = document.getElementById("progress");
+  const fieldEl = document.getElementById("field");
+  const clueEl = document.getElementById("clue-emoji");
+  const timerText = document.getElementById("timer-text");
+  const feedbackEl = document.getElementById("feedback");
+  const resultEl = document.getElementById("result");
+  const hudBuilt = document.getElementById("hud-built");
+  const hudStreak = document.getElementById("hud-streak");
+  const themeRow = document.getElementById("theme-row");
+
+  function renderThemeRow() {
+    themeRow.innerHTML = WORD_THEMES.map(t => `<button class="choice-btn${t===theme?" active":""}" data-theme="${t}">${WORD_THEME_LABELS[t]}</button>`).join("");
+    themeRow.querySelectorAll(".choice-btn").forEach(b => b.addEventListener("click", () => { theme = b.dataset.theme; newWord(); }));
+  }
+
+  function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
+
+  function startTimer() {
+    stopTimer();
+    const seconds = ROUND_SECONDS[band];
+    if (!seconds) { timerText.textContent = ""; return; }
+    timeLeft = seconds;
+    updateTimerText();
+    timerId = setInterval(() => {
+      timeLeft--;
+      updateTimerText();
+      if (timeLeft <= 0) { stopTimer(); timeUp(); }
+    }, 1000);
+  }
+
+  function updateTimerText() {
+    if (!ROUND_SECONDS[band]) { timerText.textContent = ""; return; }
+    timerText.textContent = `${timeLeft}s left`;
+    timerText.className = "wb-timer" + (timeLeft <= 6 ? " low" : "");
+  }
+
+  const DECOY_LETTERS = "abcdefghijklmnopqrstuvwxyz";
+
+  function newWord() {
+    stopTimer();
+    const pool = getWordList(band, theme);
+    const entry = pool[Math.floor(Math.random() * pool.length)];
+    word = entry.word.toLowerCase();
+    emoji = entry.emoji;
+    over = false; nextIndex = 0;
+    resultEl.innerHTML = ""; feedbackEl.textContent = "";
+    clueEl.textContent = emoji;
+
+    const wordLetters = word.split("").map((ch, i) => ({ id: "w" + i, ch, decoy: false }));
+    const usedSet = new Set(word.split(""));
+    const decoyLetters = [];
+    while (decoyLetters.length < DECOYS[band]) {
+      const ch = DECOY_LETTERS[Math.floor(Math.random() * DECOY_LETTERS.length)];
+      if (!usedSet.has(ch)) { decoyLetters.push({ id: "d" + decoyLetters.length, ch, decoy: true }); usedSet.add(ch); }
+    }
+    pops = WG.shuffle([...wordLetters, ...decoyLetters]);
+    render();
+    startTimer();
+  }
+
+  function render() {
+    hudBuilt.textContent = built;
+    hudStreak.textContent = streak;
+    progressEl.innerHTML = word.split("").map((ch, i) => i < nextIndex ? ch.toUpperCase() : `<span class="blank">_</span>`).join(" ");
+    fieldEl.innerHTML = pops.map(p => `<button class="wb-pop${p.decoy?" decoy":""}${p.popped?" popped":""}" data-id="${p.id}" ${p.popped?"disabled":""}>${p.ch.toUpperCase()}</button>`).join("");
+    fieldEl.querySelectorAll(".wb-pop").forEach(el => el.addEventListener("click", onPop));
+  }
+
+  function onPop(e) {
+    if (over) return;
+    const id = e.currentTarget.dataset.id;
+    const pop = pops.find(p => p.id === id);
+    if (!pop || pop.popped) return;
+    const needed = word[nextIndex];
+    if (!pop.decoy && pop.ch === needed) {
+      pop.popped = true;
+      nextIndex++;
+      WG.playTapSound();
+      feedbackEl.textContent = ""; feedbackEl.className = "wg-feedback";
+      render();
+      if (nextIndex === word.length) finishWin();
+    } else {
+      const btn = e.currentTarget;
+      btn.classList.add("shake");
+      setTimeout(() => btn.classList.remove("shake"), 300);
+      feedbackEl.textContent = band === "littleExplorer" ? "Try the next letter!" : "Wrong letter.";
+      feedbackEl.className = "wg-feedback bad";
+    }
+  }
+
+  function timeUp() {
+    over = true;
+    streak = 0;
+    WG.playLoseSound();
+    resultEl.innerHTML = `
+      <div class="wg-result-card lose">
+        <p class="big">Time's up! ⏳</p>
+        <p class="small">The word was "${word.toUpperCase()}" ${emoji}. ${WG.tryAgainMessage(band)}</p>
+      </div>`;
+    render();
+  }
+
+  function finishWin() {
+    over = true; built++; streak++;
+    stopTimer();
+    WG.playWinSound();
+    WG.celebrate(document.querySelector(".panel"));
+    resultEl.innerHTML = `
+      <div class="wg-result-card win">
+        <p class="big">Popped it! ${emoji}</p>
+        <p class="small">"${word.toUpperCase()}" — streak of ${streak}.</p>
+      </div>`;
+    render();
+  }
+
+  document.getElementById("age-picker").innerHTML = "";
+  WG.renderAgeBandPicker(document.getElementById("age-picker"), { active: band, onSelect: id => { band = id; streak = 0; newWord(); } });
+  renderThemeRow();
+  WG.initSoundToggle(document.getElementById("sound-toggle"));
+  document.getElementById("btn-newword").addEventListener("click", newWord);
+
+  newWord();
+</script>
+</body>
+</html>
