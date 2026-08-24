@@ -96,11 +96,6 @@
     </svg>`
   ];
 
-  function renderThemeRow() {
-    themeRow.innerHTML = WORD_THEMES.map(t => `<button class="choice-btn${t===theme?" active":""}" data-theme="${t}">${WORD_THEME_LABELS[t]}</button>`).join("");
-    themeRow.querySelectorAll(".choice-btn").forEach(b => b.addEventListener("click", () => { theme = b.dataset.theme; newWord(); }));
-  }
-
   function newWord() {
     const pool = getWordList(band, theme);
     const entry = pool[Math.floor(Math.random() * pool.length)];
@@ -174,7 +169,7 @@
 
   document.getElementById("age-picker").innerHTML = "";
   WG.renderAgeBandPicker(document.getElementById("age-picker"), { active: band, onSelect: id => { band = id; newWord(); } });
-  renderThemeRow();
+  WG.renderThemeRow(themeRow, { active: theme, onSelect: t => { theme = t; newWord(); } });
   WG.initSoundToggle(document.getElementById("sound-toggle"));
   document.getElementById("btn-newword").addEventListener("click", newWord);
 

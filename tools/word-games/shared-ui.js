@@ -41,6 +41,22 @@
     });
   }
 
+  function renderThemeRow(el, opts) {
+    opts = opts || {};
+    const active = opts.active || "animals";
+    el.innerHTML = WORD_THEMES.map(t => `
+      <button type="button" class="choice-btn${t === active ? " active" : ""}" data-theme="${t}">${WORD_THEME_LABELS[t]}</button>
+    `).join("");
+    el.querySelectorAll(".choice-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        el.querySelectorAll(".choice-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const t = btn.dataset.theme;
+        if (typeof opts.onSelect === "function") opts.onSelect(t);
+      });
+    });
+  }
+
   function shuffle(arr) {
     const a = arr.slice();
     for (let i = a.length - 1; i > 0; i--) {
@@ -167,6 +183,7 @@
     getAgeBand,
     setAgeBand,
     renderAgeBandPicker,
+    renderThemeRow,
     shuffle,
     pickRandom,
     tryAgainMessage,
