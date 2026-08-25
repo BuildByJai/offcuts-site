@@ -1,4 +1,7 @@
 import { PLAYER_POOL, MAX_SQUAD, MAX_PER_TEAM, BUDGET_CAP } from "./lib/players.js";
+import { isCoveredTeamId } from "./lib/post-match-moments/teams.js";
+import { getRecentFixturesForTeam } from "./lib/post-match-moments/api-football.js";
+import { getMomentsForFixture } from "./lib/post-match-moments/pipeline.js";
 
 const ID_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -140,6 +143,30 @@ async function handleLeaderboard(env) {
   return json(await getLeaderboard(env));
 }
 
+async function handlePmmFixtures(url, env) {
+  const teamId = Number(url.searchParams.get("team"));
+  if (!teamId || !isCoveredTeamId(teamId)) {
+    return json({ error: "Unknown or unsupported team id" }, 400);
+  }
+  try {
+    const fixtures = await getRecentFixturesForTeam(env, teamId);
+    return json({ fixtures });
+  } catch (err) {
+    return json({ error: err.message || "Could not load fixtures" }, 502);
+  }
+}
+
+async function handlePmmMoments(url, env) {
+  const fixtureId = Number(url.searchParams.get("fixture"));
+  if (!fixtureId) return json({ error: "Missing fixture id" }, 400);
+  try {
+    const data = await getMomentsForFixture(env, fixtureId);
+    return json(data);
+  } catch (err) {
+    return json({ error: err.message || "Could not generate moments" }, 502);
+  }
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -153,6 +180,12 @@ export default {
     const squadMatch = url.pathname.match(/^\/api\/squad\/([^/]+)$/);
     if (squadMatch && request.method === "GET") {
       return handleGetSquad(decodeURIComponent(squadMatch[1]), env);
+    }
+    if (url.pathname === "/api/pmm/fixtures" && request.method === "GET") {
+      return handlePmmFixtures(url, env);
+    }
+    if (url.pathname === "/api/pmm/moments" && request.method === "GET") {
+      return handlePmmMoments(url, env);
     }
 
     return env.ASSETS.fetch(request);

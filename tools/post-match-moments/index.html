@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Post-Match Moments — Offcuts</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&family=Archivo+Black&display=swap');
+  :root {
+    --paper: #FAFAF8; --ink: #181818; --ink-soft: #5C5C58;
+    --line: #E3E1DA; --accent: #156534; --accent-soft: #E9F3ED;
+    --warn: #A32D2D; --warn-soft: #F7EAEA;
+    --pitch: #1E6B3C; --pitch-line: rgba(255,255,255,0.75);
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Inter', system-ui, sans-serif; line-height: 1.55; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 24px 100px; }
+  .crumb { padding: 32px 0 0; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink-soft); }
+  .crumb a { color: var(--accent); text-decoration: none; }
+  .crumb a:hover { text-decoration: underline; }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; margin: 16px 0 10px; }
+  .lede { font-size: 16px; color: var(--ink-soft); margin: 0 0 8px; max-width: 560px; }
+  .disclaimer-top {
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color: var(--ink-soft);
+    background: var(--accent-soft); border: 1px solid var(--line); border-radius: 8px;
+    padding: 10px 14px; margin: 14px 0 28px; max-width: 560px;
+  }
+  .panel { border: 1px solid var(--line); border-radius: 10px; padding: 24px; margin-bottom: 20px; background: #fff; }
+  label { display:block; font-family:'JetBrains Mono',monospace; font-size:12px; color: var(--ink-soft); margin-bottom:10px; }
+  .btn {
+    padding:11px 20px; border-radius:8px; border:1px solid var(--accent); background:var(--accent);
+    color:#fff; font-family:'Inter',sans-serif; font-size:15px; font-weight:600; cursor:pointer;
+    text-decoration:none; display:inline-block;
+  }
+  .btn:hover { opacity:0.92; }
+  .btn.ghost { background:transparent; color:var(--ink); border-color:var(--line); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn.small { padding:7px 14px; font-size:13px; }
+  .error { color:var(--warn); font-size:13.5px; margin: 10px 0 0; background: var(--warn-soft); border-radius: 8px; padding: 10px 12px; }
+  .hint { font-size: 13px; color: var(--ink-soft); margin: 10px 0 0; }
+
+  /* team chip row */
+  .chip-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .team-chip {
+    padding:9px 15px; border:1.5px solid var(--line); border-radius:20px; background:#fff;
+    font-family:'Inter',sans-serif; font-size:14px; font-weight:600; cursor:pointer; color:var(--ink);
+    display:flex; align-items:center; gap:8px;
+  }
+  .team-chip .dot-sw { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .team-chip:hover { border-color: var(--accent); }
+  .team-chip.active { border-color:var(--accent); background:var(--accent-soft); }
+
+  /* fixture list */
+  .fixture-row {
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:14px 4px; border-bottom:1px solid var(--line); cursor:pointer;
+  }
+  .fixture-row:hover { background: var(--accent-soft); }
+  .fixture-row:last-child { border-bottom:none; }
+  .fixture-teams { font-size:14.5px; font-weight:600; }
+  .fixture-meta { font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--ink-soft); margin-top:2px; }
+  .fixture-score { font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700; flex-shrink:0; }
+  .back-link { font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--accent); background:none; border:none; cursor:pointer; padding:0 0 14px; text-decoration:none; display:inline-block; }
+  .back-link:hover { text-decoration:underline; }
+
+  .loading { padding: 20px 4px; color: var(--ink-soft); font-size: 14px; font-family:'JetBrains Mono',monospace; }
+  .loading .spin { display:inline-block; width:10px; height:10px; border-radius:50%; border:2px solid var(--line); border-top-color:var(--accent); animation: spin 0.8s linear infinite; margin-right:8px; vertical-align:-1px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- moment player (vertical frame) ---------- */
+  .player-shell { display:none; margin: 24px 0; }
+  .player-shell.active { display:block; }
+  .frame-outer { display:flex; flex-direction:column; align-items:center; }
+  .frame {
+    position:relative; width:100%; max-width:380px; aspect-ratio: 9 / 16;
+    border-radius:18px; overflow:hidden; background:#0d3d21;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.28);
+  }
+  .frame svg#pitchSvg { position:absolute; inset:0; width:100%; height:100%; display:block; }
+
+  .dot {
+    position:absolute; width:7.6%; aspect-ratio:1/1; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono',monospace; font-weight:700; font-size:11px;
+    transform:translate(-50%,-50%);
+    transition: left 2.4s cubic-bezier(.4,.05,.2,1), top 2.4s cubic-bezier(.4,.05,.2,1), opacity 0.4s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+    opacity: 0;
+  }
+  .dot.in { opacity: 1; }
+  .dot.home { background:#111318; color:#fff; border: 2px solid rgba(255,255,255,0.85); }
+  .dot.away { background:#fefefe; color:#111318; border: 2px solid rgba(0,0,0,0.25); }
+
+  .minute-chip {
+    position:absolute; top:14px; left:14px; z-index:5;
+    font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:#fff;
+    background: rgba(0,0,0,0.55); padding:5px 11px; border-radius:20px;
+    opacity:0; transition: opacity 0.5s ease;
+  }
+  .minute-chip.in { opacity:1; }
+
+  .moment-counter {
+    position:absolute; top:14px; right:14px; z-index:5;
+    font-family:'JetBrains Mono',monospace; font-size:11.5px; font-weight:600; color:rgba(255,255,255,0.85);
+    background: rgba(0,0,0,0.4); padding:5px 10px; border-radius:20px;
+  }
+
+  .scrim-bottom {
+    position:absolute; left:0; right:0; bottom:0; height:44%; z-index:2;
+    background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0) 100%);
+    pointer-events:none;
+  }
+  .headline {
+    position:absolute; left:16px; right:16px; bottom:16px; z-index:6;
+    font-family:'Archivo Black', 'Inter', sans-serif; text-transform:uppercase;
+    font-size:26px; line-height:1.05; letter-spacing:-0.01em; color:#fff;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    opacity:0; transform: translateY(8px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .headline.in { opacity:1; transform: translateY(0); }
+
+  .subtitle-bar {
+    position:absolute; left:10%; right:10%; top:50%; transform: translateY(-50%) translateY(6px);
+    z-index:6; text-align:center; opacity:0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .subtitle-bar.in { opacity:1; transform: translateY(-50%) translateY(0); }
+  .subtitle-bar span {
+    display:inline-block; background: rgba(0,0,0,0.68); color:#fff;
+    font-family:'Inter',sans-serif; font-weight:600; font-size:14.5px; line-height:1.35;
+    padding:8px 14px; border-radius:6px;
+  }
+
+  .progress-track { width:100%; max-width:380px; height:3px; background:var(--line); border-radius:2px; margin-top:12px; overflow:hidden; }
+  .progress-fill { height:100%; width:0%; background:var(--accent); transition: width linear; }
+
+  .player-controls { display:flex; align-items:center; justify-content:center; gap:14px; margin-top:14px; }
+  .nav-btn {
+    width:36px; height:36px; border-radius:50%; border:1px solid var(--line); background:#fff;
+    cursor:pointer; font-size:15px; color:var(--ink); display:flex; align-items:center; justify-content:center;
+  }
+  .nav-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .nav-btn:disabled { opacity:0.35; cursor:not-allowed; }
+  .play-pause { min-width:70px; }
+
+  .script-panel { max-width:380px; margin: 18px auto 0; text-align:left; }
+  .script-panel .label { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft); margin-bottom:6px; }
+  .script-panel .script-text { font-size:14.5px; color:var(--ink); background:var(--accent-soft); border-radius:8px; padding:12px 14px; }
+
+  .sample-banner {
+    display:inline-flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace; font-size:11.5px;
+    color:#8a5a00; background:#FFF4DE; border:1px solid #F0DDB0; padding:5px 12px; border-radius:20px; margin-bottom:12px;
+  }
+
+  section.copy { margin: 40px 0; }
+  section.copy h2 { font-size:19px; font-weight:700; margin:0 0 10px; }
+  section.copy p { color: var(--ink-soft); margin: 0 0 14px; font-size:15px; }
+  .disclaimer { font-size:12.5px; color: var(--ink-soft); border-top:1px solid var(--line); padding-top:18px; margin-top:36px; font-family:'JetBrains Mono',monospace; }
+  footer { border-top: 1px solid var(--line); padding: 28px 0 60px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="../../">← Offcuts</a></div>
+  <h1>Post-Match Moments</h1>
+  <p class="lede">Pick a finished Premier League match. Real events and stats get turned into a handful of talking-point moments, each rendered as a short animated pitch clip — ready to narrate over or post with subtitles on.</p>
+  <div class="disclaimer-top">Player positions in each clip are an illustrative read of what happened — a whiteboard sketch, not tracked data. API-Football provides events and stats, not shot/pass coordinates, so treat the shapes as a storytelling aid, never literal positional accuracy.</div>
+
+  <!-- STEP 1: team picker -->
+  <div class="panel" id="teamPanel">
+    <label>1. Pick a club</label>
+    <div class="chip-row" id="teamChips"></div>
+  </div>
+
+  <!-- STEP 2: fixture picker -->
+  <div class="panel" id="fixturePanel" style="display:none;">
+    <button class="back-link" id="backToTeams">← Back to clubs</button>
+    <label id="fixtureLabel">2. Pick a recent finished match</label>
+    <div id="fixtureList"></div>
+  </div>
+
+  <!-- sample renderer preview, always available so the render pipeline can be checked independent of live data -->
+  <div class="panel" id="samplePanel">
+    <label>Renderer preview</label>
+    <p class="hint" style="margin-top:0;">Proves out the clip renderer with a hand-fed sample moment — no live match data, no API calls.</p>
+    <button class="btn ghost small" id="loadSampleBtn">▶ Preview with sample data</button>
+  </div>
+
+  <!-- STEP 3: moment player -->
+  <div class="player-shell" id="playerShell">
+    <button class="back-link" id="backToFixtures">← Back to matches</button>
+    <div id="sampleBannerWrap"></div>
+    <div class="frame-outer">
+      <div class="frame" id="frame">
+        <svg id="pitchSvg" viewBox="0 0 68 105" preserveAspectRatio="none"></svg>
+        <div class="scrim-bottom"></div>
+        <div class="minute-chip" id="minuteChip"></div>
+        <div class="moment-counter" id="momentCounter"></div>
+        <div class="subtitle-bar" id="subtitleBar"><span id="subtitleText"></span></div>
+        <div class="headline" id="headline"></div>
+        <div id="dotsLayer"></div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="player-controls">
+        <button class="nav-btn" id="prevBtn" title="Previous moment">‹</button>
+        <button class="nav-btn play-pause" id="playPauseBtn" title="Play/Pause">Pause</button>
+        <button class="nav-btn" id="nextBtn" title="Next moment">›</button>
+      </div>
+      <div class="script-panel">
+        <div class="label">VOICEOVER SCRIPT</div>
+        <div class="script-text" id="scriptText"></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="copy">
+    <h2>How it works</h2>
+    <p>Pick one of the eight covered clubs, then a finished match. The tool pulls that fixture's real goals, cards, subs, shot and possession stats, and post-match ratings from API-Football, then an AI pass turns the data into a handful of talking-point moments with short scripts. Each moment renders as an animated pitch clip you can narrate over or post with the built-in subtitles.</p>
+    <div class="faq">
+      <h3>Why only 8 clubs?</h3>
+      <p>Keeping the list fixed keeps the picker simple and keeps the AI pass working with a consistent, familiar set of squads rather than open-ended fixture search.</p>
+      <h3>Are the player positions real?</h3>
+      <p>No — they're an illustrative sketch built from event data and stats, not tracked positional data. Use them as a storytelling aid, not a tactical record.</p>
+    </div>
+  </section>
+
+  <div class="disclaimer">Data via API-Football. Moments and scripts generated by AI from real match events, stats, and post-match ratings — always verify before publishing. Not affiliated with the Premier League or any club.</div>
+  <footer>Offcuts — random tools, built on request.</footer>
+</div>
+
+<script>
+/*
+ * Shared coordinate contract between Track A (this renderer) and Track B
+ * (the AI moment/coordinate pipeline in src/lib/post-match-moments/):
+ *   - x: 0-100, percentage across pitch width, 0 = left touchline, 100 = right touchline
+ *   - y: 0-100, percentage along pitch length, 0 = top goal line, 100 = bottom goal line
+ *   - Rendered on an SVG viewBox 0 0 68 105 (real pitch meters), so a dot's
+ *     screen position is (x/100*68, y/100*105).
+ */
+const PITCH_W = 68, PITCH_L = 105;
+
+const TEAMS = [
+  { id: 40, name: 'Liverpool', color: '#C8102E' },
+  { id: 42, name: 'Arsenal', color: '#EF0107' },
+  { id: 47, name: 'Tottenham', color: '#132257' },
+  { id: 49, name: 'Chelsea', color: '#034694' },
+  { id: 50, name: 'Manchester City', color: '#6CABDD' },
+  { id: 33, name: 'Manchester United', color: '#DA291C' },
+  { id: 51, name: 'Brighton', color: '#0057B8' },
+  { id: 35, name: 'Bournemouth', color: '#DA291C' },
+];
+
+// Hand-fed proof moments for Track A — no AI, no live data. Team names are
+// real (two of the covered clubs) but the scoreline/events are invented for
+// the renderer demo, clearly flagged in the UI as sample data.
+const SAMPLE_MOMENTS = {
+  homeTeam: 'Arsenal', awayTeam: 'Chelsea', isSample: true,
+  moments: [
+    {
+      minute: 23,
+      headline: 'ARSENAL SLICE THROUGH LEFT',
+      script: 'A quick one-two down the left drags Chelsea\'s back four out of shape, and suddenly there\'s space nobody\'s covering.',
+      subtitle: 'Space opens down the left',
+      dots: [
+        { number: 1, team: 'away', before: {x:34, y:90}, after: {x:34, y:90} },
+        { number: 4, team: 'away', before: {x:44, y:80}, after: {x:50, y:74} },
+        { number: 5, team: 'away', before: {x:24, y:80}, after: {x:30, y:70} },
+        { number: 12, team: 'away', before: {x:14, y:74}, after: {x:26, y:62} },
+        { number: 6, team: 'away', before: {x:58, y:76}, after: {x:56, y:66} },
+        { number: 7, team: 'home', before: {x:12, y:66}, after: {x:20, y:50} },
+        { number: 8, team: 'home', before: {x:36, y:60}, after: {x:38, y:52} },
+        { number: 9, team: 'home', before: {x:34, y:44}, after: {x:30, y:38} },
+        { number: 11, team: 'home', before: {x:60, y:58}, after: {x:52, y:46} },
+        { number: 20, team: 'home', before: {x:16, y:40}, after: {x:14, y:34} },
+      ],
+    },
+    {
+      minute: 41,
+      headline: 'CHELSEA WIN IT BACK HIGH',
+      script: 'A heavy touch and Chelsea pounce, three players closing the ball down inside four seconds.',
+      subtitle: 'Chelsea press and win it back',
+      dots: [
+        { number: 9, team: 'home', before: {x:34, y:30}, after: {x:34, y:34} },
+        { number: 8, team: 'home', before: {x:44, y:38}, after: {x:46, y:44} },
+        { number: 7, team: 'home', before: {x:20, y:36}, after: {x:22, y:42} },
+        { number: 10, team: 'away', before: {x:30, y:24}, after: {x:32, y:30} },
+        { number: 8, team: 'away', before: {x:44, y:22}, after: {x:42, y:32} },
+        { number: 19, team: 'away', before: {x:18, y:20}, after: {x:26, y:28} },
+        { number: 4, team: 'away', before: {x:36, y:14}, after: {x:34, y:20} },
+      ],
+    },
+    {
+      minute: 78,
+      headline: 'LATE SUB TILTS IT',
+      script: 'Fresh legs off the bench and the substitute is straight into the game, pinning Arsenal\'s full-back deep inside two minutes.',
+      subtitle: 'Fresh legs pin the full-back',
+      dots: [
+        { number: 26, team: 'away', before: {x:60, y:100}, after: {x:54, y:88} },
+        { number: 3, team: 'home', before: {x:52, y:92}, after: {x:50, y:96} },
+        { number: 6, team: 'home', before: {x:34, y:84}, after: {x:36, y:90} },
+        { number: 5, team: 'home', before: {x:20, y:86}, after: {x:22, y:90} },
+        { number: 10, team: 'away', before: {x:32, y:78}, after: {x:40, y:82} },
+        { number: 7, team: 'away', before: {x:16, y:74}, after: {x:24, y:78} },
+      ],
+    },
+  ],
+};
+
+// ---------- state ----------
+let currentMoments = null; // { homeTeam, awayTeam, isSample, moments: [...] }
+let momentIndex = 0;
+let playing = true;
+let advanceTimer = null;
+let progressStart = 0;
+let progressRAF = null;
+const MOMENT_DURATION_MS = 6500;
+
+// ---------- team / fixture picker ----------
+const teamChipsEl = document.getElementById('teamChips');
+TEAMS.forEach(team => {
+  const chip = document.createElement('button');
+  chip.className = 'team-chip';
+  chip.innerHTML = `<span class="dot-sw" style="background:${team.color}"></span>${team.name}`;
+  chip.addEventListener('click', () => selectTeam(team));
+  teamChipsEl.appendChild(chip);
+});
+
+document.getElementById('backToTeams').addEventListener('click', () => {
+  document.getElementById('fixturePanel').style.display = 'none';
+  document.getElementById('teamPanel').style.display = '';
+});
+document.getElementById('backToFixtures').addEventListener('click', () => {
+  stopPlayback();
+  document.getElementById('playerShell').classList.remove('active');
+  document.getElementById('fixturePanel').style.display = document.getElementById('fixturePanel').dataset.hasTeam ? '' : 'none';
+  document.getElementById('teamPanel').style.display = document.getElementById('fixturePanel').dataset.hasTeam ? 'none' : '';
+});
+
+async function selectTeam(team) {
+  [...teamChipsEl.children].forEach(c => c.classList.remove('active'));
+  const idx = TEAMS.indexOf(team);
+  teamChipsEl.children[idx].classList.add('active');
+
+  document.getElementById('teamPanel').style.display = 'none';
+  const fixturePanel = document.getElementById('fixturePanel');
+  fixturePanel.style.display = '';
+  fixturePanel.dataset.hasTeam = '1';
+  document.getElementById('fixtureLabel').textContent = `2. Recent finished ${team.name} matches`;
+  const listEl = document.getElementById('fixtureList');
+  listEl.innerHTML = '<div class="loading"><span class="spin"></span>Loading fixtures…</div>';
+
+  try {
+    const res = await fetch(`/api/pmm/fixtures?team=${team.id}`);
+    if (!res.ok) throw new Error('backend not ready');
+    const data = await res.json();
+    if (!Array.isArray(data.fixtures) || data.fixtures.length === 0) throw new Error('no fixtures');
+    renderFixtureList(data.fixtures, team);
+  } catch (err) {
+    listEl.innerHTML = `<div class="error">Live match data isn't wired up yet in this environment (API-Football key / KV cache pending manual setup). Use the sample preview above to check the renderer, or try again once the backend is configured.</div>`;
+  }
+}
+
+function renderFixtureList(fixtures, team) {
+  const listEl = document.getElementById('fixtureList');
+  listEl.innerHTML = '';
+  fixtures.forEach(fx => {
+    const row = document.createElement('div');
+    row.className = 'fixture-row';
+    row.innerHTML = `
+      <div>
+        <div class="fixture-teams">${fx.homeTeam} vs ${fx.awayTeam}</div>
+        <div class="fixture-meta">${fx.date} · ${fx.competition || 'Premier League'}</div>
+      </div>
+      <div class="fixture-score">${fx.homeScore}–${fx.awayScore}</div>
+    `;
+    row.addEventListener('click', () => selectFixture(fx));
+    listEl.appendChild(row);
+  });
+}
+
+async function selectFixture(fixture) {
+  const listEl = document.getElementById('fixtureList');
+  listEl.innerHTML = '<div class="loading"><span class="spin"></span>Pulling events, stats and ratings, then generating moments…</div>';
+  try {
+    const res = await fetch(`/api/pmm/moments?fixture=${fixture.id}`);
+    if (!res.ok) throw new Error('moments not ready');
+    const data = await res.json();
+    if (!Array.isArray(data.moments) || data.moments.length === 0) throw new Error('empty moments');
+    playMoments({ homeTeam: fixture.homeTeam, awayTeam: fixture.awayTeam, isSample: false, moments: data.moments });
+  } catch (err) {
+    listEl.innerHTML = `<div class="error">Couldn't generate moments for this match yet (AI pipeline / API keys pending manual setup). Use the sample preview above to check the renderer.</div>`;
+  }
+}
+
+document.getElementById('loadSampleBtn').addEventListener('click', () => playMoments(SAMPLE_MOMENTS));
+
+// ---------- pitch markings (drawn once) ----------
+function buildPitchSvg() {
+  const svg = document.getElementById('pitchSvg');
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (tag, attrs) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
+  };
+  svg.appendChild(el('rect', { x:0, y:0, width:PITCH_W, height:PITCH_L, fill:'#1E6B3C' }));
+  // subtle mow stripes
+  for (let i = 0; i < 10; i++) {
+    if (i % 2 === 0) svg.appendChild(el('rect', { x:0, y:i*PITCH_L/10, width:PITCH_W, height:PITCH_L/10, fill:'rgba(255,255,255,0.035)' }));
+  }
+  const lineAttrs = { stroke:'var(--pitch-line)', 'stroke-width':0.35, fill:'none' };
+  svg.appendChild(el('rect', { x:1.5, y:1.5, width:PITCH_W-3, height:PITCH_L-3, ...lineAttrs }));
+  svg.appendChild(el('line', { x1:1.5, y1:PITCH_L/2, x2:PITCH_W-1.5, y2:PITCH_L/2, ...lineAttrs }));
+  svg.appendChild(el('circle', { cx:PITCH_W/2, cy:PITCH_L/2, r:9.15, ...lineAttrs }));
+  svg.appendChild(el('circle', { cx:PITCH_W/2, cy:PITCH_L/2, r:0.5, fill:'var(--pitch-line)' }));
+  // top box
+  svg.appendChild(el('rect', { x:13.84, y:1.5, width:40.32, height:16.5, ...lineAttrs }));
+  svg.appendChild(el('rect', { x:24.84, y:1.5, width:18.32, height:5.5, ...lineAttrs }));
+  svg.appendChild(el('circle', { cx:PITCH_W/2, cy:12.5, r:0.5, fill:'var(--pitch-line)' }));
+  svg.appendChild(el('path', { d:`M 24.84 18 A 9.15 9.15 0 0 0 43.16 18`, ...lineAttrs }));
+  svg.appendChild(el('rect', { x:PITCH_W/2-3.66, y:0.4, width:7.32, height:1.1, fill:'none', stroke:'var(--pitch-line)', 'stroke-width':0.35 }));
+  // bottom box
+  svg.appendChild(el('rect', { x:13.84, y:PITCH_L-18, width:40.32, height:16.5, ...lineAttrs }));
+  svg.appendChild(el('rect', { x:24.84, y:PITCH_L-7, width:18.32, height:5.5, ...lineAttrs }));
+  svg.appendChild(el('circle', { cx:PITCH_W/2, cy:PITCH_L-12.5, r:0.5, fill:'var(--pitch-line)' }));
+  svg.appendChild(el('path', { d:`M 24.84 ${PITCH_L-18} A 9.15 9.15 0 0 1 43.16 ${PITCH_L-18}`, ...lineAttrs }));
+  svg.appendChild(el('rect', { x:PITCH_W/2-3.66, y:PITCH_L-1.5, width:7.32, height:1.1, fill:'none', stroke:'var(--pitch-line)', 'stroke-width':0.35 }));
+}
+buildPitchSvg();
+
+// ---------- moment player ----------
+function playMoments(data) {
+  currentMoments = data;
+  momentIndex = 0;
+  playing = true;
+  document.getElementById('fixturePanel').style.display = 'none';
+  document.getElementById('teamPanel').style.display = 'none';
+  document.getElementById('playerShell').classList.add('active');
+
+  const bannerWrap = document.getElementById('sampleBannerWrap');
+  bannerWrap.innerHTML = data.isSample ? '<div class="sample-banner">⚠ SAMPLE DATA — renderer preview only, not a real match</div>' : '';
+
+  document.getElementById('playerShell').scrollIntoView({ behavior:'smooth', block:'start' });
+  renderMoment();
+}
+
+const dotsLayer = document.getElementById('dotsLayer');
+
+function renderMoment() {
+  stopPlayback();
+  const m = currentMoments.moments[momentIndex];
+  const total = currentMoments.moments.length;
+
+  document.getElementById('momentCounter').textContent = `${momentIndex + 1} / ${total}`;
+  document.getElementById('minuteChip').textContent = `${m.minute}'`;
+  document.getElementById('minuteChip').classList.remove('in');
+  document.getElementById('headline').textContent = m.headline;
+  document.getElementById('headline').classList.remove('in');
+  document.getElementById('subtitleText').textContent = m.subtitle;
+  document.getElementById('subtitleBar').classList.remove('in');
+  document.getElementById('scriptText').textContent = m.script;
+
+  document.getElementById('prevBtn').disabled = momentIndex === 0;
+  document.getElementById('nextBtn').disabled = momentIndex === total - 1;
+
+  dotsLayer.innerHTML = '';
+  const dotEls = m.dots.map(d => {
+    const dot = document.createElement('div');
+    dot.className = `dot ${d.team}`;
+    dot.textContent = d.number;
+    positionDot(dot, d.before);
+    dotsLayer.appendChild(dot);
+    return dot;
+  });
+
+  // sequence: dots appear -> minute chip -> headline -> tween to "after" -> subtitle
+  requestAnimationFrame(() => {
+    dotEls.forEach((dot, i) => setTimeout(() => dot.classList.add('in'), i * 25));
+    setTimeout(() => document.getElementById('minuteChip').classList.add('in'), 150);
+    setTimeout(() => document.getElementById('headline').classList.add('in'), 400);
+    setTimeout(() => {
+      m.dots.forEach((d, i) => positionDot(dotEls[i], d.after));
+    }, 650);
+    setTimeout(() => document.getElementById('subtitleBar').classList.add('in'), 1400);
+  });
+
+  startProgress();
+  if (playing) scheduleAdvance();
+}
+
+function positionDot(el, pos) {
+  // SVG pitch uses preserveAspectRatio="none" so it's stretched to exactly
+  // fill the frame box — plain x%/y% of the frame lines up with it directly.
+  el.style.left = `${pos.x}%`;
+  el.style.top = `${pos.y}%`;
+}
+
+function scheduleAdvance() {
+  clearTimeout(advanceTimer);
+  advanceTimer = setTimeout(() => {
+    if (momentIndex < currentMoments.moments.length - 1) {
+      momentIndex++;
+      renderMoment();
+    } else {
+      stopPlayback();
+    }
+  }, MOMENT_DURATION_MS);
+}
+
+function startProgress() {
+  const fill = document.getElementById('progressFill');
+  fill.style.transition = 'none';
+  fill.style.width = '0%';
+  requestAnimationFrame(() => {
+    if (!playing) return;
+    fill.style.transition = `width ${MOMENT_DURATION_MS}ms linear`;
+    fill.style.width = '100%';
+  });
+}
+
+function stopPlayback() {
+  clearTimeout(advanceTimer);
+}
+
+document.getElementById('prevBtn').addEventListener('click', () => {
+  if (momentIndex > 0) { momentIndex--; renderMoment(); }
+});
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if (currentMoments && momentIndex < currentMoments.moments.length - 1) { momentIndex++; renderMoment(); }
+});
+document.getElementById('playPauseBtn').addEventListener('click', (e) => {
+  playing = !playing;
+  e.target.textContent = playing ? 'Pause' : 'Play';
+  if (playing) {
+    scheduleAdvance();
+    const fill = document.getElementById('progressFill');
+    fill.style.transition = 'none';
+  } else {
+    stopPlayback();
+    const fill = document.getElementById('progressFill');
+    const w = getComputedStyle(fill).width;
+    fill.style.transition = 'none';
+    fill.style.width = w;
+  }
+});
+
+// basic swipe support on the frame
+(function initSwipe() {
+  const frame = document.getElementById('frame');
+  let startX = null;
+  frame.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive:true });
+  frame.addEventListener('touchend', (e) => {
+    if (startX === null) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 40 && currentMoments) {
+      if (dx < 0 && momentIndex < currentMoments.moments.length - 1) { momentIndex++; renderMoment(); }
+      else if (dx > 0 && momentIndex > 0) { momentIndex--; renderMoment(); }
+    }
+    startX = null;
+  });
+})();
+</script>
+</body>
+</html>
