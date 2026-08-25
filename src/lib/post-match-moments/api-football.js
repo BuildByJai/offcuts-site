@@ -16,8 +16,36 @@
 const DEFAULT_HOST = "v3.football.api-sports.io";
 const RAPIDAPI_HOST = "api-football-v1.p.rapidapi.com";
 
+// API-Football league id for the Premier League. Like the team ids in
+// teams.js, this is the commonly-published value, not verified live here —
+// a wrong id would show up as an empty/mismatched fixture list rather than
+// fail silently, so it'll be obvious if it's off.
+const PREMIER_LEAGUE_ID = 39;
+
 const FIXTURES_LIST_TTL = 6 * 60 * 60; // finished-fixture lists change slowly
 const FULL_MATCH_TTL = 60 * 60 * 24 * 30; // a finished match's own data never changes
+
+// API-Football's `season` param is the year a season starts; the Premier
+// League season runs roughly Aug-May, so before July still belongs to the
+// season that started the previous calendar year.
+function currentSeasonStartYear(date = new Date()) {
+  const year = date.getUTCFullYear();
+  return date.getUTCMonth() >= 6 ? year : year - 1; // getUTCMonth() is 0-indexed; 6 = July
+}
+
+function mapFixtures(raw) {
+  return raw.map((f) => ({
+    id: f.fixture.id,
+    date: f.fixture.date,
+    competition: f.league?.name,
+    homeTeam: f.teams.home.name,
+    awayTeam: f.teams.away.name,
+    homeTeamId: f.teams.home.id,
+    awayTeamId: f.teams.away.id,
+    homeScore: f.goals.home,
+    awayScore: f.goals.away,
+  }));
+}
 
 async function apiFootballFetch(env, path, params) {
   if (!env.API_FOOTBALL_KEY) {
@@ -56,24 +84,33 @@ async function cached(env, key, ttlSeconds, load) {
   return value;
 }
 
+// Free-tier API-Football has no `last`/`next` param (Pro-only), so this
+// pulls the current season's finished fixtures for the team and sorts/slices
+// client-side. Early in a season there may not be `last` finished matches
+// yet, so it falls back to also pulling the previous season when short.
 export async function getRecentFixturesForTeam(env, teamId, { last = 10 } = {}) {
   return cached(env, `fixtures:team:${teamId}`, FIXTURES_LIST_TTL, async () => {
-    const response = await apiFootballFetch(env, "/fixtures", {
+    const season = currentSeasonStartYear();
+    let raw = await apiFootballFetch(env, "/fixtures", {
       team: teamId,
+      league: PREMIER_LEAGUE_ID,
+      season,
       status: "FT",
-      last,
     });
-    return response.map((f) => ({
-      id: f.fixture.id,
-      date: f.fixture.date,
-      competition: f.league?.name,
-      homeTeam: f.teams.home.name,
-      awayTeam: f.teams.away.name,
-      homeTeamId: f.teams.home.id,
-      awayTeamId: f.teams.away.id,
-      homeScore: f.goals.home,
-      awayScore: f.goals.away,
-    }));
+
+    if (raw.length < last) {
+      const prevRaw = await apiFootballFetch(env, "/fixtures", {
+        team: teamId,
+        league: PREMIER_LEAGUE_ID,
+        season: season - 1,
+        status: "FT",
+      });
+      raw = raw.concat(prevRaw);
+    }
+
+    return mapFixtures(raw)
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, last);
   });
 }
 
