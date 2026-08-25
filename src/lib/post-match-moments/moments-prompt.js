@@ -1,12 +1,18 @@
 // Two-pass Anthropic pipeline for the Post-Match Moments tool.
 //
-// Pass 1 (generateMoments): raw fixture data (events, stats, lineups, player
-// ratings) -> 4-8 talking-point moments with a headline/script/subtitle and
-// a prose `shape_description` of the illustrative positioning.
+// v2: input is a pasted match report (prose), not API-Football data. Live
+// testing showed the API-Football version produced poor/"random" player
+// positions — categorical stats (shot counts, cards, subs) have no
+// descriptive texture for Claude to reconstruct a scene from. A real match
+// report already describes who did what, where, and how, which is what the
+// shape-generation pass actually needs.
+//
+// Pass 1 (generateMoments): match label + report text -> 4-8 talking-point
+// moments with a headline/script/subtitle and a prose `shape_description`.
 // Pass 2 (generateDots): a narrowly-scoped pass per moment that converts
-// `shape_description` + the real lineup into ~10-15 before/after dot
-// coordinates, in the coordinate system Track A's renderer expects (see the
-// contract comment at the top of tools/post-match-moments/index.html):
+// `shape_description` into ~8-15 before/after dot coordinates, grounded in
+// what the report specifically says — see the coordinate contract comment
+// at the top of tools/post-match-moments/index.html:
 //   x: 0-100 across the pitch width, y: 0-100 along the pitch length,
 //   "team" is "home" or "away" for dot styling only.
 //
@@ -56,7 +62,7 @@ async function callClaude(env, { system, messages, tool, maxTokens, effort }) {
 
 const MOMENTS_TOOL = {
   name: "record_moments",
-  description: "Record the talking-point moments extracted from this match.",
+  description: "Record the talking-point moments extracted from this match report.",
   input_schema: {
     type: "object",
     properties: {
@@ -67,17 +73,28 @@ const MOMENTS_TOOL = {
         items: {
           type: "object",
           properties: {
-            minute: { type: "integer", description: "Minute the moment happened" },
+            minute: {
+              type: ["integer", "null"],
+              description: "Minute the moment happened. Use the exact minute if the report states one; otherwise your best approximate integer from context (e.g. 'just before half-time' ~44). Only null if there's truly no time indication.",
+            },
             headline: { type: "string", description: "Short, caps-style headline for an on-grass overlay, under 40 characters" },
             script: { type: "string", description: "1-2 sentence voiceover line" },
             subtitle: { type: "string", description: "Shorter version of the script for an on-screen subtitle, under 60 characters" },
             focal_players: {
               type: "array",
-              items: { type: "object", properties: { number: { type: "integer" }, team: { type: "string", enum: ["home", "away"] }, name: { type: "string" } }, required: ["number", "team"] },
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  team: { type: "string", enum: ["home", "away"], description: "First club named in the match label is 'home', second is 'away' — for dot-coloring only." },
+                  number: { type: "integer", description: "Shirt number — only include this field if the report actually states one; most reports won't, and that's fine." },
+                },
+                required: ["name", "team"],
+              },
             },
             shape_description: {
               type: "string",
-              description: "Prose description of the illustrative before/after positioning for this moment — which players, roughly where on the pitch, and how they move. Always framed as illustrative, never as tracked positional fact.",
+              description: "Prose description of the illustrative before/after positioning, grounded specifically in what the report says happened (literal movement, e.g. 'burst past two defenders down the left before cutting inside'). Always illustrative, never tracked positional fact. If the report doesn't describe enough detail for this moment, say so and describe a simple, static, generic arrangement instead of inventing movement.",
             },
           },
           required: ["minute", "headline", "script", "subtitle", "focal_players", "shape_description"],
@@ -88,48 +105,15 @@ const MOMENTS_TOOL = {
   },
 };
 
-function summarizeForPrompt(fixtureData) {
-  const { fixture, events, statistics, players, lineups } = fixtureData;
-  return {
-    fixture,
-    events: events.map((e) => ({
-      minute: e.time.elapsed,
-      type: e.type,
-      detail: e.detail,
-      team: e.team?.name,
-      player: e.player?.name,
-      assist: e.assist?.name,
-    })),
-    statistics: statistics.map((s) => ({
-      team: s.team.name,
-      stats: Object.fromEntries((s.statistics || []).map((row) => [row.type, row.value])),
-    })),
-    ratings: players.flatMap((teamBlock) =>
-      (teamBlock.players || []).map((p) => ({
-        team: teamBlock.team.name,
-        number: p.player.number,
-        name: p.player.name,
-        rating: p.statistics?.[0]?.games?.rating,
-      }))
-    ),
-    lineups: lineups.map((l) => ({
-      team: l.team.name,
-      formation: l.formation,
-      startXI: (l.startXI || []).map((s) => ({ number: s.player.number, name: s.player.name, position: s.player.pos })),
-    })),
-  };
-}
+export async function generateMoments(env, matchLabel, reportText) {
+  const system = `You are a football analyst writing short, punchy talking points for a TikTok-style highlights account. You're given a match label and the full prose text of a real match report for one finished football match. Pick 4-8 moments (goals, key chances, tactical shifts, defensive lapses, big saves, momentum swings, substitution impacts) that make good short-form talking points.
 
-export async function generateMoments(env, fixtureData) {
-  const summary = summarizeForPrompt(fixtureData);
-  const system = `You are a football analyst writing short, punchy talking points for a TikTok-style highlights account. You are given real match events, team statistics, player ratings, and lineups for one finished Premier League fixture. Pick 4-8 moments (goals, key chances, tactical shifts, defensive lapses, substitution impacts, momentum swings) that make good short-form talking points.
-
-Every moment must be grounded in the given data — do not invent events, scorelines, or stats that aren't present. The "shape_description" field is an illustrative sketch of what likely happened positionally, clearly understood to be your interpretation, not tracked positional data (this API has no shot/pass coordinates). Headlines are short, punchy, caps-style. Scripts are natural spoken voiceover lines, 1-2 sentences.`;
+Every moment must be grounded in what the report actually says — never invent events, scorelines, or stats the text doesn't support. Headlines are short, punchy, caps-style. Scripts are natural spoken voiceover lines, 1-2 sentences. See each field's schema description for specifics on minute, focal_players, and shape_description.`;
 
   const messages = [
     {
       role: "user",
-      content: `Match data (JSON):\n${JSON.stringify(summary)}\n\nExtract 4-8 talking-point moments and call record_moments.`,
+      content: `Match: ${matchLabel}\n\nMatch report:\n${reportText}\n\nExtract 4-8 talking-point moments and call record_moments.`,
     },
   ];
 
@@ -158,7 +142,7 @@ const DOTS_TOOL = {
         items: {
           type: "object",
           properties: {
-            number: { type: "integer", description: "Shirt number" },
+            number: { type: "integer", description: "On-pitch dot label. Use the player's real shirt number only if focal_players stated one; otherwise assign a simple sequential placeholder (1, 2, 3, ...) — it's just a marker, not a real shirt number." },
             team: { type: "string", enum: ["home", "away"] },
             before: { type: "object", properties: { x: { type: "number" }, y: { type: "number" } }, required: ["x", "y"] },
             after: { type: "object", properties: { x: { type: "number" }, y: { type: "number" } }, required: ["x", "y"] },
@@ -171,20 +155,19 @@ const DOTS_TOOL = {
   },
 };
 
-export async function generateDots(env, moment, fixtureData) {
-  const lineups = fixtureData.lineups.map((l, i) => ({
-    team: i === 0 ? "home" : "away",
-    teamName: l.team.name,
-    formation: l.formation,
-    startXI: (l.startXI || []).map((s) => ({ number: s.player.number, position: s.player.pos })),
-  }));
+export async function generateDots(env, moment, matchLabel) {
+  const system = `You convert a prose description of illustrative football positioning into pitch coordinates for one moment. Coordinate system: x is 0-100 across the pitch width (0 = left touchline, 100 = right touchline), y is 0-100 along the pitch length (0 = top goal line, 100 = bottom goal line). Attacking direction is your call to make the shape read naturally — just be internally consistent within this one moment.
 
-  const system = `You convert a prose description of illustrative football positioning into pitch coordinates. Coordinate system: x is 0-100 across the pitch width (0 = left touchline, 100 = right touchline), y is 0-100 along the pitch length (0 = top goal line, 100 = bottom goal line). Return only coordinates for 8-15 players — the ones relevant to this moment, not the full 22. Attacking direction and which end is "top" are your call to make the shape read naturally for the description given; just be internally consistent within this one moment. This is illustrative sketch data, not tracked positions — plausible relative positioning is all that's required, not tactical precision.`;
+Ground every focal/named player's position in what the shape description specifically says — if it describes a literal movement (e.g. "bursts down the left and cuts inside"), their before/after coordinates should visibly show that movement, not a generic default. Only players the shape description or focal_players list actually names need deliberate, description-grounded placement.
+
+Every other dot (fill out to 8-15 total) is an unnamed teammate — place these in a simple, neutral resting formation (a normal defensive/midfield/attacking spread for each side, facing each other) rather than scattering them or inventing individual movement the text never described. If the shape description itself is thin or vague, don't compensate by fabricating a dramatic shape — default the whole moment to a simple, mostly-static arrangement (small or no before/after difference) instead.
+
+This is illustrative sketch data, not tracked positions — plausible, text-grounded relative positioning is all that's required, not tactical precision.`;
 
   const messages = [
     {
       role: "user",
-      content: `Team lineups (JSON):\n${JSON.stringify(lineups)}\n\nMoment shape description:\n${moment.shape_description}\n\nFocal players: ${JSON.stringify(moment.focal_players)}\n\nCall record_dots with before/after coordinates for the 8-15 players involved.`,
+      content: `Match: ${matchLabel}\n\nMoment shape description:\n${moment.shape_description}\n\nFocal players: ${JSON.stringify(moment.focal_players)}\n\nCall record_dots with before/after coordinates for 8-15 players — the named focal players placed deliberately per the description, the rest in a neutral resting formation.`,
     },
   ];
 
@@ -193,18 +176,18 @@ export async function generateDots(env, moment, fixtureData) {
     messages,
     tool: DOTS_TOOL,
     maxTokens: 2048,
-    effort: "low",
+    effort: "medium",
   });
   return result.dots;
 }
 
 // ---------- orchestration ----------
 
-export async function generateAllMoments(env, fixtureData) {
-  const moments = await generateMoments(env, fixtureData);
+export async function generateAllMoments(env, matchLabel, reportText) {
+  const moments = await generateMoments(env, matchLabel, reportText);
   return Promise.all(
     moments.map(async (m) => {
-      const dots = await generateDots(env, m, fixtureData);
+      const dots = await generateDots(env, m, matchLabel);
       return { minute: m.minute, headline: m.headline, script: m.script, subtitle: m.subtitle, dots };
     })
   );

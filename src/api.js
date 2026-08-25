@@ -1,7 +1,5 @@
 import { PLAYER_POOL, MAX_SQUAD, MAX_PER_TEAM, BUDGET_CAP } from "./lib/players.js";
-import { isCoveredTeamId } from "./lib/post-match-moments/teams.js";
-import { getRecentFixturesForTeam } from "./lib/post-match-moments/api-football.js";
-import { getMomentsForFixture } from "./lib/post-match-moments/pipeline.js";
+import { generateMomentsFromReport } from "./lib/post-match-moments/pipeline.js";
 
 const ID_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -143,24 +141,24 @@ async function handleLeaderboard(env) {
   return json(await getLeaderboard(env));
 }
 
-async function handlePmmFixtures(url, env) {
-  const teamId = Number(url.searchParams.get("team"));
-  if (!teamId || !isCoveredTeamId(teamId)) {
-    return json({ error: "Unknown or unsupported team id" }, 400);
-  }
+async function handlePmmMoments(request, env) {
+  let body;
   try {
-    const fixtures = await getRecentFixturesForTeam(env, teamId);
-    return json({ fixtures });
-  } catch (err) {
-    return json({ error: err.message || "Could not load fixtures" }, 502);
+    body = await request.json();
+  } catch {
+    return json({ error: "Invalid JSON body" }, 400);
   }
-}
 
-async function handlePmmMoments(url, env) {
-  const fixtureId = Number(url.searchParams.get("fixture"));
-  if (!fixtureId) return json({ error: "Missing fixture id" }, 400);
+  const matchLabel = typeof body.matchLabel === "string" ? body.matchLabel.trim() : "";
+  const reportText = typeof body.reportText === "string" ? body.reportText.trim() : "";
+
+  if (!matchLabel) return json({ error: "Match label is required" }, 400);
+  if (matchLabel.length > 200) return json({ error: "Match label must be 200 characters or fewer" }, 400);
+  if (!reportText) return json({ error: "Match report text is required" }, 400);
+  if (reportText.length > 30000) return json({ error: "Match report must be 30,000 characters or fewer" }, 400);
+
   try {
-    const data = await getMomentsForFixture(env, fixtureId);
+    const data = await generateMomentsFromReport(env, matchLabel, reportText);
     return json(data);
   } catch (err) {
     return json({ error: err.message || "Could not generate moments" }, 502);
@@ -181,11 +179,8 @@ export default {
     if (squadMatch && request.method === "GET") {
       return handleGetSquad(decodeURIComponent(squadMatch[1]), env);
     }
-    if (url.pathname === "/api/pmm/fixtures" && request.method === "GET") {
-      return handlePmmFixtures(url, env);
-    }
-    if (url.pathname === "/api/pmm/moments" && request.method === "GET") {
-      return handlePmmMoments(url, env);
+    if (url.pathname === "/api/pmm/moments" && request.method === "POST") {
+      return handlePmmMoments(request, env);
     }
 
     return env.ASSETS.fetch(request);
