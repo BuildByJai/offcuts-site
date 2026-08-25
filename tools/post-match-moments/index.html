@@ -354,13 +354,19 @@ async function selectTeam(team) {
 
   try {
     const res = await fetch(`/api/pmm/fixtures?team=${team.id}`);
-    if (!res.ok) throw new Error('backend not ready');
-    const data = await res.json();
-    if (!Array.isArray(data.fixtures) || data.fixtures.length === 0) throw new Error('no fixtures');
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error((data && data.error) || `HTTP ${res.status}`);
+    if (!Array.isArray(data.fixtures) || data.fixtures.length === 0) throw new Error('No finished fixtures came back for this club');
     renderFixtureList(data.fixtures, team);
   } catch (err) {
-    listEl.innerHTML = `<div class="error">Live match data isn't wired up yet in this environment (API-Football key / KV cache pending manual setup). Use the sample preview above to check the renderer, or try again once the backend is configured.</div>`;
+    listEl.innerHTML = `<div class="error">Couldn't load fixtures: ${escapeHtml(err.message)}. Use the sample preview above to check the renderer in the meantime.</div>`;
   }
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = String(str);
+  return div.innerHTML;
 }
 
 function renderFixtureList(fixtures, team) {
@@ -386,12 +392,12 @@ async function selectFixture(fixture) {
   listEl.innerHTML = '<div class="loading"><span class="spin"></span>Pulling events, stats and ratings, then generating moments…</div>';
   try {
     const res = await fetch(`/api/pmm/moments?fixture=${fixture.id}`);
-    if (!res.ok) throw new Error('moments not ready');
-    const data = await res.json();
-    if (!Array.isArray(data.moments) || data.moments.length === 0) throw new Error('empty moments');
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error((data && data.error) || `HTTP ${res.status}`);
+    if (!Array.isArray(data.moments) || data.moments.length === 0) throw new Error('The AI pipeline returned no moments');
     playMoments({ homeTeam: fixture.homeTeam, awayTeam: fixture.awayTeam, isSample: false, moments: data.moments });
   } catch (err) {
-    listEl.innerHTML = `<div class="error">Couldn't generate moments for this match yet (AI pipeline / API keys pending manual setup). Use the sample preview above to check the renderer.</div>`;
+    listEl.innerHTML = `<div class="error">Couldn't generate moments for this match: ${escapeHtml(err.message)}. Use the sample preview above to check the renderer in the meantime.</div>`;
   }
 }
 
