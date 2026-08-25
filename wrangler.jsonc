@@ -26,5 +26,19 @@
       "binding": "FANTASY_LEADERBOARD_CACHE",
       "id": "4957f81e28784db097635870c5055b29"
     }
+    // MANUAL SETUP NEEDED — Post-Match Moments tool (tools/post-match-moments/):
+    // create a KV namespace in the Cloudflare dashboard, bind it here as
+    // { "binding": "POST_MATCH_CACHE", "id": "<real id>" }, and set these
+    // Worker secrets (`wrangler secret put <NAME>`):
+    //   - API_FOOTBALL_KEY  (reuse the Golden Boot Tracker key if still
+    //     valid — no such tool exists in this repo/history though, so
+    //     confirm a live key before relying on it)
+    //   - API_FOOTBALL_HOST (optional; defaults to v3.football.api-sports.io —
+    //     only set this to api-football-v1.p.rapidapi.com if the reused
+    //     account is a RapidAPI subscription instead)
+    //   - ANTHROPIC_API_KEY
+    //   - ANTHROPIC_MODEL   (optional; defaults to claude-opus-5)
+    // Placeholder KV IDs break bindings, so this is left out until a real
+    // namespace exists — see src/lib/post-match-moments/api-football.js.
   ]
 }
