@@ -31,10 +31,14 @@
       "id": "1c9df72099cb484190a70d2417a16481"
     }
   ]
-  // API_FOOTBALL_KEY and ANTHROPIC_API_KEY are set as Worker secrets
-  // (`wrangler secret put <NAME>`) for the Post-Match Moments tool — not
-  // stored here. Optional overrides, also via secret/env if ever needed:
-  //   - API_FOOTBALL_HOST (defaults to v3.football.api-sports.io; set to
-  //     api-football-v1.p.rapidapi.com only if the account is RapidAPI-based)
-  //   - ANTHROPIC_MODEL   (defaults to claude-opus-5)
+  // ANTHROPIC_API_KEY is set as a Worker secret (`wrangler secret put
+  // ANTHROPIC_API_KEY`) for the Post-Match Moments tool — not stored here.
+  // Optional override, also via secret/env if ever needed:
+  //   - ANTHROPIC_MODEL (defaults to claude-opus-5)
+  //
+  // v2 note: this tool no longer pulls from API-Football — input is now a
+  // pasted match report (see tools/post-match-moments/). API_FOOTBALL_KEY
+  // is still set as a secret from the earlier version but is unused; no
+  // need to remove it. POST_MATCH_CACHE is repurposed to cache generated
+  // moments by a hash of the pasted report instead of API fixture data.
 }

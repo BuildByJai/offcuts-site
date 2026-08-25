@@ -40,30 +40,17 @@
   .btn.small { padding:7px 14px; font-size:13px; }
   .error { color:var(--warn); font-size:13.5px; margin: 10px 0 0; background: var(--warn-soft); border-radius: 8px; padding: 10px 12px; }
   .hint { font-size: 13px; color: var(--ink-soft); margin: 10px 0 0; }
-
-  /* team chip row */
-  .chip-row { display:flex; gap:8px; flex-wrap:wrap; }
-  .team-chip {
-    padding:9px 15px; border:1.5px solid var(--line); border-radius:20px; background:#fff;
-    font-family:'Inter',sans-serif; font-size:14px; font-weight:600; cursor:pointer; color:var(--ink);
-    display:flex; align-items:center; gap:8px;
-  }
-  .team-chip .dot-sw { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
-  .team-chip:hover { border-color: var(--accent); }
-  .team-chip.active { border-color:var(--accent); background:var(--accent-soft); }
-
-  /* fixture list */
-  .fixture-row {
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
-    padding:14px 4px; border-bottom:1px solid var(--line); cursor:pointer;
-  }
-  .fixture-row:hover { background: var(--accent-soft); }
-  .fixture-row:last-child { border-bottom:none; }
-  .fixture-teams { font-size:14.5px; font-weight:600; }
-  .fixture-meta { font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--ink-soft); margin-top:2px; }
-  .fixture-score { font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700; flex-shrink:0; }
   .back-link { font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--accent); background:none; border:none; cursor:pointer; padding:0 0 14px; text-decoration:none; display:inline-block; }
   .back-link:hover { text-decoration:underline; }
+
+  /* report input form */
+  .field { margin-bottom:16px; }
+  input[type=text], textarea {
+    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px;
+    font-family:'Inter',sans-serif; font-size:15px; background:#fff; color:var(--ink);
+  }
+  textarea { resize:vertical; min-height:180px; line-height:1.5; }
+  input[type=text]:focus, textarea:focus { outline:none; border-color:var(--accent); }
 
   .loading { padding: 20px 4px; color: var(--ink-soft); font-size: 14px; font-family:'JetBrains Mono',monospace; }
   .loading .spin { display:inline-block; width:10px; height:10px; border-radius:50%; border:2px solid var(--line); border-top-color:var(--accent); animation: spin 0.8s linear infinite; margin-right:8px; vertical-align:-1px; }
@@ -166,33 +153,36 @@
 <div class="wrap">
   <div class="crumb"><a href="../../">← Offcuts</a></div>
   <h1>Post-Match Moments</h1>
-  <p class="lede">Pick a finished Premier League match. Real events and stats get turned into a handful of talking-point moments, each rendered as a short animated pitch clip — ready to narrate over or post with subtitles on.</p>
-  <div class="disclaimer-top">Player positions in each clip are an illustrative read of what happened — a whiteboard sketch, not tracked data. API-Football provides events and stats, not shot/pass coordinates, so treat the shapes as a storytelling aid, never literal positional accuracy.</div>
+  <p class="lede">Paste a match report and get a handful of talking-point moments back, each rendered as a short animated pitch clip — ready to narrate over or post with subtitles on.</p>
+  <div class="disclaimer-top">Player positions in each clip are an illustrative read of what the report describes — a whiteboard sketch grounded in the text, not tracked data or real coordinates. Only players the report actually describes get deliberate placement; everyone else sits in a generic resting shape.</div>
 
-  <!-- STEP 1: team picker -->
-  <div class="panel" id="teamPanel">
-    <label>1. Pick a club</label>
-    <div class="chip-row" id="teamChips"></div>
-  </div>
-
-  <!-- STEP 2: fixture picker -->
-  <div class="panel" id="fixturePanel" style="display:none;">
-    <button class="back-link" id="backToTeams">← Back to clubs</button>
-    <label id="fixtureLabel">2. Pick a finished match</label>
-    <p class="hint" style="margin-top:0;">Currently pulling from the 2023/24 season only — API-Football's free tier restricts match data to 2022–2024, so these aren't recent results. Widens once the plan is upgraded.</p>
-    <div id="fixtureList"></div>
+  <!-- STEP 1: paste a match report -->
+  <div class="panel" id="inputPanel">
+    <label>1. Match details</label>
+    <form id="reportForm">
+      <div class="field">
+        <label for="matchLabelInput">Match label</label>
+        <input type="text" id="matchLabelInput" placeholder="e.g. Newcastle vs Liverpool, 24 Aug 2026" maxlength="200" required>
+      </div>
+      <div class="field">
+        <label for="reportTextInput">Match report</label>
+        <textarea id="reportTextInput" placeholder="Paste the full match report text here…" required></textarea>
+      </div>
+      <button type="submit" class="btn" id="submitReportBtn">Generate moments</button>
+      <div id="inputStatus"></div>
+    </form>
   </div>
 
   <!-- sample renderer preview, always available so the render pipeline can be checked independent of live data -->
   <div class="panel" id="samplePanel">
     <label>Renderer preview</label>
-    <p class="hint" style="margin-top:0;">Proves out the clip renderer with a hand-fed sample moment — no live match data, no API calls.</p>
+    <p class="hint" style="margin-top:0;">Proves out the clip renderer with a hand-fed sample moment — no pasted report, no API calls.</p>
     <button class="btn ghost small" id="loadSampleBtn">▶ Preview with sample data</button>
   </div>
 
-  <!-- STEP 3: moment player -->
+  <!-- STEP 2: moment player -->
   <div class="player-shell" id="playerShell">
-    <button class="back-link" id="backToFixtures">← Back to matches</button>
+    <button class="back-link" id="backToInput">← Edit match report</button>
     <div id="sampleBannerWrap"></div>
     <div class="frame-outer">
       <div class="frame" id="frame">
@@ -219,16 +209,16 @@
 
   <section class="copy">
     <h2>How it works</h2>
-    <p>Pick one of the eight covered clubs, then a finished match. The tool pulls that fixture's real goals, cards, subs, shot and possession stats, and post-match ratings from API-Football, then an AI pass turns the data into a handful of talking-point moments with short scripts. Each moment renders as an animated pitch clip you can narrate over or post with the built-in subtitles.</p>
+    <p>Paste the full text of a real match report — a team news site, a live blog, your own notes — along with a short label for the match. An AI pass reads the report and pulls out a handful of talking-point moments with short scripts, grounding every detail (including the illustrative pitch shapes) in what the text actually describes. Each moment renders as an animated pitch clip you can narrate over or post with the built-in subtitles.</p>
     <div class="faq">
-      <h3>Why only 8 clubs?</h3>
-      <p>Keeping the list fixed keeps the picker simple and keeps the AI pass working with a consistent, familiar set of squads rather than open-ended fixture search.</p>
+      <h3>Why paste a report instead of picking a match?</h3>
+      <p>An earlier version pulled fixtures automatically from a stats API. It technically worked, but categorical data (shot counts, cards, subs) has no descriptive texture — the AI had nothing to ground a scene in, so the pitch shapes came out looking random. A real match report already says who did what, where, which is what actually makes the shapes worth watching.</p>
       <h3>Are the player positions real?</h3>
-      <p>No — they're an illustrative sketch built from event data and stats, not tracked positional data. Use them as a storytelling aid, not a tactical record.</p>
+      <p>No — they're an illustrative sketch grounded in what the report describes, not tracked positional data. Named, described players get deliberate placement; everyone else sits in a generic resting shape rather than being scattered at random. Use it as a storytelling aid, not a tactical record.</p>
     </div>
   </section>
 
-  <div class="disclaimer">Data via API-Football. Moments and scripts generated by AI from real match events, stats, and post-match ratings — always verify before publishing. Not affiliated with the Premier League or any club.</div>
+  <div class="disclaimer">Moments and scripts generated by AI from a pasted match report — always verify before publishing. Not affiliated with the Premier League or any club.</div>
   <footer>Offcuts — random tools, built on request.</footer>
 </div>
 
@@ -242,17 +232,6 @@
  *     screen position is (x/100*68, y/100*105).
  */
 const PITCH_W = 68, PITCH_L = 105;
-
-const TEAMS = [
-  { id: 40, name: 'Liverpool', color: '#C8102E' },
-  { id: 42, name: 'Arsenal', color: '#EF0107' },
-  { id: 47, name: 'Tottenham', color: '#132257' },
-  { id: 49, name: 'Chelsea', color: '#034694' },
-  { id: 50, name: 'Manchester City', color: '#6CABDD' },
-  { id: 33, name: 'Manchester United', color: '#DA291C' },
-  { id: 51, name: 'Brighton', color: '#0057B8' },
-  { id: 35, name: 'Bournemouth', color: '#DA291C' },
-];
 
 // Hand-fed proof moments for Track A — no AI, no live data. Team names are
 // real (two of the covered clubs) but the scoreline/events are invented for
@@ -319,88 +298,51 @@ let progressStart = 0;
 let progressRAF = null;
 const MOMENT_DURATION_MS = 6500;
 
-// ---------- team / fixture picker ----------
-const teamChipsEl = document.getElementById('teamChips');
-TEAMS.forEach(team => {
-  const chip = document.createElement('button');
-  chip.className = 'team-chip';
-  chip.innerHTML = `<span class="dot-sw" style="background:${team.color}"></span>${team.name}`;
-  chip.addEventListener('click', () => selectTeam(team));
-  teamChipsEl.appendChild(chip);
-});
-
-document.getElementById('backToTeams').addEventListener('click', () => {
-  document.getElementById('fixturePanel').style.display = 'none';
-  document.getElementById('teamPanel').style.display = '';
-});
-document.getElementById('backToFixtures').addEventListener('click', () => {
-  stopPlayback();
-  document.getElementById('playerShell').classList.remove('active');
-  document.getElementById('fixturePanel').style.display = document.getElementById('fixturePanel').dataset.hasTeam ? '' : 'none';
-  document.getElementById('teamPanel').style.display = document.getElementById('fixturePanel').dataset.hasTeam ? 'none' : '';
-});
-
-async function selectTeam(team) {
-  [...teamChipsEl.children].forEach(c => c.classList.remove('active'));
-  const idx = TEAMS.indexOf(team);
-  teamChipsEl.children[idx].classList.add('active');
-
-  document.getElementById('teamPanel').style.display = 'none';
-  const fixturePanel = document.getElementById('fixturePanel');
-  fixturePanel.style.display = '';
-  fixturePanel.dataset.hasTeam = '1';
-  document.getElementById('fixtureLabel').textContent = `2. Finished ${team.name} matches — 2023/24 season`;
-  const listEl = document.getElementById('fixtureList');
-  listEl.innerHTML = '<div class="loading"><span class="spin"></span>Loading fixtures…</div>';
-
-  try {
-    const res = await fetch(`/api/pmm/fixtures?team=${team.id}`);
-    const data = await res.json().catch(() => null);
-    if (!res.ok) throw new Error((data && data.error) || `HTTP ${res.status}`);
-    if (!Array.isArray(data.fixtures) || data.fixtures.length === 0) throw new Error('No finished fixtures came back for this club');
-    renderFixtureList(data.fixtures, team);
-  } catch (err) {
-    listEl.innerHTML = `<div class="error">Couldn't load fixtures: ${escapeHtml(err.message)}. Use the sample preview above to check the renderer in the meantime.</div>`;
-  }
-}
-
+// ---------- report input ----------
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = String(str);
   return div.innerHTML;
 }
 
-function renderFixtureList(fixtures, team) {
-  const listEl = document.getElementById('fixtureList');
-  listEl.innerHTML = '';
-  fixtures.forEach(fx => {
-    const row = document.createElement('div');
-    row.className = 'fixture-row';
-    row.innerHTML = `
-      <div>
-        <div class="fixture-teams">${fx.homeTeam} vs ${fx.awayTeam}</div>
-        <div class="fixture-meta">${fx.date} · ${fx.competition || 'Premier League'}</div>
-      </div>
-      <div class="fixture-score">${fx.homeScore}–${fx.awayScore}</div>
-    `;
-    row.addEventListener('click', () => selectFixture(fx));
-    listEl.appendChild(row);
-  });
-}
+document.getElementById('backToInput').addEventListener('click', () => {
+  stopPlayback();
+  document.getElementById('playerShell').classList.remove('active');
+  document.getElementById('inputPanel').style.display = '';
+});
 
-async function selectFixture(fixture) {
-  const listEl = document.getElementById('fixtureList');
-  listEl.innerHTML = '<div class="loading"><span class="spin"></span>Pulling events, stats and ratings, then generating moments…</div>';
+document.getElementById('reportForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const matchLabel = document.getElementById('matchLabelInput').value.trim();
+  const reportText = document.getElementById('reportTextInput').value.trim();
+  const statusEl = document.getElementById('inputStatus');
+  const submitBtn = document.getElementById('submitReportBtn');
+
+  if (!matchLabel || !reportText) {
+    statusEl.innerHTML = '<div class="error">Both a match label and the report text are required.</div>';
+    return;
+  }
+
+  submitBtn.disabled = true;
+  statusEl.innerHTML = '<div class="loading"><span class="spin"></span>Reading the report and generating moments…</div>';
+
   try {
-    const res = await fetch(`/api/pmm/moments?fixture=${fixture.id}`);
+    const res = await fetch('/api/pmm/moments', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ matchLabel, reportText }),
+    });
     const data = await res.json().catch(() => null);
     if (!res.ok) throw new Error((data && data.error) || `HTTP ${res.status}`);
     if (!Array.isArray(data.moments) || data.moments.length === 0) throw new Error('The AI pipeline returned no moments');
-    playMoments({ homeTeam: fixture.homeTeam, awayTeam: fixture.awayTeam, isSample: false, moments: data.moments });
+    statusEl.innerHTML = '';
+    playMoments({ matchLabel, isSample: false, moments: data.moments });
   } catch (err) {
-    listEl.innerHTML = `<div class="error">Couldn't generate moments for this match: ${escapeHtml(err.message)}. Use the sample preview above to check the renderer in the meantime.</div>`;
+    statusEl.innerHTML = `<div class="error">Couldn't generate moments: ${escapeHtml(err.message)}. Use the sample preview below to check the renderer in the meantime.</div>`;
+  } finally {
+    submitBtn.disabled = false;
   }
-}
+});
 
 document.getElementById('loadSampleBtn').addEventListener('click', () => playMoments(SAMPLE_MOMENTS));
 
@@ -443,8 +385,7 @@ function playMoments(data) {
   currentMoments = data;
   momentIndex = 0;
   playing = true;
-  document.getElementById('fixturePanel').style.display = 'none';
-  document.getElementById('teamPanel').style.display = 'none';
+  document.getElementById('inputPanel').style.display = 'none';
   document.getElementById('playerShell').classList.add('active');
 
   const bannerWrap = document.getElementById('sampleBannerWrap');
@@ -462,8 +403,10 @@ function renderMoment() {
   const total = currentMoments.moments.length;
 
   document.getElementById('momentCounter').textContent = `${momentIndex + 1} / ${total}`;
-  document.getElementById('minuteChip').textContent = `${m.minute}'`;
-  document.getElementById('minuteChip').classList.remove('in');
+  const minuteChip = document.getElementById('minuteChip');
+  minuteChip.style.display = m.minute != null ? '' : 'none';
+  minuteChip.textContent = m.minute != null ? `${m.minute}'` : '';
+  minuteChip.classList.remove('in');
   document.getElementById('headline').textContent = m.headline;
   document.getElementById('headline').classList.remove('in');
   document.getElementById('subtitleText').textContent = m.subtitle;
