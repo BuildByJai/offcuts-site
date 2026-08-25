@@ -25,13 +25,16 @@ const PREMIER_LEAGUE_ID = 39;
 const FIXTURES_LIST_TTL = 6 * 60 * 60; // finished-fixture lists change slowly
 const FULL_MATCH_TTL = 60 * 60 * 24 * 30; // a finished match's own data never changes
 
-// API-Football's `season` param is the year a season starts; the Premier
-// League season runs roughly Aug-May, so before July still belongs to the
-// season that started the previous calendar year.
-function currentSeasonStartYear(date = new Date()) {
-  const year = date.getUTCFullYear();
-  return date.getUTCMonth() >= 6 ? year : year - 1; // getUTCMonth() is 0-indexed; 6 = July
-}
+// FLAG: confirmed live — API-Football's free plan rejects any season
+// outside a fixed historical window: {"plan":"Free plans do not have access
+// to this season, try from 2022 to 2024."}. This is NOT relative to the
+// current date, so fixtures pulled right now are NOT recent matches — this
+// tool's "pick a finished match" premise only works with real recency on a
+// paid API-Football plan. Pinned to the 2023/24 season (safely inside the
+// allowed range, and a full completed season) until the plan is upgraded;
+// the frontend also says so explicitly rather than implying these are
+// current fixtures. Revisit this the moment the plan changes.
+const FREE_TIER_SEASON = 2023;
 
 function mapFixtures(raw) {
   return raw.map((f) => ({
@@ -85,28 +88,16 @@ async function cached(env, key, ttlSeconds, load) {
 }
 
 // Free-tier API-Football has no `last`/`next` param (Pro-only), so this
-// pulls the current season's finished fixtures for the team and sorts/slices
-// client-side. Early in a season there may not be `last` finished matches
-// yet, so it falls back to also pulling the previous season when short.
+// pulls the (free-tier-pinned) season's finished fixtures for the team and
+// sorts/slices client-side instead.
 export async function getRecentFixturesForTeam(env, teamId, { last = 10 } = {}) {
-  return cached(env, `fixtures:team:${teamId}`, FIXTURES_LIST_TTL, async () => {
-    const season = currentSeasonStartYear();
-    let raw = await apiFootballFetch(env, "/fixtures", {
+  return cached(env, `fixtures:team:${teamId}:season:${FREE_TIER_SEASON}`, FIXTURES_LIST_TTL, async () => {
+    const raw = await apiFootballFetch(env, "/fixtures", {
       team: teamId,
       league: PREMIER_LEAGUE_ID,
-      season,
+      season: FREE_TIER_SEASON,
       status: "FT",
     });
-
-    if (raw.length < last) {
-      const prevRaw = await apiFootballFetch(env, "/fixtures", {
-        team: teamId,
-        league: PREMIER_LEAGUE_ID,
-        season: season - 1,
-        status: "FT",
-      });
-      raw = raw.concat(prevRaw);
-    }
 
     return mapFixtures(raw)
       .sort((a, b) => new Date(b.date) - new Date(a.date))
