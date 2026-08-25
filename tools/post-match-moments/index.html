@@ -178,7 +178,8 @@
   <!-- STEP 2: fixture picker -->
   <div class="panel" id="fixturePanel" style="display:none;">
     <button class="back-link" id="backToTeams">← Back to clubs</button>
-    <label id="fixtureLabel">2. Pick a recent finished match</label>
+    <label id="fixtureLabel">2. Pick a finished match</label>
+    <p class="hint" style="margin-top:0;">Currently pulling from the 2023/24 season only — API-Football's free tier restricts match data to 2022–2024, so these aren't recent results. Widens once the plan is upgraded.</p>
     <div id="fixtureList"></div>
   </div>
 
@@ -348,7 +349,7 @@ async function selectTeam(team) {
   const fixturePanel = document.getElementById('fixturePanel');
   fixturePanel.style.display = '';
   fixturePanel.dataset.hasTeam = '1';
-  document.getElementById('fixtureLabel').textContent = `2. Recent finished ${team.name} matches`;
+  document.getElementById('fixtureLabel').textContent = `2. Finished ${team.name} matches — 2023/24 season`;
   const listEl = document.getElementById('fixtureList');
   listEl.innerHTML = '<div class="loading"><span class="spin"></span>Loading fixtures…</div>';
 
