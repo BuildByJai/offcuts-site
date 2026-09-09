@@ -74,9 +74,24 @@
   #vignette {
     position: fixed; inset: 0; z-index: 12; pointer-events: none; opacity: 0;
     background: radial-gradient(ellipse at center, rgba(180,20,20,0) 45%, rgba(150,10,10,0.7) 100%);
-    transition: opacity 0.3s ease;
   }
-  #vignette.show { opacity: 1; }
+
+  #fx-flash {
+    position: fixed; inset: 0; z-index: 13; pointer-events: none; opacity: 0;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 70%);
+  }
+  #fx-flash.hit {
+    background: radial-gradient(ellipse at center, rgba(255,70,50,0.6) 0%, rgba(255,70,50,0) 65%);
+  }
+
+  #sprint-btn {
+    position: fixed; right: 18px; bottom: 22px; z-index: 16;
+    width: 84px; height: 84px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.6); background: rgba(21,101,52,0.5);
+    color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.05em; -webkit-tap-highlight-color: transparent; touch-action: none; user-select: none;
+  }
+  #sprint-btn.active { background: rgba(21,101,52,0.88); transform: scale(0.94); }
 
   .results-row { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); }
   .results-row:last-of-type { border-bottom: none; }
@@ -97,6 +112,8 @@
 
 <canvas id="game-canvas"></canvas>
 <div id="vignette"></div>
+<div id="fx-flash"></div>
+<button id="sprint-btn" hidden>SPRINT</button>
 
 <div id="hud" hidden>
   <div id="hud-timer">0.0s</div>
@@ -111,7 +128,7 @@
     <span class="tag-inline">games</span>
     <h1>G4</h1>
     <p class="lede">Whiskers the cat is right behind you. Steer down the street, dodge the obstacles, and reach the garden gate before the gap runs out.</p>
-    <div class="controls-hint">Arrow keys / A&ndash;D to steer &middot; drag left/right on mobile &middot; obstacles cost you speed AND ground</div>
+    <div class="controls-hint">Arrow keys / A&ndash;D to steer, Shift/Space to sprint &middot; drag to steer + hold the sprint button on mobile &middot; obstacles cost you speed AND ground</div>
     <button class="btn" id="btn-start">Start Race</button>
     <p class="prompt">or press any key / tap to begin</p>
   </div>
@@ -153,6 +170,14 @@ const EYE_HEIGHT = 1.55;
 const GAP_MAX = 100;
 const GAP_DECAY_RATE = 2.6;
 const GAP_COLLISION_LOSS = 14;
+const SPRINT_SPEED_MULT = 1.38;
+const SPRINT_STEER_SLOP = 0.55;
+const SPRINT_GAP_REGEN = 11;
+const DREAD_THRESHOLD = 0.25;
+const BASE_FOV = 74;
+const FINAL_STRETCH_FOV_BOOST = 6;
+const BASE_FOG_NEAR = 40;
+const BASE_FOG_FAR = 125;
 
 const waypoints = [
   { d: 0,   x: 0 },
@@ -181,6 +206,20 @@ function centerX(d) {
   return waypoints[waypoints.length - 1].x;
 }
 
+/* escalation intensity 0..1: gentle opening, ramping middle, full-tilt final stretch */
+function escalationIntensity(progress) {
+  progress = Math.max(0, Math.min(1, progress));
+  if (progress < 0.3) {
+    const t = progress / 0.3;
+    return 0.15 * (t * t * (3 - 2 * t));
+  } else if (progress < 0.7) {
+    const t = (progress - 0.3) / 0.4;
+    return 0.15 + 0.55 * (t * t * (3 - 2 * t));
+  }
+  const t = (progress - 0.7) / 0.3;
+  return 0.70 + 0.30 * (t * t * (3 - 2 * t));
+}
+
 const BUS_STOP_D = 170;
 const ZEBRA_D = 470;
 const ROUNDABOUT_D = 360;
@@ -200,9 +239,9 @@ const rand = mulberry32(20260908);
 /* ---------------- three.js setup ---------------- */
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x9CA3A8);
-scene.fog = new THREE.Fog(0xA7ADB2, 40, 125);
+scene.fog = new THREE.Fog(0xA7ADB2, BASE_FOG_NEAR, BASE_FOG_FAR);
 
-const camera = new THREE.PerspectiveCamera(74, innerWidth / innerHeight, 0.1, 300);
+const camera = new THREE.PerspectiveCamera(BASE_FOV, innerWidth / innerHeight, 0.1, 300);
 camera.position.set(0, EYE_HEIGHT, 0);
 scene.add(camera);
 
@@ -210,11 +249,23 @@ const canvas = document.getElementById('game-canvas');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 
-scene.add(new THREE.AmbientLight(0xcfd6da, 0.55));
-const sun = new THREE.DirectionalLight(0xfff3e0, 0.85);
+scene.add(new THREE.AmbientLight(0xcfd6da, 0.42));
+const sun = new THREE.DirectionalLight(0xfff3e0, 0.95);
 sun.position.set(-24, 34, 14);
+sun.castShadow = true;
+sun.shadow.mapSize.set(512, 512);
+sun.shadow.camera.near = 1;
+sun.shadow.camera.far = 65;
+sun.shadow.camera.left = -24;
+sun.shadow.camera.right = 24;
+sun.shadow.camera.top = 24;
+sun.shadow.camera.bottom = -24;
+sun.shadow.bias = -0.0025;
 scene.add(sun);
+scene.add(sun.target);
 
 let skyMesh;
 function buildSky() {
@@ -247,10 +298,10 @@ const MAT = {
   pavement: new THREE.MeshLambertMaterial({ color: 0xa9a9a4 }),
   grass: new THREE.MeshLambertMaterial({ color: 0x5d8a4a }),
   hedge: new THREE.MeshLambertMaterial({ color: 0x3f6b34, flatShading: true }),
-  wallColors: [0xC9B89A, 0xD8CDBB, 0xB9A88C, 0xC2B49B, 0xCFC0A2].map(c => new THREE.MeshLambertMaterial({ color: c, flatShading: true })),
+  wallColors: [0xC9B89A, 0xD8CDBB, 0xB9A88C, 0xC2B49B, 0xCFC0A2, 0xA98F6E, 0xDDD6C4].map(c => new THREE.MeshLambertMaterial({ color: c, flatShading: true })),
   roof: new THREE.MeshLambertMaterial({ color: 0x5a3d33, flatShading: true }),
   roofDark: new THREE.MeshLambertMaterial({ color: 0x40332e, flatShading: true }),
-  doorColors: [0xB23A2E, 0x1F5F8B, 0x2F7D4F, 0xD9A02A, 0x6E3A6E].map(c => new THREE.MeshLambertMaterial({ color: c })),
+  doorColors: [0xB23A2E, 0x1F5F8B, 0x2F7D4F, 0xD9A02A, 0x6E3A6E, 0x2E7D6B, 0x8A2E2E].map(c => new THREE.MeshLambertMaterial({ color: c })),
   window: new THREE.MeshLambertMaterial({ color: 0x9fc4d6 }),
   binGreen: new THREE.MeshLambertMaterial({ color: 0x2f6b3a }),
   binBlack: new THREE.MeshLambertMaterial({ color: 0x272727 }),
@@ -271,7 +322,8 @@ const MAT = {
   flap: new THREE.MeshLambertMaterial({ color: 0x5c4229 }),
   catBody: new THREE.MeshLambertMaterial({ color: 0x2a2723, flatShading: true }),
   catChest: new THREE.MeshLambertMaterial({ color: 0xf2f2ee }),
-  catEyes: new THREE.MeshLambertMaterial({ color: 0xd9a02a })
+  catEyes: new THREE.MeshLambertMaterial({ color: 0xd9a02a }),
+  gardenWall: new THREE.MeshLambertMaterial({ color: 0xb08a6a, flatShading: true })
 };
 
 const GEO = {
@@ -280,25 +332,31 @@ const GEO = {
   cone: new THREE.ConeGeometry(1, 1, 8)
 };
 
-function addBox(mat, w, h, d, x, y, z, ry) {
+function addBox(mat, w, h, d, x, y, z, ry, castShadowFlag) {
   const m = new THREE.Mesh(GEO.box, mat);
   m.scale.set(w, h, d);
   m.position.set(x, y, z);
   if (ry) m.rotation.y = ry;
+  m.castShadow = castShadowFlag !== false;
+  m.receiveShadow = true;
   scene.add(m);
   return m;
 }
-function addCyl(mat, r, h, x, y, z) {
+function addCyl(mat, r, h, x, y, z, castShadowFlag) {
   const m = new THREE.Mesh(GEO.cyl, mat);
   m.scale.set(r, h, r);
   m.position.set(x, y, z);
+  m.castShadow = castShadowFlag !== false;
+  m.receiveShadow = true;
   scene.add(m);
   return m;
 }
-function addCone(mat, r, h, x, y, z) {
+function addCone(mat, r, h, x, y, z, castShadowFlag) {
   const m = new THREE.Mesh(GEO.cone, mat);
   m.scale.set(r, h, r);
   m.position.set(x, y, z);
+  m.castShadow = castShadowFlag !== false;
+  m.receiveShadow = true;
   scene.add(m);
   return m;
 }
@@ -308,6 +366,7 @@ const groundGeo = new THREE.PlaneGeometry(220, ROUTE_LENGTH + 140);
 const ground = new THREE.Mesh(groundGeo, MAT.grass);
 ground.rotation.x = -Math.PI / 2;
 ground.position.set(0, -0.02, -ROUTE_LENGTH / 2 + 30);
+ground.receiveShadow = true;
 scene.add(ground);
 
 function buildRibbon(material, halfWidth, y, extraLength) {
@@ -329,7 +388,9 @@ function buildRibbon(material, halfWidth, y, extraLength) {
   geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geo.setIndex(indices);
   geo.computeVertexNormals();
-  return new THREE.Mesh(geo, material);
+  const mesh = new THREE.Mesh(geo, material);
+  mesh.receiveShadow = true;
+  return mesh;
 }
 
 scene.add(buildRibbon(MAT.pavement, ROAD_HALF_WIDTH + PAVEMENT_WIDTH, 0, 14));
@@ -354,7 +415,9 @@ function buildEdgeStrip(material, edgeOffset, thickness, y, sign) {
   geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geo.setIndex(indices);
   geo.computeVertexNormals();
-  return new THREE.Mesh(geo, material);
+  const mesh = new THREE.Mesh(geo, material);
+  mesh.receiveShadow = true;
+  return mesh;
 }
 scene.add(buildEdgeStrip(MAT.kerbEdge, ROAD_HALF_WIDTH, 0.18, 0.025, -1));
 scene.add(buildEdgeStrip(MAT.kerbEdge, ROAD_HALF_WIDTH, 0.18, 0.025, 1));
@@ -363,7 +426,7 @@ function addCenterLine() {
   const dashLen = 2, gap = 2.5;
   for (let d = 5; d < ROUTE_LENGTH - 5; d += dashLen + gap) {
     const cx = centerX(d);
-    addBox(MAT.white, 0.22, 0.02, dashLen, cx, 0.035, -d - dashLen / 2);
+    addBox(MAT.white, 0.22, 0.02, dashLen, cx, 0.035, -d - dashLen / 2, 0, false);
   }
 }
 
@@ -373,20 +436,20 @@ function addZebraCrossing(d) {
   const totalDepth = bars * barDepth + (bars - 1) * gapDepth;
   const z0 = -d - totalDepth / 2;
   for (let i = 0; i < bars; i++) {
-    addBox(MAT.white, ROAD_HALF_WIDTH * 2 - 1, 0.03, barDepth, cx, 0.04, z0 + i * (barDepth + gapDepth) + barDepth / 2);
+    addBox(MAT.white, ROAD_HALF_WIDTH * 2 - 1, 0.03, barDepth, cx, 0.04, z0 + i * (barDepth + gapDepth) + barDepth / 2, 0, false);
   }
 }
 
 function addSpeedBump(d) {
   const cx = centerX(d);
-  addBox(MAT.white, ROAD_HALF_WIDTH * 2 - 0.6, 0.12, 0.5, cx, 0.06, -d);
+  addBox(MAT.white, ROAD_HALF_WIDTH * 2 - 0.6, 0.12, 0.5, cx, 0.06, -d, 0, false);
 }
 
 function addRoundabout(d) {
   const cx = centerX(d);
   const ix = cx - 9.5;
   const z = -d;
-  addCyl(MAT.kerb, 3.5, 0.08, ix, 0.04, z);
+  addCyl(MAT.kerb, 3.5, 0.08, ix, 0.04, z, false);
   addCyl(MAT.island, 3.2, 0.3, ix, 0.15, z);
   addCyl(MAT.treeTrunk, 0.18, 1.6, ix, 1.1, z);
   addCone(MAT.treeLeaf, 1.4, 2.1, ix, 2.75, z);
@@ -408,12 +471,12 @@ function buildHouse(cx, z, side) {
   const wallFrontX = houseX - side * (depth / 2);
   const bayProtrusion = 0.7;
   const bayX = wallFrontX - side * (bayProtrusion / 2);
-  addBox(wall, bayProtrusion, 1.5, 1.5, bayX, 0.85, z - length * 0.15);
-  addBox(MAT.window, bayProtrusion * 0.2, 0.9, 1.1, bayX - side * (bayProtrusion * 0.4), 0.95, z - length * 0.15);
+  addBox(wall, bayProtrusion, 1.5, 1.5, bayX, 0.85, z - length * 0.15, 0, false);
+  addBox(MAT.window, bayProtrusion * 0.2, 0.9, 1.1, bayX - side * (bayProtrusion * 0.4), 0.95, z - length * 0.15, 0, false);
 
   const door = MAT.doorColors[Math.floor(rand() * MAT.doorColors.length)];
-  addBox(door, 0.08, 1.7, 0.7, wallFrontX - side * 0.03, 0.85, z + length * 0.28);
-  addBox(MAT.window, 0.08, 0.8, 0.9, wallFrontX - side * 0.03, 2.15, z + length * 0.28);
+  addBox(door, 0.08, 1.7, 0.7, wallFrontX - side * 0.03, 0.85, z + length * 0.28, 0, false);
+  addBox(MAT.window, 0.08, 0.8, 0.9, wallFrontX - side * 0.03, 2.15, z + length * 0.28, 0, false);
 
   if (rand() < 0.8) {
     const binMats = [MAT.binGreen, MAT.binBlack, MAT.binBlue];
@@ -429,10 +492,22 @@ function buildHedge(cx, z, side) {
   addBox(MAT.hedge, 1.0, 0.75 + rand() * 0.15, 3.6, cx + side * 9.4, 0.4, z);
 }
 
+function buildGardenWall(cx, z, side) {
+  const wx = cx + side * 9.4;
+  addBox(MAT.gardenWall, 1.0, 0.6, 3.2, wx, 0.3, z);
+  addBox(MAT.kerb, 1.05, 0.08, 3.3, wx, 0.64, z, 0, false);
+}
+
+function buildStreetTree(cx, z, side) {
+  const tx = cx + side * 7.9;
+  addCyl(MAT.treeTrunk, 0.14, 1.4, tx, 0.7, z);
+  addCone(MAT.treeLeaf, 1.1, 1.7, tx, 2.0, z);
+}
+
 function buildPostbox(cx, z, side) {
   const px = cx + side * 6.6;
   addCyl(MAT.postboxRed, 0.28, 1.1, px, 0.55, z);
-  addCyl(MAT.postboxRed, 0.3, 0.15, px, 1.15, z);
+  addCyl(MAT.postboxRed, 0.3, 0.15, px, 1.15, z, false);
   OBSTACLES.push({ x: px, z: z, radius: 0.55 });
 }
 
@@ -442,7 +517,7 @@ function buildParkedCar(cx, z, side) {
   addBox(mat, 1.7, 0.85, 3.6, carX, 0.62, z);
   addBox(mat, 1.35, 0.55, 1.9, carX, 1.18, z - 0.15);
   [[-0.75, -1.3], [0.75, -1.3], [-0.75, 1.3], [0.75, 1.3]].forEach(([wx, wz]) => {
-    addCyl(MAT.tyre, 0.32, 0.28, carX + wx, 0.32, z + wz).rotation.z = Math.PI / 2;
+    addCyl(MAT.tyre, 0.32, 0.28, carX + wx, 0.32, z + wz, false).rotation.z = Math.PI / 2;
   });
   OBSTACLES.push({ x: carX, z: z, radius: 1.3 });
 }
@@ -463,13 +538,19 @@ const HOUSE_STEP = 18;
 for (let d = 25; d < ROUTE_LENGTH - 20; d += HOUSE_STEP) {
   const cx = centerX(d);
   const z = -d;
+  const spawnIntensity = escalationIntensity(d / ROUTE_LENGTH);
   [-1, 1].forEach(side => {
     const jitter = (rand() - 0.5) * 2;
-    buildHedge(cx, z + jitter * 0.3, side);
+    if (rand() < 0.22) {
+      buildGardenWall(cx, z + jitter * 0.3, side);
+    } else {
+      buildHedge(cx, z + jitter * 0.3, side);
+    }
     buildHouse(cx, z + jitter, side);
-    if (rand() < 0.35) buildPostbox(cx, z + jitter * 0.5, side);
+    if (rand() < 0.35 * (0.5 + spawnIntensity)) buildPostbox(cx, z + jitter * 0.5, side);
+    if (rand() < 0.18) buildStreetTree(cx, z + jitter * 0.6, side);
   });
-  if (rand() < 0.4) {
+  if (rand() < 0.4 * (0.5 + spawnIntensity * 1.3)) {
     const side = rand() < 0.5 ? -1 : 1;
     buildParkedCar(cx, z + (rand() - 0.5) * 4, side);
   }
@@ -482,6 +563,7 @@ SPEED_BUMP_DS.forEach(addSpeedBump);
 addCenterLine();
 
 /* ---------------- the sanctuary: where the cat can't follow ---------------- */
+let sanctuaryFlap;
 function buildSanctuary() {
   const cx = centerX(ROUTE_LENGTH);
   const z = -ROUTE_LENGTH - 2;
@@ -490,13 +572,14 @@ function buildSanctuary() {
   const panelWidth = (ROAD_HALF_WIDTH * 2 - gapWidth) / 2;
   addBox(MAT.fence, panelWidth, fenceHeight, 0.15, cx - gapWidth / 2 - panelWidth / 2, fenceHeight / 2, z);
   addBox(MAT.fence, panelWidth, fenceHeight, 0.15, cx + gapWidth / 2 + panelWidth / 2, fenceHeight / 2, z);
-  const flap = addBox(MAT.flap, gapWidth * 0.9, fenceHeight * 0.8, 0.06, cx, fenceHeight * 0.8 / 2, z);
-  flap.rotation.y = 0.18;
+  sanctuaryFlap = addBox(MAT.flap, gapWidth * 0.9, fenceHeight * 0.8, 0.06, cx, fenceHeight * 0.8 / 2, z);
+  sanctuaryFlap.rotation.y = 0.18;
 
   const gardenGeo = new THREE.PlaneGeometry(20, 20);
   const garden = new THREE.Mesh(gardenGeo, MAT.grass);
   garden.rotation.x = -Math.PI / 2;
   garden.position.set(cx, 0.01, z - 8);
+  garden.receiveShadow = true;
   scene.add(garden);
   for (let i = 0; i < 8; i++) {
     const a = (i / 8) * Math.PI * 2;
@@ -569,7 +652,7 @@ let catVisible = false;
 let catTimer = 0;
 let catCooldown = 1.2;
 
-function updateCat(dt) {
+function updateCat(dt, progress) {
   if (catVisible) {
     catTimer -= dt;
     catGroup.position.y = catGroup.userData.baseY + Math.abs(Math.sin(performance.now() * 0.02)) * 0.05;
@@ -585,7 +668,9 @@ function updateCat(dt) {
   const gapRatio = Math.max(0, gap) / GAP_MAX;
   const turnBoost = Math.abs(steerInput) > 0.45 ? 0.5 : 0;
   const proximityBoost = (1 - gapRatio) * 1.1;
-  const chance = (0.12 + turnBoost + proximityBoost) * dt;
+  const dreadBoost = dreadLevel * 0.9;
+  const escalationBoost = escalationIntensity(progress || 0) * 0.4;
+  const chance = (0.1 + turnBoost + proximityBoost + dreadBoost + escalationBoost) * dt;
   if (Math.random() < chance) triggerCatGlimpse(gapRatio);
 }
 
@@ -607,20 +692,26 @@ function updateRig(dt, steerInput) {
 }
 
 /* ---------------- input ---------------- */
-const keys = { left: false, right: false };
+const keys = { left: false, right: false, sprint: false };
 let touchStartX = null;
 let touchSteer = 0;
+const isTouchDevice = 'ontouchstart' in window;
 
 window.addEventListener('keydown', e => {
   const k = e.key.toLowerCase();
   if (k === 'arrowleft' || k === 'a') keys.left = true;
   if (k === 'arrowright' || k === 'd') keys.right = true;
+  if (k === 'shift' || k === ' ') {
+    keys.sprint = true;
+    if (state === 'racing') e.preventDefault();
+  }
   if (state === 'ready') startRace();
 });
 window.addEventListener('keyup', e => {
   const k = e.key.toLowerCase();
   if (k === 'arrowleft' || k === 'a') keys.left = false;
   if (k === 'arrowright' || k === 'd') keys.right = false;
+  if (k === 'shift' || k === ' ') keys.sprint = false;
 });
 canvas.addEventListener('touchstart', e => {
   if (state === 'ready') startRace();
@@ -633,6 +724,21 @@ canvas.addEventListener('touchmove', e => {
 }, { passive: true });
 canvas.addEventListener('touchend', () => { touchStartX = null; touchSteer = 0; }, { passive: true });
 canvas.addEventListener('click', () => { if (state === 'ready') startRace(); });
+
+const sprintBtn = document.getElementById('sprint-btn');
+sprintBtn.addEventListener('touchstart', e => {
+  e.preventDefault();
+  e.stopPropagation();
+  keys.sprint = true;
+  sprintBtn.classList.add('active');
+  if (state === 'ready') startRace();
+}, { passive: false });
+sprintBtn.addEventListener('touchend', e => {
+  e.preventDefault();
+  e.stopPropagation();
+  keys.sprint = false;
+  sprintBtn.classList.remove('active');
+}, { passive: false });
 
 /* ---------------- audio (optional engine hum) ---------------- */
 let audioCtx = null, osc = null, gainNode = null;
@@ -657,6 +763,23 @@ function stopAudio() {
   if (osc) { try { osc.stop(); } catch (e) {} osc = null; }
   if (audioCtx) { try { audioCtx.close(); } catch (e) {} audioCtx = null; }
 }
+function playBlip(freqStart, freqEnd, duration, gainPeak, type) {
+  if (!audioCtx) return;
+  try {
+    const t0 = audioCtx.currentTime;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freqStart, t0);
+    o.frequency.exponentialRampToValueAtTime(Math.max(20, freqEnd), t0 + duration);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.linearRampToValueAtTime(gainPeak, t0 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+    o.connect(g).connect(audioCtx.destination);
+    o.start(t0);
+    o.stop(t0 + duration + 0.03);
+  } catch (e) { /* ignore */ }
+}
 
 /* ---------------- game state ---------------- */
 let state = 'ready';
@@ -671,6 +794,15 @@ let shakeMag = 0;
 let gap = GAP_MAX;
 let outcome = null;
 let outcomeTimer = 0;
+let timeScale = 1;
+let slowMoActive = false;
+let whipZ = 0;
+let flapSlamTimer = 0;
+let dreadLevel = 0;
+let heartbeatCooldown = 0;
+let flashTime = 0;
+let flashMag = 0;
+let flashIsHit = false;
 
 const startScreen = document.getElementById('start-screen');
 const resultsScreen = document.getElementById('results-screen');
@@ -678,6 +810,7 @@ const hud = document.getElementById('hud');
 const hudTimer = document.getElementById('hud-timer');
 const gapFillEl = document.getElementById('gap-fill');
 const vignette = document.getElementById('vignette');
+const fxFlashEl = document.getElementById('fx-flash');
 const resultsTag = document.getElementById('results-tag');
 const resultsTitle = document.getElementById('results-title');
 const resultsSub = document.getElementById('results-sub');
@@ -694,6 +827,7 @@ function startRace() {
   state = 'racing';
   startScreen.hidden = true;
   hud.hidden = false;
+  if (isTouchDevice) sprintBtn.hidden = false;
   raceStartTime = performance.now();
   startAudio();
 }
@@ -704,36 +838,68 @@ function updateGapMeterUI() {
   gapFillEl.style.background = ratio > 0.5 ? '#3fae5c' : ratio > 0.22 ? '#d9a02a' : '#c23b2e';
 }
 
+function updateHeartbeat(dt, dread) {
+  if (dread < 0.15) { heartbeatCooldown = Math.max(heartbeatCooldown, 0.3); return; }
+  heartbeatCooldown -= dt;
+  if (heartbeatCooldown <= 0) {
+    playBlip(58, 42, 0.16, 0.05, 'sine');
+    heartbeatCooldown = 1.05 - dread * 0.55;
+  }
+}
+
+function updateDread(dt) {
+  const gapRatio = Math.max(0, gap) / GAP_MAX;
+  const dreadTarget = gapRatio < DREAD_THRESHOLD ? (1 - gapRatio / DREAD_THRESHOLD) : 0;
+  dreadLevel += (dreadTarget - dreadLevel) * Math.min(1, dt * 4);
+  vignette.style.opacity = (dreadLevel * 0.8).toFixed(3);
+  updateHeartbeat(dt, dreadLevel);
+}
+
+function flashHit() { flashTime = 0.22; flashMag = 1; flashIsHit = true; }
+function flashNearMiss() { flashTime = 0.16; flashMag = 0.5; flashIsHit = false; }
+
 function triggerCaught() {
   state = 'outcome';
   outcome = 'caught';
-  outcomeTimer = 1.1;
+  outcomeTimer = 1.0;
   stopAudio();
+  timeScale = 1;
+  slowMoActive = false;
   catVisible = true;
   catGroup.visible = true;
   catGroup.scale.set(1.5, 1.5, 1.5);
   catGroup.rotation.y = 0;
   catGroup.position.set(0, -0.05, 0.85);
-  vignette.classList.add('show');
-  shakeTime = 0.5;
-  shakeMag = 0.14;
+  vignette.style.opacity = 1;
+  shakeTime = 0.55;
+  shakeMag = 0.16;
+  flashHit();
+  playBlip(140, 45, 0.3, 0.11, 'square');
 }
 
 function triggerEscape() {
   state = 'outcome';
   outcome = 'escaped';
-  outcomeTimer = 0.9;
+  outcomeTimer = 1.4;
   stopAudio();
+  timeScale = 1;
+  slowMoActive = false;
   catVisible = true;
   catGroup.visible = true;
+  catGroup.scale.set(1, 1, 1);
   catGroup.position.set(0.7, -0.15, 2.0);
   catGroup.rotation.y = 0.9;
+  vignette.style.opacity = 0;
+  whipZ = (Math.random() < 0.5 ? -1 : 1) * 0.14;
+  flapSlamTimer = 0.5;
+  playBlip(500, 950, 0.2, 0.06, 'sine');
 }
 
 function showResults() {
   state = 'finished';
   hud.hidden = true;
-  vignette.classList.remove('show');
+  sprintBtn.hidden = true;
+  vignette.style.opacity = 0;
   if (outcome === 'escaped') {
     resultsTag.textContent = 'escaped';
     resultsTitle.textContent = 'You made it!';
@@ -766,20 +932,38 @@ function animate() {
     elapsed = (performance.now() - raceStartTime) / 1000;
     hudTimer.textContent = elapsed.toFixed(1) + 's';
 
+    if (!slowMoActive && distance > ROUTE_LENGTH - 7 && distance < ROUTE_LENGTH) slowMoActive = true;
+    timeScale += ((slowMoActive ? 0.5 : 1) - timeScale) * Math.min(1, dt * 8);
+    const physDt = dt * timeScale;
+
+    const progress = Math.min(1, distance / ROUTE_LENGTH);
+    const intensity = escalationIntensity(progress);
+    const sprinting = keys.sprint;
+
     const accelT = Math.min(1, elapsed / ACCEL_TIME);
-    const targetSpeed = TOP_SPEED * accelT;
-    speed += (targetSpeed - speed) * Math.min(1, dt * 2.2);
+    const speedMult = sprinting ? SPRINT_SPEED_MULT : 1;
+    const targetSpeed = TOP_SPEED * accelT * speedMult;
+    speed += (targetSpeed - speed) * Math.min(1, physDt * 2.2);
     if (speed < 0) speed = 0;
 
-    distance += speed * dt;
-    gap -= GAP_DECAY_RATE * dt;
+    distance += speed * physDt;
+
+    const decay = GAP_DECAY_RATE * (0.55 + intensity * 1.1);
+    if (sprinting) {
+      gap += (SPRINT_GAP_REGEN - decay * 0.3) * physDt;
+    } else {
+      gap -= decay * physDt;
+    }
 
     const rawInput = (keys.right ? 1 : 0) - (keys.left ? 1 : 0) + touchSteer;
     const clampedInput = Math.max(-1, Math.min(1, rawInput));
-    steerInput += (clampedInput - steerInput) * Math.min(1, dt * 10);
+    steerInput += (clampedInput - steerInput) * Math.min(1, physDt * 10);
 
-    const targetOffset = steerInput * MAX_OFFSET;
-    steerOffset += (targetOffset - steerOffset) * Math.min(1, dt * STEER_LERP);
+    const sprintWobble = sprinting ? Math.sin(performance.now() * 0.01) * SPRINT_STEER_SLOP * Math.abs(steerInput) : 0;
+    const targetOffset = steerInput * MAX_OFFSET + sprintWobble;
+    const steerLerpRate = sprinting ? STEER_LERP * 0.45 : STEER_LERP;
+    steerOffset += (targetOffset - steerOffset) * Math.min(1, physDt * steerLerpRate);
+    steerOffset = Math.max(-MAX_OFFSET - 1, Math.min(MAX_OFFSET + 1, steerOffset));
 
     const cx = centerX(distance);
     camera.position.x = cx + steerOffset;
@@ -789,22 +973,35 @@ function animate() {
     camera.position.y = EYE_HEIGHT + Math.sin(performance.now() * 0.012) * bobAmp;
     camera.rotation.z = -steerInput * 0.035;
 
-    updateRig(dt, steerInput);
+    updateRig(physDt, steerInput);
     updateAudio(speed / TOP_SPEED);
-    updateCat(dt);
+    updateCat(physDt, progress);
+    updateDread(dt);
+
+    if (sprinting) {
+      shakeMag = Math.max(shakeMag, 0.035);
+      shakeTime = Math.max(shakeTime, 0.09);
+    }
 
     for (const ob of OBSTACLES) {
       if (ob.hit) continue;
       const dz = Math.abs(camera.position.z - ob.z);
       if (dz < 1.6) {
         const dx = camera.position.x - ob.x;
-        if (Math.abs(dx) < ob.radius + 0.55) {
+        const absDx = Math.abs(dx);
+        if (absDx < ob.radius + 0.55) {
           ob.hit = true;
           speed *= HIT_SLOWDOWN;
           gap -= GAP_COLLISION_LOSS;
-          shakeTime = 0.28;
-          shakeMag = 0.09;
+          shakeTime = 0.32;
+          shakeMag = 0.13;
+          flashHit();
+          playBlip(180, 55, 0.22, 0.09, 'square');
           steerOffset = Math.max(-MAX_OFFSET, Math.min(MAX_OFFSET, steerOffset + (dx >= 0 ? 1 : -1) * 0.6));
+        } else if (!ob.nearMissDone && absDx < ob.radius + 1.15) {
+          ob.nearMissDone = true;
+          flashNearMiss();
+          playBlip(1000, 1500, 0.14, 0.04, 'sine');
         }
       }
     }
@@ -814,10 +1011,19 @@ function animate() {
 
     if (shakeTime > 0) {
       shakeTime -= dt;
-      const s = shakeMag * Math.max(0, shakeTime / 0.28);
+      const s = shakeMag * Math.max(0, shakeTime / 0.32);
       camera.position.x += (Math.random() - 0.5) * s;
       camera.position.y += (Math.random() - 0.5) * s;
     }
+
+    const finalStretchT = Math.max(0, (progress - 0.7) / 0.3);
+    const dreadPulse = dreadLevel * Math.sin(performance.now() * 0.01) * 1.2;
+    const targetFov = BASE_FOV + finalStretchT * FINAL_STRETCH_FOV_BOOST + dreadPulse;
+    camera.fov += (targetFov - camera.fov) * Math.min(1, physDt * 3);
+    camera.updateProjectionMatrix();
+
+    const fogFarTarget = BASE_FOG_FAR - intensity * 32;
+    scene.fog.far += (fogFarTarget - scene.fog.far) * Math.min(1, physDt * 1.2);
 
     if (gap <= 0) {
       triggerCaught();
@@ -833,13 +1039,27 @@ function animate() {
       const cx = centerX(distance);
       camera.position.x += (cx + steerOffset - camera.position.x) * Math.min(1, dt * 4);
       camera.position.z = -distance;
+      whipZ += (0 - whipZ) * Math.min(1, dt * 5);
+      camera.rotation.z = whipZ;
+      if (flapSlamTimer > 0 && sanctuaryFlap) {
+        flapSlamTimer -= dt;
+        const t = 1 - Math.max(0, flapSlamTimer / 0.5);
+        sanctuaryFlap.rotation.y = 0.18 + t * 1.3;
+      }
+      if (catVisible) {
+        const bt = 1 - Math.max(0, outcomeTimer / 1.4);
+        const squash = 1 + Math.sin(bt * Math.PI * 3) * 0.15 * Math.max(0, 1 - bt * 1.6);
+        catGroup.scale.set(1 / squash, squash, 1 / squash);
+        catGroup.position.y = -0.15 + Math.abs(Math.sin(performance.now() * 0.02)) * 0.05;
+      }
     } else {
       speed *= 0.9;
+      if (catVisible) catGroup.position.y = -0.05 + Math.abs(Math.sin(performance.now() * 0.03)) * 0.03;
     }
 
     if (shakeTime > 0) {
       shakeTime -= dt;
-      const s = shakeMag * Math.max(0, shakeTime / 0.5);
+      const s = shakeMag * Math.max(0, shakeTime / 0.55);
       camera.position.x += (Math.random() - 0.5) * s;
       camera.position.y += (Math.random() - 0.5) * s;
     }
@@ -847,6 +1067,17 @@ function animate() {
     if (outcomeTimer <= 0) showResults();
   }
 
+  if (flashTime > 0) {
+    flashTime -= dt;
+    const t = Math.max(0, flashTime / (flashIsHit ? 0.22 : 0.16));
+    fxFlashEl.style.opacity = (flashMag * t).toFixed(3);
+    fxFlashEl.classList.toggle('hit', flashIsHit);
+  } else {
+    fxFlashEl.style.opacity = 0;
+  }
+
+  sun.position.set(camera.position.x - 24, camera.position.y + 34, camera.position.z + 14);
+  sun.target.position.copy(camera.position);
   if (skyMesh) skyMesh.position.set(camera.position.x, EYE_HEIGHT, camera.position.z);
 
   renderer.render(scene, camera);
