@@ -57,9 +57,26 @@
 
   #hud {
     position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 15;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  #hud-timer {
     font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; color: #fff;
     background: rgba(0,0,0,0.32); padding: 8px 18px; border-radius: 20px; letter-spacing: 0.02em;
   }
+  #gap-wrap {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(0,0,0,0.32); padding: 6px 12px 6px 10px; border-radius: 20px;
+  }
+  .gap-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #fff; opacity: 0.75; letter-spacing: 0.06em; }
+  #gap-track { width: 120px; height: 8px; border-radius: 5px; background: rgba(255,255,255,0.22); overflow: hidden; }
+  #gap-fill { height: 100%; width: 100%; border-radius: 5px; background: #3fae5c; transition: background-color 0.25s linear; }
+
+  #vignette {
+    position: fixed; inset: 0; z-index: 12; pointer-events: none; opacity: 0;
+    background: radial-gradient(ellipse at center, rgba(180,20,20,0) 45%, rgba(150,10,10,0.7) 100%);
+    transition: opacity 0.3s ease;
+  }
+  #vignette.show { opacity: 1; }
 
   .results-row { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); }
   .results-row:last-of-type { border-bottom: none; }
@@ -79,15 +96,22 @@
 <a class="home-link" href="../../">&larr; offcuts</a>
 
 <canvas id="game-canvas"></canvas>
+<div id="vignette"></div>
 
-<div id="hud" hidden>0.0s</div>
+<div id="hud" hidden>
+  <div id="hud-timer">0.0s</div>
+  <div id="gap-wrap">
+    <span class="gap-label">GAP</span>
+    <div id="gap-track"><div id="gap-fill"></div></div>
+  </div>
+</div>
 
 <div class="overlay" id="start-screen">
   <div class="card">
     <span class="tag-inline">games</span>
     <h1>G4</h1>
-    <p class="lede">First-person scooter time trial. Steer left/right down the street and avoid the obstacles — beat your best time.</p>
-    <div class="controls-hint">Arrow keys / A&ndash;D to steer &middot; drag left/right on mobile</div>
+    <p class="lede">Whiskers the cat is right behind you. Steer down the street, dodge the obstacles, and reach the garden gate before the gap runs out.</p>
+    <div class="controls-hint">Arrow keys / A&ndash;D to steer &middot; drag left/right on mobile &middot; obstacles cost you speed AND ground</div>
     <button class="btn" id="btn-start">Start Race</button>
     <p class="prompt">or press any key / tap to begin</p>
   </div>
@@ -95,17 +119,20 @@
 
 <div class="overlay" id="results-screen" hidden>
   <div class="card">
-    <span class="tag-inline">results</span>
-    <h1>Finished!</h1>
-    <div class="results-row hero">
-      <span class="label">Your time</span>
-      <span class="value" id="result-time">0.00s</span>
+    <span class="tag-inline" id="results-tag">results</span>
+    <h1 id="results-title">Finished!</h1>
+    <p class="lede" id="results-sub" style="margin-bottom:18px;"></p>
+    <div id="results-time-rows">
+      <div class="results-row hero">
+        <span class="label">Your time</span>
+        <span class="value" id="result-time">0.00s</span>
+      </div>
+      <div class="results-row">
+        <span class="label">Best time</span>
+        <span class="value" id="best-time">0.00s</span>
+      </div>
+      <div id="new-best-badge" hidden>New best!</div>
     </div>
-    <div class="results-row">
-      <span class="label">Best time</span>
-      <span class="value" id="best-time">0.00s</span>
-    </div>
-    <div id="new-best-badge" hidden>New best!</div>
     <button class="btn" id="btn-again" style="margin-top:22px;">Race Again</button>
   </div>
 </div>
@@ -123,6 +150,9 @@ const ACCEL_TIME = 2.2;
 const STEER_LERP = 8;
 const HIT_SLOWDOWN = 0.5;
 const EYE_HEIGHT = 1.55;
+const GAP_MAX = 100;
+const GAP_DECAY_RATE = 2.6;
+const GAP_COLLISION_LOSS = 14;
 
 const waypoints = [
   { d: 0,   x: 0 },
@@ -169,8 +199,8 @@ const rand = mulberry32(20260908);
 
 /* ---------------- three.js setup ---------------- */
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xAEB4B8);
-scene.fog = new THREE.Fog(0xAEB4B8, 35, 130);
+scene.background = new THREE.Color(0x9CA3A8);
+scene.fog = new THREE.Fog(0xA7ADB2, 40, 125);
 
 const camera = new THREE.PerspectiveCamera(74, innerWidth / innerHeight, 0.1, 300);
 camera.position.set(0, EYE_HEIGHT, 0);
@@ -181,10 +211,29 @@ const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.setSize(innerWidth, innerHeight);
 
-scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-const sun = new THREE.DirectionalLight(0xffffff, 0.5);
-sun.position.set(-20, 30, 10);
+scene.add(new THREE.AmbientLight(0xcfd6da, 0.55));
+const sun = new THREE.DirectionalLight(0xfff3e0, 0.85);
+sun.position.set(-24, 34, 14);
 scene.add(sun);
+
+let skyMesh;
+function buildSky() {
+  const skyGeo = new THREE.SphereGeometry(220, 24, 16);
+  const topColor = new THREE.Color(0xC9CFD4);
+  const bottomColor = new THREE.Color(0x8D949A);
+  const colors = [];
+  const pos = skyGeo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const t = THREE.MathUtils.clamp((pos.getY(i) / 220 + 0.15) / 1.15, 0, 1);
+    const c = bottomColor.clone().lerp(topColor, t);
+    colors.push(c.r, c.g, c.b);
+  }
+  skyGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  const skyMat = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false });
+  skyMesh = new THREE.Mesh(skyGeo, skyMat);
+  scene.add(skyMesh);
+}
+buildSky();
 
 window.addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
@@ -216,7 +265,13 @@ const MAT = {
   treeLeaf: new THREE.MeshLambertMaterial({ color: 0x3c6b3a }),
   metalGrey: new THREE.MeshLambertMaterial({ color: 0x777d80 }),
   skin: new THREE.MeshLambertMaterial({ color: 0xE0A878 }),
-  sleeve: new THREE.MeshLambertMaterial({ color: 0x2b5c8a })
+  sleeve: new THREE.MeshLambertMaterial({ color: 0x2b5c8a }),
+  kerbEdge: new THREE.MeshLambertMaterial({ color: 0x2b2b2b }),
+  fence: new THREE.MeshLambertMaterial({ color: 0x7a5a3a, flatShading: true }),
+  flap: new THREE.MeshLambertMaterial({ color: 0x5c4229 }),
+  catBody: new THREE.MeshLambertMaterial({ color: 0x2a2723, flatShading: true }),
+  catChest: new THREE.MeshLambertMaterial({ color: 0xf2f2ee }),
+  catEyes: new THREE.MeshLambertMaterial({ color: 0xd9a02a })
 };
 
 const GEO = {
@@ -255,12 +310,13 @@ ground.rotation.x = -Math.PI / 2;
 ground.position.set(0, -0.02, -ROUTE_LENGTH / 2 + 30);
 scene.add(ground);
 
-function buildRibbon(material, halfWidth, y) {
+function buildRibbon(material, halfWidth, y, extraLength) {
   const step = 4;
   const positions = [];
   const indices = [];
   let vi = 0;
-  for (let d = 0; d <= ROUTE_LENGTH; d += step) {
+  const maxD = ROUTE_LENGTH + (extraLength || 0);
+  for (let d = 0; d <= maxD; d += step) {
     const cx = centerX(d);
     positions.push(cx - halfWidth, y, -d, cx + halfWidth, y, -d);
     if (d > 0) {
@@ -276,14 +332,38 @@ function buildRibbon(material, halfWidth, y) {
   return new THREE.Mesh(geo, material);
 }
 
-scene.add(buildRibbon(MAT.pavement, ROAD_HALF_WIDTH + PAVEMENT_WIDTH, 0));
-scene.add(buildRibbon(MAT.road, ROAD_HALF_WIDTH, 0.02));
+scene.add(buildRibbon(MAT.pavement, ROAD_HALF_WIDTH + PAVEMENT_WIDTH, 0, 14));
+scene.add(buildRibbon(MAT.road, ROAD_HALF_WIDTH, 0.02, 14));
+
+function buildEdgeStrip(material, edgeOffset, thickness, y, sign) {
+  const step = 4;
+  const positions = [];
+  const indices = [];
+  let vi = 0;
+  for (let d = 0; d <= ROUTE_LENGTH + 14; d += step) {
+    const cx = centerX(d);
+    const base = cx + sign * edgeOffset;
+    positions.push(base - thickness / 2, y, -d, base + thickness / 2, y, -d);
+    if (d > 0) {
+      const b = vi - 2;
+      indices.push(b, b + 1, b + 2, b + 1, b + 3, b + 2);
+    }
+    vi += 2;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setIndex(indices);
+  geo.computeVertexNormals();
+  return new THREE.Mesh(geo, material);
+}
+scene.add(buildEdgeStrip(MAT.kerbEdge, ROAD_HALF_WIDTH, 0.18, 0.025, -1));
+scene.add(buildEdgeStrip(MAT.kerbEdge, ROAD_HALF_WIDTH, 0.18, 0.025, 1));
 
 function addCenterLine() {
   const dashLen = 2, gap = 2.5;
   for (let d = 5; d < ROUTE_LENGTH - 5; d += dashLen + gap) {
     const cx = centerX(d);
-    addBox(MAT.white, 0.18, 0.02, dashLen, cx, 0.035, -d - dashLen / 2);
+    addBox(MAT.white, 0.22, 0.02, dashLen, cx, 0.035, -d - dashLen / 2);
   }
 }
 
@@ -401,6 +481,30 @@ buildBusStop(BUS_STOP_D, 1);
 SPEED_BUMP_DS.forEach(addSpeedBump);
 addCenterLine();
 
+/* ---------------- the sanctuary: where the cat can't follow ---------------- */
+function buildSanctuary() {
+  const cx = centerX(ROUTE_LENGTH);
+  const z = -ROUTE_LENGTH - 2;
+  const gapWidth = 1.3;
+  const fenceHeight = 1.7;
+  const panelWidth = (ROAD_HALF_WIDTH * 2 - gapWidth) / 2;
+  addBox(MAT.fence, panelWidth, fenceHeight, 0.15, cx - gapWidth / 2 - panelWidth / 2, fenceHeight / 2, z);
+  addBox(MAT.fence, panelWidth, fenceHeight, 0.15, cx + gapWidth / 2 + panelWidth / 2, fenceHeight / 2, z);
+  const flap = addBox(MAT.flap, gapWidth * 0.9, fenceHeight * 0.8, 0.06, cx, fenceHeight * 0.8 / 2, z);
+  flap.rotation.y = 0.18;
+
+  const gardenGeo = new THREE.PlaneGeometry(20, 20);
+  const garden = new THREE.Mesh(gardenGeo, MAT.grass);
+  garden.rotation.x = -Math.PI / 2;
+  garden.position.set(cx, 0.01, z - 8);
+  scene.add(garden);
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2;
+    addBox(MAT.hedge, 0.6, 0.5, 0.6, cx + Math.cos(a) * 3, 0.25, z - 8 + Math.sin(a) * 3);
+  }
+}
+buildSanctuary();
+
 /* ---------------- Jerry: arms + scooter, first-person rig ---------------- */
 const rig = new THREE.Group();
 camera.add(rig);
@@ -435,6 +539,67 @@ function buildArm(sideX) {
 }
 buildArm(-0.32);
 buildArm(0.32);
+
+/* ---------------- Whiskers: the chasing cat, glimpsed at the frame's edges ---------------- */
+const catGroup = new THREE.Group();
+catGroup.visible = false;
+catGroup.userData.baseY = -0.18;
+camera.add(catGroup);
+
+function addCatPart(w, h, d, x, y, z, mat, rx, ry, rz) {
+  const m = new THREE.Mesh(GEO.box, mat || MAT.catBody);
+  m.scale.set(w, h, d);
+  m.position.set(x, y, z);
+  if (rx) m.rotation.x = rx;
+  if (ry) m.rotation.y = ry;
+  if (rz) m.rotation.z = rz;
+  catGroup.add(m);
+  return m;
+}
+addCatPart(0.34, 0.3, 0.62, 0, 0, 0);
+addCatPart(0.2, 0.16, 0.22, 0, -0.1, 0.24, MAT.catChest);
+addCatPart(0.24, 0.24, 0.26, 0, 0.16, -0.34);
+addCatPart(0.09, 0.13, 0.04, -0.08, 0.29, -0.42, MAT.catBody, 0, 0, 0.3);
+addCatPart(0.09, 0.13, 0.04, 0.08, 0.29, -0.42, MAT.catBody, 0, 0, -0.3);
+addCatPart(0.035, 0.035, 0.02, -0.06, 0.17, -0.46, MAT.catEyes);
+addCatPart(0.035, 0.035, 0.02, 0.06, 0.17, -0.46, MAT.catEyes);
+addCatPart(0.055, 0.055, 0.55, 0.12, 0.08, 0.4, MAT.catBody, 0.5, 0, 0);
+
+let catVisible = false;
+let catTimer = 0;
+let catCooldown = 1.2;
+
+function updateCat(dt) {
+  if (catVisible) {
+    catTimer -= dt;
+    catGroup.position.y = catGroup.userData.baseY + Math.abs(Math.sin(performance.now() * 0.02)) * 0.05;
+    if (catTimer <= 0) {
+      catVisible = false;
+      catGroup.visible = false;
+      catCooldown = 0.9 + Math.random() * 0.7;
+    }
+    return;
+  }
+  catCooldown -= dt;
+  if (catCooldown > 0) return;
+  const gapRatio = Math.max(0, gap) / GAP_MAX;
+  const turnBoost = Math.abs(steerInput) > 0.45 ? 0.5 : 0;
+  const proximityBoost = (1 - gapRatio) * 1.1;
+  const chance = (0.12 + turnBoost + proximityBoost) * dt;
+  if (Math.random() < chance) triggerCatGlimpse(gapRatio);
+}
+
+function triggerCatGlimpse(gapRatio) {
+  catVisible = true;
+  catGroup.visible = true;
+  const side = Math.random() < 0.5 ? -1 : 1;
+  const closeness = 1 - gapRatio;
+  const baseY = -0.18;
+  catGroup.position.set(side * (1.5 + Math.random() * 0.35), baseY, 1.1 - closeness * 0.55);
+  catGroup.rotation.y = side > 0 ? -0.7 : 0.7;
+  catGroup.userData.baseY = baseY;
+  catTimer = 0.3 + Math.random() * 0.22;
+}
 
 function updateRig(dt, steerInput) {
   const leanTarget = -steerInput * 0.16;
@@ -503,10 +668,20 @@ let raceStartTime = 0;
 let elapsed = 0;
 let shakeTime = 0;
 let shakeMag = 0;
+let gap = GAP_MAX;
+let outcome = null;
+let outcomeTimer = 0;
 
 const startScreen = document.getElementById('start-screen');
 const resultsScreen = document.getElementById('results-screen');
 const hud = document.getElementById('hud');
+const hudTimer = document.getElementById('hud-timer');
+const gapFillEl = document.getElementById('gap-fill');
+const vignette = document.getElementById('vignette');
+const resultsTag = document.getElementById('results-tag');
+const resultsTitle = document.getElementById('results-title');
+const resultsSub = document.getElementById('results-sub');
+const resultsTimeRows = document.getElementById('results-time-rows');
 const resultTimeEl = document.getElementById('result-time');
 const bestTimeEl = document.getElementById('best-time');
 const newBestBadge = document.getElementById('new-best-badge');
@@ -523,18 +698,61 @@ function startRace() {
   startAudio();
 }
 
-function finishRace() {
-  state = 'finished';
+function updateGapMeterUI() {
+  const ratio = Math.max(0, gap) / GAP_MAX;
+  gapFillEl.style.width = (ratio * 100) + '%';
+  gapFillEl.style.background = ratio > 0.5 ? '#3fae5c' : ratio > 0.22 ? '#d9a02a' : '#c23b2e';
+}
+
+function triggerCaught() {
+  state = 'outcome';
+  outcome = 'caught';
+  outcomeTimer = 1.1;
   stopAudio();
-  const finalTime = elapsed;
-  const stored = localStorage.getItem('g4-best-time');
-  const best = stored ? parseFloat(stored) : Infinity;
-  const isBest = finalTime < best;
-  if (isBest) localStorage.setItem('g4-best-time', finalTime.toFixed(2));
-  resultTimeEl.textContent = finalTime.toFixed(2) + 's';
-  bestTimeEl.textContent = (isBest ? finalTime : best).toFixed(2) + 's';
-  newBestBadge.hidden = !isBest;
+  catVisible = true;
+  catGroup.visible = true;
+  catGroup.scale.set(1.5, 1.5, 1.5);
+  catGroup.rotation.y = 0;
+  catGroup.position.set(0, -0.05, 0.85);
+  vignette.classList.add('show');
+  shakeTime = 0.5;
+  shakeMag = 0.14;
+}
+
+function triggerEscape() {
+  state = 'outcome';
+  outcome = 'escaped';
+  outcomeTimer = 0.9;
+  stopAudio();
+  catVisible = true;
+  catGroup.visible = true;
+  catGroup.position.set(0.7, -0.15, 2.0);
+  catGroup.rotation.y = 0.9;
+}
+
+function showResults() {
+  state = 'finished';
   hud.hidden = true;
+  vignette.classList.remove('show');
+  if (outcome === 'escaped') {
+    resultsTag.textContent = 'escaped';
+    resultsTitle.textContent = 'You made it!';
+    resultsSub.textContent = 'Whiskers skids to a halt at the gate — safe another day.';
+    const finalTime = elapsed;
+    const stored = localStorage.getItem('g4-best-time');
+    const best = stored ? parseFloat(stored) : Infinity;
+    const isBest = finalTime < best;
+    if (isBest) localStorage.setItem('g4-best-time', finalTime.toFixed(2));
+    resultTimeEl.textContent = finalTime.toFixed(2) + 's';
+    bestTimeEl.textContent = (isBest ? finalTime : best).toFixed(2) + 's';
+    newBestBadge.hidden = !isBest;
+    resultsTimeRows.hidden = false;
+  } else {
+    resultsTag.textContent = 'caught';
+    resultsTitle.textContent = 'Caught!';
+    resultsSub.textContent = 'So close — have another go and widen that gap.';
+    resultsTimeRows.hidden = true;
+  }
   resultsScreen.hidden = false;
 }
 
@@ -546,7 +764,7 @@ function animate() {
 
   if (state === 'racing') {
     elapsed = (performance.now() - raceStartTime) / 1000;
-    hud.textContent = elapsed.toFixed(1) + 's';
+    hudTimer.textContent = elapsed.toFixed(1) + 's';
 
     const accelT = Math.min(1, elapsed / ACCEL_TIME);
     const targetSpeed = TOP_SPEED * accelT;
@@ -554,6 +772,7 @@ function animate() {
     if (speed < 0) speed = 0;
 
     distance += speed * dt;
+    gap -= GAP_DECAY_RATE * dt;
 
     const rawInput = (keys.right ? 1 : 0) - (keys.left ? 1 : 0) + touchSteer;
     const clampedInput = Math.max(-1, Math.min(1, rawInput));
@@ -572,6 +791,7 @@ function animate() {
 
     updateRig(dt, steerInput);
     updateAudio(speed / TOP_SPEED);
+    updateCat(dt);
 
     for (const ob of OBSTACLES) {
       if (ob.hit) continue;
@@ -581,12 +801,16 @@ function animate() {
         if (Math.abs(dx) < ob.radius + 0.55) {
           ob.hit = true;
           speed *= HIT_SLOWDOWN;
+          gap -= GAP_COLLISION_LOSS;
           shakeTime = 0.28;
           shakeMag = 0.09;
           steerOffset = Math.max(-MAX_OFFSET, Math.min(MAX_OFFSET, steerOffset + (dx >= 0 ? 1 : -1) * 0.6));
         }
       }
     }
+
+    gap = Math.max(0, Math.min(GAP_MAX, gap));
+    updateGapMeterUI();
 
     if (shakeTime > 0) {
       shakeTime -= dt;
@@ -595,8 +819,35 @@ function animate() {
       camera.position.y += (Math.random() - 0.5) * s;
     }
 
-    if (distance >= ROUTE_LENGTH) finishRace();
+    if (gap <= 0) {
+      triggerCaught();
+    } else if (distance >= ROUTE_LENGTH) {
+      triggerEscape();
+    }
+  } else if (state === 'outcome') {
+    outcomeTimer -= dt;
+
+    if (outcome === 'escaped') {
+      speed *= 0.985;
+      distance += speed * dt;
+      const cx = centerX(distance);
+      camera.position.x += (cx + steerOffset - camera.position.x) * Math.min(1, dt * 4);
+      camera.position.z = -distance;
+    } else {
+      speed *= 0.9;
+    }
+
+    if (shakeTime > 0) {
+      shakeTime -= dt;
+      const s = shakeMag * Math.max(0, shakeTime / 0.5);
+      camera.position.x += (Math.random() - 0.5) * s;
+      camera.position.y += (Math.random() - 0.5) * s;
+    }
+
+    if (outcomeTimer <= 0) showResults();
   }
+
+  if (skyMesh) skyMesh.position.set(camera.position.x, EYE_HEIGHT, camera.position.z);
 
   renderer.render(scene, camera);
 }
