@@ -28,17 +28,18 @@
 
   .overlay {
     position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center;
-    padding: 24px; background: rgba(20,22,20,0.55);
+    padding: 24px; background: rgba(20,22,20,0.55); overflow-y: auto;
   }
   .card {
-    background: var(--paper); border-radius: 14px; padding: 32px 28px; max-width: 380px; width: 100%;
-    text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+    background: var(--paper); border-radius: 14px; padding: 32px 28px; max-width: 420px; width: 100%;
+    text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.35); margin: auto;
   }
   .tag-inline {
     display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent);
     background: var(--accent-soft); padding: 3px 9px; border-radius: 4px; margin-bottom: 10px;
   }
   .card h1 { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; margin: 4px 0 10px; }
+  .card h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.01em; margin: 4px 0 14px; }
   .card p.lede { color: var(--ink-soft); font-size: 15px; margin: 0 0 22px; line-height: 1.5; }
   .card .controls-hint {
     font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft);
@@ -52,6 +53,7 @@
   .btn:hover { opacity: 0.92; }
   .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); margin-top: 10px; }
   .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.small { padding: 9px 16px; font-size: 13px; width: auto; }
   .prompt { margin-top: 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft); animation: blink 1.6s ease-in-out infinite; }
   @keyframes blink { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
 
@@ -75,7 +77,6 @@
     position: fixed; inset: 0; z-index: 12; pointer-events: none; opacity: 0;
     background: radial-gradient(ellipse at center, rgba(180,20,20,0) 45%, rgba(150,10,10,0.7) 100%);
   }
-
   #fx-flash {
     position: fixed; inset: 0; z-index: 13; pointer-events: none; opacity: 0;
     background: radial-gradient(ellipse at center, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 70%);
@@ -93,6 +94,14 @@
   }
   #sprint-btn.active { background: rgba(21,101,52,0.88); transform: scale(0.94); }
 
+  #pause-btn {
+    position: fixed; top: 14px; right: 14px; z-index: 16;
+    width: 40px; height: 40px; border-radius: 50%; border: none;
+    background: rgba(0,0,0,0.35); color: #fff; font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #pause-btn:hover { background: rgba(0,0,0,0.5); }
+
   .results-row { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); }
   .results-row:last-of-type { border-bottom: none; }
   .results-row .label { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft); }
@@ -102,6 +111,28 @@
     display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #fff;
     background: var(--accent); padding: 3px 10px; border-radius: 20px; margin-top: 6px;
   }
+  .btn-row { display: flex; gap: 10px; margin-top: 22px; }
+  .btn-row .btn { margin-top: 0; }
+
+  .level-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .level-tile {
+    border: 1.5px solid var(--line); border-radius: 10px; padding: 16px 14px; text-align: left;
+    cursor: pointer; background: #fff; transition: border-color 0.15s ease;
+  }
+  .level-tile:hover { border-color: var(--accent); }
+  .level-tile.locked { cursor: default; opacity: 0.5; background: var(--accent-soft); }
+  .level-tile .lv-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+  .level-tile.locked .lv-num { color: var(--ink-soft); }
+  .level-tile .lv-name { font-size: 15px; font-weight: 700; margin: 4px 0 6px; }
+  .level-tile .lv-best { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-soft); }
+  .level-tile .lv-lock { font-size: 18px; }
+
+  .settings-block { text-align: left; margin: 18px 0; padding: 14px 16px; background: var(--accent-soft); border-radius: 10px; }
+  .settings-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+  .settings-row:last-child { margin-bottom: 0; }
+  .settings-row label { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink); }
+  .settings-row input[type=range] { width: 130px; accent-color: var(--accent); }
+  .settings-row input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); }
 
   [hidden] { display: none !important; }
 </style>
@@ -109,6 +140,7 @@
 <body>
 
 <a class="home-link" href="../../">&larr; offcuts</a>
+<button id="pause-btn" hidden title="Pause">&#10074;&#10074;</button>
 
 <canvas id="game-canvas"></canvas>
 <div id="vignette"></div>
@@ -123,14 +155,63 @@
   </div>
 </div>
 
-<div class="overlay" id="start-screen">
+<div class="overlay" id="menu-screen">
   <div class="card">
     <span class="tag-inline">games</span>
     <h1>G4</h1>
-    <p class="lede">Whiskers the cat is right behind you. Steer down the street, dodge the obstacles, and reach the garden gate before the gap runs out.</p>
-    <div class="controls-hint">Arrow keys / A&ndash;D to steer, Shift/Space to sprint &middot; drag to steer + hold the sprint button on mobile &middot; obstacles cost you speed AND ground</div>
+    <p class="lede">Whiskers the cat is on your tail across four runs. Steer, sprint and thread the obstacles to reach safety before the gap closes.</p>
+    <button class="btn" id="btn-play">Play</button>
+    <div class="settings-block">
+      <div class="settings-row">
+        <label>Sound</label>
+        <input type="checkbox" id="setting-sound" checked>
+      </div>
+      <div class="settings-row">
+        <label>Steering sensitivity</label>
+        <input type="range" id="setting-sensitivity" min="0.6" max="1.6" step="0.1" value="1">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="levelselect-screen" hidden>
+  <div class="card">
+    <span class="tag-inline">select a run</span>
+    <h2>Choose your route</h2>
+    <div class="level-grid" id="level-grid"></div>
+    <button class="btn ghost" id="btn-back-menu">Back</button>
+  </div>
+</div>
+
+<div class="overlay" id="start-screen" hidden>
+  <div class="card">
+    <span class="tag-inline" id="ready-tag">level 1</span>
+    <h1 id="ready-title">Quiet Cul-de-sac</h1>
+    <p class="lede" id="ready-lede">Whiskers the cat is right behind you. Steer down the street, dodge the obstacles, and reach safety before the gap runs out.</p>
+    <div class="controls-hint">Arrow keys / A&ndash;D to steer, Shift/Space to sprint, Esc to pause &middot; drag to steer + hold the sprint button on mobile</div>
     <button class="btn" id="btn-start">Start Race</button>
+    <button class="btn ghost" id="btn-ready-back">Back to levels</button>
     <p class="prompt">or press any key / tap to begin</p>
+  </div>
+</div>
+
+<div class="overlay" id="pause-screen" hidden>
+  <div class="card">
+    <span class="tag-inline">paused</span>
+    <h2>Race paused</h2>
+    <button class="btn" id="btn-resume">Resume</button>
+    <button class="btn ghost" id="btn-restart">Restart Level</button>
+    <button class="btn ghost" id="btn-quit">Quit to Menu</button>
+    <div class="settings-block">
+      <div class="settings-row">
+        <label>Sound</label>
+        <input type="checkbox" id="pause-setting-sound" checked>
+      </div>
+      <div class="settings-row">
+        <label>Steering sensitivity</label>
+        <input type="range" id="pause-setting-sensitivity" min="0.6" max="1.6" step="0.1" value="1">
+      </div>
+    </div>
   </div>
 </div>
 
@@ -150,22 +231,17 @@
       </div>
       <div id="new-best-badge" hidden>New best!</div>
     </div>
-    <button class="btn" id="btn-again" style="margin-top:22px;">Race Again</button>
+    <div class="btn-row">
+      <button class="btn" id="btn-primary-action">Retry</button>
+      <button class="btn ghost" id="btn-secondary-action">Menu</button>
+    </div>
   </div>
 </div>
 
 <script type="module">
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
-/* ---------------- route ---------------- */
-const ROUTE_LENGTH = 560;
-const ROAD_HALF_WIDTH = 5;
-const PAVEMENT_WIDTH = 2.2;
-const MAX_OFFSET = ROAD_HALF_WIDTH - 1.3;
-const TOP_SPEED = 26;
-const ACCEL_TIME = 2.2;
-const STEER_LERP = 8;
-const HIT_SLOWDOWN = 0.5;
+/* ---------------- shared tuning constants ---------------- */
 const EYE_HEIGHT = 1.55;
 const GAP_MAX = 100;
 const GAP_DECAY_RATE = 2.6;
@@ -176,35 +252,10 @@ const SPRINT_GAP_REGEN = 11;
 const DREAD_THRESHOLD = 0.25;
 const BASE_FOV = 74;
 const FINAL_STRETCH_FOV_BOOST = 6;
-const BASE_FOG_NEAR = 40;
-const BASE_FOG_FAR = 125;
-
-const waypoints = [
-  { d: 0,   x: 0 },
-  { d: 70,  x: 0 },
-  { d: 130, x: 5.5 },
-  { d: 190, x: 5.5 },
-  { d: 235, x: -4.5 },
-  { d: 285, x: -4.5 },
-  { d: 315, x: 0 },
-  { d: 335, x: 8 },
-  { d: 385, x: 8 },
-  { d: 415, x: 0 },
-  { d: ROUTE_LENGTH, x: 0 }
-];
-
-function centerX(d) {
-  d = Math.max(0, Math.min(ROUTE_LENGTH, d));
-  for (let i = 0; i < waypoints.length - 1; i++) {
-    const a = waypoints[i], b = waypoints[i + 1];
-    if (d <= b.d) {
-      const t = (d - a.d) / ((b.d - a.d) || 1);
-      const s = t * t * (3 - 2 * t);
-      return a.x + (b.x - a.x) * s;
-    }
-  }
-  return waypoints[waypoints.length - 1].x;
-}
+const TOP_SPEED = 26;
+const ACCEL_TIME = 2.2;
+const STEER_LERP = 8;
+const HIT_SLOWDOWN = 0.5;
 
 /* escalation intensity 0..1: gentle opening, ramping middle, full-tilt final stretch */
 function escalationIntensity(progress) {
@@ -220,12 +271,7 @@ function escalationIntensity(progress) {
   return 0.70 + 0.30 * (t * t * (3 - 2 * t));
 }
 
-const BUS_STOP_D = 170;
-const ZEBRA_D = 470;
-const ROUNDABOUT_D = 360;
-const SPEED_BUMP_DS = [95, 500];
-
-/* ---------------- seeded random (fixed decoration, fair replays) ---------------- */
+/* ---------------- seeded random (fixed decoration per level, fair replays) ---------------- */
 function mulberry32(a) {
   return function () {
     a |= 0; a = a + 0x6D2B79F5 | 0;
@@ -234,12 +280,11 @@ function mulberry32(a) {
     return ((t ^ t >>> 14) >>> 0) / 4294967296;
   };
 }
-const rand = mulberry32(20260908);
+let rand = mulberry32(1001);
 
-/* ---------------- three.js setup ---------------- */
+/* ---------------- three.js core (persistent across levels) ---------------- */
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x9CA3A8);
-scene.fog = new THREE.Fog(0xA7ADB2, BASE_FOG_NEAR, BASE_FOG_FAR);
+scene.background = new THREE.Color(0xdfeaf2);
 
 const camera = new THREE.PerspectiveCamera(BASE_FOV, innerWidth / innerHeight, 0.1, 300);
 camera.position.set(0, EYE_HEIGHT, 0);
@@ -249,42 +294,12 @@ const canvas = document.getElementById('game-canvas');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.setSize(innerWidth, innerHeight);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFShadowMap;
 
-scene.add(new THREE.AmbientLight(0xcfd6da, 0.42));
-const sun = new THREE.DirectionalLight(0xfff3e0, 0.95);
+const ambient = new THREE.AmbientLight(0xffffff, 0.65);
+scene.add(ambient);
+const sun = new THREE.DirectionalLight(0xffffff, 1.05);
 sun.position.set(-24, 34, 14);
-sun.castShadow = true;
-sun.shadow.mapSize.set(512, 512);
-sun.shadow.camera.near = 1;
-sun.shadow.camera.far = 65;
-sun.shadow.camera.left = -24;
-sun.shadow.camera.right = 24;
-sun.shadow.camera.top = 24;
-sun.shadow.camera.bottom = -24;
-sun.shadow.bias = -0.0025;
 scene.add(sun);
-scene.add(sun.target);
-
-let skyMesh;
-function buildSky() {
-  const skyGeo = new THREE.SphereGeometry(220, 24, 16);
-  const topColor = new THREE.Color(0xC9CFD4);
-  const bottomColor = new THREE.Color(0x8D949A);
-  const colors = [];
-  const pos = skyGeo.attributes.position;
-  for (let i = 0; i < pos.count; i++) {
-    const t = THREE.MathUtils.clamp((pos.getY(i) / 220 + 0.15) / 1.15, 0, 1);
-    const c = bottomColor.clone().lerp(topColor, t);
-    colors.push(c.r, c.g, c.b);
-  }
-  skyGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-  const skyMat = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false });
-  skyMesh = new THREE.Mesh(skyGeo, skyMat);
-  scene.add(skyMesh);
-}
-buildSky();
 
 window.addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
@@ -292,89 +307,217 @@ window.addEventListener('resize', () => {
   renderer.setSize(innerWidth, innerHeight);
 });
 
-/* ---------------- materials & shared geometry ---------------- */
-const MAT = {
-  road: new THREE.MeshLambertMaterial({ color: 0x47484a }),
-  pavement: new THREE.MeshLambertMaterial({ color: 0xa9a9a4 }),
-  grass: new THREE.MeshLambertMaterial({ color: 0x5d8a4a }),
-  hedge: new THREE.MeshLambertMaterial({ color: 0x3f6b34, flatShading: true }),
-  wallColors: [0xC9B89A, 0xD8CDBB, 0xB9A88C, 0xC2B49B, 0xCFC0A2, 0xA98F6E, 0xDDD6C4].map(c => new THREE.MeshLambertMaterial({ color: c, flatShading: true })),
-  roof: new THREE.MeshLambertMaterial({ color: 0x5a3d33, flatShading: true }),
-  roofDark: new THREE.MeshLambertMaterial({ color: 0x40332e, flatShading: true }),
-  doorColors: [0xB23A2E, 0x1F5F8B, 0x2F7D4F, 0xD9A02A, 0x6E3A6E, 0x2E7D6B, 0x8A2E2E].map(c => new THREE.MeshLambertMaterial({ color: c })),
-  window: new THREE.MeshLambertMaterial({ color: 0x9fc4d6 }),
-  binGreen: new THREE.MeshLambertMaterial({ color: 0x2f6b3a }),
-  binBlack: new THREE.MeshLambertMaterial({ color: 0x272727 }),
-  binBlue: new THREE.MeshLambertMaterial({ color: 0x2a5f9e }),
-  postboxRed: new THREE.MeshLambertMaterial({ color: 0xB4222A }),
-  carColors: [0x8A1F1F, 0x1F3E8A, 0x1F6E3A, 0xC9C9C9, 0x2B2B2B, 0xB88A2A].map(c => new THREE.MeshLambertMaterial({ color: c, flatShading: true })),
-  tyre: new THREE.MeshLambertMaterial({ color: 0x1a1a1a }),
-  white: new THREE.MeshLambertMaterial({ color: 0xf2f2ee }),
-  kerb: new THREE.MeshLambertMaterial({ color: 0xc7c3ba }),
-  island: new THREE.MeshLambertMaterial({ color: 0x4f7a3d }),
-  treeTrunk: new THREE.MeshLambertMaterial({ color: 0x5b4632 }),
-  treeLeaf: new THREE.MeshLambertMaterial({ color: 0x3c6b3a }),
-  metalGrey: new THREE.MeshLambertMaterial({ color: 0x777d80 }),
-  skin: new THREE.MeshLambertMaterial({ color: 0xE0A878 }),
-  sleeve: new THREE.MeshLambertMaterial({ color: 0x2b5c8a }),
-  kerbEdge: new THREE.MeshLambertMaterial({ color: 0x2b2b2b }),
-  fence: new THREE.MeshLambertMaterial({ color: 0x7a5a3a, flatShading: true }),
-  flap: new THREE.MeshLambertMaterial({ color: 0x5c4229 }),
-  catBody: new THREE.MeshLambertMaterial({ color: 0x2a2723, flatShading: true }),
-  catChest: new THREE.MeshLambertMaterial({ color: 0xf2f2ee }),
-  catEyes: new THREE.MeshLambertMaterial({ color: 0xd9a02a }),
-  gardenWall: new THREE.MeshLambertMaterial({ color: 0xb08a6a, flatShading: true })
-};
+/* ---------------- toon shading + outline system ---------------- */
+function buildToonGradientMap(steps) {
+  const c = document.createElement('canvas');
+  c.width = steps; c.height = 1;
+  const ctx = c.getContext('2d');
+  for (let i = 0; i < steps; i++) {
+    const v = Math.round((i / (steps - 1)) * 255);
+    ctx.fillStyle = `rgb(${v},${v},${v})`;
+    ctx.fillRect(i, 0, 1, 1);
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.minFilter = THREE.NearestFilter;
+  tex.magFilter = THREE.NearestFilter;
+  tex.generateMipmaps = false;
+  return tex;
+}
+const TOON_GRADIENT = buildToonGradientMap(4);
+function toonMat(color, opts) {
+  return new THREE.MeshToonMaterial(Object.assign({ color, gradientMap: TOON_GRADIENT }, opts || {}));
+}
 
+const OUTLINE_MAT = new THREE.MeshBasicMaterial({ color: 0x120f0c, side: THREE.BackSide });
+function addOutline(mesh, mult) {
+  const outline = new THREE.Mesh(mesh.geometry, OUTLINE_MAT);
+  outline.scale.copy(mesh.scale).multiplyScalar(mult || 1.16);
+  outline.position.copy(mesh.position);
+  outline.rotation.copy(mesh.rotation);
+  (mesh.parent || scene).add(outline);
+  return outline;
+}
+
+/* ---------------- shared geometry ---------------- */
 const GEO = {
   box: new THREE.BoxGeometry(1, 1, 1),
   cyl: new THREE.CylinderGeometry(1, 1, 1, 8),
-  cone: new THREE.ConeGeometry(1, 1, 8)
+  cone: new THREE.ConeGeometry(1, 1, 8),
+  sphere: new THREE.SphereGeometry(1, 10, 8),
+  circle: new THREE.CircleGeometry(1, 20)
 };
 
-function addBox(mat, w, h, d, x, y, z, ry, castShadowFlag) {
+/* ---------------- shared materials (used across every level) ---------------- */
+const SHARED_MAT = {
+  tyre: toonMat(0x1a1a1a),
+  white: toonMat(0xffffff),
+  metalGrey: toonMat(0x9aa0a6),
+  skin: toonMat(0xE8AE84),
+  sleeve: toonMat(0x2b5c8a),
+  catBody: toonMat(0x2f2a26),
+  catChest: toonMat(0xffffff),
+  catEyes: toonMat(0xffc233)
+};
+
+/* ---------------- level-scoped scene bookkeeping ---------------- */
+let levelObjects = [];
+let levelMaterials = [];
+const OBSTACLES = [];
+
+function trackMesh(m) { levelObjects.push(m); return m; }
+function trackMat(m) { levelMaterials.push(m); return m; }
+
+function addBox(mat, w, h, d, x, y, z, ry, outline) {
   const m = new THREE.Mesh(GEO.box, mat);
   m.scale.set(w, h, d);
   m.position.set(x, y, z);
   if (ry) m.rotation.y = ry;
-  m.castShadow = castShadowFlag !== false;
-  m.receiveShadow = true;
   scene.add(m);
+  trackMesh(m);
+  if (outline) trackMesh(addOutline(m));
   return m;
 }
-function addCyl(mat, r, h, x, y, z, castShadowFlag) {
+function addCyl(mat, r, h, x, y, z, outline) {
   const m = new THREE.Mesh(GEO.cyl, mat);
   m.scale.set(r, h, r);
   m.position.set(x, y, z);
-  m.castShadow = castShadowFlag !== false;
-  m.receiveShadow = true;
   scene.add(m);
+  trackMesh(m);
+  if (outline) trackMesh(addOutline(m));
   return m;
 }
-function addCone(mat, r, h, x, y, z, castShadowFlag) {
+function addCone(mat, r, h, x, y, z, outline) {
   const m = new THREE.Mesh(GEO.cone, mat);
   m.scale.set(r, h, r);
   m.position.set(x, y, z);
-  m.castShadow = castShadowFlag !== false;
-  m.receiveShadow = true;
   scene.add(m);
+  trackMesh(m);
+  if (outline) trackMesh(addOutline(m));
+  return m;
+}
+function addSphere(mat, rx, ry_, rz, x, y, z, outline) {
+  const m = new THREE.Mesh(GEO.sphere, mat);
+  m.scale.set(rx, ry_, rz);
+  m.position.set(x, y, z);
+  scene.add(m);
+  trackMesh(m);
+  if (outline) trackMesh(addOutline(m));
   return m;
 }
 
-/* ---------------- ground, road ribbon, markings ---------------- */
-const groundGeo = new THREE.PlaneGeometry(220, ROUTE_LENGTH + 140);
-const ground = new THREE.Mesh(groundGeo, MAT.grass);
-ground.rotation.x = -Math.PI / 2;
-ground.position.set(0, -0.02, -ROUTE_LENGTH / 2 + 30);
-ground.receiveShadow = true;
-scene.add(ground);
+/* ---------------- sky (persistent, recoloured per level) ---------------- */
+let skyMesh;
+function buildSky() {
+  const skyGeo = new THREE.SphereGeometry(220, 24, 16);
+  const colors = new Float32Array(skyGeo.attributes.position.count * 3);
+  skyGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  const skyMat = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false });
+  skyMesh = new THREE.Mesh(skyGeo, skyMat);
+  scene.add(skyMesh);
+}
+buildSky();
+function updateSkyColors(topHex, bottomHex) {
+  const topColor = new THREE.Color(topHex);
+  const bottomColor = new THREE.Color(bottomHex);
+  const pos = skyMesh.geometry.attributes.position;
+  const col = skyMesh.geometry.attributes.color;
+  for (let i = 0; i < pos.count; i++) {
+    const t = THREE.MathUtils.clamp((pos.getY(i) / 220 + 0.15) / 1.15, 0, 1);
+    const c = bottomColor.clone().lerp(topColor, t);
+    col.setXYZ(i, c.r, c.g, c.b);
+  }
+  col.needsUpdate = true;
+}
+
+/* ================================================================
+   LEVEL DEFINITIONS
+   ================================================================ */
+const LEVELS = [
+  {
+    id: 1, name: 'Quiet Cul-de-sac', seed: 1001,
+    routeLength: 560, roadHalfWidth: 5, pavementWidth: 2.2,
+    waypoints: [
+      { d: 0, x: 0 }, { d: 70, x: 0 }, { d: 130, x: 5.5 }, { d: 190, x: 5.5 },
+      { d: 235, x: -4.5 }, { d: 285, x: -4.5 }, { d: 315, x: 0 },
+      { d: 335, x: 8 }, { d: 385, x: 8 }, { d: 415, x: 0 }
+    ],
+    obstacleDensity: 0.75, gapDecayMult: 0.8, catAggro: 0.75,
+    sky: { top: 0xbfe0f2, bottom: 0xf1f8fc }, fog: { color: 0xdcecf6, near: 45, far: 130 },
+    sunColor: 0xfff6e0,
+    sanctuaryAnim: 'swing',
+    buildMaterials: buildSuburbMaterials, spawnRoadside: spawnSuburbRoadside, buildSanctuary: buildFenceSanctuary,
+    tagline: 'The one that started it all — learn the ropes.'
+  },
+  {
+    id: 2, name: 'The High Street', seed: 2002,
+    routeLength: 520, roadHalfWidth: 5.2, pavementWidth: 2.4,
+    waypoints: [
+      { d: 0, x: 0 }, { d: 60, x: 0 }, { d: 120, x: -6 }, { d: 175, x: -6 },
+      { d: 220, x: 0 }, { d: 250, x: 6 }, { d: 300, x: 6 }, { d: 345, x: -3 },
+      { d: 385, x: -3 }
+    ],
+    obstacleDensity: 1.0, gapDecayMult: 1.0, catAggro: 1.0,
+    sky: { top: 0xffcf85, bottom: 0xfff2d8 }, fog: { color: 0xf6e2bc, near: 40, far: 120 },
+    sunColor: 0xffe6b8,
+    sanctuaryAnim: 'drop',
+    buildMaterials: buildHighstreetMaterials, spawnRoadside: spawnHighstreetRoadside, buildSanctuary: buildShopSanctuary,
+    tagline: 'Busier, faster, more to dodge.'
+  },
+  {
+    id: 3, name: 'The Park Run', seed: 3003,
+    routeLength: 500, roadHalfWidth: 4.8, pavementWidth: 1.8,
+    waypoints: [
+      { d: 0, x: 0 }, { d: 50, x: 0 }, { d: 95, x: 5 }, { d: 140, x: 5 },
+      { d: 175, x: -5.5 }, { d: 220, x: -5.5 }, { d: 255, x: 0 },
+      { d: 280, x: 7 }, { d: 320, x: 7 }, { d: 355, x: -4 }, { d: 390, x: -4 }
+    ],
+    obstacleDensity: 1.15, gapDecayMult: 1.2, catAggro: 1.25,
+    sky: { top: 0x9fe08f, bottom: 0xe4f9db }, fog: { color: 0xcdeec0, near: 38, far: 108 },
+    sunColor: 0xfbffe0,
+    sanctuaryAnim: 'swing',
+    buildMaterials: buildParkMaterials, spawnRoadside: spawnParkRoadside, buildSanctuary: buildParkGateSanctuary,
+    tagline: 'Tighter bends, quacking hazards.'
+  },
+  {
+    id: 4, name: 'Industrial Estate', seed: 4004,
+    routeLength: 480, roadHalfWidth: 4.3, pavementWidth: 1.6,
+    waypoints: [
+      { d: 0, x: 0 }, { d: 45, x: 0 }, { d: 85, x: -5 }, { d: 120, x: -5 },
+      { d: 150, x: 4.5 }, { d: 190, x: 4.5 }, { d: 220, x: 0 },
+      { d: 245, x: -6 }, { d: 280, x: -6 }, { d: 310, x: 3 }, { d: 340, x: 3 }
+    ],
+    obstacleDensity: 1.35, gapDecayMult: 1.5, catAggro: 1.6,
+    sky: { top: 0xd79a68, bottom: 0xecd0a8 }, fog: { color: 0xd8bf98, near: 30, far: 92 },
+    sunColor: 0xffceaa,
+    sanctuaryAnim: 'drop',
+    buildMaterials: buildIndustrialMaterials, spawnRoadside: spawnIndustrialRoadside, buildSanctuary: buildWarehouseSanctuary,
+    tagline: 'The finale. Everything, faster, tighter.'
+  }
+];
+
+let currentLevel = LEVELS[0];
+let levelMat = {};
+
+function centerX(d) {
+  const wps = currentLevel.waypoints.concat([{ d: currentLevel.routeLength, x: currentLevel.waypoints[currentLevel.waypoints.length - 1].x }]);
+  d = Math.max(0, Math.min(currentLevel.routeLength, d));
+  for (let i = 0; i < wps.length - 1; i++) {
+    const a = wps[i], b = wps[i + 1];
+    if (d <= b.d) {
+      const t = (d - a.d) / ((b.d - a.d) || 1);
+      const s = t * t * (3 - 2 * t);
+      return a.x + (b.x - a.x) * s;
+    }
+  }
+  return wps[wps.length - 1].x;
+}
 
 function buildRibbon(material, halfWidth, y, extraLength) {
   const step = 4;
   const positions = [];
   const indices = [];
   let vi = 0;
-  const maxD = ROUTE_LENGTH + (extraLength || 0);
+  const maxD = currentLevel.routeLength + (extraLength || 0);
   for (let d = 0; d <= maxD; d += step) {
     const cx = centerX(d);
     positions.push(cx - halfWidth, y, -d, cx + halfWidth, y, -d);
@@ -389,19 +532,17 @@ function buildRibbon(material, halfWidth, y, extraLength) {
   geo.setIndex(indices);
   geo.computeVertexNormals();
   const mesh = new THREE.Mesh(geo, material);
-  mesh.receiveShadow = true;
+  scene.add(mesh);
+  trackMesh(mesh);
   return mesh;
 }
-
-scene.add(buildRibbon(MAT.pavement, ROAD_HALF_WIDTH + PAVEMENT_WIDTH, 0, 14));
-scene.add(buildRibbon(MAT.road, ROAD_HALF_WIDTH, 0.02, 14));
 
 function buildEdgeStrip(material, edgeOffset, thickness, y, sign) {
   const step = 4;
   const positions = [];
   const indices = [];
   let vi = 0;
-  for (let d = 0; d <= ROUTE_LENGTH + 14; d += step) {
+  for (let d = 0; d <= currentLevel.routeLength + 14; d += step) {
     const cx = centerX(d);
     const base = cx + sign * edgeOffset;
     positions.push(base - thickness / 2, y, -d, base + thickness / 2, y, -d);
@@ -416,54 +557,56 @@ function buildEdgeStrip(material, edgeOffset, thickness, y, sign) {
   geo.setIndex(indices);
   geo.computeVertexNormals();
   const mesh = new THREE.Mesh(geo, material);
-  mesh.receiveShadow = true;
+  scene.add(mesh);
+  trackMesh(mesh);
   return mesh;
 }
-scene.add(buildEdgeStrip(MAT.kerbEdge, ROAD_HALF_WIDTH, 0.18, 0.025, -1));
-scene.add(buildEdgeStrip(MAT.kerbEdge, ROAD_HALF_WIDTH, 0.18, 0.025, 1));
 
 function addCenterLine() {
   const dashLen = 2, gap = 2.5;
-  for (let d = 5; d < ROUTE_LENGTH - 5; d += dashLen + gap) {
+  for (let d = 5; d < currentLevel.routeLength - 5; d += dashLen + gap) {
     const cx = centerX(d);
-    addBox(MAT.white, 0.22, 0.02, dashLen, cx, 0.035, -d - dashLen / 2, 0, false);
+    addBox(levelMat.markings || SHARED_MAT.white, 0.22, 0.02, dashLen, cx, 0.035, -d - dashLen / 2);
   }
 }
 
-function addZebraCrossing(d) {
-  const cx = centerX(d);
-  const bars = 6, barDepth = 0.7, gapDepth = 0.6;
-  const totalDepth = bars * barDepth + (bars - 1) * gapDepth;
-  const z0 = -d - totalDepth / 2;
-  for (let i = 0; i < bars; i++) {
-    addBox(MAT.white, ROAD_HALF_WIDTH * 2 - 1, 0.03, barDepth, cx, 0.04, z0 + i * (barDepth + gapDepth) + barDepth / 2, 0, false);
-  }
+/* ================================================================
+   THEME: SUBURB (Level 1)
+   ================================================================ */
+function buildSuburbMaterials() {
+  return {
+    road: trackMat(toonMat(0x5a5d61)),
+    pavement: trackMat(toonMat(0xc7c9c2)),
+    grass: trackMat(toonMat(0x6fbf5c)),
+    kerbEdge: trackMat(toonMat(0x2c2c2c)),
+    markings: trackMat(toonMat(0xffffff)),
+    hedge: trackMat(toonMat(0x4a9e3f)),
+    wallColors: [0xE8B978, 0xF0D2A0, 0xD99B6C, 0xE3C8A0, 0xF5E0B8, 0xC98F5E, 0xF2E6C9].map(c => trackMat(toonMat(c))),
+    roof: trackMat(toonMat(0x8a4a3a)),
+    roofDark: trackMat(toonMat(0x5c3226)),
+    doorColors: [0xE0453A, 0x2C86C9, 0x35A860, 0xE8B02A, 0x9A4FB0, 0x2EAE9A, 0xB0302E].map(c => trackMat(toonMat(c))),
+    window: trackMat(toonMat(0x8FD4F0)),
+    binGreen: trackMat(toonMat(0x389049)),
+    binBlack: trackMat(toonMat(0x2c2c2c)),
+    binBlue: trackMat(toonMat(0x2f7ac9)),
+    postboxRed: trackMat(toonMat(0xD9241F)),
+    carColors: [0xD9241F, 0x2454C4, 0x2E9E4A, 0xF2F2F2, 0x2c2c2c, 0xE8A61E].map(c => trackMat(toonMat(c))),
+    kerb: trackMat(toonMat(0xd8d6cc)),
+    island: trackMat(toonMat(0x5f9e48)),
+    treeTrunk: trackMat(toonMat(0x6b4a34)),
+    treeLeaf: trackMat(toonMat(0x4a9e3f)),
+    gardenWall: trackMat(toonMat(0xc99a6e)),
+    fence: trackMat(toonMat(0x9a6a3f)),
+    flap: trackMat(toonMat(0x6b4526))
+  };
 }
-
-function addSpeedBump(d) {
-  const cx = centerX(d);
-  addBox(MAT.white, ROAD_HALF_WIDTH * 2 - 0.6, 0.12, 0.5, cx, 0.06, -d, 0, false);
-}
-
-function addRoundabout(d) {
-  const cx = centerX(d);
-  const ix = cx - 9.5;
-  const z = -d;
-  addCyl(MAT.kerb, 3.5, 0.08, ix, 0.04, z, false);
-  addCyl(MAT.island, 3.2, 0.3, ix, 0.15, z);
-  addCyl(MAT.treeTrunk, 0.18, 1.6, ix, 1.1, z);
-  addCone(MAT.treeLeaf, 1.4, 2.1, ix, 2.75, z);
-}
-
-/* ---------------- decoration ---------------- */
-const OBSTACLES = [];
 
 function buildHouse(cx, z, side) {
   const length = 4.0, depth = 3.0, height = 2.9;
   const houseX = cx + side * 11.5;
-  const wall = MAT.wallColors[Math.floor(rand() * MAT.wallColors.length)];
-  addBox(wall, depth, height, length, houseX, height / 2, z);
-  const roofMat = rand() < 0.5 ? MAT.roof : MAT.roofDark;
+  const wall = levelMat.wallColors[Math.floor(rand() * levelMat.wallColors.length)];
+  addBox(wall, depth, height, length, houseX, height / 2, z, 0, true);
+  const roofMat = rand() < 0.5 ? levelMat.roof : levelMat.roofDark;
   addBox(roofMat, depth + 0.3, 0.22, length + 0.3, houseX, height + 0.11, z);
   const ridge = addBox(roofMat, depth * 0.55, 0.9, length * 0.85, houseX, height + 0.5, z);
   ridge.rotation.z = Math.PI / 4;
@@ -471,15 +614,15 @@ function buildHouse(cx, z, side) {
   const wallFrontX = houseX - side * (depth / 2);
   const bayProtrusion = 0.7;
   const bayX = wallFrontX - side * (bayProtrusion / 2);
-  addBox(wall, bayProtrusion, 1.5, 1.5, bayX, 0.85, z - length * 0.15, 0, false);
-  addBox(MAT.window, bayProtrusion * 0.2, 0.9, 1.1, bayX - side * (bayProtrusion * 0.4), 0.95, z - length * 0.15, 0, false);
+  addBox(wall, bayProtrusion, 1.5, 1.5, bayX, 0.85, z - length * 0.15);
+  addBox(levelMat.window, bayProtrusion * 0.2, 0.9, 1.1, bayX - side * (bayProtrusion * 0.4), 0.95, z - length * 0.15);
 
-  const door = MAT.doorColors[Math.floor(rand() * MAT.doorColors.length)];
-  addBox(door, 0.08, 1.7, 0.7, wallFrontX - side * 0.03, 0.85, z + length * 0.28, 0, false);
-  addBox(MAT.window, 0.08, 0.8, 0.9, wallFrontX - side * 0.03, 2.15, z + length * 0.28, 0, false);
+  const door = levelMat.doorColors[Math.floor(rand() * levelMat.doorColors.length)];
+  addBox(door, 0.08, 1.7, 0.7, wallFrontX - side * 0.03, 0.85, z + length * 0.28);
+  addBox(levelMat.window, 0.08, 0.8, 0.9, wallFrontX - side * 0.03, 2.15, z + length * 0.28);
 
   if (rand() < 0.8) {
-    const binMats = [MAT.binGreen, MAT.binBlack, MAT.binBlue];
+    const binMats = [levelMat.binGreen, levelMat.binBlack, levelMat.binBlue];
     const bm = binMats[Math.floor(rand() * binMats.length)];
     const binX = cx + side * 7.0;
     const binZ = z + (rand() - 0.5) * 1.5;
@@ -488,134 +631,471 @@ function buildHouse(cx, z, side) {
   }
 }
 
-function buildHedge(cx, z, side) {
-  addBox(MAT.hedge, 1.0, 0.75 + rand() * 0.15, 3.6, cx + side * 9.4, 0.4, z);
-}
-
+function buildHedgeRow(cx, z, side) { addBox(levelMat.hedge, 1.0, 0.75 + rand() * 0.15, 3.6, cx + side * 9.4, 0.4, z); }
 function buildGardenWall(cx, z, side) {
   const wx = cx + side * 9.4;
-  addBox(MAT.gardenWall, 1.0, 0.6, 3.2, wx, 0.3, z);
-  addBox(MAT.kerb, 1.05, 0.08, 3.3, wx, 0.64, z, 0, false);
+  addBox(levelMat.gardenWall, 1.0, 0.6, 3.2, wx, 0.3, z);
+  addBox(levelMat.kerb, 1.05, 0.08, 3.3, wx, 0.64, z);
 }
-
 function buildStreetTree(cx, z, side) {
   const tx = cx + side * 7.9;
-  addCyl(MAT.treeTrunk, 0.14, 1.4, tx, 0.7, z);
-  addCone(MAT.treeLeaf, 1.1, 1.7, tx, 2.0, z);
+  addCyl(levelMat.treeTrunk, 0.14, 1.4, tx, 0.7, z);
+  addCone(levelMat.treeLeaf, 1.1, 1.7, tx, 2.0, z);
 }
-
 function buildPostbox(cx, z, side) {
   const px = cx + side * 6.6;
-  addCyl(MAT.postboxRed, 0.28, 1.1, px, 0.55, z);
-  addCyl(MAT.postboxRed, 0.3, 0.15, px, 1.15, z, false);
+  addCyl(levelMat.postboxRed, 0.28, 1.1, px, 0.55, z, true);
+  addCyl(levelMat.postboxRed, 0.3, 0.15, px, 1.15, z);
   OBSTACLES.push({ x: px, z: z, radius: 0.55 });
 }
-
-function buildParkedCar(cx, z, side) {
+function buildParkedCar(cx, z, side, mats) {
   const carX = cx + side * 4.1;
-  const mat = MAT.carColors[Math.floor(rand() * MAT.carColors.length)];
-  addBox(mat, 1.7, 0.85, 3.6, carX, 0.62, z);
+  const cars = mats || levelMat.carColors;
+  const mat = cars[Math.floor(rand() * cars.length)];
+  addBox(mat, 1.7, 0.85, 3.6, carX, 0.62, z, 0, true);
   addBox(mat, 1.35, 0.55, 1.9, carX, 1.18, z - 0.15);
   [[-0.75, -1.3], [0.75, -1.3], [-0.75, 1.3], [0.75, 1.3]].forEach(([wx, wz]) => {
-    addCyl(MAT.tyre, 0.32, 0.28, carX + wx, 0.32, z + wz, false).rotation.z = Math.PI / 2;
+    addCyl(SHARED_MAT.tyre, 0.32, 0.28, carX + wx, 0.32, z + wz).rotation.z = Math.PI / 2;
   });
   OBSTACLES.push({ x: carX, z: z, radius: 1.3 });
 }
-
+function buildRoundabout(d) {
+  const cx = centerX(d);
+  const ix = cx - 9.5;
+  const z = -d;
+  addCyl(levelMat.kerb, 3.5, 0.08, ix, 0.04, z);
+  addCyl(levelMat.island, 3.2, 0.3, ix, 0.15, z);
+  addCyl(levelMat.treeTrunk, 0.18, 1.6, ix, 1.1, z);
+  addCone(levelMat.treeLeaf, 1.4, 2.1, ix, 2.75, z);
+}
 function buildBusStop(d, side) {
   const cx = centerX(d);
   const x = cx + side * 7.4;
   const z = -d;
-  addBox(MAT.window, 0.08, 1.9, 2.4, x, 1.0, z);
-  addBox(MAT.metalGrey, 0.9, 0.08, 2.6, x - side * 0.4, 2.05, z);
-  addBox(MAT.metalGrey, 0.1, 2.0, 0.1, x - side * 0.75, 1.0, z - 1.1);
-  addBox(MAT.metalGrey, 0.1, 2.0, 0.1, x - side * 0.75, 1.0, z + 1.1);
-  addCyl(MAT.metalGrey, 0.05, 2.2, x + side * 0.3, 1.1, z + 1.4);
-  addBox(MAT.doorColors[1], 0.05, 0.35, 0.25, x + side * 0.3, 2.05, z + 1.4);
+  addBox(levelMat.window, 0.08, 1.9, 2.4, x, 1.0, z);
+  addBox(SHARED_MAT.metalGrey, 0.9, 0.08, 2.6, x - side * 0.4, 2.05, z);
+  addBox(SHARED_MAT.metalGrey, 0.1, 2.0, 0.1, x - side * 0.75, 1.0, z - 1.1);
+  addBox(SHARED_MAT.metalGrey, 0.1, 2.0, 0.1, x - side * 0.75, 1.0, z + 1.1);
 }
 
-const HOUSE_STEP = 18;
-for (let d = 25; d < ROUTE_LENGTH - 20; d += HOUSE_STEP) {
+function spawnSuburbRoadside(cx, z, side, density) {
+  const jitter = (rand() - 0.5) * 2;
+  if (rand() < 0.22) buildGardenWall(cx, z + jitter * 0.3, side);
+  else buildHedgeRow(cx, z + jitter * 0.3, side);
+  buildHouse(cx, z + jitter, side);
+  if (rand() < 0.35 * density) buildPostbox(cx, z + jitter * 0.5, side);
+  if (rand() < 0.18) buildStreetTree(cx, z + jitter * 0.6, side);
+}
+
+/* ================================================================
+   THEME: HIGH STREET (Level 2)
+   ================================================================ */
+function buildHighstreetMaterials() {
+  return {
+    road: trackMat(toonMat(0x54535a)),
+    pavement: trackMat(toonMat(0xcac2b0)),
+    grass: trackMat(toonMat(0x7a9e56)),
+    kerbEdge: trackMat(toonMat(0x2a2a2a)),
+    markings: trackMat(toonMat(0xffffff)),
+    shopWall: [0xE8D8C0, 0xD8C4A8, 0xEDE0CC, 0xDCC9AE].map(c => trackMat(toonMat(c))),
+    awning: [0xD9241F, 0x2C86C9, 0x35A860, 0xE8B02A].map(c => trackMat(toonMat(c))),
+    signboard: [0x2c2c2c, 0x6b3a2e, 0x1f5c4a].map(c => trackMat(toonMat(c))),
+    window: trackMat(toonMat(0xA8DEF2)),
+    door: trackMat(toonMat(0x3a2a20)),
+    lampPost: trackMat(toonMat(0x2c2c2c)),
+    lampHead: trackMat(toonMat(0xF2E08A)),
+    benchWood: trackMat(toonMat(0x9a6a3f)),
+    stallTable: trackMat(toonMat(0x8a6244)),
+    crate: [0xC98F5E, 0xB0784A].map(c => trackMat(toonMat(c))),
+    carColors: [0xD9241F, 0x2454C4, 0x2E9E4A, 0xF2F2F2, 0x2c2c2c, 0xE8A61E].map(c => trackMat(toonMat(c))),
+    pedestrianCoat: [0x2C86C9, 0xE0453A, 0x35A860, 0x9A4FB0].map(c => trackMat(toonMat(c))),
+    pedestrianSkin: trackMat(toonMat(0xE8AE84)),
+    kerb: trackMat(toonMat(0xd8d6cc)),
+    plaza: trackMat(toonMat(0xC7B89A)),
+    fence: trackMat(toonMat(0x8a6244)),
+    flap: trackMat(toonMat(0x3a2a20))
+  };
+}
+
+function buildShopfront(cx, z, side) {
+  const length = 4.2, depth = 2.8, height = 2.6;
+  const shopX = cx + side * 10.5;
+  const wall = levelMat.shopWall[Math.floor(rand() * levelMat.shopWall.length)];
+  addBox(wall, depth, height, length, shopX, height / 2, z, 0, true);
+  addBox(SHARED_MAT.metalGrey, depth + 0.2, 0.15, length + 0.2, shopX, height + 0.08, z);
+
+  const frontX = shopX - side * (depth / 2);
+  addBox(levelMat.window, 0.06, 1.5, length * 0.75, frontX - side * 0.03, 0.85, z);
+  const awn = levelMat.awning[Math.floor(rand() * levelMat.awning.length)];
+  const awning = addBox(awn, 0.9, 0.1, length * 0.85, frontX - side * 0.45, 1.75, z);
+  awning.rotation.x = side > 0 ? -0.28 : 0.28;
+  addBox(levelMat.signboard[Math.floor(rand() * levelMat.signboard.length)], 0.15, 0.4, length * 0.8, frontX - side * 0.08, 2.15, z);
+  addBox(levelMat.door, 0.08, 1.7, 0.65, frontX - side * 0.03, 0.85, z + length * 0.32);
+
+  if (rand() < 0.7) {
+    const binX = cx + side * 7.0;
+    const binZ = z + (rand() - 0.5) * 1.5;
+    addBox(SHARED_MAT.metalGrey, 0.5, 0.75, 0.45, binX, 0.38, binZ);
+    OBSTACLES.push({ x: binX, z: binZ, radius: 0.65 });
+  }
+}
+function buildLampPost(cx, z, side) {
+  const px = cx + side * 6.6;
+  addCyl(levelMat.lampPost, 0.09, 2.4, px, 1.2, z, true);
+  addBox(levelMat.lampHead, 0.35, 0.35, 0.35, px, 2.5, z);
+  OBSTACLES.push({ x: px, z: z, radius: 0.5 });
+}
+function buildBench(cx, z, side, mat) {
+  const bx = cx + side * 7.2;
+  const woodMat = mat || levelMat.benchWood;
+  addBox(woodMat, 1.4, 0.08, 0.5, bx, 0.5, z);
+  addBox(woodMat, 1.4, 0.5, 0.08, bx, 0.75, z - 0.22);
+  addCyl(SHARED_MAT.metalGrey, 0.05, 0.5, bx - 0.55, 0.25, z);
+  addCyl(SHARED_MAT.metalGrey, 0.05, 0.5, bx + 0.55, 0.25, z);
+  OBSTACLES.push({ x: bx, z: z, radius: 0.9 });
+}
+function buildMarketStall(cx, z, side) {
+  const sx = cx + side * 4.3;
+  addBox(levelMat.stallTable, 1.6, 0.9, 1.2, sx, 0.45, z, 0, true);
+  const crateMat = levelMat.crate[Math.floor(rand() * levelMat.crate.length)];
+  addBox(crateMat, 0.4, 0.35, 0.4, sx - 0.4, 1.08, z);
+  addBox(crateMat, 0.4, 0.35, 0.4, sx + 0.35, 1.08, z);
+  const awn = levelMat.awning[Math.floor(rand() * levelMat.awning.length)];
+  const canopy = addBox(awn, 1.8, 0.1, 1.4, sx, 1.8, z);
+  canopy.rotation.z = 0.05;
+  OBSTACLES.push({ x: sx, z: z, radius: 1.1 });
+}
+function buildPedestrian(cx, z, side) {
+  const px = cx + side * 6.2;
+  const coat = levelMat.pedestrianCoat[Math.floor(rand() * levelMat.pedestrianCoat.length)];
+  addBox(coat, 0.4, 0.9, 0.28, px, 0.75, z);
+  addSphere(levelMat.pedestrianSkin, 0.16, 0.18, 0.16, px, 1.35, z);
+}
+function buildTownSquare(d) {
   const cx = centerX(d);
+  const ix = cx - 9.5;
   const z = -d;
-  const spawnIntensity = escalationIntensity(d / ROUTE_LENGTH);
-  [-1, 1].forEach(side => {
-    const jitter = (rand() - 0.5) * 2;
-    if (rand() < 0.22) {
-      buildGardenWall(cx, z + jitter * 0.3, side);
-    } else {
-      buildHedge(cx, z + jitter * 0.3, side);
-    }
-    buildHouse(cx, z + jitter, side);
-    if (rand() < 0.35 * (0.5 + spawnIntensity)) buildPostbox(cx, z + jitter * 0.5, side);
-    if (rand() < 0.18) buildStreetTree(cx, z + jitter * 0.6, side);
-  });
-  if (rand() < 0.4 * (0.5 + spawnIntensity * 1.3)) {
-    const side = rand() < 0.5 ? -1 : 1;
-    buildParkedCar(cx, z + (rand() - 0.5) * 4, side);
+  addCyl(levelMat.plaza, 3.6, 0.06, ix, 0.03, z);
+  buildLampPost2(ix, z);
+  buildBench(ix + 1.6, z, 0, levelMat.benchWood);
+}
+function buildLampPost2(x, z) {
+  addCyl(levelMat.lampPost, 0.1, 2.6, x, 1.3, z, true);
+  addBox(levelMat.lampHead, 0.38, 0.38, 0.38, x, 2.65, z);
+}
+
+function spawnHighstreetRoadside(cx, z, side, density) {
+  const jitter = (rand() - 0.5) * 1.6;
+  buildShopfront(cx, z + jitter, side);
+  if (rand() < 0.4 * density) buildLampPost(cx, z + jitter * 0.5, side);
+  if (rand() < 0.22) buildBench(cx, z + jitter * 0.4, side);
+  if (rand() < 0.15) buildPedestrian(cx, z + jitter * 0.6, side);
+}
+
+/* ================================================================
+   THEME: PARK (Level 3)
+   ================================================================ */
+function buildParkMaterials() {
+  return {
+    road: trackMat(toonMat(0x8a6f56)),
+    pavement: trackMat(toonMat(0xb9ac86)),
+    grass: trackMat(toonMat(0x6fc24f)),
+    kerbEdge: trackMat(toonMat(0x4a3c2c)),
+    markings: trackMat(toonMat(0xf2ead2)),
+    hedge: trackMat(toonMat(0x4a9e3f)),
+    benchWood: trackMat(toonMat(0x7a5230)),
+    binGreen: trackMat(toonMat(0x2f7a3a)),
+    treeTrunk: trackMat(toonMat(0x6b4a34)),
+    treeLeaf: [0x4fae3f, 0x5fbf4a, 0x3f9e38].map(c => trackMat(toonMat(c))),
+    pondWater: trackMat(toonMat(0x4aa8d8)),
+    pondWall: trackMat(toonMat(0x9a9482)),
+    duckBody: trackMat(toonMat(0xffd23a)),
+    duckBeak: trackMat(toonMat(0xE8842A)),
+    railing: trackMat(toonMat(0x2f7a3a)),
+    gatePanel: trackMat(toonMat(0x1f5c2a)),
+    kerb: trackMat(toonMat(0xd8d0b8))
+  };
+}
+
+function buildParkBench(cx, z, side) {
+  const bx = cx + side * 7.0;
+  addBox(levelMat.benchWood, 1.3, 0.08, 0.48, bx, 0.48, z, 0, true);
+  addBox(levelMat.benchWood, 1.3, 0.48, 0.08, bx, 0.72, z - 0.2);
+  OBSTACLES.push({ x: bx, z: z, radius: 0.85 });
+}
+function buildLitterBin(cx, z, side) {
+  const bx = cx + side * 6.6;
+  addCyl(levelMat.binGreen, 0.32, 0.7, bx, 0.35, z, true);
+  OBSTACLES.push({ x: bx, z: z, radius: 0.5 });
+}
+function buildParkTree(cx, z, side) {
+  const tx = cx + side * 8.4;
+  const leaf = levelMat.treeLeaf[Math.floor(rand() * levelMat.treeLeaf.length)];
+  addCyl(levelMat.treeTrunk, 0.2, 1.8, tx, 0.9, z);
+  addSphere(leaf, 1.3, 1.4, 1.3, tx, 2.6, z);
+}
+function buildDuckAt(x, z) {
+  addSphere(levelMat.duckBody, 0.28, 0.24, 0.34, x, 0.28, z, true);
+  addSphere(levelMat.duckBody, 0.16, 0.15, 0.17, x, 0.5, z - 0.22);
+  addCone(levelMat.duckBeak, 0.07, 0.16, x, 0.48, z - 0.4);
+  OBSTACLES.push({ x: x, z: z, radius: 0.55 });
+}
+function buildDuck(cx, z, side) {
+  const dx = cx + side * (3.6 + rand() * 0.8);
+  const dz = z + (rand() - 0.5) * 1.5;
+  buildDuckAt(dx, dz);
+}
+function buildPond(d) {
+  const cx = centerX(d);
+  const ix = cx - 8.5;
+  const z = -d;
+  addCyl(levelMat.pondWall, 4.0, 0.1, ix, 0.05, z);
+  const water = new THREE.Mesh(GEO.circle, levelMat.pondWater);
+  water.rotation.x = -Math.PI / 2;
+  water.scale.set(3.6, 3.6, 1);
+  water.position.set(ix, 0.1, z);
+  scene.add(water);
+  trackMesh(water);
+  addCyl(levelMat.pondWall, 0.12, 0.9, ix, 0.5, z);
+  addCone(SHARED_MAT.metalGrey, 0.1, 0.35, ix, 1.05, z);
+  for (let i = 0; i < 2; i++) {
+    buildDuckAt(ix + (rand() - 0.5) * 3, -d + (rand() - 0.5) * 3);
   }
 }
 
-addZebraCrossing(ZEBRA_D);
-addRoundabout(ROUNDABOUT_D);
-buildBusStop(BUS_STOP_D, 1);
-SPEED_BUMP_DS.forEach(addSpeedBump);
-addCenterLine();
+function spawnParkRoadside(cx, z, side, density) {
+  const jitter = (rand() - 0.5) * 1.8;
+  if (rand() < 0.4) buildParkTree(cx, z + jitter * 0.5, side);
+  if (rand() < 0.3 * density) buildParkBench(cx, z + jitter * 0.4, side);
+  if (rand() < 0.3 * density) buildLitterBin(cx, z + jitter * 0.5, side);
+  if (rand() < 0.16) buildDuck(cx, z + jitter, side);
+}
 
-/* ---------------- the sanctuary: where the cat can't follow ---------------- */
-let sanctuaryFlap;
-function buildSanctuary() {
-  const cx = centerX(ROUTE_LENGTH);
-  const z = -ROUTE_LENGTH - 2;
-  const gapWidth = 1.3;
-  const fenceHeight = 1.7;
-  const panelWidth = (ROAD_HALF_WIDTH * 2 - gapWidth) / 2;
-  addBox(MAT.fence, panelWidth, fenceHeight, 0.15, cx - gapWidth / 2 - panelWidth / 2, fenceHeight / 2, z);
-  addBox(MAT.fence, panelWidth, fenceHeight, 0.15, cx + gapWidth / 2 + panelWidth / 2, fenceHeight / 2, z);
-  sanctuaryFlap = addBox(MAT.flap, gapWidth * 0.9, fenceHeight * 0.8, 0.06, cx, fenceHeight * 0.8 / 2, z);
-  sanctuaryFlap.rotation.y = 0.18;
+/* ================================================================
+   THEME: INDUSTRIAL (Level 4)
+   ================================================================ */
+function buildIndustrialMaterials() {
+  return {
+    road: trackMat(toonMat(0x3f3d3a)),
+    pavement: trackMat(toonMat(0x8a8378)),
+    grass: trackMat(toonMat(0x8f8a6e)),
+    kerbEdge: trackMat(toonMat(0x1a1a1a)),
+    markings: trackMat(toonMat(0xE8C63A)),
+    warehouseWall: [0xB0AC9E, 0xA69C88, 0xBCB6A4].map(c => trackMat(toonMat(c))),
+    warehouseStripe: trackMat(toonMat(0xD9241F)),
+    shutter: trackMat(toonMat(0x4a4842)),
+    skipOrange: trackMat(toonMat(0xE8621E)),
+    skipRim: trackMat(toonMat(0xC94A16)),
+    pallet: trackMat(toonMat(0xB0824A)),
+    fence: trackMat(toonMat(0x5a5650)),
+    flap: trackMat(toonMat(0x3a3834)),
+    kerb: trackMat(toonMat(0x716c60))
+  };
+}
 
+function buildWarehouse(cx, z, side) {
+  const length = 6.5, depth = 4.0, height = 3.6;
+  const wx = cx + side * 12.5;
+  const wall = levelMat.warehouseWall[Math.floor(rand() * levelMat.warehouseWall.length)];
+  addBox(wall, depth, height, length, wx, height / 2, z, 0, true);
+  addBox(levelMat.warehouseStripe, depth + 0.06, 0.35, length + 0.06, wx, 1.1, z);
+  addBox(SHARED_MAT.metalGrey, depth + 0.25, 0.2, length + 0.25, wx, height + 0.1, z);
+  const frontX = wx - side * (depth / 2 + 0.03);
+  addBox(levelMat.shutter, 0.1, 2.0, 1.8, frontX, 1.0, z);
+}
+function buildSkip(cx, z, side) {
+  const sx = cx + side * 4.2;
+  addBox(levelMat.skipOrange, 1.5, 0.9, 1.9, sx, 0.45, z, 0, true);
+  addBox(levelMat.skipRim, 1.6, 0.12, 2.0, sx, 0.94, z);
+  OBSTACLES.push({ x: sx, z: z, radius: 1.15 });
+}
+function buildPallet(cx, z, side) {
+  const px = cx + side * 6.6;
+  addBox(levelMat.pallet, 1.0, 0.18, 1.0, px, 0.18, z, 0, true);
+  addBox(levelMat.pallet, 0.7, 0.5, 0.7, px, 0.6, z);
+  OBSTACLES.push({ x: px, z: z, radius: 0.8 });
+}
+function buildLampPostIndustrial(cx, z, side) {
+  const px = cx + side * 6.9;
+  addCyl(SHARED_MAT.metalGrey, 0.08, 2.6, px, 1.3, z, true);
+  addBox(levelMat.shutter, 0.3, 0.3, 0.3, px, 2.6, z);
+  OBSTACLES.push({ x: px, z: z, radius: 0.45 });
+}
+
+function spawnIndustrialRoadside(cx, z, side, density) {
+  const jitter = (rand() - 0.5) * 1.4;
+  buildWarehouse(cx, z + jitter, side);
+  if (rand() < 0.4 * density) buildSkip(cx, z + jitter * 0.5, side);
+  if (rand() < 0.35 * density) buildPallet(cx, z + jitter * 0.6, side);
+  if (rand() < 0.2) buildLampPostIndustrial(cx, z + jitter * 0.4, side);
+}
+
+/* ================================================================
+   SANCTUARIES
+   ================================================================ */
+let sanctuaryDoor;
+function buildFenceSanctuary(cx, z) {
+  const gapWidth = 1.3, fenceHeight = 1.7;
+  const panelWidth = (currentLevel.roadHalfWidth * 2 - gapWidth) / 2;
+  addBox(levelMat.fence, panelWidth, fenceHeight, 0.15, cx - gapWidth / 2 - panelWidth / 2, fenceHeight / 2, z);
+  addBox(levelMat.fence, panelWidth, fenceHeight, 0.15, cx + gapWidth / 2 + panelWidth / 2, fenceHeight / 2, z);
+  sanctuaryDoor = addBox(levelMat.flap, gapWidth * 0.9, fenceHeight * 0.8, 0.06, cx, fenceHeight * 0.8 / 2, z);
+  sanctuaryDoor.rotation.y = 0.18;
+  buildSafeGarden(cx, z);
+}
+function buildShopSanctuary(cx, z) {
+  const gapWidth = 1.4, height = 2.4, doorH = height * 0.85;
+  const panelWidth = (currentLevel.roadHalfWidth * 2 - gapWidth) / 2;
+  addBox(levelMat.shopWall ? levelMat.shopWall[0] : levelMat.fence, panelWidth, height, 0.2, cx - gapWidth / 2 - panelWidth / 2, height / 2, z);
+  addBox(levelMat.shopWall ? levelMat.shopWall[0] : levelMat.fence, panelWidth, height, 0.2, cx + gapWidth / 2 + panelWidth / 2, height / 2, z);
+  sanctuaryDoor = addBox(levelMat.flap, gapWidth * 0.95, doorH, 0.08, cx, doorH, z);
+  sanctuaryDoor.userData.openY = doorH;
+  sanctuaryDoor.userData.closedY = doorH / 2;
+  buildSafeGarden(cx, z, 0xC7B89A);
+}
+function buildParkGateSanctuary(cx, z) {
+  const gapWidth = 1.35, height = 1.6;
+  const panelWidth = (currentLevel.roadHalfWidth * 2 - gapWidth) / 2;
+  for (let i = 0; i < 4; i++) {
+    addBox(levelMat.railing, 0.06, height, 0.06, cx - gapWidth / 2 - (i + 0.5) * (panelWidth / 4), height / 2, z);
+    addBox(levelMat.railing, 0.06, height, 0.06, cx + gapWidth / 2 + (i + 0.5) * (panelWidth / 4), height / 2, z);
+  }
+  addBox(levelMat.railing, panelWidth, 0.08, 0.06, cx - gapWidth / 2 - panelWidth / 2, height, z);
+  addBox(levelMat.railing, panelWidth, 0.08, 0.06, cx + gapWidth / 2 + panelWidth / 2, height, z);
+  sanctuaryDoor = addBox(levelMat.gatePanel, gapWidth * 0.9, height * 0.85, 0.06, cx, height * 0.85 / 2, z);
+  sanctuaryDoor.rotation.y = 0.18;
+  buildSafeGarden(cx, z, 0xcdeec0);
+}
+function buildWarehouseSanctuary(cx, z) {
+  const gapWidth = 1.5, height = 2.6, doorH = height * 0.9;
+  const panelWidth = (currentLevel.roadHalfWidth * 2 - gapWidth) / 2;
+  addBox(levelMat.warehouseWall[0], panelWidth, height, 0.25, cx - gapWidth / 2 - panelWidth / 2, height / 2, z);
+  addBox(levelMat.warehouseWall[0], panelWidth, height, 0.25, cx + gapWidth / 2 + panelWidth / 2, height / 2, z);
+  sanctuaryDoor = addBox(levelMat.shutter, gapWidth * 0.95, doorH, 0.1, cx, doorH, z);
+  sanctuaryDoor.userData.openY = doorH;
+  sanctuaryDoor.userData.closedY = doorH / 2;
+  buildSafeGarden(cx, z, 0xd8bf98);
+}
+function buildSafeGarden(cx, z, tint) {
   const gardenGeo = new THREE.PlaneGeometry(20, 20);
-  const garden = new THREE.Mesh(gardenGeo, MAT.grass);
+  const mat = tint ? trackMat(toonMat(tint)) : levelMat.grass;
+  const garden = new THREE.Mesh(gardenGeo, mat);
   garden.rotation.x = -Math.PI / 2;
   garden.position.set(cx, 0.01, z - 8);
-  garden.receiveShadow = true;
   scene.add(garden);
+  trackMesh(garden);
+  const hedgeMat = levelMat.hedge || levelMat.railing || SHARED_MAT.metalGrey;
   for (let i = 0; i < 8; i++) {
     const a = (i / 8) * Math.PI * 2;
-    addBox(MAT.hedge, 0.6, 0.5, 0.6, cx + Math.cos(a) * 3, 0.25, z - 8 + Math.sin(a) * 3);
+    addBox(hedgeMat, 0.6, 0.5, 0.6, cx + Math.cos(a) * 3, 0.25, z - 8 + Math.sin(a) * 3);
   }
 }
-buildSanctuary();
 
-/* ---------------- Jerry: arms + scooter, first-person rig ---------------- */
+/* ================================================================
+   LEVEL BUILD / TEARDOWN
+   ================================================================ */
+function teardownLevel() {
+  levelObjects.forEach(m => { if (m.parent) m.parent.remove(m); });
+  levelObjects = [];
+  levelMaterials.forEach(m => m.dispose());
+  levelMaterials = [];
+  OBSTACLES.length = 0;
+}
+
+function buildLevel(level) {
+  teardownLevel();
+  currentLevel = level;
+  rand = mulberry32(level.seed);
+  levelMat = level.buildMaterials();
+
+  updateSkyColors(level.sky.top, level.sky.bottom);
+  scene.background = new THREE.Color(level.sky.bottom);
+  scene.fog = new THREE.Fog(level.fog.color, level.fog.near, level.fog.far);
+  sun.color = new THREE.Color(level.sunColor);
+
+  const groundGeo = new THREE.PlaneGeometry(220, level.routeLength + 140);
+  const ground = new THREE.Mesh(groundGeo, levelMat.grass);
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.set(0, -0.02, -level.routeLength / 2 + 30);
+  scene.add(ground);
+  trackMesh(ground);
+
+  buildRibbon(levelMat.pavement, level.roadHalfWidth + level.pavementWidth, 0, 14);
+  buildRibbon(levelMat.road, level.roadHalfWidth, 0.02, 14);
+  buildEdgeStrip(levelMat.kerbEdge, level.roadHalfWidth, 0.18, 0.025, -1);
+  buildEdgeStrip(levelMat.kerbEdge, level.roadHalfWidth, 0.18, 0.025, 1);
+  addCenterLine();
+
+  const STEP = 18;
+  for (let d = 25; d < level.routeLength - 20; d += STEP) {
+    const cx = centerX(d);
+    const z = -d;
+    const intensity = escalationIntensity(d / level.routeLength);
+    const density = (0.5 + intensity) * level.obstacleDensity;
+    [-1, 1].forEach(side => level.spawnRoadside(cx, z, side, density));
+    if (rand() < 0.35 * (0.5 + intensity * 1.3) * level.obstacleDensity) {
+      const side = rand() < 0.5 ? -1 : 1;
+      if (level.id === 1) buildParkedCar(cx, z + (rand() - 0.5) * 4, side, levelMat.carColors);
+      else if (level.id === 2) buildParkedCar(cx, z + (rand() - 0.5) * 4, side, levelMat.carColors);
+    }
+  }
+
+  if (level.id === 1) {
+    buildRoundabout(level.routeLength * 0.64);
+    buildBusStop(level.routeLength * 0.3, 1);
+  } else if (level.id === 2) {
+    buildTownSquare(level.routeLength * 0.55);
+    buildMarketStall(centerX(level.routeLength * 0.4), -level.routeLength * 0.4, -1);
+    buildMarketStall(centerX(level.routeLength * 0.72), -level.routeLength * 0.72, 1);
+  } else if (level.id === 3) {
+    buildPond(level.routeLength * 0.5);
+  } else if (level.id === 4) {
+    buildSkip(centerX(level.routeLength * 0.45), -level.routeLength * 0.45, 1);
+    buildSkip(centerX(level.routeLength * 0.75), -level.routeLength * 0.75, -1);
+  }
+
+  const sanctCx = centerX(level.routeLength);
+  const sanctZ = -level.routeLength - 2;
+  level.buildSanctuary(sanctCx, sanctZ);
+
+  distance = 0; speed = 0; steerInput = 0; steerOffset = 0; gap = GAP_MAX;
+  timeScale = 1; slowMoActive = false; dreadLevel = 0;
+  camera.fov = BASE_FOV;
+  camera.updateProjectionMatrix();
+  camera.rotation.set(0, 0, 0);
+  camera.position.set(centerX(0), EYE_HEIGHT, 0);
+  OBSTACLES.forEach(o => { o.hit = false; o.nearMissDone = false; });
+}
+
+/* ================================================================
+   JERRY: arms + scooter (persistent, outlined)
+   ================================================================ */
 const rig = new THREE.Group();
 camera.add(rig);
-
-function addLocal(parent, mat, w, h, d, x, y, z) {
+function addLocal(parent, mat, w, h, d, x, y, z, outline) {
   const m = new THREE.Mesh(GEO.box, mat);
   m.scale.set(w, h, d);
   m.position.set(x, y, z);
   parent.add(m);
+  if (outline) addOutline(m);
   return m;
 }
-
-addLocal(rig, MAT.metalGrey, 0.42, 0.05, 1.0, 0, -1.05, -0.9);
-addLocal(rig, MAT.metalGrey, 0.06, 0.55, 0.06, 0, -0.75, -1.35);
-addLocal(rig, MAT.metalGrey, 0.65, 0.05, 0.05, 0, -0.42, -1.4);
-const frontWheel = new THREE.Mesh(GEO.cyl, MAT.tyre);
+addLocal(rig, SHARED_MAT.metalGrey, 0.42, 0.05, 1.0, 0, -1.05, -0.9, true);
+addLocal(rig, SHARED_MAT.metalGrey, 0.06, 0.55, 0.06, 0, -0.75, -1.35, true);
+addLocal(rig, SHARED_MAT.metalGrey, 0.65, 0.05, 0.05, 0, -0.42, -1.4, true);
+const frontWheel = new THREE.Mesh(GEO.cyl, SHARED_MAT.tyre);
 frontWheel.scale.set(0.28, 0.06, 0.28);
 frontWheel.rotation.z = Math.PI / 2;
 frontWheel.position.set(0, -1.15, -1.55);
 rig.add(frontWheel);
 
 function buildArm(sideX) {
-  const sleeveMesh = new THREE.Mesh(GEO.box, MAT.sleeve);
+  const sleeveMesh = new THREE.Mesh(GEO.box, SHARED_MAT.sleeve);
   sleeveMesh.scale.set(0.16, 0.16, 0.55);
   sleeveMesh.position.set(sideX, -0.55, -1.05);
   sleeveMesh.rotation.x = -0.35;
   rig.add(sleeveMesh);
-  const hand = new THREE.Mesh(GEO.box, MAT.skin);
+  const hand = new THREE.Mesh(GEO.box, SHARED_MAT.skin);
   hand.scale.set(0.15, 0.14, 0.2);
   hand.position.set(sideX, -0.44, -1.38);
   rig.add(hand);
@@ -623,30 +1103,38 @@ function buildArm(sideX) {
 buildArm(-0.32);
 buildArm(0.32);
 
-/* ---------------- Whiskers: the chasing cat, glimpsed at the frame's edges ---------------- */
+function updateRig(dt, steerInput) {
+  const leanTarget = -steerInput * 0.16;
+  rig.rotation.z += (leanTarget - rig.rotation.z) * Math.min(1, dt * 6);
+}
+
+/* ================================================================
+   WHISKERS: the chasing cat (persistent, outlined)
+   ================================================================ */
 const catGroup = new THREE.Group();
 catGroup.visible = false;
 catGroup.userData.baseY = -0.18;
 camera.add(catGroup);
 
-function addCatPart(w, h, d, x, y, z, mat, rx, ry, rz) {
-  const m = new THREE.Mesh(GEO.box, mat || MAT.catBody);
+function addCatPart(w, h, d, x, y, z, mat, rx, ry, rz, outline) {
+  const m = new THREE.Mesh(GEO.box, mat || SHARED_MAT.catBody);
   m.scale.set(w, h, d);
   m.position.set(x, y, z);
   if (rx) m.rotation.x = rx;
   if (ry) m.rotation.y = ry;
   if (rz) m.rotation.z = rz;
   catGroup.add(m);
+  if (outline) addOutline(m, 1.2);
   return m;
 }
-addCatPart(0.34, 0.3, 0.62, 0, 0, 0);
-addCatPart(0.2, 0.16, 0.22, 0, -0.1, 0.24, MAT.catChest);
-addCatPart(0.24, 0.24, 0.26, 0, 0.16, -0.34);
-addCatPart(0.09, 0.13, 0.04, -0.08, 0.29, -0.42, MAT.catBody, 0, 0, 0.3);
-addCatPart(0.09, 0.13, 0.04, 0.08, 0.29, -0.42, MAT.catBody, 0, 0, -0.3);
-addCatPart(0.035, 0.035, 0.02, -0.06, 0.17, -0.46, MAT.catEyes);
-addCatPart(0.035, 0.035, 0.02, 0.06, 0.17, -0.46, MAT.catEyes);
-addCatPart(0.055, 0.055, 0.55, 0.12, 0.08, 0.4, MAT.catBody, 0.5, 0, 0);
+addCatPart(0.34, 0.3, 0.62, 0, 0, 0, SHARED_MAT.catBody, 0, 0, 0, true);
+addCatPart(0.2, 0.16, 0.22, 0, -0.1, 0.24, SHARED_MAT.catChest);
+addCatPart(0.24, 0.24, 0.26, 0, 0.16, -0.34, SHARED_MAT.catBody, 0, 0, 0, true);
+addCatPart(0.09, 0.13, 0.04, -0.08, 0.29, -0.42, SHARED_MAT.catBody, 0, 0, 0.3);
+addCatPart(0.09, 0.13, 0.04, 0.08, 0.29, -0.42, SHARED_MAT.catBody, 0, 0, -0.3);
+addCatPart(0.035, 0.035, 0.02, -0.06, 0.17, -0.46, SHARED_MAT.catEyes);
+addCatPart(0.035, 0.035, 0.02, 0.06, 0.17, -0.46, SHARED_MAT.catEyes);
+addCatPart(0.055, 0.055, 0.55, 0.12, 0.08, 0.4, SHARED_MAT.catBody, 0.5, 0, 0);
 
 let catVisible = false;
 let catTimer = 0;
@@ -670,7 +1158,7 @@ function updateCat(dt, progress) {
   const proximityBoost = (1 - gapRatio) * 1.1;
   const dreadBoost = dreadLevel * 0.9;
   const escalationBoost = escalationIntensity(progress || 0) * 0.4;
-  const chance = (0.1 + turnBoost + proximityBoost + dreadBoost + escalationBoost) * dt;
+  const chance = (0.1 + turnBoost + proximityBoost + dreadBoost + escalationBoost) * currentLevel.catAggro * dt;
   if (Math.random() < chance) triggerCatGlimpse(gapRatio);
 }
 
@@ -686,11 +1174,6 @@ function triggerCatGlimpse(gapRatio) {
   catTimer = 0.3 + Math.random() * 0.22;
 }
 
-function updateRig(dt, steerInput) {
-  const leanTarget = -steerInput * 0.16;
-  rig.rotation.z += (leanTarget - rig.rotation.z) * Math.min(1, dt * 6);
-}
-
 /* ---------------- input ---------------- */
 const keys = { left: false, right: false, sprint: false };
 let touchStartX = null;
@@ -704,6 +1187,10 @@ window.addEventListener('keydown', e => {
   if (k === 'shift' || k === ' ') {
     keys.sprint = true;
     if (state === 'racing') e.preventDefault();
+  }
+  if (k === 'escape') {
+    if (state === 'racing') pauseGame();
+    else if (state === 'paused') resumeGame();
   }
   if (state === 'ready') startRace();
 });
@@ -727,22 +1214,24 @@ canvas.addEventListener('click', () => { if (state === 'ready') startRace(); });
 
 const sprintBtn = document.getElementById('sprint-btn');
 sprintBtn.addEventListener('touchstart', e => {
-  e.preventDefault();
-  e.stopPropagation();
+  e.preventDefault(); e.stopPropagation();
   keys.sprint = true;
   sprintBtn.classList.add('active');
   if (state === 'ready') startRace();
 }, { passive: false });
 sprintBtn.addEventListener('touchend', e => {
-  e.preventDefault();
-  e.stopPropagation();
+  e.preventDefault(); e.stopPropagation();
   keys.sprint = false;
   sprintBtn.classList.remove('active');
 }, { passive: false });
 
-/* ---------------- audio (optional engine hum) ---------------- */
+const pauseBtn = document.getElementById('pause-btn');
+pauseBtn.addEventListener('click', () => { if (state === 'racing') pauseGame(); });
+
+/* ---------------- audio ---------------- */
 let audioCtx = null, osc = null, gainNode = null;
 function startAudio() {
+  if (!settings.sound) return;
   try {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     osc = audioCtx.createOscillator();
@@ -757,14 +1246,14 @@ function startAudio() {
 function updateAudio(ratio) {
   if (!osc) return;
   osc.frequency.setTargetAtTime(60 + ratio * 90, audioCtx.currentTime, 0.05);
-  gainNode.gain.setTargetAtTime(0.015 + ratio * 0.02, audioCtx.currentTime, 0.05);
+  gainNode.gain.setTargetAtTime(settings.sound ? 0.015 + ratio * 0.02 : 0, audioCtx.currentTime, 0.05);
 }
 function stopAudio() {
   if (osc) { try { osc.stop(); } catch (e) {} osc = null; }
   if (audioCtx) { try { audioCtx.close(); } catch (e) {} audioCtx = null; }
 }
 function playBlip(freqStart, freqEnd, duration, gainPeak, type) {
-  if (!audioCtx) return;
+  if (!audioCtx || !settings.sound) return;
   try {
     const t0 = audioCtx.currentTime;
     const o = audioCtx.createOscillator();
@@ -781,8 +1270,27 @@ function playBlip(freqStart, freqEnd, duration, gainPeak, type) {
   } catch (e) { /* ignore */ }
 }
 
+/* ---------------- progress + settings persistence ---------------- */
+const PROGRESS_KEY = 'g4-progress';
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(PROGRESS_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      return Object.assign({ unlocked: 1, bestTimes: {}, completed: {}, settings: { sound: true, sensitivity: 1 } }, p);
+    }
+  } catch (e) {}
+  return { unlocked: 1, bestTimes: {}, completed: {}, settings: { sound: true, sensitivity: 1 } };
+}
+function saveProgress() {
+  try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress)); } catch (e) {}
+}
+let progress = loadProgress();
+let settings = progress.settings;
+
 /* ---------------- game state ---------------- */
-let state = 'ready';
+let state = 'menu';
+let currentLevelIndex = 0;
 let distance = 0;
 let speed = 0;
 let steerInput = 0;
@@ -803,14 +1311,22 @@ let heartbeatCooldown = 0;
 let flashTime = 0;
 let flashMag = 0;
 let flashIsHit = false;
+let pauseStartTime = 0;
 
+const menuScreen = document.getElementById('menu-screen');
+const levelselectScreen = document.getElementById('levelselect-screen');
 const startScreen = document.getElementById('start-screen');
+const pauseScreen = document.getElementById('pause-screen');
 const resultsScreen = document.getElementById('results-screen');
 const hud = document.getElementById('hud');
 const hudTimer = document.getElementById('hud-timer');
 const gapFillEl = document.getElementById('gap-fill');
 const vignette = document.getElementById('vignette');
 const fxFlashEl = document.getElementById('fx-flash');
+const levelGrid = document.getElementById('level-grid');
+const readyTag = document.getElementById('ready-tag');
+const readyTitle = document.getElementById('ready-title');
+const readyLede = document.getElementById('ready-lede');
 const resultsTag = document.getElementById('results-tag');
 const resultsTitle = document.getElementById('results-title');
 const resultsSub = document.getElementById('results-sub');
@@ -818,19 +1334,127 @@ const resultsTimeRows = document.getElementById('results-time-rows');
 const resultTimeEl = document.getElementById('result-time');
 const bestTimeEl = document.getElementById('best-time');
 const newBestBadge = document.getElementById('new-best-badge');
+const btnPrimaryAction = document.getElementById('btn-primary-action');
+const btnSecondaryAction = document.getElementById('btn-secondary-action');
+const settingSound = document.getElementById('setting-sound');
+const settingSensitivity = document.getElementById('setting-sensitivity');
+const pauseSettingSound = document.getElementById('pause-setting-sound');
+const pauseSettingSensitivity = document.getElementById('pause-setting-sensitivity');
 
-document.getElementById('btn-start').addEventListener('click', startRace);
-document.getElementById('btn-again').addEventListener('click', () => location.reload());
+settingSound.checked = settings.sound;
+settingSensitivity.value = settings.sensitivity;
+pauseSettingSound.checked = settings.sound;
+pauseSettingSensitivity.value = settings.sensitivity;
+function applySettingsChange(sound, sensitivity) {
+  settings.sound = sound;
+  settings.sensitivity = sensitivity;
+  progress.settings = settings;
+  saveProgress();
+  settingSound.checked = sound;
+  pauseSettingSound.checked = sound;
+  settingSensitivity.value = sensitivity;
+  pauseSettingSensitivity.value = sensitivity;
+}
+settingSound.addEventListener('change', () => applySettingsChange(settingSound.checked, parseFloat(settingSensitivity.value)));
+settingSensitivity.addEventListener('input', () => applySettingsChange(settingSound.checked, parseFloat(settingSensitivity.value)));
+pauseSettingSound.addEventListener('change', () => applySettingsChange(pauseSettingSound.checked, parseFloat(pauseSettingSensitivity.value)));
+pauseSettingSensitivity.addEventListener('input', () => applySettingsChange(pauseSettingSound.checked, parseFloat(pauseSettingSensitivity.value)));
+
+function hideAllScreens() {
+  menuScreen.hidden = true;
+  levelselectScreen.hidden = true;
+  startScreen.hidden = true;
+  pauseScreen.hidden = true;
+  resultsScreen.hidden = true;
+}
+
+function showMenu() {
+  state = 'menu';
+  hideAllScreens();
+  menuScreen.hidden = false;
+  hud.hidden = true;
+  sprintBtn.hidden = true;
+  pauseBtn.hidden = true;
+  vignette.style.opacity = 0;
+}
+
+function renderLevelGrid() {
+  levelGrid.innerHTML = '';
+  LEVELS.forEach((lvl, i) => {
+    const unlocked = lvl.id <= progress.unlocked;
+    const tile = document.createElement('div');
+    tile.className = 'level-tile' + (unlocked ? '' : ' locked');
+    const best = progress.bestTimes[lvl.id];
+    tile.innerHTML = `
+      <div class="lv-num">LEVEL ${lvl.id}</div>
+      <div class="lv-name">${unlocked ? lvl.name : '???'}</div>
+      ${unlocked
+        ? `<div class="lv-best">${best ? 'Best ' + best.toFixed(2) + 's' : 'Not yet run'}</div>`
+        : `<div class="lv-lock">&#128274;</div>`}
+    `;
+    if (unlocked) tile.addEventListener('click', () => showReady(i));
+    levelGrid.appendChild(tile);
+  });
+}
+
+function showLevelSelect() {
+  state = 'levelselect';
+  hideAllScreens();
+  renderLevelGrid();
+  levelselectScreen.hidden = false;
+}
+
+function showReady(index) {
+  currentLevelIndex = index;
+  const lvl = LEVELS[index];
+  state = 'ready';
+  hideAllScreens();
+  readyTag.textContent = 'level ' + lvl.id;
+  readyTitle.textContent = lvl.name;
+  readyLede.textContent = lvl.tagline + ' Steer down the route, dodge the obstacles, and reach safety before the gap runs out.';
+  startScreen.hidden = false;
+  buildLevel(lvl);
+}
 
 function startRace() {
   if (state !== 'ready') return;
   state = 'racing';
-  startScreen.hidden = true;
+  hideAllScreens();
   hud.hidden = false;
+  pauseBtn.hidden = false;
   if (isTouchDevice) sprintBtn.hidden = false;
   raceStartTime = performance.now();
   startAudio();
 }
+
+function pauseGame() {
+  if (state !== 'racing') return;
+  state = 'paused';
+  pauseStartTime = performance.now();
+  hideAllScreens();
+  pauseScreen.hidden = false;
+  if (gainNode) gainNode.gain.value = 0;
+}
+function resumeGame() {
+  if (state !== 'paused') return;
+  raceStartTime += performance.now() - pauseStartTime;
+  state = 'racing';
+  hideAllScreens();
+}
+function restartLevel() {
+  showReady(currentLevelIndex);
+}
+function quitToMenu() {
+  stopAudio();
+  showMenu();
+}
+document.getElementById('btn-resume').addEventListener('click', resumeGame);
+document.getElementById('btn-restart').addEventListener('click', restartLevel);
+document.getElementById('btn-quit').addEventListener('click', quitToMenu);
+document.getElementById('btn-play').addEventListener('click', showLevelSelect);
+document.getElementById('btn-back-menu').addEventListener('click', showMenu);
+document.getElementById('btn-ready-back').addEventListener('click', showLevelSelect);
+document.getElementById('btn-start').addEventListener('click', startRace);
 
 function updateGapMeterUI() {
   const ratio = Math.max(0, gap) / GAP_MAX;
@@ -863,8 +1487,7 @@ function triggerCaught() {
   outcome = 'caught';
   outcomeTimer = 1.0;
   stopAudio();
-  timeScale = 1;
-  slowMoActive = false;
+  timeScale = 1; slowMoActive = false;
   catVisible = true;
   catGroup.visible = true;
   catGroup.scale.set(1.5, 1.5, 1.5);
@@ -882,8 +1505,7 @@ function triggerEscape() {
   outcome = 'escaped';
   outcomeTimer = 1.4;
   stopAudio();
-  timeScale = 1;
-  slowMoActive = false;
+  timeScale = 1; slowMoActive = false;
   catVisible = true;
   catGroup.visible = true;
   catGroup.scale.set(1, 1, 1);
@@ -893,36 +1515,64 @@ function triggerEscape() {
   whipZ = (Math.random() < 0.5 ? -1 : 1) * 0.14;
   flapSlamTimer = 0.5;
   playBlip(500, 950, 0.2, 0.06, 'sine');
+
+  const lvl = LEVELS[currentLevelIndex];
+  const finalTime = elapsed;
+  const prevBest = progress.bestTimes[lvl.id];
+  if (!prevBest || finalTime < prevBest) progress.bestTimes[lvl.id] = finalTime;
+  progress.completed[lvl.id] = true;
+  if (lvl.id === progress.unlocked && progress.unlocked < LEVELS.length) progress.unlocked = lvl.id + 1;
+  saveProgress();
 }
 
 function showResults() {
   state = 'finished';
   hud.hidden = true;
+  pauseBtn.hidden = true;
   sprintBtn.hidden = true;
   vignette.style.opacity = 0;
+  hideAllScreens();
+  const lvl = LEVELS[currentLevelIndex];
+  const isLast = lvl.id === LEVELS.length;
+
   if (outcome === 'escaped') {
-    resultsTag.textContent = 'escaped';
-    resultsTitle.textContent = 'You made it!';
-    resultsSub.textContent = 'Whiskers skids to a halt at the gate — safe another day.';
     const finalTime = elapsed;
-    const stored = localStorage.getItem('g4-best-time');
-    const best = stored ? parseFloat(stored) : Infinity;
-    const isBest = finalTime < best;
-    if (isBest) localStorage.setItem('g4-best-time', finalTime.toFixed(2));
+    const best = progress.bestTimes[lvl.id];
+    const isBest = best === finalTime;
+    resultsTag.textContent = isLast ? 'game complete' : 'level complete';
+    resultsTitle.textContent = isLast ? 'You made it home!' : 'You made it!';
+    resultsSub.textContent = isLast
+      ? 'Whiskers finally gives up the chase. All four routes conquered.'
+      : 'Whiskers skids to a halt — safe another day. Next route unlocked.';
     resultTimeEl.textContent = finalTime.toFixed(2) + 's';
-    bestTimeEl.textContent = (isBest ? finalTime : best).toFixed(2) + 's';
+    bestTimeEl.textContent = (best || finalTime).toFixed(2) + 's';
     newBestBadge.hidden = !isBest;
     resultsTimeRows.hidden = false;
+    if (isLast) {
+      btnPrimaryAction.textContent = 'Race Again';
+      btnPrimaryAction.onclick = () => restartLevel();
+    } else {
+      btnPrimaryAction.textContent = 'Next Level';
+      btnPrimaryAction.onclick = () => showReady(currentLevelIndex + 1);
+    }
+    btnSecondaryAction.textContent = 'Menu';
+    btnSecondaryAction.onclick = () => showMenu();
   } else {
     resultsTag.textContent = 'caught';
     resultsTitle.textContent = 'Caught!';
     resultsSub.textContent = 'So close — have another go and widen that gap.';
     resultsTimeRows.hidden = true;
+    btnPrimaryAction.textContent = 'Retry';
+    btnPrimaryAction.onclick = () => restartLevel();
+    btnSecondaryAction.textContent = 'Menu';
+    btnSecondaryAction.onclick = () => showMenu();
   }
   resultsScreen.hidden = false;
 }
 
-/* ---------------- main loop ---------------- */
+/* ================================================================
+   MAIN LOOP
+   ================================================================ */
 const clock = new THREE.Clock();
 function animate() {
   requestAnimationFrame(animate);
@@ -932,12 +1582,12 @@ function animate() {
     elapsed = (performance.now() - raceStartTime) / 1000;
     hudTimer.textContent = elapsed.toFixed(1) + 's';
 
-    if (!slowMoActive && distance > ROUTE_LENGTH - 7 && distance < ROUTE_LENGTH) slowMoActive = true;
+    if (!slowMoActive && distance > currentLevel.routeLength - 7 && distance < currentLevel.routeLength) slowMoActive = true;
     timeScale += ((slowMoActive ? 0.5 : 1) - timeScale) * Math.min(1, dt * 8);
     const physDt = dt * timeScale;
 
-    const progress = Math.min(1, distance / ROUTE_LENGTH);
-    const intensity = escalationIntensity(progress);
+    const progress_ = Math.min(1, distance / currentLevel.routeLength);
+    const intensity = escalationIntensity(progress_);
     const sprinting = keys.sprint;
 
     const accelT = Math.min(1, elapsed / ACCEL_TIME);
@@ -948,7 +1598,7 @@ function animate() {
 
     distance += speed * physDt;
 
-    const decay = GAP_DECAY_RATE * (0.55 + intensity * 1.1);
+    const decay = GAP_DECAY_RATE * (0.55 + intensity * 1.1) * currentLevel.gapDecayMult;
     if (sprinting) {
       gap += (SPRINT_GAP_REGEN - decay * 0.3) * physDt;
     } else {
@@ -957,13 +1607,14 @@ function animate() {
 
     const rawInput = (keys.right ? 1 : 0) - (keys.left ? 1 : 0) + touchSteer;
     const clampedInput = Math.max(-1, Math.min(1, rawInput));
-    steerInput += (clampedInput - steerInput) * Math.min(1, physDt * 10);
+    steerInput += (clampedInput - steerInput) * Math.min(1, physDt * 10 * settings.sensitivity);
 
+    const maxOffset = currentLevel.roadHalfWidth - 1.3;
     const sprintWobble = sprinting ? Math.sin(performance.now() * 0.01) * SPRINT_STEER_SLOP * Math.abs(steerInput) : 0;
-    const targetOffset = steerInput * MAX_OFFSET + sprintWobble;
-    const steerLerpRate = sprinting ? STEER_LERP * 0.45 : STEER_LERP;
+    const targetOffset = steerInput * maxOffset + sprintWobble;
+    const steerLerpRate = (sprinting ? STEER_LERP * 0.45 : STEER_LERP) * settings.sensitivity;
     steerOffset += (targetOffset - steerOffset) * Math.min(1, physDt * steerLerpRate);
-    steerOffset = Math.max(-MAX_OFFSET - 1, Math.min(MAX_OFFSET + 1, steerOffset));
+    steerOffset = Math.max(-maxOffset - 1, Math.min(maxOffset + 1, steerOffset));
 
     const cx = centerX(distance);
     camera.position.x = cx + steerOffset;
@@ -975,7 +1626,7 @@ function animate() {
 
     updateRig(physDt, steerInput);
     updateAudio(speed / TOP_SPEED);
-    updateCat(physDt, progress);
+    updateCat(physDt, progress_);
     updateDread(dt);
 
     if (sprinting) {
@@ -997,7 +1648,7 @@ function animate() {
           shakeMag = 0.13;
           flashHit();
           playBlip(180, 55, 0.22, 0.09, 'square');
-          steerOffset = Math.max(-MAX_OFFSET, Math.min(MAX_OFFSET, steerOffset + (dx >= 0 ? 1 : -1) * 0.6));
+          steerOffset = Math.max(-maxOffset, Math.min(maxOffset, steerOffset + (dx >= 0 ? 1 : -1) * 0.6));
         } else if (!ob.nearMissDone && absDx < ob.radius + 1.15) {
           ob.nearMissDone = true;
           flashNearMiss();
@@ -1016,18 +1667,18 @@ function animate() {
       camera.position.y += (Math.random() - 0.5) * s;
     }
 
-    const finalStretchT = Math.max(0, (progress - 0.7) / 0.3);
+    const finalStretchT = Math.max(0, (progress_ - 0.7) / 0.3);
     const dreadPulse = dreadLevel * Math.sin(performance.now() * 0.01) * 1.2;
     const targetFov = BASE_FOV + finalStretchT * FINAL_STRETCH_FOV_BOOST + dreadPulse;
     camera.fov += (targetFov - camera.fov) * Math.min(1, physDt * 3);
     camera.updateProjectionMatrix();
 
-    const fogFarTarget = BASE_FOG_FAR - intensity * 32;
+    const fogFarTarget = currentLevel.fog.far - intensity * (currentLevel.fog.far - currentLevel.fog.near) * 0.35;
     scene.fog.far += (fogFarTarget - scene.fog.far) * Math.min(1, physDt * 1.2);
 
     if (gap <= 0) {
       triggerCaught();
-    } else if (distance >= ROUTE_LENGTH) {
+    } else if (distance >= currentLevel.routeLength) {
       triggerEscape();
     }
   } else if (state === 'outcome') {
@@ -1041,10 +1692,16 @@ function animate() {
       camera.position.z = -distance;
       whipZ += (0 - whipZ) * Math.min(1, dt * 5);
       camera.rotation.z = whipZ;
-      if (flapSlamTimer > 0 && sanctuaryFlap) {
+      if (flapSlamTimer > 0 && sanctuaryDoor) {
         flapSlamTimer -= dt;
         const t = 1 - Math.max(0, flapSlamTimer / 0.5);
-        sanctuaryFlap.rotation.y = 0.18 + t * 1.3;
+        if (currentLevel.sanctuaryAnim === 'drop') {
+          const openY = sanctuaryDoor.userData.openY;
+          const closedY = sanctuaryDoor.userData.closedY;
+          sanctuaryDoor.position.y = openY + (closedY - openY) * t;
+        } else {
+          sanctuaryDoor.rotation.y = 0.18 + t * 1.3;
+        }
       }
       if (catVisible) {
         const bt = 1 - Math.max(0, outcomeTimer / 1.4);
@@ -1076,13 +1733,21 @@ function animate() {
     fxFlashEl.style.opacity = 0;
   }
 
-  sun.position.set(camera.position.x - 24, camera.position.y + 34, camera.position.z + 14);
-  sun.target.position.copy(camera.position);
-  if (skyMesh) skyMesh.position.set(camera.position.x, EYE_HEIGHT, camera.position.z);
+  if (state === 'racing' || state === 'outcome') {
+    sun.position.set(camera.position.x - 24, camera.position.y + 34, camera.position.z + 14);
+    if (skyMesh) skyMesh.position.set(camera.position.x, EYE_HEIGHT, camera.position.z);
+  }
 
   renderer.render(scene, camera);
 }
+updateSkyColors(LEVELS[0].sky.top, LEVELS[0].sky.bottom);
+scene.background = new THREE.Color(LEVELS[0].sky.bottom);
+camera.position.set(0, EYE_HEIGHT, 4);
+camera.lookAt(0, EYE_HEIGHT, -1);
+
 animate();
+
+showMenu();
 </script>
 </body>
 </html>
