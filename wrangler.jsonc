@@ -29,15 +29,17 @@
     {
       "binding": "POST_MATCH_CACHE",
       "id": "1c9df72099cb484190a70d2417a16481"
-    },
-    {
-      // Placeholder id — this namespace doesn't exist yet. Before deploying,
-      // run `wrangler kv namespace create STUDY_LEADERBOARD` and paste the
-      // real id in here, or the-study's leaderboard endpoints will 500.
-      "binding": "STUDY_LEADERBOARD",
-      "id": "REPLACE_WITH_REAL_KV_NAMESPACE_ID"
     }
   ]
+  // The Study (tools/the-study/) wants a STUDY_LEADERBOARD KV namespace for
+  // its global leaderboard. It's not provisioned yet — a placeholder id here
+  // previously broke deploys (Cloudflare rejects a kv_namespaces id that
+  // doesn't exist), so the binding is left out entirely for now. The game
+  // itself is unaffected: /api/study/leaderboard and /api/study/score return
+  // a 503 without it, and the client falls back to a locally-stored best
+  // time. To turn the global leaderboard on: run
+  // `wrangler kv namespace create STUDY_LEADERBOARD`, then add its real id
+  // back into kv_namespaces above.
   // ANTHROPIC_API_KEY is set as a Worker secret (`wrangler secret put
   // ANTHROPIC_API_KEY`) for the Post-Match Moments tool — not stored here.
   // Optional override, also via secret/env if ever needed:
