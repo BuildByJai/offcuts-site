@@ -142,6 +142,8 @@ async function handleLeaderboard(env) {
 }
 
 async function handleStudySubmitScore(request, env) {
+  if (!env.STUDY_LEADERBOARD) return json({ error: "Leaderboard isn't set up yet" }, 503);
+
   let body;
   try {
     body = await request.json();
@@ -165,6 +167,8 @@ async function handleStudySubmitScore(request, env) {
 }
 
 async function handleStudyLeaderboard(env) {
+  if (!env.STUDY_LEADERBOARD) return json({ error: "Leaderboard isn't set up yet" }, 503);
+
   const list = await env.STUDY_LEADERBOARD.list();
   const entries = await Promise.all(
     list.keys.map(async (key) => {
