@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>The Study — Offcuts</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
+  :root {
+    --paper: #FAFAF8; --ink: #181818; --ink-soft: #5C5C58;
+    --line: #E3E1DA; --accent: #156534; --accent-soft: #E9F3ED;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
+    background: #1c1712; color: var(--ink); font-family: 'Inter', system-ui, sans-serif;
+    overscroll-behavior: none; -webkit-font-smoothing: antialiased;
+  }
+  #game-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+
+  .home-link {
+    position: fixed; top: max(14px, env(safe-area-inset-top)); left: 14px; z-index: 20;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #fff;
+    text-decoration: none; background: rgba(0,0,0,0.35); padding: 6px 12px; border-radius: 20px;
+    backdrop-filter: blur(2px);
+  }
+  .home-link:hover { background: rgba(0,0,0,0.5); }
+
+  .overlay {
+    position: fixed; inset: 0; z-index: 15; display: flex; align-items: center; justify-content: center;
+    padding: 24px; background: rgba(20,22,20,0.55); overflow-y: auto;
+  }
+  .overlay .card {
+    background: var(--paper); border-radius: 14px; padding: 32px 28px; max-width: 440px; width: 100%;
+  }
+  .tag-inline {
+    display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent);
+    background: var(--accent-soft); padding: 3px 9px; border-radius: 4px; margin-bottom: 10px;
+  }
+  .card h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 10px; }
+  .card h2 { font-size: 19px; font-weight: 700; margin: 0 0 14px; }
+  .lede { color: var(--ink-soft); font-size: 14.5px; line-height: 1.55; margin: 0 0 18px; }
+  .controls-hint {
+    background: var(--accent-soft); border-radius: 8px; padding: 10px 12px; margin-bottom: 18px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink); line-height: 1.6;
+  }
+  .btn {
+    display: block; width: 100%; padding: 13px 20px; border-radius: 8px; border: 1px solid var(--accent);
+    background: var(--accent); color: #fff; font-family: 'Inter', sans-serif; font-size: 15px;
+    font-weight: 600; cursor: pointer; margin-bottom: 10px; text-align: center;
+  }
+  .btn:hover { opacity: 0.92; }
+  .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .credits-line { font-size: 11.5px; color: var(--ink-soft); margin: 14px 0 0; font-family: 'JetBrains Mono', monospace; }
+  .credits-line a { color: var(--accent); }
+
+  #hud { position: fixed; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 12; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  #hud-timer {
+    font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 17px; color: #fff;
+    background: rgba(0,0,0,0.38); padding: 7px 14px; border-radius: 20px; letter-spacing: 0.02em;
+  }
+  #interact-prompt {
+    position: fixed; left: 50%; bottom: 108px; transform: translateX(-50%) translateY(8px);
+    z-index: 12; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #fff;
+    background: rgba(0,0,0,0.55); padding: 9px 16px; border-radius: 22px; cursor: pointer;
+    opacity: 0; pointer-events: none; transition: opacity .15s ease, transform .15s ease;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  #interact-prompt.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+  #interact-prompt kbd {
+    font-family: inherit; background: rgba(255,255,255,0.18); padding: 1px 6px; border-radius: 4px; margin-right: 6px;
+  }
+
+  #toast {
+    position: fixed; left: 50%; top: 20%; transform: translateX(-50%) translateY(-6px);
+    z-index: 16; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #fff;
+    background: rgba(30,20,20,0.85); padding: 10px 18px; border-radius: 10px;
+    opacity: 0; transition: opacity .2s ease, transform .2s ease; pointer-events: none; text-align: center; max-width: 80vw;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  #joystick-base {
+    position: fixed; left: max(20px, env(safe-area-inset-left)); bottom: max(20px, env(safe-area-inset-bottom));
+    width: 108px; height: 108px; border-radius: 50%; background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25); z-index: 12; touch-action: none;
+  }
+  #joystick-knob {
+    position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; border-radius: 50%;
+    background: rgba(255,255,255,0.55); transform: translate(-50%, -50%);
+  }
+
+  #clue-panel, #safe-panel, #win-panel, #leaderboard-panel {
+    position: fixed; inset: 0; z-index: 17; display: flex; align-items: flex-end; justify-content: center;
+    background: rgba(10,8,6,0.5);
+  }
+  @media (min-width: 560px) {
+    #clue-panel, #safe-panel, #win-panel, #leaderboard-panel { align-items: center; }
+  }
+  .sheet {
+    background: var(--paper); width: 100%; max-width: 420px; border-radius: 16px 16px 0 0; padding: 26px 24px calc(26px + env(safe-area-inset-bottom));
+  }
+  @media (min-width: 560px) { .sheet { border-radius: 16px; } }
+  .sheet .obj-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .sheet .obj-text { font-size: 16.5px; line-height: 1.5; margin: 0 0 20px; }
+  .sheet .close-row { display: flex; gap: 10px; }
+  .sheet .close-row .btn { margin-bottom: 0; }
+
+  #safe-display {
+    display: flex; gap: 10px; justify-content: center; margin: 4px 0 18px;
+  }
+  .digit-box {
+    width: 48px; height: 58px; border: 2px solid var(--line); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace;
+    font-size: 26px; font-weight: 700; background: #fff;
+  }
+  .digit-box.filled { border-color: var(--accent); color: var(--accent); }
+  #safe-display.shake { animation: shake .35s ease; }
+  #safe-display.success .digit-box { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+  @keyframes shake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-8px);} 40%{transform:translateX(8px);} 60%{transform:translateX(-6px);} 80%{transform:translateX(6px);} }
+
+  #keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .key-btn {
+    padding: 14px 0; border-radius: 8px; border: 1px solid var(--line); background: #fff;
+    font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 600; cursor: pointer; color: var(--ink);
+  }
+  .key-btn:active { background: var(--accent-soft); border-color: var(--accent); }
+  .key-btn.wide { grid-column: span 1; font-size: 13px; color: var(--ink-soft); }
+
+  #win-panel .sheet { text-align: center; }
+  #win-time { font-family: 'JetBrains Mono', monospace; font-size: 40px; font-weight: 800; color: var(--accent); margin: 4px 0 4px; }
+  #win-best { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft); margin: 0 0 18px; }
+  #win-name {
+    width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 15px;
+    font-family: 'Inter', sans-serif; margin-bottom: 12px; text-align: center; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  #win-name:focus { outline: none; border-color: var(--accent); }
+  #win-submit-status { font-size: 12px; color: var(--ink-soft); margin: -4px 0 14px; min-height: 14px; }
+
+  #leaderboard-list { list-style: none; margin: 0 0 18px; padding: 0; max-height: 320px; overflow-y: auto; }
+  #leaderboard-list li {
+    display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line);
+    font-family: 'JetBrains Mono', monospace; font-size: 13.5px;
+  }
+  #leaderboard-list li .rank { color: var(--ink-soft); width: 24px; flex-shrink: 0; }
+  #leaderboard-list li .lname { flex: 1; font-weight: 600; }
+  #leaderboard-list li .ltime { color: var(--accent); font-weight: 700; }
+  #leaderboard-list li.you { background: var(--accent-soft); border-radius: 6px; padding-left: 8px; }
+  #leaderboard-empty { color: var(--ink-soft); font-size: 13.5px; text-align: center; padding: 20px 0; }
+</style>
+</head>
+<body>
+
+<canvas id="game-canvas"></canvas>
+<a class="home-link" href="../../">&larr; Offcuts</a>
+
+<div id="hud" hidden>
+  <div id="hud-timer">00:00.0</div>
+</div>
+
+<div id="interact-prompt"><kbd>E</kbd><span id="interact-label">Interact</span></div>
+<div id="toast"></div>
+
+<div id="joystick-base" hidden><div id="joystick-knob"></div></div>
+
+<div class="overlay" id="start-screen">
+  <div class="card">
+    <span class="tag-inline">games &middot; escape room</span>
+    <h1>The Study</h1>
+    <p class="lede">You're locked in a cluttered study. Every clue you need is already in the room — look around, work out the 4-digit code, open the safe and get out. Nothing is hidden, so it's all about reading the room correctly.</p>
+    <div class="controls-hint">
+      Move: WASD / arrow keys (or the on-screen stick on mobile)<br>
+      Interact: E or click/tap an object, when the prompt shows<br>
+      Timer starts the moment you hit Start
+    </div>
+    <button class="btn" id="btn-start">Start</button>
+    <button class="btn ghost" id="btn-view-leaderboard">Leaderboard</button>
+    <p class="credits-line">Phase 1 of a reusable escape-room engine &middot; scene built entirely in Three.js</p>
+  </div>
+</div>
+
+<div id="clue-panel" hidden>
+  <div class="sheet">
+    <p class="obj-label" id="clue-label">Object</p>
+    <p class="obj-text" id="clue-text">Clue text.</p>
+    <div class="close-row"><button class="btn" id="btn-clue-close">Close</button></div>
+  </div>
+</div>
+
+<div id="safe-panel" hidden>
+  <div class="sheet">
+    <p class="obj-label">Safe</p>
+    <p class="obj-text" style="margin-bottom:14px;">Enter the 4-digit code.</p>
+    <div id="safe-display">
+      <div class="digit-box"></div><div class="digit-box"></div><div class="digit-box"></div><div class="digit-box"></div>
+    </div>
+    <div id="keypad"></div>
+    <div class="close-row"><button class="btn ghost" id="btn-safe-close">Close</button></div>
+  </div>
+</div>
+
+<div id="win-panel" hidden>
+  <div class="sheet">
+    <span class="tag-inline">escaped</span>
+    <h2>You made it out</h2>
+    <div id="win-time">00:00.0</div>
+    <p id="win-best" hidden>New personal best</p>
+    <input id="win-name" maxlength="12" placeholder="YOUR INITIALS" autocomplete="off">
+    <p id="win-submit-status"></p>
+    <button class="btn" id="btn-win-submit">Save to leaderboard</button>
+    <button class="btn ghost" id="btn-win-leaderboard">View leaderboard</button>
+    <button class="btn ghost" id="btn-win-retry">Play again</button>
+  </div>
+</div>
+
+<div id="leaderboard-panel" hidden>
+  <div class="sheet">
+    <span class="tag-inline">fastest escapes</span>
+    <h2>Leaderboard</h2>
+    <ul id="leaderboard-list"></ul>
+    <p id="leaderboard-empty" hidden>No times yet — be the first to escape.</p>
+    <button class="btn ghost" id="btn-leaderboard-close">Close</button>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+/* ---------------- clue data — edit wording/decoys/code here only ---------------- */
+const SAFE_CODE = '0715';
+const CLUES = {
+  clock:    { label: 'Wall clock',     text: 'The hands are stopped dead at 7:15.' },
+  calendar: { label: 'Calendar',       text: 'The 15th is circled in red marker.' },
+  photo:    { label: 'Framed photo',   text: 'You flip it over. Scrawled on the back: "born \'52".' },
+  bookshelf:{ label: 'Bookshelf',      text: 'One book sits upside down on the shelf: "Fahrenheit 451".' },
+  cabinet:  { label: 'Filing cabinet', text: 'Locked. A note taped to the front reads: "the safe remembers when we met."' }
+};
+
+/* ---------------- renderer / scene / camera ---------------- */
+const canvas = document.getElementById('game-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1c1712);
+
+const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.1, 100);
+
+function resize() {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+}
+addEventListener('resize', resize);
+resize();
+
+scene.add(new THREE.AmbientLight(0xffe6c2, 0.75));
+const lamp = new THREE.PointLight(0xffcf8a, 1.3, 14, 2);
+lamp.position.set(-3.6, 2.6, -2.2);
+lamp.castShadow = true;
+scene.add(lamp);
+const sun = new THREE.DirectionalLight(0xfff2df, 0.7);
+sun.position.set(4, 6, 3);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+sun.shadow.camera.left = -8; sun.shadow.camera.right = 8;
+sun.shadow.camera.top = 8; sun.shadow.camera.bottom = -8;
+scene.add(sun);
+
+/* ---------------- shared helpers ---------------- */
+function stdMat(color, opts) {
+  return new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.82, metalness: 0.06 }, opts || {}));
+}
+const GEO = {
+  box: new THREE.BoxGeometry(1, 1, 1),
+  cyl: new THREE.CylinderGeometry(0.5, 0.5, 1, 20),
+  sphere: new THREE.SphereGeometry(0.5, 18, 14),
+  plane: new THREE.PlaneGeometry(1, 1)
+};
+function box(w, h, d, mat, x, y, z, ry) {
+  const m = new THREE.Mesh(GEO.box, mat);
+  m.scale.set(w, h, d);
+  m.position.set(x, y, z);
+  if (ry) m.rotation.y = ry;
+  m.castShadow = true; m.receiveShadow = true;
+  return m;
+}
+function makeCanvasTexture(w, h, draw) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  draw(c.getContext('2d'), w, h);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+/* ---------------- room shell ---------------- */
+const ROOM_HALF_X = 6, ROOM_HALF_Z = 5, WALL_H = 4, WALL_T = 0.25;
+const DOOR_HALF_W = 1.05;
+
+const floorTex = makeCanvasTexture(256, 256, (ctx) => {
+  ctx.fillStyle = '#5c4330'; ctx.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 16; i++) {
+    ctx.fillStyle = i % 2 ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.03)';
+    ctx.fillRect(0, i * 16, 256, 16);
+  }
+});
+floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
+floorTex.repeat.set(6, 5);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_HALF_X * 2, ROOM_HALF_Z * 2), stdMat(0xffffff, { map: floorTex, roughness: 0.9 }));
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor);
+
+const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_HALF_X * 2, ROOM_HALF_Z * 2), stdMat(0x2a2420, { roughness: 1 }));
+ceiling.rotation.x = Math.PI / 2;
+ceiling.position.y = WALL_H;
+scene.add(ceiling);
+
+const WALL_MAT = stdMat(0xcdbfa5, { roughness: 0.95 });
+function wallSegment(x, z, w, d) { scene.add(box(w, WALL_H, d, WALL_MAT, x, WALL_H / 2, z)); }
+wallSegment(0, -ROOM_HALF_Z, ROOM_HALF_X * 2, WALL_T);           // north
+wallSegment(-ROOM_HALF_X, 0, WALL_T, ROOM_HALF_Z * 2);            // west
+wallSegment(ROOM_HALF_X, 0, WALL_T, ROOM_HALF_Z * 2);             // east
+wallSegment(-(DOOR_HALF_W + (ROOM_HALF_X - DOOR_HALF_W) / 2 + 0), ROOM_HALF_Z, ROOM_HALF_X - DOOR_HALF_W, WALL_T); // south-west of door
+wallSegment((DOOR_HALF_W + (ROOM_HALF_X - DOOR_HALF_W) / 2), ROOM_HALF_Z, ROOM_HALF_X - DOOR_HALF_W, WALL_T);      // south-east of door
+scene.add(box(DOOR_HALF_W * 2 + 0.4, WALL_H - 2.7, WALL_T, WALL_MAT, 0, WALL_H - (WALL_H - 2.7) / 2, ROOM_HALF_Z)); // door header
+
+/* ---------------- solids for movement collision (AABBs, x/z half-extents) ---------------- */
+const SOLIDS = [
+  { x: 0, z: -ROOM_HALF_Z, hw: ROOM_HALF_X, hd: 0.3 },
+  { x: -ROOM_HALF_X, z: 0, hw: 0.3, hd: ROOM_HALF_Z },
+  { x: ROOM_HALF_X, z: 0, hw: 0.3, hd: ROOM_HALF_Z }
+];
+function addSolid(x, z, w, d) { SOLIDS.push({ x, z, hw: w / 2, hd: d / 2 }); }
+
+/* ---------------- desk (decorative dressing, not a clue) ---------------- */
+const WOOD_DARK = stdMat(0x4a3324, { roughness: 0.7 });
+const deskGroup = new THREE.Group();
+deskGroup.add(box(2.4, 0.12, 1.1, WOOD_DARK, 0, 0.9, 0));
+[[-1.05,-0.45],[1.05,-0.45],[-1.05,0.45],[1.05,0.45]].forEach(([dx,dz]) => {
+  deskGroup.add(box(0.12, 0.9, 0.12, WOOD_DARK, dx, 0.45, dz));
+});
+deskGroup.add(box(0.5, 0.35, 0.02, stdMat(0x1e2a33, { roughness: 0.3, metalness: 0.2 }), -0.7, 1.15, -0.4, -0.15)); // little laptop screen
+deskGroup.add(box(0.5, 0.02, 0.35, stdMat(0x2a2a2a), -0.7, 0.97, -0.2));
+deskGroup.position.set(-3.0, 0, -2.6);
+scene.add(deskGroup);
+addSolid(-3.0, -2.6, 2.6, 1.3);
+
+/* ---------------- wall clock (frozen at 7:15) ---------------- */
+const clockTex = makeCanvasTexture(256, 256, (ctx) => {
+  ctx.fillStyle = '#f4ecd8'; ctx.beginPath(); ctx.arc(128, 128, 122, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#2a2420'; ctx.lineWidth = 6; ctx.stroke();
+  ctx.fillStyle = '#2a2420';
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2;
+    ctx.fillRect(128 + Math.sin(a) * 100 - 3, 128 - Math.cos(a) * 100 - 3, 6, 6);
+  }
+  ctx.save(); ctx.translate(128, 128);
+  ctx.strokeStyle = '#2a2420'; ctx.lineCap = 'round';
+  ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(0, 0);
+  const hourA = ((7 % 12) / 12 + (15 / 60) / 12) * Math.PI * 2;
+  ctx.lineTo(Math.sin(hourA) * 55, -Math.cos(hourA) * 55); ctx.stroke();
+  ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(0, 0);
+  const minA = (15 / 60) * Math.PI * 2;
+  ctx.lineTo(Math.sin(minA) * 85, -Math.cos(minA) * 85); ctx.stroke();
+  ctx.restore();
+});
+const clockMesh = new THREE.Mesh(new THREE.CircleGeometry(0.42, 32), stdMat(0xffffff, { map: clockTex, roughness: 0.6 }));
+clockMesh.position.set(-3.3, 2.7, -ROOM_HALF_Z + 0.14);
+scene.add(clockMesh);
+
+/* ---------------- calendar (15th circled red) ---------------- */
+const calTex = makeCanvasTexture(220, 260, (ctx) => {
+  ctx.fillStyle = '#f7f4ec'; ctx.fillRect(0, 0, 220, 260);
+  ctx.fillStyle = '#2a2420'; ctx.font = 'bold 20px monospace'; ctx.fillText('SEPTEMBER', 18, 30);
+  const days = ['S','M','T','W','T','F','S'];
+  ctx.font = '11px monospace';
+  days.forEach((d, i) => ctx.fillText(d, 14 + i * 28, 55));
+  let day = 1;
+  for (let row = 0; row < 5; row++) {
+    for (let col = 0; col < 7; col++) {
+      if (row === 0 && col < 1) continue;
+      if (day > 30) continue;
+      const cx = 20 + col * 28, cy = 80 + row * 34;
+      ctx.fillStyle = '#3a332c'; ctx.font = '13px monospace';
+      ctx.fillText(String(day), cx, cy);
+      if (day === 15) {
+        ctx.strokeStyle = '#c0362c'; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.ellipse(cx + 4, cy - 4, 15, 12, 0, 0, Math.PI * 2); ctx.stroke();
+      }
+      day++;
+    }
+  }
+});
+const calMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.73), stdMat(0xffffff, { map: calTex, roughness: 0.7 }));
+calMesh.position.set(-0.4, 2.4, -ROOM_HALF_Z + 0.13);
+scene.add(calMesh);
+
+/* ---------------- framed photo (flips to reveal "born '52") ---------------- */
+const photoFrontTex = makeCanvasTexture(200, 240, (ctx) => {
+  ctx.fillStyle = '#8fa9c7'; ctx.fillRect(0, 0, 200, 240);
+  ctx.fillStyle = '#4a3f38'; ctx.beginPath(); ctx.ellipse(100, 150, 46, 70, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(100, 78, 34, 0, Math.PI * 2); ctx.fill();
+});
+const photoBackTex = makeCanvasTexture(200, 240, (ctx) => {
+  ctx.fillStyle = '#d8c8a8'; ctx.fillRect(0, 0, 200, 240);
+  ctx.fillStyle = '#3a2f22'; ctx.font = 'italic 22px Georgia, serif';
+  ctx.save(); ctx.translate(30, 130); ctx.rotate(-0.08);
+  ctx.fillText("born '52", 0, 0);
+  ctx.restore();
+});
+const photoGroup = new THREE.Group();
+const photoFrame = box(0.5, 0.62, 0.04, stdMat(0x9c8256, { metalness: 0.3, roughness: 0.5 }), 0, 0, 0);
+const photoFace = new THREE.Mesh(new THREE.PlaneGeometry(0.38, 0.48), stdMat(0xffffff, { map: photoFrontTex, roughness: 0.6 }));
+photoFace.position.z = 0.025;
+const photoBack = new THREE.Mesh(new THREE.PlaneGeometry(0.38, 0.48), stdMat(0xffffff, { map: photoBackTex, roughness: 0.6 }));
+photoBack.rotation.y = Math.PI; photoBack.position.z = -0.025;
+photoGroup.add(photoFrame, photoFace, photoBack);
+photoGroup.position.set(3, 2.45, -ROOM_HALF_Z + 0.16);
+scene.add(photoGroup);
+
+/* ---------------- bookshelf (one book upside down: Fahrenheit 451) ---------------- */
+const shelfGroup = new THREE.Group();
+shelfGroup.add(box(0.5, 2.6, 1.5, WOOD_DARK, 0, 1.3, 0));
+const bookColors = [0x8a3a3a, 0x3a6b4a, 0x35507a, 0xb08a3a, 0x6a4a80, 0x3a3a3a];
+[0.6, 1.3, 2.0].forEach((shelfY, si) => {
+  shelfGroup.add(box(0.48, 0.04, 1.4, WOOD_DARK, 0, shelfY, 0));
+  let z = -0.6;
+  for (let i = 0; i < 5; i++) {
+    const bw = 0.09 + (i % 3) * 0.02, bh = 0.42 + (i % 2) * 0.06;
+    const upsideDown = si === 1 && i === 2;
+    const mat = upsideDown ? stdMat(0xffffff, { map: makeCanvasTexture(64, 256, (ctx) => {
+      ctx.fillStyle = '#c9463a'; ctx.fillRect(0, 0, 64, 256);
+      ctx.save(); ctx.translate(32, 128); ctx.rotate(Math.PI / 2);
+      ctx.fillStyle = '#fff'; ctx.font = 'bold 15px monospace'; ctx.textAlign = 'center';
+      ctx.fillText('FAHRENHEIT 451', 0, 5);
+      ctx.restore();
+    }) }) : stdMat(bookColors[(si * 5 + i) % bookColors.length]);
+    const b = box(bw, bh, 0.24, mat, 0.26, shelfY + bh / 2 + 0.02, z);
+    if (upsideDown) b.rotation.z = Math.PI;
+    shelfGroup.add(b);
+    z += 0.24;
+  }
+});
+shelfGroup.position.set(ROOM_HALF_X - 0.35, 0, -1.2);
+shelfGroup.rotation.y = -Math.PI / 2;
+scene.add(shelfGroup);
+addSolid(ROOM_HALF_X - 0.35, -1.2, 0.7, 1.7);
+
+/* ---------------- filing cabinet ---------------- */
+const cabinetGroup = new THREE.Group();
+const METAL_MAT = stdMat(0x6b7178, { metalness: 0.4, roughness: 0.5 });
+cabinetGroup.add(box(0.7, 1.3, 0.6, METAL_MAT, 0, 0.65, 0));
+[0.35, 0.75, 1.15].forEach((y) => {
+  cabinetGroup.add(box(0.62, 0.32, 0.03, stdMat(0x565c62, { metalness: 0.5, roughness: 0.4 }), 0, y, 0.3));
+  cabinetGroup.add(box(0.14, 0.03, 0.04, stdMat(0x2c2f33), 0, y, 0.33));
+});
+cabinetGroup.position.set(-ROOM_HALF_X + 0.4, 0, 2.2);
+scene.add(cabinetGroup);
+addSolid(-ROOM_HALF_X + 0.4, 2.2, 0.9, 0.9);
+
+/* ---------------- safe ---------------- */
+const safeGroup = new THREE.Group();
+const safeMat = stdMat(0x2e2f33, { metalness: 0.55, roughness: 0.4 });
+safeGroup.add(box(0.9, 0.9, 0.7, safeMat, 0, 0.45, 0));
+const dialTex = makeCanvasTexture(128, 128, (ctx) => {
+  ctx.fillStyle = '#1c1d1f'; ctx.beginPath(); ctx.arc(64, 64, 60, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#8a8f96'; ctx.lineWidth = 3; ctx.stroke();
+  ctx.fillStyle = '#c9463a'; ctx.beginPath(); ctx.arc(64, 12, 5, 0, Math.PI * 2); ctx.fill();
+});
+const dial = new THREE.Mesh(new THREE.CircleGeometry(0.16, 24), stdMat(0xffffff, { map: dialTex }));
+dial.position.set(0, 0.55, 0.36);
+safeGroup.add(dial);
+const safeDoorLight = box(0.05, 0.9, 0.7, stdMat(0xc9463a, { emissive: 0xc9463a, emissiveIntensity: 0.5 }), 0.47, 0.45, 0);
+safeGroup.add(safeDoorLight);
+safeGroup.position.set(3.9, 0, 3.1);
+scene.add(safeGroup);
+addSolid(3.9, 3.1, 1.1, 0.9);
+
+/* ---------------- door ---------------- */
+const doorMat = stdMat(0x7a2f27, { roughness: 0.65 });
+const doorMesh = box(DOOR_HALF_W * 2 - 0.12, 2.7, 0.14, doorMat, 0, 1.35, ROOM_HALF_Z - 0.02);
+scene.add(doorMesh);
+const doorIconTex = { locked: null, unlocked: null };
+doorIconTex.locked = makeCanvasTexture(64, 64, (ctx) => { ctx.font = '44px system-ui'; ctx.textAlign = 'center'; ctx.fillText('🔒', 32, 46); });
+doorIconTex.unlocked = makeCanvasTexture(64, 64, (ctx) => { ctx.font = '44px system-ui'; ctx.textAlign = 'center'; ctx.fillText('🔓', 32, 46); });
+const doorIconMat = stdMat(0xffffff, { map: doorIconTex.locked, transparent: true });
+const doorIcon = new THREE.Mesh(new THREE.PlaneGeometry(0.28, 0.28), doorIconMat);
+doorIcon.position.set(0, 2.2, ROOM_HALF_Z - 0.09);
+scene.add(doorIcon);
+
+/* ---------------- player character (procedural rig, no external asset) ---------------- */
+const SKIN = stdMat(0xE8AE84);
+const SHIRT = stdMat(0x2f5c86);
+const PANTS = stdMat(0x2b2f36);
+const HAIR = stdMat(0x2a1f1a);
+
+const player = new THREE.Group();
+const torso = box(0.42, 0.5, 0.26, SHIRT, 0, 1.05, 0);
+player.add(torso);
+const head = new THREE.Mesh(GEO.sphere, SKIN); head.scale.set(0.26, 0.28, 0.26); head.position.set(0, 1.48, 0); head.castShadow = true;
+player.add(head);
+const hair = box(0.27, 0.1, 0.27, HAIR, 0, 1.6, -0.01);
+player.add(hair);
+
+function limb(mat, w, h, d) {
+  const g = new THREE.Group();
+  const m = box(w, h, d, mat, 0, -h / 2, 0);
+  g.add(m);
+  return g;
+}
+const armL = limb(SHIRT, 0.13, 0.42, 0.14); armL.position.set(-0.28, 1.28, 0);
+const armR = limb(SHIRT, 0.13, 0.42, 0.14); armR.position.set(0.28, 1.28, 0);
+const legL = limb(PANTS, 0.16, 0.5, 0.18); legL.position.set(-0.12, 0.78, 0);
+const legR = limb(PANTS, 0.16, 0.5, 0.18); legR.position.set(0.12, 0.78, 0);
+player.add(armL, armR, legL, legR);
+player.position.set(0, 0, 1.2);
+scene.add(player);
+const PLAYER_RADIUS = 0.34;
+
+/* ---------------- interactable objects ---------------- */
+let doorUnlocked = false;
+const interactables = [
+  { id: 'clock', px: -3.3, pz: -3.4, radius: 1.7, label: CLUES.clock.label },
+  { id: 'calendar', px: -0.4, pz: -3.4, radius: 1.7, label: CLUES.calendar.label },
+  { id: 'photo', px: 3.0, pz: -3.4, radius: 1.7, label: CLUES.photo.label },
+  { id: 'bookshelf', px: ROOM_HALF_X - 1.3, pz: -1.2, radius: 1.7, label: CLUES.bookshelf.label },
+  { id: 'cabinet', px: -ROOM_HALF_X + 1.3, pz: 2.2, radius: 1.6, label: CLUES.cabinet.label },
+  { id: 'safe', px: 2.9, pz: 2.9, radius: 1.7, label: 'Safe' },
+  { id: 'door', px: 0, pz: ROOM_HALF_Z - 1.0, radius: 1.6, label: 'Exit door' }
+];
+
+/* ---------------- input: keyboard, touch joystick, click/tap ---------------- */
+const keys = { forward: false, back: false, left: false, right: false, interact: false };
+addEventListener('keydown', (e) => {
+  if (e.code === 'KeyW' || e.code === 'ArrowUp') keys.forward = true;
+  if (e.code === 'KeyS' || e.code === 'ArrowDown') keys.back = true;
+  if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.left = true;
+  if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.right = true;
+  if (e.code === 'KeyE' || e.code === 'Space') { tryInteract(); }
+});
+addEventListener('keyup', (e) => {
+  if (e.code === 'KeyW' || e.code === 'ArrowUp') keys.forward = false;
+  if (e.code === 'KeyS' || e.code === 'ArrowDown') keys.back = false;
+  if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.left = false;
+  if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.right = false;
+});
+
+const isTouchDevice = 'ontouchstart' in window;
+const joystickBase = document.getElementById('joystick-base');
+const joystickKnob = document.getElementById('joystick-knob');
+let stickVec = { x: 0, y: 0 };
+if (isTouchDevice) {
+  joystickBase.hidden = false;
+  let activeTouchId = null, baseRect = null;
+  joystickBase.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const t = e.changedTouches[0];
+    activeTouchId = t.identifier;
+    baseRect = joystickBase.getBoundingClientRect();
+  }, { passive: false });
+  joystickBase.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    for (const t of e.changedTouches) {
+      if (t.identifier !== activeTouchId) continue;
+      const cx = baseRect.left + baseRect.width / 2, cy = baseRect.top + baseRect.height / 2;
+      let dx = t.clientX - cx, dy = t.clientY - cy;
+      const max = baseRect.width / 2;
+      const dist = Math.min(Math.hypot(dx, dy), max);
+      const ang = Math.atan2(dy, dx);
+      dx = Math.cos(ang) * dist; dy = Math.sin(ang) * dist;
+      joystickKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+      stickVec.x = dx / max; stickVec.y = dy / max;
+    }
+  }, { passive: false });
+  const endTouch = (e) => {
+    for (const t of e.changedTouches) {
+      if (t.identifier !== activeTouchId) continue;
+      activeTouchId = null; stickVec.x = 0; stickVec.y = 0;
+      joystickKnob.style.transform = 'translate(-50%, -50%)';
+    }
+  };
+  joystickBase.addEventListener('touchend', endTouch);
+  joystickBase.addEventListener('touchcancel', endTouch);
+}
+
+const raycaster = new THREE.Raycaster();
+canvas.addEventListener('pointerdown', (e) => {
+  if (!gameActive) return;
+  const nx = (e.clientX / innerWidth) * 2 - 1, ny = -(e.clientY / innerHeight) * 2 + 1;
+  raycaster.setFromCamera({ x: nx, y: ny }, camera);
+  const nearest = nearestInRange();
+  if (nearest) tryInteract();
+});
+
+document.getElementById('interact-prompt').addEventListener('click', () => tryInteract());
+
+/* ---------------- movement + camera follow ---------------- */
+const clock = new THREE.Clock();
+let facing = Math.PI;
+let moveDist = 0;
+const SPEED = 3.1;
+
+// Each axis is tested independently against the pre-move position (not chained
+// through the other axis's resolved value) — otherwise sliding diagonally into
+// a furniture corner can block both axes at once and freeze the player there.
+function resolveMove(nx, nz) {
+  const oldX = player.position.x, oldZ = player.position.z;
+  let rx = nx, rz = nz;
+  for (const s of SOLIDS) {
+    if (Math.abs(nx - s.x) < (s.hw + PLAYER_RADIUS) && Math.abs(oldZ - s.z) < (s.hd + PLAYER_RADIUS)) rx = oldX;
+  }
+  for (const s of SOLIDS) {
+    if (Math.abs(oldX - s.x) < (s.hw + PLAYER_RADIUS) && Math.abs(nz - s.z) < (s.hd + PLAYER_RADIUS)) rz = oldZ;
+  }
+  return [rx, rz];
+}
+
+function updateMovement(dt) {
+  let ix = (keys.right ? 1 : 0) - (keys.left ? 1 : 0) + stickVec.x;
+  let iz = (keys.back ? 1 : 0) - (keys.forward ? 1 : 0) + stickVec.y;
+  const len = Math.hypot(ix, iz);
+  if (len > 1) { ix /= len; iz /= len; }
+  const moving = len > 0.08;
+  if (moving) {
+    const targetFacing = Math.atan2(ix, iz);
+    let diff = targetFacing - facing;
+    while (diff > Math.PI) diff -= Math.PI * 2;
+    while (diff < -Math.PI) diff += Math.PI * 2;
+    facing += diff * Math.min(1, dt * 10);
+    const step = SPEED * dt;
+    let nx = player.position.x + ix * step, nz = player.position.z + iz * step;
+    nx = Math.max(-ROOM_HALF_X + PLAYER_RADIUS + 0.2, Math.min(ROOM_HALF_X - PLAYER_RADIUS - 0.2, nx));
+    nz = Math.max(-ROOM_HALF_Z + PLAYER_RADIUS + 0.2, Math.min(ROOM_HALF_Z - PLAYER_RADIUS - 0.2, nz));
+    [nx, nz] = resolveMove(nx, nz);
+    player.position.x = nx; player.position.z = nz;
+    moveDist += step;
+  }
+  player.rotation.y = facing;
+  animateRig(moving, dt);
+  return moving;
+}
+
+let reachTween = null;
+function animateRig(moving, dt) {
+  const t = moveDist * 6.2;
+  if (moving && !reachTween) {
+    legL.rotation.x = Math.sin(t) * 0.6;
+    legR.rotation.x = -Math.sin(t) * 0.6;
+    armL.rotation.x = -Math.sin(t) * 0.5;
+    armR.rotation.x = Math.sin(t) * 0.5;
+    torso.position.y = 1.05 + Math.abs(Math.sin(t)) * 0.015;
+  } else if (!reachTween) {
+    const idle = Math.sin(performance.now() * 0.002) * 0.03;
+    legL.rotation.x += (0 - legL.rotation.x) * 0.15;
+    legR.rotation.x += (0 - legR.rotation.x) * 0.15;
+    armL.rotation.x += (0 - armL.rotation.x) * 0.15;
+    armR.rotation.x += (0 - armR.rotation.x) * 0.15;
+    torso.position.y = 1.05 + idle;
+  }
+}
+
+function playReachAnimation() {
+  const start = performance.now();
+  const dur = 420;
+  reachTween = true;
+  function step() {
+    const t = Math.min(1, (performance.now() - start) / dur);
+    const s = t < 0.5 ? t * 2 : (1 - t) * 2;
+    armR.rotation.x = -s * 1.5;
+    torso.rotation.x = s * 0.18;
+    if (t < 1) requestAnimationFrame(step);
+    else { armR.rotation.x = 0; torso.rotation.x = 0; reachTween = null; }
+  }
+  step();
+}
+
+const camOffset = new THREE.Vector3(0, 2.7, 3.1);
+const camTarget = new THREE.Vector3();
+function updateCamera(dt) {
+  // Clamped to the room's interior so a player standing close to a wall never
+  // pushes the trailing camera outside it (or through the door).
+  const margin = 0.4;
+  const desired = new THREE.Vector3(
+    THREE.MathUtils.clamp(player.position.x - Math.sin(facing) * camOffset.z, -ROOM_HALF_X + margin, ROOM_HALF_X - margin),
+    camOffset.y,
+    THREE.MathUtils.clamp(player.position.z - Math.cos(facing) * camOffset.z, -ROOM_HALF_Z + margin, ROOM_HALF_Z - margin)
+  );
+  camera.position.lerp(desired, Math.min(1, dt * 4.5));
+  camTarget.set(player.position.x, 1.2, player.position.z);
+  camera.lookAt(camTarget);
+}
+
+/* ---------------- interaction ---------------- */
+const interactPrompt = document.getElementById('interact-prompt');
+const interactLabel = document.getElementById('interact-label');
+function nearestInRange() {
+  let best = null, bestD = Infinity;
+  for (const o of interactables) {
+    const d = Math.hypot(player.position.x - o.px, player.position.z - o.pz);
+    if (d < o.radius && d < bestD) { best = o; bestD = d; }
+  }
+  return best;
+}
+function updateInteractPrompt() {
+  const target = nearestInRange();
+  if (target) {
+    interactLabel.textContent = target.id === 'safe' ? 'Open safe' : target.id === 'door' ? (doorUnlocked ? 'Exit' : 'Try door') : `Examine ${target.label.toLowerCase()}`;
+    interactPrompt.classList.add('show');
+  } else {
+    interactPrompt.classList.remove('show');
+  }
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+function tryInteract() {
+  if (!gameActive) return;
+  const target = nearestInRange();
+  if (!target) return;
+  playReachAnimation();
+  if (target.id === 'door') {
+    if (doorUnlocked) { winGame(); } else { showToast("It's locked. Find the code first."); }
+    return;
+  }
+  if (target.id === 'safe') {
+    openSafePanel();
+    return;
+  }
+  openCluePanel(target.id);
+}
+
+function openCluePanel(id) {
+  document.getElementById('clue-label').textContent = CLUES[id].label;
+  document.getElementById('clue-text').textContent = CLUES[id].text;
+  document.getElementById('clue-panel').hidden = false;
+}
+document.getElementById('btn-clue-close').addEventListener('click', () => {
+  document.getElementById('clue-panel').hidden = true;
+});
+
+/* ---------------- safe keypad ---------------- */
+let safeEntry = '';
+const safeDisplay = document.getElementById('safe-display');
+const keypadEl = document.getElementById('keypad');
+['1','2','3','4','5','6','7','8','9','Clear','0','Back'].forEach((k) => {
+  const b = document.createElement('button');
+  b.className = 'key-btn' + (k.length > 1 ? ' wide' : '');
+  b.textContent = k;
+  b.addEventListener('click', () => handleKey(k));
+  keypadEl.appendChild(b);
+});
+function renderSafeDisplay() {
+  const boxes = safeDisplay.querySelectorAll('.digit-box');
+  boxes.forEach((b, i) => {
+    b.textContent = safeEntry[i] || '';
+    b.classList.toggle('filled', !!safeEntry[i]);
+  });
+}
+function handleKey(k) {
+  if (k === 'Clear') { safeEntry = ''; safeDisplay.classList.remove('success'); renderSafeDisplay(); return; }
+  if (k === 'Back') { safeEntry = safeEntry.slice(0, -1); renderSafeDisplay(); return; }
+  if (safeEntry.length >= 4) return;
+  safeEntry += k;
+  renderSafeDisplay();
+  if (safeEntry.length === 4) setTimeout(checkSafeCode, 200);
+}
+function checkSafeCode() {
+  if (safeEntry === SAFE_CODE) {
+    safeDisplay.classList.add('success');
+    playBeep(true);
+    doorUnlocked = true;
+    doorIconMat.map = doorIconTex.unlocked;
+    doorIconMat.needsUpdate = true;
+    safeDoorLight.material.color.set(0x3fae5c);
+    safeDoorLight.material.emissive.set(0x3fae5c);
+    setTimeout(() => {
+      document.getElementById('safe-panel').hidden = true;
+      showToast('The safe clicks open. The door is unlocked.');
+    }, 700);
+  } else {
+    playBeep(false);
+    safeDisplay.classList.add('shake');
+    setTimeout(() => {
+      safeDisplay.classList.remove('shake');
+      safeEntry = '';
+      renderSafeDisplay();
+    }, 380);
+  }
+}
+function openSafePanel() {
+  safeEntry = ''; safeDisplay.classList.remove('success');
+  renderSafeDisplay();
+  document.getElementById('safe-panel').hidden = false;
+}
+document.getElementById('btn-safe-close').addEventListener('click', () => {
+  document.getElementById('safe-panel').hidden = true;
+});
+
+let audioCtx = null;
+function playBeep(success) {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = 'sine';
+    o.frequency.value = success ? 660 : 160;
+    g.gain.value = 0.08;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    o.frequency.exponentialRampToValueAtTime(success ? 990 : 120, audioCtx.currentTime + 0.18);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.22);
+    o.stop(audioCtx.currentTime + 0.24);
+  } catch (e) { /* audio unavailable, ignore */ }
+}
+
+/* ---------------- timer / game state ---------------- */
+let gameActive = false;
+let startTime = 0;
+const hudEl = document.getElementById('hud');
+const hudTimer = document.getElementById('hud-timer');
+function fmtTime(ms) {
+  const total = ms / 1000;
+  const m = Math.floor(total / 60);
+  const s = (total - m * 60).toFixed(1);
+  return `${String(m).padStart(2, '0')}:${s.padStart(4, '0')}`;
+}
+function startGame() {
+  document.getElementById('start-screen').hidden = true;
+  hudEl.hidden = false;
+  gameActive = true;
+  startTime = performance.now();
+}
+function winGame() {
+  gameActive = false;
+  const elapsed = performance.now() - startTime;
+  hudEl.hidden = true;
+  const bestKey = 'the-study-best-ms';
+  const prevBest = Number(localStorage.getItem(bestKey) || Infinity);
+  const isBest = elapsed < prevBest;
+  if (isBest) localStorage.setItem(bestKey, String(Math.round(elapsed)));
+  document.getElementById('win-time').textContent = fmtTime(elapsed);
+  document.getElementById('win-best').hidden = !isBest;
+  document.getElementById('win-name').value = localStorage.getItem('the-study-name') || '';
+  document.getElementById('win-submit-status').textContent = '';
+  lastRunMs = Math.round(elapsed);
+  document.getElementById('win-panel').hidden = false;
+}
+let lastRunMs = 0;
+
+document.getElementById('btn-start').addEventListener('click', startGame);
+document.getElementById('btn-win-retry').addEventListener('click', () => location.reload());
+
+/* ---------------- leaderboard ---------------- */
+async function submitScore(name, timeMs) {
+  const res = await fetch('/api/study/score', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ name, timeMs })
+  });
+  if (!res.ok) throw new Error('submit failed');
+  return res.json();
+}
+async function fetchLeaderboard() {
+  const res = await fetch('/api/study/leaderboard');
+  if (!res.ok) throw new Error('fetch failed');
+  return res.json();
+}
+function renderLeaderboard(entries, highlightName) {
+  const list = document.getElementById('leaderboard-list');
+  const empty = document.getElementById('leaderboard-empty');
+  list.innerHTML = '';
+  if (!entries || entries.length === 0) {
+    empty.hidden = false;
+    return;
+  }
+  empty.hidden = true;
+  entries.forEach((e) => {
+    const li = document.createElement('li');
+    if (highlightName && e.name === highlightName) li.classList.add('you');
+    li.innerHTML = `<span class="rank">#${e.rank}</span><span class="lname">${escapeHtml(e.name)}</span><span class="ltime">${fmtTime(e.timeMs)}</span>`;
+    list.appendChild(li);
+  });
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+async function openLeaderboard(highlightName) {
+  document.getElementById('leaderboard-panel').hidden = false;
+  const list = document.getElementById('leaderboard-list');
+  list.innerHTML = '<li style="border:none;color:var(--ink-soft)">Loading…</li>';
+  try {
+    renderLeaderboard(await fetchLeaderboard(), highlightName);
+  } catch (e) {
+    document.getElementById('leaderboard-empty').hidden = false;
+    document.getElementById('leaderboard-empty').textContent = 'Leaderboard is unavailable right now — your time is saved locally.';
+    list.innerHTML = '';
+  }
+}
+document.getElementById('btn-view-leaderboard').addEventListener('click', () => openLeaderboard());
+document.getElementById('btn-win-leaderboard').addEventListener('click', () => openLeaderboard(document.getElementById('win-name').value.trim().toUpperCase()));
+document.getElementById('btn-leaderboard-close').addEventListener('click', () => { document.getElementById('leaderboard-panel').hidden = true; });
+
+document.getElementById('btn-win-submit').addEventListener('click', async () => {
+  const input = document.getElementById('win-name');
+  const name = input.value.trim().toUpperCase().slice(0, 12);
+  const statusEl = document.getElementById('win-submit-status');
+  if (!name) { statusEl.textContent = 'Enter your initials first.'; return; }
+  localStorage.setItem('the-study-name', name);
+  const btn = document.getElementById('btn-win-submit');
+  btn.disabled = true;
+  statusEl.textContent = 'Saving…';
+  try {
+    await submitScore(name, lastRunMs);
+    statusEl.textContent = 'Saved to the leaderboard.';
+  } catch (e) {
+    statusEl.textContent = "Couldn't reach the leaderboard — your time is still saved locally.";
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+/* ---------------- main loop ---------------- */
+function tick() {
+  const dt = Math.min(0.05, clock.getDelta());
+  if (gameActive) {
+    updateMovement(dt);
+    updateInteractPrompt();
+    hudTimer.textContent = fmtTime(performance.now() - startTime);
+  }
+  updateCamera(dt);
+  renderer.render(scene, camera);
+  requestAnimationFrame(tick);
+}
+tick();
+</script>
+</body>
+</html>
