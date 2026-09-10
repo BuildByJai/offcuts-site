@@ -29,6 +29,13 @@
     {
       "binding": "POST_MATCH_CACHE",
       "id": "1c9df72099cb484190a70d2417a16481"
+    },
+    {
+      // Placeholder id — this namespace doesn't exist yet. Before deploying,
+      // run `wrangler kv namespace create STUDY_LEADERBOARD` and paste the
+      // real id in here, or the-study's leaderboard endpoints will 500.
+      "binding": "STUDY_LEADERBOARD",
+      "id": "REPLACE_WITH_REAL_KV_NAMESPACE_ID"
     }
   ]
   // ANTHROPIC_API_KEY is set as a Worker secret (`wrangler secret put

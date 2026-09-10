@@ -3,7 +3,7 @@ import { generateMomentsFromReport } from "./lib/post-match-moments/pipeline.js"
 
 const ID_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-function generateSquadId() {
+function generateId() {
   const bytes = new Uint8Array(8);
   crypto.getRandomValues(bytes);
   return Array.from(bytes, (b) => ID_CHARS[b % ID_CHARS.length]).join("");
@@ -54,7 +54,7 @@ async function handleDraft(request, env) {
 
   let squadId;
   for (let attempt = 0; attempt < 5 && !squadId; attempt++) {
-    const candidate = generateSquadId();
+    const candidate = generateId();
     const existing = await env.FANTASY_SQUADS.get(candidate);
     if (!existing) squadId = candidate;
   }
@@ -141,6 +141,44 @@ async function handleLeaderboard(env) {
   return json(await getLeaderboard(env));
 }
 
+async function handleStudySubmitScore(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "Invalid JSON body" }, 400);
+  }
+
+  const name = typeof body.name === "string" ? body.name.trim().slice(0, 12) : "";
+  const timeMs = Number(body.timeMs);
+
+  if (!name) return json({ error: "Name is required" }, 400);
+  if (!Number.isFinite(timeMs) || timeMs <= 0 || timeMs > 3_600_000) {
+    return json({ error: "Invalid time" }, 400);
+  }
+
+  const id = generateId();
+  const record = { name, timeMs: Math.round(timeMs), createdAt: new Date().toISOString() };
+  await env.STUDY_LEADERBOARD.put(id, JSON.stringify(record));
+
+  return json({ id });
+}
+
+async function handleStudyLeaderboard(env) {
+  const list = await env.STUDY_LEADERBOARD.list();
+  const entries = await Promise.all(
+    list.keys.map(async (key) => {
+      const raw = await env.STUDY_LEADERBOARD.get(key.name);
+      return raw ? JSON.parse(raw) : null;
+    })
+  );
+
+  const sorted = entries.filter(Boolean).sort((a, b) => a.timeMs - b.timeMs);
+  return json(
+    sorted.slice(0, 50).map((entry, i) => ({ name: entry.name, timeMs: entry.timeMs, rank: i + 1 }))
+  );
+}
+
 async function handlePmmMoments(request, env) {
   let body;
   try {
@@ -181,6 +219,12 @@ export default {
     }
     if (url.pathname === "/api/pmm/moments" && request.method === "POST") {
       return handlePmmMoments(request, env);
+    }
+    if (url.pathname === "/api/study/score" && request.method === "POST") {
+      return handleStudySubmitScore(request, env);
+    }
+    if (url.pathname === "/api/study/leaderboard" && request.method === "GET") {
+      return handleStudyLeaderboard(env);
     }
 
     return env.ASSETS.fetch(request);
