@@ -84,6 +84,16 @@
   #fx-flash.hit {
     background: radial-gradient(ellipse at center, rgba(255,70,50,0.6) 0%, rgba(255,70,50,0) 65%);
   }
+  #screen-fade {
+    position: fixed; inset: 0; z-index: 14; pointer-events: none; opacity: 0; background: #05060a;
+  }
+  #safehouse-cue {
+    position: fixed; top: 78px; left: 50%; transform: translateX(-50%); z-index: 15;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: #fff;
+    background: rgba(0,0,0,0.38); padding: 6px 16px; border-radius: 20px; opacity: 0;
+    transition: opacity 0.4s ease; white-space: nowrap;
+  }
+  #safehouse-cue.show { opacity: 1; }
 
   #sprint-btn {
     position: fixed; right: 18px; bottom: 22px; z-index: 16;
@@ -145,6 +155,7 @@
 <canvas id="game-canvas"></canvas>
 <div id="vignette"></div>
 <div id="fx-flash"></div>
+<div id="screen-fade"></div>
 <button id="sprint-btn" hidden>SPRINT</button>
 
 <div id="hud" hidden>
@@ -154,6 +165,7 @@
     <div id="gap-track"><div id="gap-fill"></div></div>
   </div>
 </div>
+<div id="safehouse-cue">Get to the door!</div>
 
 <div class="overlay" id="menu-screen">
   <div class="card">
@@ -442,11 +454,12 @@ const LEVELS = [
       { d: 335, x: 8 }, { d: 385, x: 8 }, { d: 415, x: 0 }
     ],
     obstacleDensity: 0.75, gapDecayMult: 0.8, catAggro: 0.75,
-    sky: { top: 0xbfe0f2, bottom: 0xf1f8fc }, fog: { color: 0xdcecf6, near: 45, far: 130 },
+    sky: { top: 0x3fa8f0, bottom: 0xbfe8ff }, fog: { color: 0xbfe8ff, near: 45, far: 130 },
     sunColor: 0xfff6e0,
     sanctuaryAnim: 'swing',
     buildMaterials: buildSuburbMaterials, spawnRoadside: spawnSuburbRoadside, buildSanctuary: buildFenceSanctuary,
-    tagline: 'The one that started it all — learn the ropes.'
+    tagline: 'The one that started it all — learn the ropes.', cueText: 'Get to the garden gate!',
+    crossings: [{ d: 130, side: 1 }, { d: 400, side: -1 }]
   },
   {
     id: 2, name: 'The High Street', seed: 2002,
@@ -457,11 +470,12 @@ const LEVELS = [
       { d: 385, x: -3 }
     ],
     obstacleDensity: 1.0, gapDecayMult: 1.0, catAggro: 1.0,
-    sky: { top: 0xffcf85, bottom: 0xfff2d8 }, fog: { color: 0xf6e2bc, near: 40, far: 120 },
+    sky: { top: 0xff9a3c, bottom: 0xffd76b }, fog: { color: 0xffd76b, near: 40, far: 120 },
     sunColor: 0xffe6b8,
     sanctuaryAnim: 'drop',
     buildMaterials: buildHighstreetMaterials, spawnRoadside: spawnHighstreetRoadside, buildSanctuary: buildShopSanctuary,
-    tagline: 'Busier, faster, more to dodge.'
+    tagline: 'Busier, faster, more to dodge.', cueText: 'Get to the shop door!',
+    crossings: [{ d: 120, side: -1 }, { d: 440, side: 1 }]
   },
   {
     id: 3, name: 'The Park Run', seed: 3003,
@@ -472,11 +486,12 @@ const LEVELS = [
       { d: 280, x: 7 }, { d: 320, x: 7 }, { d: 355, x: -4 }, { d: 390, x: -4 }
     ],
     obstacleDensity: 1.15, gapDecayMult: 1.2, catAggro: 1.25,
-    sky: { top: 0x9fe08f, bottom: 0xe4f9db }, fog: { color: 0xcdeec0, near: 38, far: 108 },
+    sky: { top: 0x3fc23f, bottom: 0xb8f27a }, fog: { color: 0xb8f27a, near: 38, far: 108 },
     sunColor: 0xfbffe0,
     sanctuaryAnim: 'swing',
     buildMaterials: buildParkMaterials, spawnRoadside: spawnParkRoadside, buildSanctuary: buildParkGateSanctuary,
-    tagline: 'Tighter bends, quacking hazards.'
+    tagline: 'Tighter bends, quacking hazards.', cueText: 'Get to the park gate!',
+    crossings: [{ d: 110, side: 1 }, { d: 400, side: -1 }]
   },
   {
     id: 4, name: 'Industrial Estate', seed: 4004,
@@ -487,11 +502,12 @@ const LEVELS = [
       { d: 245, x: -6 }, { d: 280, x: -6 }, { d: 310, x: 3 }, { d: 340, x: 3 }
     ],
     obstacleDensity: 1.35, gapDecayMult: 1.5, catAggro: 1.6,
-    sky: { top: 0xd79a68, bottom: 0xecd0a8 }, fog: { color: 0xd8bf98, near: 30, far: 92 },
+    sky: { top: 0xe8621e, bottom: 0xffb347 }, fog: { color: 0xe8a05c, near: 30, far: 92 },
     sunColor: 0xffceaa,
     sanctuaryAnim: 'drop',
     buildMaterials: buildIndustrialMaterials, spawnRoadside: spawnIndustrialRoadside, buildSanctuary: buildWarehouseSanctuary,
-    tagline: 'The finale. Everything, faster, tighter.'
+    tagline: 'The finale. Everything, faster, tighter.', cueText: 'Get to the warehouse door!',
+    crossings: [{ d: 100, side: -1 }, { d: 420, side: 1 }]
   }
 ];
 
@@ -582,10 +598,14 @@ function buildSuburbMaterials() {
     markings: trackMat(toonMat(0xffffff)),
     hedge: trackMat(toonMat(0x4a9e3f)),
     wallColors: [0xE8B978, 0xF0D2A0, 0xD99B6C, 0xE3C8A0, 0xF5E0B8, 0xC98F5E, 0xF2E6C9].map(c => trackMat(toonMat(c))),
-    roof: trackMat(toonMat(0x8a4a3a)),
-    roofDark: trackMat(toonMat(0x5c3226)),
+    roof: trackMat(toonMat(0xC9382A)),
+    roofDark: trackMat(toonMat(0x7A2E1F)),
+    trim: trackMat(toonMat(0xFFFFFF)),
+    chimney: trackMat(toonMat(0xB0402E)),
     doorColors: [0xE0453A, 0x2C86C9, 0x35A860, 0xE8B02A, 0x9A4FB0, 0x2EAE9A, 0xB0302E].map(c => trackMat(toonMat(c))),
-    window: trackMat(toonMat(0x8FD4F0)),
+    window: trackMat(toonMat(0x6FE0FF)),
+    potTerracotta: trackMat(toonMat(0xC96A3E)),
+    flowerColors: [0xFF4D6D, 0xFFD23A, 0xB84DFF, 0xFF8C42].map(c => trackMat(toonMat(c))),
     binGreen: trackMat(toonMat(0x389049)),
     binBlack: trackMat(toonMat(0x2c2c2c)),
     binBlue: trackMat(toonMat(0x2f7ac9)),
@@ -606,20 +626,29 @@ function buildHouse(cx, z, side) {
   const houseX = cx + side * 11.5;
   const wall = levelMat.wallColors[Math.floor(rand() * levelMat.wallColors.length)];
   addBox(wall, depth, height, length, houseX, height / 2, z, 0, true);
+  addBox(levelMat.trim, depth + 0.04, 0.16, length + 0.04, houseX, height * 0.34, z);
   const roofMat = rand() < 0.5 ? levelMat.roof : levelMat.roofDark;
   addBox(roofMat, depth + 0.3, 0.22, length + 0.3, houseX, height + 0.11, z);
   const ridge = addBox(roofMat, depth * 0.55, 0.9, length * 0.85, houseX, height + 0.5, z);
   ridge.rotation.z = Math.PI / 4;
+  addBox(levelMat.chimney, 0.32, 0.75, 0.32, houseX + side * 0.9, height + 0.75, z - length * 0.28);
 
   const wallFrontX = houseX - side * (depth / 2);
   const bayProtrusion = 0.7;
   const bayX = wallFrontX - side * (bayProtrusion / 2);
-  addBox(wall, bayProtrusion, 1.5, 1.5, bayX, 0.85, z - length * 0.15);
-  addBox(levelMat.window, bayProtrusion * 0.2, 0.9, 1.1, bayX - side * (bayProtrusion * 0.4), 0.95, z - length * 0.15);
+  addBox(wall, bayProtrusion, 1.6, 1.7, bayX, 0.88, z - length * 0.15, 0, true);
+  addBox(levelMat.window, bayProtrusion * 0.22, 1.0, 1.3, bayX - side * (bayProtrusion * 0.4), 0.98, z - length * 0.15);
 
   const door = levelMat.doorColors[Math.floor(rand() * levelMat.doorColors.length)];
-  addBox(door, 0.08, 1.7, 0.7, wallFrontX - side * 0.03, 0.85, z + length * 0.28);
-  addBox(levelMat.window, 0.08, 0.8, 0.9, wallFrontX - side * 0.03, 2.15, z + length * 0.28);
+  addBox(door, 0.09, 1.9, 0.85, wallFrontX - side * 0.03, 0.9, z + length * 0.28);
+  addBox(levelMat.trim, 0.11, 0.14, 1.0, wallFrontX - side * 0.03, 1.9, z + length * 0.28);
+  addBox(levelMat.window, 0.09, 1.0, 1.1, wallFrontX - side * 0.03, 2.25, z + length * 0.28);
+
+  const potX = wallFrontX - side * 0.5;
+  const potZ = z + length * 0.28 + 0.65;
+  addCyl(levelMat.potTerracotta, 0.16, 0.28, potX, 0.14, potZ, true);
+  const flowerMat = levelMat.flowerColors[Math.floor(rand() * levelMat.flowerColors.length)];
+  addSphere(flowerMat, 0.16, 0.14, 0.16, potX, 0.34, potZ);
 
   if (rand() < 0.8) {
     const binMats = [levelMat.binGreen, levelMat.binBlack, levelMat.binBlue];
@@ -934,46 +963,68 @@ function spawnIndustrialRoadside(cx, z, side, density) {
    SANCTUARIES
    ================================================================ */
 let sanctuaryDoor;
+const sanctuaryPos = { x: 0, z: 0 };
+const PORCH_LIGHT_MAT = new THREE.MeshBasicMaterial({ color: 0xffe066 });
+function addPorchLight(x, y, z) {
+  const light = new THREE.Mesh(GEO.sphere, PORCH_LIGHT_MAT);
+  light.scale.set(0.14, 0.14, 0.14);
+  light.position.set(x, y, z);
+  scene.add(light);
+  trackMesh(light);
+  return light;
+}
 function buildFenceSanctuary(cx, z) {
+  sanctuaryPos.x = cx; sanctuaryPos.z = z;
   const gapWidth = 1.3, fenceHeight = 1.7;
   const panelWidth = (currentLevel.roadHalfWidth * 2 - gapWidth) / 2;
-  addBox(levelMat.fence, panelWidth, fenceHeight, 0.15, cx - gapWidth / 2 - panelWidth / 2, fenceHeight / 2, z);
-  addBox(levelMat.fence, panelWidth, fenceHeight, 0.15, cx + gapWidth / 2 + panelWidth / 2, fenceHeight / 2, z);
-  sanctuaryDoor = addBox(levelMat.flap, gapWidth * 0.9, fenceHeight * 0.8, 0.06, cx, fenceHeight * 0.8 / 2, z);
-  sanctuaryDoor.rotation.y = 0.18;
+  addBox(levelMat.fence, panelWidth, fenceHeight, 0.15, cx - gapWidth / 2 - panelWidth / 2, fenceHeight / 2, z, 0, true);
+  addBox(levelMat.fence, panelWidth, fenceHeight, 0.15, cx + gapWidth / 2 + panelWidth / 2, fenceHeight / 2, z, 0, true);
+  sanctuaryDoor = addBox(levelMat.flap, gapWidth * 0.9, fenceHeight * 0.8, 0.06, cx, fenceHeight * 0.8 / 2, z, 0, true);
+  sanctuaryDoor.userData.closedRotY = 0;
+  sanctuaryDoor.userData.openRotY = 1.35;
+  sanctuaryDoor.rotation.y = 0;
+  addPorchLight(cx + gapWidth / 2 + 0.35, fenceHeight * 0.75, z + 0.1);
   buildSafeGarden(cx, z);
 }
 function buildShopSanctuary(cx, z) {
+  sanctuaryPos.x = cx; sanctuaryPos.z = z;
   const gapWidth = 1.4, height = 2.4, doorH = height * 0.85;
   const panelWidth = (currentLevel.roadHalfWidth * 2 - gapWidth) / 2;
-  addBox(levelMat.shopWall ? levelMat.shopWall[0] : levelMat.fence, panelWidth, height, 0.2, cx - gapWidth / 2 - panelWidth / 2, height / 2, z);
-  addBox(levelMat.shopWall ? levelMat.shopWall[0] : levelMat.fence, panelWidth, height, 0.2, cx + gapWidth / 2 + panelWidth / 2, height / 2, z);
-  sanctuaryDoor = addBox(levelMat.flap, gapWidth * 0.95, doorH, 0.08, cx, doorH, z);
+  addBox(levelMat.shopWall ? levelMat.shopWall[0] : levelMat.fence, panelWidth, height, 0.2, cx - gapWidth / 2 - panelWidth / 2, height / 2, z, 0, true);
+  addBox(levelMat.shopWall ? levelMat.shopWall[0] : levelMat.fence, panelWidth, height, 0.2, cx + gapWidth / 2 + panelWidth / 2, height / 2, z, 0, true);
+  sanctuaryDoor = addBox(levelMat.flap, gapWidth * 0.95, doorH, 0.08, cx, doorH / 2, z, 0, true);
   sanctuaryDoor.userData.openY = doorH;
   sanctuaryDoor.userData.closedY = doorH / 2;
+  addPorchLight(cx + gapWidth / 2 + 0.35, height * 0.8, z + 0.1);
   buildSafeGarden(cx, z, 0xC7B89A);
 }
 function buildParkGateSanctuary(cx, z) {
+  sanctuaryPos.x = cx; sanctuaryPos.z = z;
   const gapWidth = 1.35, height = 1.6;
   const panelWidth = (currentLevel.roadHalfWidth * 2 - gapWidth) / 2;
   for (let i = 0; i < 4; i++) {
-    addBox(levelMat.railing, 0.06, height, 0.06, cx - gapWidth / 2 - (i + 0.5) * (panelWidth / 4), height / 2, z);
-    addBox(levelMat.railing, 0.06, height, 0.06, cx + gapWidth / 2 + (i + 0.5) * (panelWidth / 4), height / 2, z);
+    addBox(levelMat.railing, 0.06, height, 0.06, cx - gapWidth / 2 - (i + 0.5) * (panelWidth / 4), height / 2, z, 0, true);
+    addBox(levelMat.railing, 0.06, height, 0.06, cx + gapWidth / 2 + (i + 0.5) * (panelWidth / 4), height / 2, z, 0, true);
   }
   addBox(levelMat.railing, panelWidth, 0.08, 0.06, cx - gapWidth / 2 - panelWidth / 2, height, z);
   addBox(levelMat.railing, panelWidth, 0.08, 0.06, cx + gapWidth / 2 + panelWidth / 2, height, z);
-  sanctuaryDoor = addBox(levelMat.gatePanel, gapWidth * 0.9, height * 0.85, 0.06, cx, height * 0.85 / 2, z);
-  sanctuaryDoor.rotation.y = 0.18;
+  sanctuaryDoor = addBox(levelMat.gatePanel, gapWidth * 0.9, height * 0.85, 0.06, cx, height * 0.85 / 2, z, 0, true);
+  sanctuaryDoor.userData.closedRotY = 0;
+  sanctuaryDoor.userData.openRotY = 1.35;
+  sanctuaryDoor.rotation.y = 0;
+  addPorchLight(cx + gapWidth / 2 + 0.35, height * 0.75, z + 0.1);
   buildSafeGarden(cx, z, 0xcdeec0);
 }
 function buildWarehouseSanctuary(cx, z) {
+  sanctuaryPos.x = cx; sanctuaryPos.z = z;
   const gapWidth = 1.5, height = 2.6, doorH = height * 0.9;
   const panelWidth = (currentLevel.roadHalfWidth * 2 - gapWidth) / 2;
-  addBox(levelMat.warehouseWall[0], panelWidth, height, 0.25, cx - gapWidth / 2 - panelWidth / 2, height / 2, z);
-  addBox(levelMat.warehouseWall[0], panelWidth, height, 0.25, cx + gapWidth / 2 + panelWidth / 2, height / 2, z);
-  sanctuaryDoor = addBox(levelMat.shutter, gapWidth * 0.95, doorH, 0.1, cx, doorH, z);
+  addBox(levelMat.warehouseWall[0], panelWidth, height, 0.25, cx - gapWidth / 2 - panelWidth / 2, height / 2, z, 0, true);
+  addBox(levelMat.warehouseWall[0], panelWidth, height, 0.25, cx + gapWidth / 2 + panelWidth / 2, height / 2, z, 0, true);
+  sanctuaryDoor = addBox(levelMat.shutter, gapWidth * 0.95, doorH, 0.1, cx, doorH / 2, z, 0, true);
   sanctuaryDoor.userData.openY = doorH;
   sanctuaryDoor.userData.closedY = doorH / 2;
+  addPorchLight(cx + gapWidth / 2 + 0.35, height * 0.8, z + 0.1);
   buildSafeGarden(cx, z, 0xd8bf98);
 }
 function buildSafeGarden(cx, z, tint) {
@@ -992,6 +1043,98 @@ function buildSafeGarden(cx, z, tint) {
 }
 
 /* ================================================================
+   MOVING TRAFFIC
+   ================================================================ */
+const TRAFFIC = [];
+let crossTraffic = [];
+
+function buildTrafficCarGroup(mat) {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(GEO.box, mat);
+  body.scale.set(1.7, 0.85, 3.6);
+  body.position.set(0, 0.62, 0);
+  g.add(body);
+  addOutline(body);
+  const roof = new THREE.Mesh(GEO.box, mat);
+  roof.scale.set(1.35, 0.55, 1.9);
+  roof.position.set(0, 1.18, -0.15);
+  g.add(roof);
+  [[-0.75, -1.3], [0.75, -1.3], [-0.75, 1.3], [0.75, 1.3]].forEach(([wx, wz]) => {
+    const wheel = new THREE.Mesh(GEO.cyl, SHARED_MAT.tyre);
+    wheel.scale.set(0.32, 0.28, 0.32);
+    wheel.position.set(wx, 0.32, wz);
+    wheel.rotation.z = Math.PI / 2;
+    g.add(wheel);
+  });
+  scene.add(g);
+  trackMesh(g);
+  return g;
+}
+
+function spawnLaneTraffic() {
+  const laneOffsets = [-1.5, 1.5];
+  let laneIdx = 0;
+  for (let d = 55; d < currentLevel.routeLength - 30; d += 45) {
+    const inten = escalationIntensity(d / currentLevel.routeLength);
+    if (rand() < 0.32 + inten * 0.5) {
+      const cx = centerX(d);
+      const laneOffset = laneOffsets[laneIdx % 2];
+      laneIdx++;
+      const carMats = levelMat.carColors || [SHARED_MAT.metalGrey];
+      const mat = carMats[Math.floor(rand() * carMats.length)];
+      const group = buildTrafficCarGroup(mat);
+      const startZ = -d;
+      group.position.set(cx + laneOffset, 0, startZ);
+      const spd = TOP_SPEED * (0.5 + rand() * 0.18) * currentLevel.gapDecayMult;
+      const rec = { mesh: group, x: cx + laneOffset, z: startZ, speed: spd, radius: 1.3, hit: false, nearMissDone: false };
+      TRAFFIC.push(rec);
+      OBSTACLES.push(rec);
+    }
+  }
+}
+
+function updateLaneTraffic(dt) {
+  TRAFFIC.forEach(t => {
+    t.z -= t.speed * dt;
+    t.mesh.position.z = t.z;
+  });
+}
+
+function spawnCrossTraffic() {
+  crossTraffic = (currentLevel.crossings || []).map(c => ({ d: c.d, side: c.side, triggered: false, active: false }));
+}
+
+function updateCrossTraffic(dt) {
+  crossTraffic.forEach(c => {
+    if (!c.triggered && distance > c.d - 13 && distance < c.d) {
+      c.triggered = true;
+      c.active = true;
+      c.t = 0;
+      const cx = centerX(c.d);
+      const span = currentLevel.roadHalfWidth + 6;
+      c.fromX = cx + c.side * span;
+      c.toX = cx - c.side * span;
+      c.z = -c.d;
+      c.duration = 1.15;
+      const mat = (levelMat.carColors && levelMat.carColors[Math.floor(rand() * levelMat.carColors.length)]) || SHARED_MAT.metalGrey;
+      c.mesh = buildTrafficCarGroup(mat);
+      c.mesh.rotation.y = Math.PI / 2;
+      c.mesh.position.set(c.fromX, 0, c.z);
+      c.rec = { mesh: c.mesh, x: c.fromX, z: c.z, radius: 1.3, hit: false, nearMissDone: false };
+      OBSTACLES.push(c.rec);
+    }
+    if (c.active) {
+      c.t += dt;
+      const p = Math.min(1, c.t / c.duration);
+      const x = c.fromX + (c.toX - c.fromX) * p;
+      c.rec.x = x;
+      c.mesh.position.x = x;
+      if (p >= 1) c.active = false;
+    }
+  });
+}
+
+/* ================================================================
    LEVEL BUILD / TEARDOWN
    ================================================================ */
 function teardownLevel() {
@@ -1000,6 +1143,8 @@ function teardownLevel() {
   levelMaterials.forEach(m => m.dispose());
   levelMaterials = [];
   OBSTACLES.length = 0;
+  TRAFFIC.length = 0;
+  crossTraffic = [];
 }
 
 function buildLevel(level) {
@@ -1054,16 +1199,28 @@ function buildLevel(level) {
     buildSkip(centerX(level.routeLength * 0.75), -level.routeLength * 0.75, -1);
   }
 
+  spawnLaneTraffic();
+  spawnCrossTraffic();
+
   const sanctCx = centerX(level.routeLength);
   const sanctZ = -level.routeLength - 2;
   level.buildSanctuary(sanctCx, sanctZ);
 
   distance = 0; speed = 0; steerInput = 0; steerOffset = 0; gap = GAP_MAX;
   timeScale = 1; slowMoActive = false; dreadLevel = 0;
+  doorOpened = false; doorOpenTimer = 0; screenFade = 0; catBonkTimer = 0; camYaw = 0;
   camera.fov = BASE_FOV;
   camera.updateProjectionMatrix();
   camera.rotation.set(0, 0, 0);
   camera.position.set(centerX(0), EYE_HEIGHT, 0);
+  if (catGroup.parent !== camera) { camera.add(catGroup); }
+  catGroup.visible = false;
+  catVisible = false;
+  catGroup.scale.set(1, 1, 1);
+  catGroup.position.set(0, -0.18, 1.1);
+  catGroup.rotation.set(0, 0, 0);
+  safehouseCueEl.textContent = level.cueText;
+  safehouseCueEl.classList.remove('show');
   OBSTACLES.forEach(o => { o.hit = false; o.nearMissDone = false; });
 }
 
@@ -1304,7 +1461,6 @@ let outcome = null;
 let outcomeTimer = 0;
 let timeScale = 1;
 let slowMoActive = false;
-let whipZ = 0;
 let flapSlamTimer = 0;
 let dreadLevel = 0;
 let heartbeatCooldown = 0;
@@ -1312,6 +1468,11 @@ let flashTime = 0;
 let flashMag = 0;
 let flashIsHit = false;
 let pauseStartTime = 0;
+let doorOpened = false;
+let doorOpenTimer = 0;
+let screenFade = 0;
+let catBonkTimer = 0;
+let camYaw = 0;
 
 const menuScreen = document.getElementById('menu-screen');
 const levelselectScreen = document.getElementById('levelselect-screen');
@@ -1323,6 +1484,8 @@ const hudTimer = document.getElementById('hud-timer');
 const gapFillEl = document.getElementById('gap-fill');
 const vignette = document.getElementById('vignette');
 const fxFlashEl = document.getElementById('fx-flash');
+const screenFadeEl = document.getElementById('screen-fade');
+const safehouseCueEl = document.getElementById('safehouse-cue');
 const levelGrid = document.getElementById('level-grid');
 const readyTag = document.getElementById('ready-tag');
 const readyTitle = document.getElementById('ready-title');
@@ -1506,15 +1669,29 @@ function triggerEscape() {
   outcomeTimer = 1.4;
   stopAudio();
   timeScale = 1; slowMoActive = false;
+  safehouseCueEl.classList.remove('show');
+
+  if (sanctuaryDoor) {
+    sanctuaryDoor.userData.slamFromY = sanctuaryDoor.position.y;
+    sanctuaryDoor.userData.slamFromRotY = sanctuaryDoor.rotation.y;
+  }
+  flapSlamTimer = 0.4;
+  screenFade = 1;
+  camYaw = 0;
+
+  camera.remove(catGroup);
+  scene.add(catGroup);
   catVisible = true;
   catGroup.visible = true;
   catGroup.scale.set(1, 1, 1);
-  catGroup.position.set(0.7, -0.15, 2.0);
-  catGroup.rotation.y = 0.9;
+  const bonkSide = Math.random() < 0.5 ? -1 : 1;
+  catGroup.position.set(sanctuaryPos.x + bonkSide * 0.45, 0.15, sanctuaryPos.z + 1.0);
+  catGroup.rotation.set(0, Math.PI, 0);
+  catBonkTimer = 0.4;
+
   vignette.style.opacity = 0;
-  whipZ = (Math.random() < 0.5 ? -1 : 1) * 0.14;
-  flapSlamTimer = 0.5;
   playBlip(500, 950, 0.2, 0.06, 'sine');
+  playBlip(220, 90, 0.18, 0.08, 'square');
 
   const lvl = LEVELS[currentLevelIndex];
   const finalTime = elapsed;
@@ -1634,6 +1811,9 @@ function animate() {
       shakeTime = Math.max(shakeTime, 0.09);
     }
 
+    updateLaneTraffic(physDt);
+    updateCrossTraffic(physDt);
+
     for (const ob of OBSTACLES) {
       if (ob.hit) continue;
       const dz = Math.abs(camera.position.z - ob.z);
@@ -1676,6 +1856,25 @@ function animate() {
     const fogFarTarget = currentLevel.fog.far - intensity * (currentLevel.fog.far - currentLevel.fog.near) * 0.35;
     scene.fog.far += (fogFarTarget - scene.fog.far) * Math.min(1, physDt * 1.2);
 
+    const distToDoor = currentLevel.routeLength - distance;
+    safehouseCueEl.classList.toggle('show', distToDoor < 55 && distToDoor > 0);
+    if (!doorOpened && distToDoor < 14 && distToDoor > 0 && sanctuaryDoor) {
+      doorOpened = true;
+      doorOpenTimer = 0.4;
+      sanctuaryDoor.userData.openFromY = sanctuaryDoor.position.y;
+      sanctuaryDoor.userData.openFromRotY = sanctuaryDoor.rotation.y;
+      playBlip(300, 420, 0.15, 0.04, 'sine');
+    }
+    if (doorOpenTimer > 0 && sanctuaryDoor) {
+      doorOpenTimer -= physDt;
+      const dt2 = 1 - Math.max(0, doorOpenTimer / 0.4);
+      if (currentLevel.sanctuaryAnim === 'drop') {
+        sanctuaryDoor.position.y = sanctuaryDoor.userData.openFromY + (sanctuaryDoor.userData.openY - sanctuaryDoor.userData.openFromY) * dt2;
+      } else {
+        sanctuaryDoor.rotation.y = sanctuaryDoor.userData.openFromRotY + (sanctuaryDoor.userData.openRotY - sanctuaryDoor.userData.openFromRotY) * dt2;
+      }
+    }
+
     if (gap <= 0) {
       triggerCaught();
     } else if (distance >= currentLevel.routeLength) {
@@ -1685,29 +1884,29 @@ function animate() {
     outcomeTimer -= dt;
 
     if (outcome === 'escaped') {
-      speed *= 0.985;
+      speed *= Math.pow(0.02, dt);
       distance += speed * dt;
       const cx = centerX(distance);
       camera.position.x += (cx + steerOffset - camera.position.x) * Math.min(1, dt * 4);
       camera.position.z = -distance;
-      whipZ += (0 - whipZ) * Math.min(1, dt * 5);
-      camera.rotation.z = whipZ;
+      camYaw += (Math.PI - camYaw) * Math.min(1, dt * 6);
+      camera.rotation.y = camYaw;
+
       if (flapSlamTimer > 0 && sanctuaryDoor) {
         flapSlamTimer -= dt;
-        const t = 1 - Math.max(0, flapSlamTimer / 0.5);
+        const t = 1 - Math.max(0, flapSlamTimer / 0.4);
         if (currentLevel.sanctuaryAnim === 'drop') {
-          const openY = sanctuaryDoor.userData.openY;
-          const closedY = sanctuaryDoor.userData.closedY;
-          sanctuaryDoor.position.y = openY + (closedY - openY) * t;
+          sanctuaryDoor.position.y = sanctuaryDoor.userData.slamFromY + (sanctuaryDoor.userData.closedY - sanctuaryDoor.userData.slamFromY) * t;
         } else {
-          sanctuaryDoor.rotation.y = 0.18 + t * 1.3;
+          sanctuaryDoor.rotation.y = sanctuaryDoor.userData.slamFromRotY + (sanctuaryDoor.userData.closedRotY - sanctuaryDoor.userData.slamFromRotY) * t;
         }
       }
-      if (catVisible) {
-        const bt = 1 - Math.max(0, outcomeTimer / 1.4);
-        const squash = 1 + Math.sin(bt * Math.PI * 3) * 0.15 * Math.max(0, 1 - bt * 1.6);
-        catGroup.scale.set(1 / squash, squash, 1 / squash);
-        catGroup.position.y = -0.15 + Math.abs(Math.sin(performance.now() * 0.02)) * 0.05;
+      if (catBonkTimer > 0) {
+        catBonkTimer -= dt;
+        const bt = Math.min(1, (0.4 - catBonkTimer) / 0.35);
+        const bump = Math.sin(Math.min(1, bt) * Math.PI);
+        catGroup.scale.set(1 + bump * 0.25, 1 - bump * 0.3, 1 + bump * 0.25);
+        catGroup.position.z = sanctuaryPos.z + 1.0 - bump * 0.22;
       }
     } else {
       speed *= 0.9;
@@ -1731,6 +1930,14 @@ function animate() {
     fxFlashEl.classList.toggle('hit', flashIsHit);
   } else {
     fxFlashEl.style.opacity = 0;
+  }
+
+  if (screenFade > 0.002) {
+    screenFade *= Math.pow(0.001, dt / 0.4);
+    screenFadeEl.style.opacity = (screenFade * 0.85).toFixed(3);
+  } else if (screenFade !== 0) {
+    screenFade = 0;
+    screenFadeEl.style.opacity = 0;
   }
 
   if (state === 'racing' || state === 'outcome') {
