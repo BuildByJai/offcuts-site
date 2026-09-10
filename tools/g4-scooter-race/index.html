@@ -307,11 +307,28 @@ const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.setSize(innerWidth, innerHeight);
 
-const ambient = new THREE.AmbientLight(0xffffff, 0.65);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+
+const ambient = new THREE.HemisphereLight(0xffd9a8, 0x4a3a2a, 0.55);
 scene.add(ambient);
-const sun = new THREE.DirectionalLight(0xffffff, 1.05);
-sun.position.set(-24, 34, 14);
+const sun = new THREE.DirectionalLight(0xffb877, 2.0);
+sun.position.set(-28, 38, 18);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+sun.shadow.camera.near = 1;
+sun.shadow.camera.far = 65;
+sun.shadow.camera.left = -22;
+sun.shadow.camera.right = 22;
+sun.shadow.camera.top = 22;
+sun.shadow.camera.bottom = -22;
+sun.shadow.bias = -0.0022;
+sun.shadow.radius = 3;
 scene.add(sun);
+scene.add(sun.target);
 
 window.addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
@@ -319,33 +336,202 @@ window.addEventListener('resize', () => {
   renderer.setSize(innerWidth, innerHeight);
 });
 
-/* ---------------- toon shading + outline system ---------------- */
-function buildToonGradientMap(steps) {
+/* ---------------- procedural tileable textures (canvas-generated, no external files) ----------------
+   No image-generation tool is available in this pipeline, and sourcing external texture files would
+   mean either bundling unverified third-party images or fetching from the network at load time. Canvas-
+   generated CanvasTexture keeps the tool a single dependency-free file, loads instantly, and still gives
+   genuinely tileable, detailed surfaces rather than flat colour — this is the brief's own sanctioned
+   fallback ("If generating textures isn't feasible inline, use CSS/canvas-generated procedural textures"). */
+function texCanvas(size) {
   const c = document.createElement('canvas');
-  c.width = steps; c.height = 1;
-  const ctx = c.getContext('2d');
-  for (let i = 0; i < steps; i++) {
-    const v = Math.round((i / (steps - 1)) * 255);
-    ctx.fillStyle = `rgb(${v},${v},${v})`;
-    ctx.fillRect(i, 0, 1, 1);
-  }
-  const tex = new THREE.CanvasTexture(c);
-  tex.minFilter = THREE.NearestFilter;
-  tex.magFilter = THREE.NearestFilter;
-  tex.generateMipmaps = false;
+  c.width = size; c.height = size;
+  return c;
+}
+function toTexture(canvas, repeat) {
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(repeat, repeat);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
   return tex;
 }
-const TOON_GRADIENT = buildToonGradientMap(4);
-function toonMat(color, opts) {
-  return new THREE.MeshToonMaterial(Object.assign({ color, gradientMap: TOON_GRADIENT }, opts || {}));
+function noiseSpeckle(ctx, size, count, alpha) {
+  for (let i = 0; i < count; i++) {
+    const v = Math.random() < 0.5 ? 0 : 255;
+    ctx.fillStyle = `rgba(${v},${v},${v},${(Math.random() * alpha).toFixed(3)})`;
+    const s = 1 + Math.random() * 2;
+    ctx.fillRect(Math.random() * size, Math.random() * size, s, s);
+  }
+}
+function buildBrickTexture(mortarHex, brickHex) {
+  const size = 256;
+  const c = texCanvas(size);
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = mortarHex;
+  ctx.fillRect(0, 0, size, size);
+  const bw = 34, bh = 15, mo = 3;
+  ctx.fillStyle = brickHex;
+  let row = 0;
+  for (let y = -bh; y < size + bh; y += bh + mo, row++) {
+    const off = (row % 2) * (bw / 2);
+    for (let x = -bw; x < size + bw; x += bw + mo) {
+      ctx.fillRect(x + off, y, bw, bh);
+    }
+  }
+  noiseSpeckle(ctx, size, 900, 0.05);
+  return toTexture(c, 2.2);
+}
+function buildRoadTexture() {
+  const size = 256;
+  const c = texCanvas(size);
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#3a3a3e';
+  ctx.fillRect(0, 0, size, size);
+  noiseSpeckle(ctx, size, 2200, 0.09);
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+  for (let i = 0; i < 6; i++) {
+    ctx.beginPath();
+    const y = Math.random() * size;
+    ctx.moveTo(0, y);
+    ctx.bezierCurveTo(size * 0.3, y + (Math.random() - 0.5) * 30, size * 0.7, y + (Math.random() - 0.5) * 30, size, y);
+    ctx.lineWidth = 1 + Math.random() * 2;
+    ctx.stroke();
+  }
+  return toTexture(c, 6);
+}
+function buildPavementTexture() {
+  const size = 256;
+  const c = texCanvas(size);
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#b7b2a4';
+  ctx.fillRect(0, 0, size, size);
+  ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+  ctx.lineWidth = 2;
+  const cell = 42;
+  for (let x = 0; x <= size; x += cell) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, size); ctx.stroke(); }
+  for (let y = 0; y <= size; y += cell) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(size, y); ctx.stroke(); }
+  noiseSpeckle(ctx, size, 700, 0.06);
+  return toTexture(c, 5);
+}
+function buildRoofTexture(hex) {
+  const size = 256;
+  const c = texCanvas(size);
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = hex;
+  ctx.fillRect(0, 0, size, size);
+  const rh = 18;
+  ctx.strokeStyle = 'rgba(0,0,0,0.28)';
+  ctx.lineWidth = 2;
+  let row = 0;
+  for (let y = 0; y < size; y += rh, row++) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(size, y); ctx.stroke();
+    const off = (row % 2) * 16;
+    for (let x = -16; x < size + 16; x += 32) {
+      ctx.beginPath(); ctx.moveTo(x + off, y); ctx.lineTo(x + off, y + rh); ctx.stroke();
+    }
+  }
+  noiseSpeckle(ctx, size, 500, 0.08);
+  return toTexture(c, 2.4);
+}
+function buildGrassTexture() {
+  const size = 256;
+  const c = texCanvas(size);
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#5f9e46';
+  ctx.fillRect(0, 0, size, size);
+  for (let i = 0; i < 2200; i++) {
+    const x = Math.random() * size, y = Math.random() * size;
+    const g = Math.random() < 0.5 ? '#4d8a38' : '#79b85c';
+    ctx.strokeStyle = g;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + (Math.random() - 0.5) * 3, y - 3 - Math.random() * 3);
+    ctx.stroke();
+  }
+  return toTexture(c, 14);
+}
+function buildWoodTexture(hex) {
+  const size = 256;
+  const c = texCanvas(size);
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = hex;
+  ctx.fillRect(0, 0, size, size);
+  for (let i = 0; i < 40; i++) {
+    ctx.strokeStyle = `rgba(0,0,0,${(0.05 + Math.random() * 0.1).toFixed(3)})`;
+    ctx.lineWidth = 1 + Math.random() * 2;
+    const y = (i / 40) * size + (Math.random() - 0.5) * 4;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.bezierCurveTo(size * 0.3, y + (Math.random() - 0.5) * 6, size * 0.7, y + (Math.random() - 0.5) * 6, size, y);
+    ctx.stroke();
+  }
+  return toTexture(c, 1.6);
+}
+function buildGlassTexture() {
+  const size = 128;
+  const c = texCanvas(size);
+  const ctx = c.getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, size, size);
+  grad.addColorStop(0, '#dff3ff');
+  grad.addColorStop(0.45, '#8fc9e8');
+  grad.addColorStop(0.55, '#5fa8d0');
+  grad.addColorStop(1, '#2f6f92');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+  ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+  ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(0, size * 0.2); ctx.lineTo(size * 0.5, 0); ctx.stroke();
+  return toTexture(c, 1);
 }
 
+const TEX = {
+  brickWarm: buildBrickTexture('#c9a87c', '#b5764a'),
+  brickCool: buildBrickTexture('#c7c3ba', '#8f7d6e'),
+  road: buildRoadTexture(),
+  pavement: buildPavementTexture(),
+  roofRed: buildRoofTexture('#9c3a2a'),
+  roofDark: buildRoofTexture('#5c3226'),
+  grass: buildGrassTexture(),
+  wood: buildWoodTexture('#9a6a3f'),
+  glass: buildGlassTexture()
+};
+// road/pavement/grass are applied via custom world-unit UVs (buildRibbon / ground planes)
+// rather than the geometry's default 0-1 UV range, so their tiling is driven entirely by
+// those UVs — force repeat to 1 so the constructor's box-oriented repeat doesn't double up.
+TEX.road.repeat.set(1, 1);
+TEX.pavement.repeat.set(1, 1);
+TEX.grass.repeat.set(1, 1);
+
+/* ---------------- warm PBR-style material + fake AO + outline system ---------------- */
+function stdMat(color, opts) {
+  return new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.82, metalness: 0.04 }, opts || {}));
+}
+
+const AO_MAT = new THREE.MeshBasicMaterial({ color: 0x1a1208, transparent: true, opacity: 0.32, depthWrite: false });
+function addAoStrip(x, y, z, w, d) {
+  const m = new THREE.Mesh(GEO.box, AO_MAT);
+  m.scale.set(w, 0.16, d);
+  m.position.set(x, y, z);
+  scene.add(m);
+  trackMesh(m);
+  return m;
+}
+
+/* Outline (inverted-hull) call sites are kept throughout the file for structural compatibility, but the
+   technique itself is retired here: bold black silhouettes read as toon/cel-shading, which this brief's
+   "warm, painterly, stylised-realistic — NOT flat toon" direction explicitly moves away from. Outline
+   meshes are still created (so every existing call site and its trackMesh/teardown bookkeeping stays
+   valid) but marked invisible, which skips them from the render pass entirely at zero GPU cost. Surface
+   definition now comes from the AO strips below and the baked detail (mortar lines, tile grout) in the
+   procedural textures instead. */
 const OUTLINE_MAT = new THREE.MeshBasicMaterial({ color: 0x120f0c, side: THREE.BackSide });
 function addOutline(mesh, mult) {
   const outline = new THREE.Mesh(mesh.geometry, OUTLINE_MAT);
-  outline.scale.copy(mesh.scale).multiplyScalar(mult || 1.16);
+  outline.scale.copy(mesh.scale).multiplyScalar(mult || 1.04);
   outline.position.copy(mesh.position);
   outline.rotation.copy(mesh.rotation);
+  outline.visible = false;
   (mesh.parent || scene).add(outline);
   return outline;
 }
@@ -361,14 +547,15 @@ const GEO = {
 
 /* ---------------- shared materials (used across every level) ---------------- */
 const SHARED_MAT = {
-  tyre: toonMat(0x1a1a1a),
-  white: toonMat(0xffffff),
-  metalGrey: toonMat(0x9aa0a6),
-  skin: toonMat(0xE8AE84),
-  sleeve: toonMat(0x2b5c8a),
-  catBody: toonMat(0x2f2a26),
-  catChest: toonMat(0xffffff),
-  catEyes: toonMat(0xffc233)
+  tyre: stdMat(0x1a1a1a),
+  white: stdMat(0xffffff),
+  metalGrey: stdMat(0x9aa0a6),
+  skin: stdMat(0xE8AE84),
+  sleeve: stdMat(0x2b5c8a),
+  catBody: stdMat(0x2f2a26),
+  catChest: stdMat(0xffffff),
+  catEyes: stdMat(0xffc233),
+  glass: stdMat(0x9fd0e8, { map: TEX.glass, transparent: true, opacity: 0.85, roughness: 0.12, metalness: 0.35 })
 };
 
 /* ---------------- level-scoped scene bookkeeping ---------------- */
@@ -384,6 +571,7 @@ function addBox(mat, w, h, d, x, y, z, ry, outline) {
   m.scale.set(w, h, d);
   m.position.set(x, y, z);
   if (ry) m.rotation.y = ry;
+  m.receiveShadow = true;
   scene.add(m);
   trackMesh(m);
   if (outline) trackMesh(addOutline(m));
@@ -393,6 +581,7 @@ function addCyl(mat, r, h, x, y, z, outline) {
   const m = new THREE.Mesh(GEO.cyl, mat);
   m.scale.set(r, h, r);
   m.position.set(x, y, z);
+  m.receiveShadow = true;
   scene.add(m);
   trackMesh(m);
   if (outline) trackMesh(addOutline(m));
@@ -402,6 +591,7 @@ function addCone(mat, r, h, x, y, z, outline) {
   const m = new THREE.Mesh(GEO.cone, mat);
   m.scale.set(r, h, r);
   m.position.set(x, y, z);
+  m.receiveShadow = true;
   scene.add(m);
   trackMesh(m);
   if (outline) trackMesh(addOutline(m));
@@ -411,6 +601,7 @@ function addSphere(mat, rx, ry_, rz, x, y, z, outline) {
   const m = new THREE.Mesh(GEO.sphere, mat);
   m.scale.set(rx, ry_, rz);
   m.position.set(x, y, z);
+  m.receiveShadow = true;
   scene.add(m);
   trackMesh(m);
   if (outline) trackMesh(addOutline(m));
@@ -454,60 +645,69 @@ const LEVELS = [
       { d: 335, x: 8 }, { d: 385, x: 8 }, { d: 415, x: 0 }
     ],
     obstacleDensity: 0.75, gapDecayMult: 0.8, catAggro: 0.75,
-    sky: { top: 0x3fa8f0, bottom: 0xbfe8ff }, fog: { color: 0xbfe8ff, near: 45, far: 130 },
-    sunColor: 0xfff6e0,
+    sky: { top: 0x8fb6d6, bottom: 0xffe3b0 }, fog: { color: 0xf0d9ae, near: 45, far: 130 },
+    sunColor: 0xffb877,
     sanctuaryAnim: 'swing',
     buildMaterials: buildSuburbMaterials, spawnRoadside: spawnSuburbRoadside, buildSanctuary: buildFenceSanctuary,
     tagline: 'The one that started it all — learn the ropes.', cueText: 'Get to the garden gate!',
-    crossings: [{ d: 130, side: 1 }, { d: 400, side: -1 }]
+    crossings: [{ d: 130, side: 1 }, { d: 400, side: -1 }],
+    trafficBuilder: buildTrafficCarGroup, trafficBehavior: 'steady', trafficSpeedMult: 1, trafficRadius: 1.3
   },
   {
     id: 2, name: 'The High Street', seed: 2002,
-    routeLength: 520, roadHalfWidth: 5.2, pavementWidth: 2.4,
+    routeLength: 720, roadHalfWidth: 5.2, pavementWidth: 2.4,
     waypoints: [
-      { d: 0, x: 0 }, { d: 60, x: 0 }, { d: 120, x: -6 }, { d: 175, x: -6 },
-      { d: 220, x: 0 }, { d: 250, x: 6 }, { d: 300, x: 6 }, { d: 345, x: -3 },
-      { d: 385, x: -3 }
+      { d: 0, x: 0 }, { d: 50, x: 0 }, { d: 100, x: -4 }, { d: 150, x: -4 },
+      { d: 200, x: 0 }, { d: 230, x: 5 }, { d: 280, x: 5 }, { d: 320, x: 0 },
+      { d: 360, x: -5 }, { d: 410, x: -5 }, { d: 450, x: 0 }, { d: 490, x: 4.5 },
+      { d: 540, x: 4.5 }, { d: 580, x: -4 }, { d: 630, x: -4 }, { d: 670, x: 0 }
     ],
     obstacleDensity: 1.0, gapDecayMult: 1.0, catAggro: 1.0,
-    sky: { top: 0xff9a3c, bottom: 0xffd76b }, fog: { color: 0xffd76b, near: 40, far: 120 },
-    sunColor: 0xffe6b8,
+    sky: { top: 0xffab5c, bottom: 0xffe2a0 }, fog: { color: 0xffd7a0, near: 40, far: 120 },
+    sunColor: 0xffb877,
     sanctuaryAnim: 'drop',
     buildMaterials: buildHighstreetMaterials, spawnRoadside: spawnHighstreetRoadside, buildSanctuary: buildShopSanctuary,
-    tagline: 'Busier, faster, more to dodge.', cueText: 'Get to the shop door!',
-    crossings: [{ d: 120, side: -1 }, { d: 440, side: 1 }]
+    tagline: 'Longer, busier, a winding run of shopfronts.', cueText: 'Get to the shop door!',
+    crossings: [{ d: 100, side: -1 }, { d: 360, side: 1 }, { d: 620, side: -1 }],
+    trafficBuilder: buildVanBusGroup, trafficBehavior: 'steady', trafficSpeedMult: 0.78, trafficRadius: 1.7
   },
   {
     id: 3, name: 'The Park Run', seed: 3003,
-    routeLength: 500, roadHalfWidth: 4.8, pavementWidth: 1.8,
+    routeLength: 920, roadHalfWidth: 4.8, pavementWidth: 1.8,
     waypoints: [
-      { d: 0, x: 0 }, { d: 50, x: 0 }, { d: 95, x: 5 }, { d: 140, x: 5 },
-      { d: 175, x: -5.5 }, { d: 220, x: -5.5 }, { d: 255, x: 0 },
-      { d: 280, x: 7 }, { d: 320, x: 7 }, { d: 355, x: -4 }, { d: 390, x: -4 }
+      { d: 0, x: 0 }, { d: 40, x: 0 }, { d: 75, x: 7 }, { d: 105, x: 7 },
+      { d: 130, x: -7 }, { d: 160, x: -7 }, { d: 185, x: 6 }, { d: 200, x: 6 },
+      { d: 225, x: -6 }, { d: 250, x: -6 }, { d: 290, x: 0 }, { d: 340, x: 8 },
+      { d: 385, x: 8 }, { d: 420, x: -7 }, { d: 460, x: -7 }, { d: 500, x: 0 },
+      { d: 550, x: 7 }, { d: 600, x: 7 }, { d: 640, x: -8 }, { d: 685, x: -8 },
+      { d: 730, x: 0 }, { d: 780, x: 6 }, { d: 820, x: 6 }, { d: 860, x: 0 }
     ],
     obstacleDensity: 1.15, gapDecayMult: 1.2, catAggro: 1.25,
-    sky: { top: 0x3fc23f, bottom: 0xb8f27a }, fog: { color: 0xb8f27a, near: 38, far: 108 },
-    sunColor: 0xfbffe0,
+    sky: { top: 0x8fbf62, bottom: 0xffe7a8 }, fog: { color: 0xe8dca0, near: 38, far: 108 },
+    sunColor: 0xffc98a,
     sanctuaryAnim: 'swing',
     buildMaterials: buildParkMaterials, spawnRoadside: spawnParkRoadside, buildSanctuary: buildParkGateSanctuary,
-    tagline: 'Tighter bends, quacking hazards.', cueText: 'Get to the park gate!',
-    crossings: [{ d: 110, side: 1 }, { d: 400, side: -1 }]
+    tagline: 'Longer still, with tight back-to-back turns.', cueText: 'Get to the park gate!',
+    crossings: [{ d: 90, side: 1 }, { d: 400, side: -1 }, { d: 750, side: 1 }],
+    trafficBuilder: buildParkMoverGroup, trafficBehavior: 'erratic', trafficSpeedMult: 0.6, trafficRadius: 0.65
   },
   {
     id: 4, name: 'Industrial Estate', seed: 4004,
-    routeLength: 480, roadHalfWidth: 4.3, pavementWidth: 1.6,
+    routeLength: 1180, roadHalfWidth: 4.3, pavementWidth: 1.6,
     waypoints: [
-      { d: 0, x: 0 }, { d: 45, x: 0 }, { d: 85, x: -5 }, { d: 120, x: -5 },
-      { d: 150, x: 4.5 }, { d: 190, x: 4.5 }, { d: 220, x: 0 },
-      { d: 245, x: -6 }, { d: 280, x: -6 }, { d: 310, x: 3 }, { d: 340, x: 3 }
+      { d: 0, x: 0 }, { d: 250, x: 0 }, { d: 275, x: -8 }, { d: 310, x: -8 },
+      { d: 340, x: 0 }, { d: 600, x: 0 }, { d: 625, x: 8 }, { d: 660, x: 8 },
+      { d: 690, x: 0 }, { d: 950, x: 0 }, { d: 975, x: -7 }, { d: 1010, x: -7 },
+      { d: 1040, x: 0 }, { d: 1100, x: 0 }
     ],
     obstacleDensity: 1.35, gapDecayMult: 1.5, catAggro: 1.6,
-    sky: { top: 0xe8621e, bottom: 0xffb347 }, fog: { color: 0xe8a05c, near: 30, far: 92 },
-    sunColor: 0xffceaa,
+    sky: { top: 0xd98d54, bottom: 0xffc888 }, fog: { color: 0xe0a86a, near: 30, far: 92 },
+    sunColor: 0xff9d5c,
     sanctuaryAnim: 'drop',
     buildMaterials: buildIndustrialMaterials, spawnRoadside: spawnIndustrialRoadside, buildSanctuary: buildWarehouseSanctuary,
-    tagline: 'The finale. Everything, faster, tighter.', cueText: 'Get to the warehouse door!',
-    crossings: [{ d: 100, side: -1 }, { d: 420, side: 1 }]
+    tagline: 'The finale — long straights, then sudden sharp turns.', cueText: 'Get to the warehouse door!',
+    crossings: [{ d: 120, side: -1 }, { d: 500, side: 1 }, { d: 900, side: -1 }],
+    trafficBuilder: buildForkliftTruckGroup, trafficBehavior: 'reversing', trafficSpeedMult: 0.68, trafficRadius: 1.85
   }
 ];
 
@@ -528,15 +728,26 @@ function centerX(d) {
   return wps[wps.length - 1].x;
 }
 
-function buildRibbon(material, halfWidth, y, extraLength) {
+function rescaleUv(geo, uTiles, vTiles) {
+  const uv = geo.attributes.uv;
+  for (let i = 0; i < uv.count; i++) {
+    uv.setXY(i, uv.getX(i) * uTiles, uv.getY(i) * vTiles);
+  }
+  uv.needsUpdate = true;
+}
+
+function buildRibbon(material, halfWidth, y, extraLength, tileSize) {
   const step = 4;
+  const ts = tileSize || 3;
   const positions = [];
+  const uvs = [];
   const indices = [];
   let vi = 0;
   const maxD = currentLevel.routeLength + (extraLength || 0);
   for (let d = 0; d <= maxD; d += step) {
     const cx = centerX(d);
     positions.push(cx - halfWidth, y, -d, cx + halfWidth, y, -d);
+    uvs.push(0, d / ts, (halfWidth * 2) / ts, d / ts);
     if (d > 0) {
       const base = vi - 2;
       indices.push(base, base + 1, base + 2, base + 1, base + 3, base + 2);
@@ -545,9 +756,11 @@ function buildRibbon(material, halfWidth, y, extraLength) {
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
   geo.setIndex(indices);
   geo.computeVertexNormals();
   const mesh = new THREE.Mesh(geo, material);
+  mesh.receiveShadow = true;
   scene.add(mesh);
   trackMesh(mesh);
   return mesh;
@@ -573,6 +786,7 @@ function buildEdgeStrip(material, edgeOffset, thickness, y, sign) {
   geo.setIndex(indices);
   geo.computeVertexNormals();
   const mesh = new THREE.Mesh(geo, material);
+  mesh.receiveShadow = true;
   scene.add(mesh);
   trackMesh(mesh);
   return mesh;
@@ -591,33 +805,33 @@ function addCenterLine() {
    ================================================================ */
 function buildSuburbMaterials() {
   return {
-    road: trackMat(toonMat(0x5a5d61)),
-    pavement: trackMat(toonMat(0xc7c9c2)),
-    grass: trackMat(toonMat(0x6fbf5c)),
-    kerbEdge: trackMat(toonMat(0x2c2c2c)),
-    markings: trackMat(toonMat(0xffffff)),
-    hedge: trackMat(toonMat(0x4a9e3f)),
-    wallColors: [0xE8B978, 0xF0D2A0, 0xD99B6C, 0xE3C8A0, 0xF5E0B8, 0xC98F5E, 0xF2E6C9].map(c => trackMat(toonMat(c))),
-    roof: trackMat(toonMat(0xC9382A)),
-    roofDark: trackMat(toonMat(0x7A2E1F)),
-    trim: trackMat(toonMat(0xFFFFFF)),
-    chimney: trackMat(toonMat(0xB0402E)),
-    doorColors: [0xE0453A, 0x2C86C9, 0x35A860, 0xE8B02A, 0x9A4FB0, 0x2EAE9A, 0xB0302E].map(c => trackMat(toonMat(c))),
-    window: trackMat(toonMat(0x6FE0FF)),
-    potTerracotta: trackMat(toonMat(0xC96A3E)),
-    flowerColors: [0xFF4D6D, 0xFFD23A, 0xB84DFF, 0xFF8C42].map(c => trackMat(toonMat(c))),
-    binGreen: trackMat(toonMat(0x389049)),
-    binBlack: trackMat(toonMat(0x2c2c2c)),
-    binBlue: trackMat(toonMat(0x2f7ac9)),
-    postboxRed: trackMat(toonMat(0xD9241F)),
-    carColors: [0xD9241F, 0x2454C4, 0x2E9E4A, 0xF2F2F2, 0x2c2c2c, 0xE8A61E].map(c => trackMat(toonMat(c))),
-    kerb: trackMat(toonMat(0xd8d6cc)),
-    island: trackMat(toonMat(0x5f9e48)),
-    treeTrunk: trackMat(toonMat(0x6b4a34)),
-    treeLeaf: trackMat(toonMat(0x4a9e3f)),
-    gardenWall: trackMat(toonMat(0xc99a6e)),
-    fence: trackMat(toonMat(0x9a6a3f)),
-    flap: trackMat(toonMat(0x6b4526))
+    road: trackMat(stdMat(0xffffff, { map: TEX.road, roughness: 0.92 })),
+    pavement: trackMat(stdMat(0xffffff, { map: TEX.pavement, roughness: 0.88 })),
+    grass: trackMat(stdMat(0xffffff, { map: TEX.grass, roughness: 0.95 })),
+    kerbEdge: trackMat(stdMat(0x2c2c2c)),
+    markings: trackMat(stdMat(0xffffff)),
+    hedge: trackMat(stdMat(0x4a9e3f)),
+    wallColors: [0xE8B978, 0xF0D2A0, 0xD99B6C, 0xE3C8A0, 0xF5E0B8, 0xC98F5E, 0xF2E6C9].map(c => trackMat(stdMat(c, { map: TEX.brickWarm }))),
+    roof: trackMat(stdMat(0xffffff, { map: TEX.roofRed, roughness: 0.78 })),
+    roofDark: trackMat(stdMat(0xffffff, { map: TEX.roofDark, roughness: 0.78 })),
+    trim: trackMat(stdMat(0xFFFFFF)),
+    chimney: trackMat(stdMat(0xB0402E, { map: TEX.brickWarm })),
+    doorColors: [0xE0453A, 0x2C86C9, 0x35A860, 0xE8B02A, 0x9A4FB0, 0x2EAE9A, 0xB0302E].map(c => trackMat(stdMat(c))),
+    window: SHARED_MAT.glass,
+    potTerracotta: trackMat(stdMat(0xC96A3E)),
+    flowerColors: [0xFF4D6D, 0xFFD23A, 0xB84DFF, 0xFF8C42].map(c => trackMat(stdMat(c))),
+    binGreen: trackMat(stdMat(0x389049)),
+    binBlack: trackMat(stdMat(0x2c2c2c)),
+    binBlue: trackMat(stdMat(0x2f7ac9)),
+    postboxRed: trackMat(stdMat(0xD9241F)),
+    carColors: [0xD9241F, 0x2454C4, 0x2E9E4A, 0xF2F2F2, 0x2c2c2c, 0xE8A61E].map(c => trackMat(stdMat(c))),
+    kerb: trackMat(stdMat(0xd8d6cc)),
+    island: trackMat(stdMat(0x5f9e48)),
+    treeTrunk: trackMat(stdMat(0x6b4a34)),
+    treeLeaf: trackMat(stdMat(0x4a9e3f)),
+    gardenWall: trackMat(stdMat(0xc99a6e, { map: TEX.brickCool })),
+    fence: trackMat(stdMat(0xffffff, { map: TEX.wood, roughness: 0.85 })),
+    flap: trackMat(stdMat(0xffffff, { map: TEX.wood, roughness: 0.85 }))
   };
 }
 
@@ -632,6 +846,7 @@ function buildHouse(cx, z, side) {
   const ridge = addBox(roofMat, depth * 0.55, 0.9, length * 0.85, houseX, height + 0.5, z);
   ridge.rotation.z = Math.PI / 4;
   addBox(levelMat.chimney, 0.32, 0.75, 0.32, houseX + side * 0.9, height + 0.75, z - length * 0.28);
+  addAoStrip(houseX, 0.05, z, depth + 0.3, length + 0.3);
 
   const wallFrontX = houseX - side * (depth / 2);
   const bayProtrusion = 0.7;
@@ -721,28 +936,28 @@ function spawnSuburbRoadside(cx, z, side, density) {
    ================================================================ */
 function buildHighstreetMaterials() {
   return {
-    road: trackMat(toonMat(0x54535a)),
-    pavement: trackMat(toonMat(0xcac2b0)),
-    grass: trackMat(toonMat(0x7a9e56)),
-    kerbEdge: trackMat(toonMat(0x2a2a2a)),
-    markings: trackMat(toonMat(0xffffff)),
-    shopWall: [0xE8D8C0, 0xD8C4A8, 0xEDE0CC, 0xDCC9AE].map(c => trackMat(toonMat(c))),
-    awning: [0xD9241F, 0x2C86C9, 0x35A860, 0xE8B02A].map(c => trackMat(toonMat(c))),
-    signboard: [0x2c2c2c, 0x6b3a2e, 0x1f5c4a].map(c => trackMat(toonMat(c))),
-    window: trackMat(toonMat(0xA8DEF2)),
-    door: trackMat(toonMat(0x3a2a20)),
-    lampPost: trackMat(toonMat(0x2c2c2c)),
-    lampHead: trackMat(toonMat(0xF2E08A)),
-    benchWood: trackMat(toonMat(0x9a6a3f)),
-    stallTable: trackMat(toonMat(0x8a6244)),
-    crate: [0xC98F5E, 0xB0784A].map(c => trackMat(toonMat(c))),
-    carColors: [0xD9241F, 0x2454C4, 0x2E9E4A, 0xF2F2F2, 0x2c2c2c, 0xE8A61E].map(c => trackMat(toonMat(c))),
-    pedestrianCoat: [0x2C86C9, 0xE0453A, 0x35A860, 0x9A4FB0].map(c => trackMat(toonMat(c))),
-    pedestrianSkin: trackMat(toonMat(0xE8AE84)),
-    kerb: trackMat(toonMat(0xd8d6cc)),
-    plaza: trackMat(toonMat(0xC7B89A)),
-    fence: trackMat(toonMat(0x8a6244)),
-    flap: trackMat(toonMat(0x3a2a20))
+    road: trackMat(stdMat(0xffffff, { map: TEX.road, roughness: 0.92 })),
+    pavement: trackMat(stdMat(0xffffff, { map: TEX.pavement, roughness: 0.88 })),
+    grass: trackMat(stdMat(0xffffff, { map: TEX.grass, roughness: 0.95 })),
+    kerbEdge: trackMat(stdMat(0x2a2a2a)),
+    markings: trackMat(stdMat(0xffffff)),
+    shopWall: [0xE8D8C0, 0xD8C4A8, 0xEDE0CC, 0xDCC9AE].map(c => trackMat(stdMat(c, { map: TEX.brickCool }))),
+    awning: [0xD9241F, 0x2C86C9, 0x35A860, 0xE8B02A].map(c => trackMat(stdMat(c))),
+    signboard: [0x2c2c2c, 0x6b3a2e, 0x1f5c4a].map(c => trackMat(stdMat(c))),
+    window: SHARED_MAT.glass,
+    door: trackMat(stdMat(0x3a2a20, { map: TEX.wood, roughness: 0.7 })),
+    lampPost: trackMat(stdMat(0x2c2c2c)),
+    lampHead: trackMat(stdMat(0xF2E08A)),
+    benchWood: trackMat(stdMat(0x9a6a3f, { map: TEX.wood, roughness: 0.8 })),
+    stallTable: trackMat(stdMat(0x8a6244, { map: TEX.wood, roughness: 0.8 })),
+    crate: [0xC98F5E, 0xB0784A].map(c => trackMat(stdMat(c, { map: TEX.wood, roughness: 0.85 }))),
+    carColors: [0xD9241F, 0x2454C4, 0x2E9E4A, 0xF2F2F2, 0x2c2c2c, 0xE8A61E].map(c => trackMat(stdMat(c))),
+    pedestrianCoat: [0x2C86C9, 0xE0453A, 0x35A860, 0x9A4FB0].map(c => trackMat(stdMat(c))),
+    pedestrianSkin: trackMat(stdMat(0xE8AE84)),
+    kerb: trackMat(stdMat(0xd8d6cc)),
+    plaza: trackMat(stdMat(0xffffff, { map: TEX.pavement, roughness: 0.88 })),
+    fence: trackMat(stdMat(0x8a6244, { map: TEX.wood, roughness: 0.85 })),
+    flap: trackMat(stdMat(0x3a2a20))
   };
 }
 
@@ -752,6 +967,7 @@ function buildShopfront(cx, z, side) {
   const wall = levelMat.shopWall[Math.floor(rand() * levelMat.shopWall.length)];
   addBox(wall, depth, height, length, shopX, height / 2, z, 0, true);
   addBox(SHARED_MAT.metalGrey, depth + 0.2, 0.15, length + 0.2, shopX, height + 0.08, z);
+  addAoStrip(shopX, 0.05, z, depth + 0.3, length + 0.3);
 
   const frontX = shopX - side * (depth / 2);
   addBox(levelMat.window, 0.06, 1.5, length * 0.75, frontX - side * 0.03, 0.85, z);
@@ -826,23 +1042,24 @@ function spawnHighstreetRoadside(cx, z, side, density) {
    ================================================================ */
 function buildParkMaterials() {
   return {
-    road: trackMat(toonMat(0x8a6f56)),
-    pavement: trackMat(toonMat(0xb9ac86)),
-    grass: trackMat(toonMat(0x6fc24f)),
-    kerbEdge: trackMat(toonMat(0x4a3c2c)),
-    markings: trackMat(toonMat(0xf2ead2)),
-    hedge: trackMat(toonMat(0x4a9e3f)),
-    benchWood: trackMat(toonMat(0x7a5230)),
-    binGreen: trackMat(toonMat(0x2f7a3a)),
-    treeTrunk: trackMat(toonMat(0x6b4a34)),
-    treeLeaf: [0x4fae3f, 0x5fbf4a, 0x3f9e38].map(c => trackMat(toonMat(c))),
-    pondWater: trackMat(toonMat(0x4aa8d8)),
-    pondWall: trackMat(toonMat(0x9a9482)),
-    duckBody: trackMat(toonMat(0xffd23a)),
-    duckBeak: trackMat(toonMat(0xE8842A)),
-    railing: trackMat(toonMat(0x2f7a3a)),
-    gatePanel: trackMat(toonMat(0x1f5c2a)),
-    kerb: trackMat(toonMat(0xd8d0b8))
+    road: trackMat(stdMat(0xffffff, { map: TEX.road, roughness: 0.92 })),
+    pavement: trackMat(stdMat(0xffffff, { map: TEX.pavement, roughness: 0.88 })),
+    grass: trackMat(stdMat(0xffffff, { map: TEX.grass, roughness: 0.95 })),
+    kerbEdge: trackMat(stdMat(0x4a3c2c)),
+    markings: trackMat(stdMat(0xf2ead2)),
+    hedge: trackMat(stdMat(0x4a9e3f)),
+    benchWood: trackMat(stdMat(0x7a5230, { map: TEX.wood, roughness: 0.8 })),
+    binGreen: trackMat(stdMat(0x2f7a3a)),
+    treeTrunk: trackMat(stdMat(0x6b4a34, { map: TEX.wood, roughness: 0.9 })),
+    treeLeaf: [0x4fae3f, 0x5fbf4a, 0x3f9e38].map(c => trackMat(stdMat(c))),
+    pondWater: trackMat(stdMat(0x4aa8d8, { roughness: 0.15, metalness: 0.2, transparent: true, opacity: 0.9 })),
+    pondWall: trackMat(stdMat(0x9a9482)),
+    duckBody: trackMat(stdMat(0xffd23a)),
+    duckBeak: trackMat(stdMat(0xE8842A)),
+    railing: trackMat(stdMat(0x2f7a3a)),
+    gatePanel: trackMat(stdMat(0x1f5c2a, { map: TEX.wood, roughness: 0.8 })),
+    kerb: trackMat(stdMat(0xd8d0b8)),
+    moverColors: [0x2C86C9, 0xE0453A, 0x35A860, 0x9A4FB0, 0x2c2c2c, 0xE8B02A].map(c => trackMat(stdMat(c)))
   };
 }
 
@@ -905,20 +1122,21 @@ function spawnParkRoadside(cx, z, side, density) {
    ================================================================ */
 function buildIndustrialMaterials() {
   return {
-    road: trackMat(toonMat(0x3f3d3a)),
-    pavement: trackMat(toonMat(0x8a8378)),
-    grass: trackMat(toonMat(0x8f8a6e)),
-    kerbEdge: trackMat(toonMat(0x1a1a1a)),
-    markings: trackMat(toonMat(0xE8C63A)),
-    warehouseWall: [0xB0AC9E, 0xA69C88, 0xBCB6A4].map(c => trackMat(toonMat(c))),
-    warehouseStripe: trackMat(toonMat(0xD9241F)),
-    shutter: trackMat(toonMat(0x4a4842)),
-    skipOrange: trackMat(toonMat(0xE8621E)),
-    skipRim: trackMat(toonMat(0xC94A16)),
-    pallet: trackMat(toonMat(0xB0824A)),
-    fence: trackMat(toonMat(0x5a5650)),
-    flap: trackMat(toonMat(0x3a3834)),
-    kerb: trackMat(toonMat(0x716c60))
+    road: trackMat(stdMat(0xffffff, { map: TEX.road, roughness: 0.92 })),
+    pavement: trackMat(stdMat(0xffffff, { map: TEX.pavement, roughness: 0.88 })),
+    grass: trackMat(stdMat(0xffffff, { map: TEX.grass, roughness: 0.95 })),
+    kerbEdge: trackMat(stdMat(0x1a1a1a)),
+    markings: trackMat(stdMat(0xE8C63A)),
+    warehouseWall: [0xB0AC9E, 0xA69C88, 0xBCB6A4].map(c => trackMat(stdMat(c, { map: TEX.brickCool, roughness: 0.85 }))),
+    warehouseStripe: trackMat(stdMat(0xD9241F)),
+    shutter: trackMat(stdMat(0x4a4842, { roughness: 0.6, metalness: 0.35 })),
+    skipOrange: trackMat(stdMat(0xE8621E)),
+    skipRim: trackMat(stdMat(0xC94A16)),
+    pallet: trackMat(stdMat(0xB0824A, { map: TEX.wood, roughness: 0.85 })),
+    fence: trackMat(stdMat(0x5a5650)),
+    flap: trackMat(stdMat(0x3a3834)),
+    kerb: trackMat(stdMat(0x716c60)),
+    vehicleColors: [0xE8C63A, 0xD9241F, 0x4a4842, 0x2454C4, 0xB0824A].map(c => trackMat(stdMat(c)))
   };
 }
 
@@ -929,6 +1147,7 @@ function buildWarehouse(cx, z, side) {
   addBox(wall, depth, height, length, wx, height / 2, z, 0, true);
   addBox(levelMat.warehouseStripe, depth + 0.06, 0.35, length + 0.06, wx, 1.1, z);
   addBox(SHARED_MAT.metalGrey, depth + 0.25, 0.2, length + 0.25, wx, height + 0.1, z);
+  addAoStrip(wx, 0.05, z, depth + 0.3, length + 0.3);
   const frontX = wx - side * (depth / 2 + 0.03);
   addBox(levelMat.shutter, 0.1, 2.0, 1.8, frontX, 1.0, z);
 }
@@ -1029,10 +1248,12 @@ function buildWarehouseSanctuary(cx, z) {
 }
 function buildSafeGarden(cx, z, tint) {
   const gardenGeo = new THREE.PlaneGeometry(20, 20);
-  const mat = tint ? trackMat(toonMat(tint)) : levelMat.grass;
+  if (!tint) rescaleUv(gardenGeo, 20 / 3, 20 / 3);
+  const mat = tint ? trackMat(stdMat(tint)) : levelMat.grass;
   const garden = new THREE.Mesh(gardenGeo, mat);
   garden.rotation.x = -Math.PI / 2;
   garden.position.set(cx, 0.01, z - 8);
+  garden.receiveShadow = true;
   scene.add(garden);
   trackMesh(garden);
   const hedgeMat = levelMat.hedge || levelMat.railing || SHARED_MAT.metalGrey;
@@ -1047,17 +1268,19 @@ function buildSafeGarden(cx, z, tint) {
    ================================================================ */
 const TRAFFIC = [];
 let crossTraffic = [];
+const WARNING_BEACON_MAT = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
 
 function buildTrafficCarGroup(mat) {
   const g = new THREE.Group();
   const body = new THREE.Mesh(GEO.box, mat);
   body.scale.set(1.7, 0.85, 3.6);
   body.position.set(0, 0.62, 0);
+  body.castShadow = true;
   g.add(body);
-  addOutline(body);
   const roof = new THREE.Mesh(GEO.box, mat);
   roof.scale.set(1.35, 0.55, 1.9);
   roof.position.set(0, 1.18, -0.15);
+  roof.castShadow = true;
   g.add(roof);
   [[-0.75, -1.3], [0.75, -1.3], [-0.75, 1.3], [0.75, 1.3]].forEach(([wx, wz]) => {
     const wheel = new THREE.Mesh(GEO.cyl, SHARED_MAT.tyre);
@@ -1071,22 +1294,166 @@ function buildTrafficCarGroup(mat) {
   return g;
 }
 
+function buildVanBusGroup(mat) {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(GEO.box, mat);
+  body.scale.set(2.1, 1.7, 5.2);
+  body.position.set(0, 1.0, 0);
+  body.castShadow = true;
+  g.add(body);
+  const windshield = new THREE.Mesh(GEO.box, SHARED_MAT.glass);
+  windshield.scale.set(1.85, 0.55, 0.08);
+  windshield.position.set(0, 1.55, -2.56);
+  g.add(windshield);
+  const sideGlass = new THREE.Mesh(GEO.box, SHARED_MAT.glass);
+  sideGlass.scale.set(0.06, 0.5, 3.0);
+  sideGlass.position.set(1.06, 1.55, 0);
+  g.add(sideGlass);
+  [[-0.95, -1.9], [0.95, -1.9], [-0.95, 1.9], [0.95, 1.9]].forEach(([wx, wz]) => {
+    const wheel = new THREE.Mesh(GEO.cyl, SHARED_MAT.tyre);
+    wheel.scale.set(0.38, 0.34, 0.38);
+    wheel.position.set(wx, 0.38, wz);
+    wheel.rotation.z = Math.PI / 2;
+    g.add(wheel);
+  });
+  scene.add(g);
+  trackMesh(g);
+  return g;
+}
+
+function buildParkMoverGroup(mat) {
+  const g = new THREE.Group();
+  const kind = Math.floor(rand() * 3);
+  if (kind === 0) {
+    const frame = new THREE.Mesh(GEO.box, SHARED_MAT.metalGrey);
+    frame.scale.set(0.06, 0.4, 0.9);
+    frame.position.set(0, 0.5, 0);
+    g.add(frame);
+    const rider = new THREE.Mesh(GEO.box, mat);
+    rider.scale.set(0.3, 0.55, 0.22);
+    rider.position.set(0, 0.95, -0.05);
+    rider.castShadow = true;
+    g.add(rider);
+    [-0.4, 0.42].forEach(wz => {
+      const wheel = new THREE.Mesh(GEO.cyl, SHARED_MAT.tyre);
+      wheel.scale.set(0.32, 0.04, 0.32);
+      wheel.position.set(0, 0.32, wz);
+      wheel.rotation.x = Math.PI / 2;
+      g.add(wheel);
+    });
+    g.userData.kind = 'cyclist';
+  } else if (kind === 1) {
+    const body = new THREE.Mesh(GEO.box, mat);
+    body.scale.set(0.32, 0.7, 0.24);
+    body.position.set(0, 0.8, 0);
+    body.castShadow = true;
+    g.add(body);
+    const head = new THREE.Mesh(GEO.sphere, SHARED_MAT.skin);
+    head.scale.set(0.14, 0.15, 0.14);
+    head.position.set(0, 1.28, 0);
+    g.add(head);
+    g.userData.kind = 'jogger';
+  } else {
+    const body = new THREE.Mesh(GEO.box, mat);
+    body.scale.set(0.24, 0.22, 0.5);
+    body.position.set(0, 0.28, 0);
+    body.castShadow = true;
+    g.add(body);
+    const head = new THREE.Mesh(GEO.box, mat);
+    head.scale.set(0.16, 0.16, 0.18);
+    head.position.set(0, 0.4, -0.3);
+    g.add(head);
+    g.userData.kind = 'dog';
+  }
+  scene.add(g);
+  trackMesh(g);
+  return g;
+}
+
+function buildForkliftTruckGroup(mat) {
+  const g = new THREE.Group();
+  const isTruck = rand() < 0.5;
+  if (isTruck) {
+    const body = new THREE.Mesh(GEO.box, mat);
+    body.scale.set(2.3, 2.0, 6.0);
+    body.position.set(0, 1.1, 0);
+    body.castShadow = true;
+    g.add(body);
+    const cab = new THREE.Mesh(GEO.box, SHARED_MAT.metalGrey);
+    cab.scale.set(2.1, 1.3, 1.4);
+    cab.position.set(0, 1.75, -2.8);
+    cab.castShadow = true;
+    g.add(cab);
+    [[-1.0, -2.4], [1.0, -2.4], [-1.0, 0], [1.0, 0], [-1.0, 2.4], [1.0, 2.4]].forEach(([wx, wz]) => {
+      const wheel = new THREE.Mesh(GEO.cyl, SHARED_MAT.tyre);
+      wheel.scale.set(0.4, 0.34, 0.4);
+      wheel.position.set(wx, 0.4, wz);
+      wheel.rotation.z = Math.PI / 2;
+      g.add(wheel);
+    });
+    const beacon = new THREE.Mesh(GEO.box, WARNING_BEACON_MAT);
+    beacon.scale.set(0.2, 0.2, 0.2);
+    beacon.position.set(0, 2.55, -2.8);
+    g.add(beacon);
+    g.userData.beacon = beacon;
+    g.userData.kind = 'truck';
+  } else {
+    const body = new THREE.Mesh(GEO.box, mat);
+    body.scale.set(1.1, 0.9, 1.8);
+    body.position.set(0, 0.55, 0);
+    body.castShadow = true;
+    g.add(body);
+    const mast = new THREE.Mesh(GEO.box, SHARED_MAT.metalGrey);
+    mast.scale.set(0.12, 1.6, 0.12);
+    mast.position.set(0, 0.9, -1.0);
+    g.add(mast);
+    const forks = new THREE.Mesh(GEO.box, SHARED_MAT.metalGrey);
+    forks.scale.set(0.9, 0.08, 0.9);
+    forks.position.set(0, 0.25, -1.5);
+    g.add(forks);
+    [[-0.5, -0.8], [0.5, -0.8], [-0.5, 0.7], [0.5, 0.7]].forEach(([wx, wz]) => {
+      const wheel = new THREE.Mesh(GEO.cyl, SHARED_MAT.tyre);
+      wheel.scale.set(0.28, 0.26, 0.28);
+      wheel.position.set(wx, 0.28, wz);
+      wheel.rotation.z = Math.PI / 2;
+      g.add(wheel);
+    });
+    const beacon = new THREE.Mesh(GEO.box, WARNING_BEACON_MAT);
+    beacon.scale.set(0.16, 0.16, 0.16);
+    beacon.position.set(0, 1.55, 0);
+    g.add(beacon);
+    g.userData.beacon = beacon;
+    g.userData.kind = 'forklift';
+  }
+  scene.add(g);
+  trackMesh(g);
+  return g;
+}
+
+function pickTrafficMat() {
+  const pool = levelMat.carColors || levelMat.moverColors || levelMat.vehicleColors || [SHARED_MAT.metalGrey];
+  return pool[Math.floor(rand() * pool.length)];
+}
+
 function spawnLaneTraffic() {
   const laneOffsets = [-1.5, 1.5];
   let laneIdx = 0;
+  const builder = currentLevel.trafficBuilder || buildTrafficCarGroup;
   for (let d = 55; d < currentLevel.routeLength - 30; d += 45) {
     const inten = escalationIntensity(d / currentLevel.routeLength);
     if (rand() < 0.32 + inten * 0.5) {
       const cx = centerX(d);
       const laneOffset = laneOffsets[laneIdx % 2];
       laneIdx++;
-      const carMats = levelMat.carColors || [SHARED_MAT.metalGrey];
-      const mat = carMats[Math.floor(rand() * carMats.length)];
-      const group = buildTrafficCarGroup(mat);
+      const group = builder(pickTrafficMat());
       const startZ = -d;
       group.position.set(cx + laneOffset, 0, startZ);
-      const spd = TOP_SPEED * (0.5 + rand() * 0.18) * currentLevel.gapDecayMult;
-      const rec = { mesh: group, x: cx + laneOffset, z: startZ, speed: spd, radius: 1.3, hit: false, nearMissDone: false };
+      const spd = TOP_SPEED * (0.5 + rand() * 0.18) * currentLevel.gapDecayMult * (currentLevel.trafficSpeedMult || 1);
+      const rec = {
+        mesh: group, x: cx + laneOffset, z: startZ, speed: spd,
+        radius: currentLevel.trafficRadius || 1.3, hit: false, nearMissDone: false,
+        baseX: cx + laneOffset, wobblePhase: rand() * Math.PI * 2, wobbleFreq: 1.6 + rand() * 1.2, wobbleAmp: 0.5 + rand() * 0.4
+      };
       TRAFFIC.push(rec);
       OBSTACLES.push(rec);
     }
@@ -1094,21 +1461,32 @@ function spawnLaneTraffic() {
 }
 
 function updateLaneTraffic(dt) {
+  const erratic = currentLevel.trafficBehavior === 'erratic';
   TRAFFIC.forEach(t => {
     t.z -= t.speed * dt;
-    t.mesh.position.z = t.z;
+    let x = t.baseX;
+    let y = 0;
+    if (erratic) {
+      t.wobbleT = (t.wobbleT || 0) + dt;
+      x = t.baseX + Math.sin(t.wobbleT * t.wobbleFreq + t.wobblePhase) * t.wobbleAmp;
+      y = Math.abs(Math.sin(performance.now() * 0.008 + t.wobblePhase)) * 0.06;
+      t.mesh.rotation.y = -Math.cos(t.wobbleT * t.wobbleFreq + t.wobblePhase) * t.wobbleAmp * 0.4;
+    }
+    t.x = x;
+    t.mesh.position.set(x, y, t.z);
   });
 }
 
 function spawnCrossTraffic() {
-  crossTraffic = (currentLevel.crossings || []).map(c => ({ d: c.d, side: c.side, triggered: false, active: false }));
+  crossTraffic = (currentLevel.crossings || []).map(c => ({ d: c.d, side: c.side, triggered: false, active: false, warning: false }));
 }
 
 function updateCrossTraffic(dt) {
+  const reversing = currentLevel.trafficBehavior === 'reversing';
+  const builder = currentLevel.trafficBuilder || buildTrafficCarGroup;
   crossTraffic.forEach(c => {
     if (!c.triggered && distance > c.d - 13 && distance < c.d) {
       c.triggered = true;
-      c.active = true;
       c.t = 0;
       const cx = centerX(c.d);
       const span = currentLevel.roadHalfWidth + 6;
@@ -1116,12 +1494,29 @@ function updateCrossTraffic(dt) {
       c.toX = cx - c.side * span;
       c.z = -c.d;
       c.duration = 1.15;
-      const mat = (levelMat.carColors && levelMat.carColors[Math.floor(rand() * levelMat.carColors.length)]) || SHARED_MAT.metalGrey;
-      c.mesh = buildTrafficCarGroup(mat);
+      c.mesh = builder(pickTrafficMat());
       c.mesh.rotation.y = Math.PI / 2;
       c.mesh.position.set(c.fromX, 0, c.z);
-      c.rec = { mesh: c.mesh, x: c.fromX, z: c.z, radius: 1.3, hit: false, nearMissDone: false };
+      c.rec = { mesh: c.mesh, x: c.fromX, z: c.z, radius: currentLevel.trafficRadius || 1.3, hit: false, nearMissDone: false };
       OBSTACLES.push(c.rec);
+      if (reversing && c.mesh.userData.beacon) {
+        c.warning = true;
+        c.warningT = 0.55;
+        playBlip(720, 720, 0.1, 0.05, 'square');
+      } else {
+        c.active = true;
+      }
+    }
+    if (c.warning) {
+      c.warningT -= dt;
+      const blink = Math.floor(performance.now() / 110) % 2 === 0;
+      c.mesh.userData.beacon.visible = blink;
+      if (c.warningT <= 0) {
+        c.warning = false;
+        c.active = true;
+        c.mesh.userData.beacon.visible = true;
+        playBlip(720, 720, 0.1, 0.05, 'square');
+      }
     }
     if (c.active) {
       c.t += dt;
@@ -1158,15 +1553,18 @@ function buildLevel(level) {
   scene.fog = new THREE.Fog(level.fog.color, level.fog.near, level.fog.far);
   sun.color = new THREE.Color(level.sunColor);
 
-  const groundGeo = new THREE.PlaneGeometry(220, level.routeLength + 140);
+  const groundW = 220, groundD = level.routeLength + 140, grassTile = 3;
+  const groundGeo = new THREE.PlaneGeometry(groundW, groundD);
+  rescaleUv(groundGeo, groundW / grassTile, groundD / grassTile);
   const ground = new THREE.Mesh(groundGeo, levelMat.grass);
   ground.rotation.x = -Math.PI / 2;
   ground.position.set(0, -0.02, -level.routeLength / 2 + 30);
+  ground.receiveShadow = true;
   scene.add(ground);
   trackMesh(ground);
 
-  buildRibbon(levelMat.pavement, level.roadHalfWidth + level.pavementWidth, 0, 14);
-  buildRibbon(levelMat.road, level.roadHalfWidth, 0.02, 14);
+  buildRibbon(levelMat.pavement, level.roadHalfWidth + level.pavementWidth, 0, 14, 2.5);
+  buildRibbon(levelMat.road, level.roadHalfWidth, 0.02, 14, 3);
   buildEdgeStrip(levelMat.kerbEdge, level.roadHalfWidth, 0.18, 0.025, -1);
   buildEdgeStrip(levelMat.kerbEdge, level.roadHalfWidth, 0.18, 0.025, 1);
   addCenterLine();
@@ -1942,6 +2340,8 @@ function animate() {
 
   if (state === 'racing' || state === 'outcome') {
     sun.position.set(camera.position.x - 24, camera.position.y + 34, camera.position.z + 14);
+    sun.target.position.set(camera.position.x, 0, camera.position.z);
+    sun.target.updateMatrixWorld();
     if (skyMesh) skyMesh.position.set(camera.position.x, EYE_HEIGHT, camera.position.z);
   }
 
