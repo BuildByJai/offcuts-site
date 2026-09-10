@@ -688,18 +688,24 @@ function playReachAnimation() {
   step();
 }
 
-const camOffset = new THREE.Vector3(0, 2.7, 3.1);
+// Fixed-angle follow camera: it translates with the player but never rotates
+// to match their facing. A camera that swings around to stay "behind" a
+// turning character makes WASD mean a different screen direction every time
+// you change heading — great for a chase game, disorienting in a small room
+// where you're constantly doubling back. The player model still turns to
+// face its movement direction (see `facing` above); that's cosmetic only.
+const camOffset = new THREE.Vector3(0, 3.3, 3.6);
 const camTarget = new THREE.Vector3();
 function updateCamera(dt) {
   // Clamped to the room's interior so a player standing close to a wall never
-  // pushes the trailing camera outside it (or through the door).
+  // pushes the camera outside it (or through the door).
   const margin = 0.4;
   const desired = new THREE.Vector3(
-    THREE.MathUtils.clamp(player.position.x - Math.sin(facing) * camOffset.z, -ROOM_HALF_X + margin, ROOM_HALF_X - margin),
+    THREE.MathUtils.clamp(player.position.x, -ROOM_HALF_X + margin, ROOM_HALF_X - margin),
     camOffset.y,
-    THREE.MathUtils.clamp(player.position.z - Math.cos(facing) * camOffset.z, -ROOM_HALF_Z + margin, ROOM_HALF_Z - margin)
+    THREE.MathUtils.clamp(player.position.z + camOffset.z, -ROOM_HALF_Z + margin, ROOM_HALF_Z - margin)
   );
-  camera.position.lerp(desired, Math.min(1, dt * 4.5));
+  camera.position.lerp(desired, Math.min(1, dt * 6));
   camTarget.set(player.position.x, 1.2, player.position.z);
   camera.lookAt(camTarget);
 }
