@@ -183,6 +183,48 @@ async function handleStudyLeaderboard(env) {
   );
 }
 
+async function handleWaveRunnerSubmitScore(request, env) {
+  if (!env.WAVE_RUNNER_LEADERBOARD) return json({ error: "Leaderboard isn't set up yet" }, 503);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "Invalid JSON body" }, 400);
+  }
+
+  const name = typeof body.name === "string" ? body.name.trim().slice(0, 12) : "";
+  const score = Number(body.score);
+
+  if (!name) return json({ error: "Name is required" }, 400);
+  if (!Number.isFinite(score) || score < 0 || score > 999_999) {
+    return json({ error: "Invalid score" }, 400);
+  }
+
+  const id = generateId();
+  const record = { name, score: Math.round(score), createdAt: new Date().toISOString() };
+  await env.WAVE_RUNNER_LEADERBOARD.put(id, JSON.stringify(record));
+
+  return json({ id });
+}
+
+async function handleWaveRunnerLeaderboard(env) {
+  if (!env.WAVE_RUNNER_LEADERBOARD) return json({ error: "Leaderboard isn't set up yet" }, 503);
+
+  const list = await env.WAVE_RUNNER_LEADERBOARD.list();
+  const entries = await Promise.all(
+    list.keys.map(async (key) => {
+      const raw = await env.WAVE_RUNNER_LEADERBOARD.get(key.name);
+      return raw ? JSON.parse(raw) : null;
+    })
+  );
+
+  const sorted = entries.filter(Boolean).sort((a, b) => b.score - a.score);
+  return json(
+    sorted.slice(0, 50).map((entry, i) => ({ name: entry.name, score: entry.score, rank: i + 1 }))
+  );
+}
+
 async function handlePmmMoments(request, env) {
   let body;
   try {
@@ -229,6 +271,12 @@ export default {
     }
     if (url.pathname === "/api/study/leaderboard" && request.method === "GET") {
       return handleStudyLeaderboard(env);
+    }
+    if (url.pathname === "/api/wave-runner/score" && request.method === "POST") {
+      return handleWaveRunnerSubmitScore(request, env);
+    }
+    if (url.pathname === "/api/wave-runner/leaderboard" && request.method === "GET") {
+      return handleWaveRunnerLeaderboard(env);
     }
 
     return env.ASSETS.fetch(request);

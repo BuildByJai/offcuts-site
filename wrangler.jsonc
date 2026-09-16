@@ -40,6 +40,13 @@
   // time. To turn the global leaderboard on: run
   // `wrangler kv namespace create STUDY_LEADERBOARD`, then add its real id
   // back into kv_namespaces above.
+  //
+  // Same situation for Wave Runner (tools/wave-runner/): it wants a
+  // WAVE_RUNNER_LEADERBOARD KV namespace, not provisioned yet. Without it,
+  // /api/wave-runner/leaderboard and /api/wave-runner/score return 503 and
+  // the client falls back to a locally-stored best score. To turn it on:
+  // run `wrangler kv namespace create WAVE_RUNNER_LEADERBOARD`, then add
+  // its real id into kv_namespaces above.
   // ANTHROPIC_API_KEY is set as a Worker secret (`wrangler secret put
   // ANTHROPIC_API_KEY`) for the Post-Match Moments tool — not stored here.
   // Optional override, also via secret/env if ever needed:
