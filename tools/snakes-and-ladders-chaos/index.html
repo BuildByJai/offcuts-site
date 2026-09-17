@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Snakes &amp; Ladders: Chaos Mode — Offcuts</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
+  :root {
+    --paper: #FAFAF8; --ink: #181818; --ink-soft: #5C5C58;
+    --line: #E3E1DA; --accent: #156534; --accent-soft: #E9F3ED;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
+    background: #cfd9dd; color: var(--ink); font-family: 'Inter', system-ui, sans-serif;
+    overscroll-behavior: none; -webkit-font-smoothing: antialiased;
+  }
+  #game-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+
+  .home-link {
+    position: fixed; top: 14px; left: 14px; z-index: 30;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #fff;
+    text-decoration: none; background: rgba(0,0,0,0.35); padding: 6px 12px; border-radius: 20px;
+    backdrop-filter: blur(2px);
+  }
+  .home-link:hover { background: rgba(0,0,0,0.5); }
+
+  .overlay {
+    position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center;
+    padding: 24px; background: rgba(20,22,20,0.55); overflow-y: auto;
+  }
+  .overlay.hidden { display: none; }
+  .card {
+    background: var(--paper); border-radius: 14px; padding: 32px 28px; max-width: 440px; width: 100%;
+    text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.35); margin: auto;
+  }
+  .tag-inline {
+    display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent);
+    background: var(--accent-soft); padding: 3px 9px; border-radius: 4px; margin-bottom: 10px;
+  }
+  .card h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; margin: 4px 0 10px; line-height: 1.15; }
+  .card h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.01em; margin: 4px 0 6px; }
+  .card p.lede { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 20px; line-height: 1.5; }
+  .btn {
+    display: inline-block; padding: 13px 28px; border-radius: 8px; border: 1px solid var(--accent);
+    background: var(--accent); color: #fff; font-family: 'Inter', sans-serif; font-size: 16px;
+    font-weight: 700; cursor: pointer; width: 100%;
+  }
+  .btn:hover { opacity: 0.92; }
+  .btn:disabled { opacity: 0.5; cursor: default; }
+  .btn.small { padding: 10px 22px; font-size: 14px; width: auto; }
+
+  /* --- setup screen --- */
+  .setup-block { text-align: left; margin-bottom: 18px; }
+  .setup-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-soft);
+    letter-spacing: 0.04em; text-transform: uppercase; margin: 0 0 8px;
+  }
+  .count-btns { display: flex; gap: 8px; }
+  .count-btns button {
+    flex: 1; padding: 10px 0; border-radius: 8px; border: 1.5px solid var(--line); background: #fff;
+    font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 700; color: var(--ink-soft); cursor: pointer;
+  }
+  .count-btns button.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+
+  .player-row {
+    display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--line);
+  }
+  .player-row input {
+    flex: 1; min-width: 0; border: 1.5px solid var(--line); border-radius: 7px; padding: 9px 10px;
+    font-family: 'Inter', sans-serif; font-size: 14px; color: var(--ink); background: #fff;
+  }
+  .player-row input:focus { outline: none; border-color: var(--accent); }
+  .swatches { display: flex; gap: 5px; flex-shrink: 0; }
+  .swatch {
+    width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.12);
+  }
+  .swatch.active { border-color: var(--ink); transform: scale(1.08); }
+
+  #player-rows { margin-bottom: 22px; }
+
+  /* --- turn splash --- */
+  .splash-card { border-top: 6px solid var(--accent); }
+  #splash-dot { display: inline-block; width: 14px; height: 14px; border-radius: 50%; margin-right: 8px; vertical-align: -1px; }
+
+  /* --- hud --- */
+  #hud {
+    position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 15;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  #hud.hidden { display: none; }
+  #turn-pill {
+    display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
+    padding: 8px 16px; border-radius: 20px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #fff;
+  }
+  #turn-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  #dice-readout {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #fff; background: rgba(0,0,0,0.4);
+    padding: 6px 14px; border-radius: 16px; backdrop-filter: blur(2px); opacity: 0; transition: opacity 0.2s;
+  }
+  #dice-readout.show { opacity: 1; }
+
+  #legend {
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 15;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #fff; background: rgba(0,0,0,0.35);
+    padding: 6px 14px; border-radius: 16px; backdrop-filter: blur(2px);
+  }
+  #legend.hidden { display: none; }
+
+  #drag-hint {
+    position: fixed; bottom: 16px; right: 16px; z-index: 15;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #fff; background: rgba(0,0,0,0.35);
+    padding: 6px 12px; border-radius: 16px; backdrop-filter: blur(2px);
+  }
+  #drag-hint.hidden { display: none; }
+
+  /* --- win screen / confetti --- */
+  #confetti-layer { position: fixed; inset: 0; z-index: 21; pointer-events: none; overflow: hidden; }
+  .confetti-piece { position: absolute; top: -20px; width: 8px; height: 14px; opacity: 0.95; animation: confetti-fall linear forwards; }
+  @keyframes confetti-fall { to { transform: translateY(112vh) rotate(540deg); } }
+
+  @media (max-width: 480px) {
+    .card { padding: 26px 20px; }
+    .card h1 { font-size: 25px; }
+    #legend { font-size: 10px; max-width: 92vw; white-space: normal; text-align: center; }
+    #drag-hint { right: auto; left: 50%; transform: translateX(-50%); bottom: 52px; }
+  }
+</style>
+</head>
+<body>
+
+<a class="home-link" href="../../">&larr; Offcuts</a>
+<canvas id="game-canvas"></canvas>
+
+<div id="hud" class="hidden">
+  <div id="turn-pill"><span id="turn-dot"></span><span id="turn-name">Player 1</span></div>
+  <button id="roll-btn" class="btn small">Roll Dice</button>
+  <div id="dice-readout">rolled <span id="dice-value">6</span></div>
+</div>
+
+<div id="legend" class="hidden">&#x1FA9C; ladder climbs up &nbsp;&middot;&nbsp; &#x1F40D; snake slides down</div>
+<div id="drag-hint" class="hidden">drag to rotate view</div>
+
+<div id="setup-overlay" class="overlay">
+  <div class="card">
+    <p class="tag-inline">offcuts / games</p>
+    <h1>Snakes &amp; Ladders<br>Chaos Mode</h1>
+    <p class="lede">The classic board, rendered full 3D. Chaos cards and the snake escape mini-game land in a later update — for now it's pure dice, ladders and snakes.</p>
+
+    <div class="setup-block">
+      <p class="setup-label">Players</p>
+      <div class="count-btns" id="count-btns">
+        <button data-n="2">2</button>
+        <button data-n="3">3</button>
+        <button data-n="4" class="active">4</button>
+      </div>
+    </div>
+
+    <div id="player-rows"></div>
+
+    <button id="start-btn" class="btn">Start Game</button>
+  </div>
+</div>
+
+<div id="turn-splash" class="overlay hidden">
+  <div class="card splash-card">
+    <p class="tag-inline">pass the device</p>
+    <h2><span id="splash-dot"></span><span id="splash-name">Player 1</span>'s Turn</h2>
+    <p class="lede">Tap below when it's safely in front of you.</p>
+    <button id="splash-continue" class="btn">Tap to Continue</button>
+  </div>
+</div>
+
+<div id="win-overlay" class="overlay hidden">
+  <div class="card">
+    <p class="tag-inline">&#x1F389; we have a winner</p>
+    <h1 id="win-name">Player 1 Wins!</h1>
+    <p class="lede">First to tile 100, landed exactly. Nice roll.</p>
+    <button id="play-again-btn" class="btn">Play Again</button>
+  </div>
+</div>
+<div id="confetti-layer"></div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+/* ============================== constants ============================== */
+const TILE = 1;
+const BOARD_N = 10;
+const BOARD_HALF = (BOARD_N - 1) / 2 * TILE;
+const TILE_H = 0.18;
+const TOP_Y = TILE_H / 2;
+
+const PLAYER_OFFSETS = [
+  [-0.20, -0.20], [0.20, -0.20], [-0.20, 0.20], [0.20, 0.20]
+];
+
+const PALETTE = [
+  { name: 'Red',    hex: 0xe6483d },
+  { name: 'Blue',   hex: 0x2f6fed },
+  { name: 'Amber',  hex: 0xf2a71b },
+  { name: 'Violet', hex: 0x7c4fe0 },
+];
+
+const LADDERS = [[1,38],[4,14],[9,31],[21,42],[28,84],[36,44],[51,67],[71,91],[80,100]];
+const SNAKES  = [[17,7],[54,34],[62,19],[64,60],[87,24],[93,73],[95,75],[98,79]];
+
+const BOARD_EFFECTS = {};
+LADDERS.forEach(([a,b]) => BOARD_EFFECTS[a] = { type: 'ladder', to: b });
+SNAKES.forEach(([a,b]) => BOARD_EFFECTS[a] = { type: 'snake', to: b });
+
+const DICE_TRAY_POS = new THREE.Vector3(BOARD_HALF + 2.3, 0, BOARD_HALF + 1.6);
+const OFFBOARD_POS = new THREE.Vector3(-BOARD_HALF - 1.3, TOP_Y, -BOARD_HALF - 0.4);
+
+const DEFAULT_TARGET = new THREE.Vector3(0, 0, 0);
+const DEFAULT_RADIUS = 11.5;
+const DICE_RADIUS = 4.4;
+
+/* ============================== easing / util ============================== */
+function easeInOutQuad(t) { return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+1, 2)/2; }
+function easeOutCubic(t) { return 1 - Math.pow(1-t, 3); }
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+function seqUp(a, b) { const arr = []; for (let i=a;i<=b;i++) arr.push(i); return arr; }
+function seqDown(a, b) { const arr = []; for (let i=a;i>=b;i--) arr.push(i); return arr; }
+function lerp(a, b, t) { return a + (b-a) * t; }
+
+/* ============================== tile geometry helpers ============================== */
+function tileRowCol(n) {
+  const idx = n - 1;
+  const row = Math.floor(idx / 10);
+  let col = idx % 10;
+  if (row % 2 === 1) col = 9 - col;
+  return { row, col };
+}
+function tileCenter(n) {
+  if (n <= 0) return OFFBOARD_POS.clone();
+  const { row, col } = tileRowCol(n);
+  return new THREE.Vector3(col * TILE - BOARD_HALF, TOP_Y, row * TILE - BOARD_HALF);
+}
+function playerPos(n, playerIndex) {
+  const c = tileCenter(n);
+  if (playerIndex == null) return c;
+  const off = PLAYER_OFFSETS[playerIndex] || [0,0];
+  return new THREE.Vector3(c.x + off[0], c.y, c.z + off[1]);
+}
+
+/* ============================== scene setup ============================== */
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xb9c7cc);
+scene.fog = new THREE.Fog(0xb9c7cc, 16, 34);
+
+const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.1, 100);
+
+const canvas = document.getElementById('game-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+const hemi = new THREE.HemisphereLight(0xffffff, 0x3a4a3a, 0.75);
+scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xfff2df, 1.4);
+sun.position.set(-10, 16, 8);
+scene.add(sun);
+const fill = new THREE.DirectionalLight(0xcfe0ff, 0.35);
+fill.position.set(8, 6, -10);
+scene.add(fill);
+
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+/* ground */
+const ground = new THREE.Mesh(
+  new THREE.CircleGeometry(18, 24),
+  new THREE.MeshStandardMaterial({ color: 0x8fae6b, roughness: 1 })
+);
+ground.rotation.x = -Math.PI/2;
+ground.position.y = -0.02;
+scene.add(ground);
+
+/* ============================== board tiles ============================== */
+function numberTexture(n) {
+  const size = 96;
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, size, size);
+  ctx.fillStyle = 'rgba(24,24,24,0.72)';
+  ctx.font = '700 30px Inter, system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(String(n), size/2, size/2 + 2);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+const tileGeo = new THREE.BoxGeometry(TILE * 0.94, TILE_H, TILE * 0.94);
+const labelGeo = new THREE.PlaneGeometry(TILE * 0.7, TILE * 0.7);
+
+for (let n = 1; n <= 100; n++) {
+  const { row, col } = tileRowCol(n);
+  const checker = (row + col) % 2 === 0;
+  let color = checker ? 0xEDEAE0 : 0xDAD5C6;
+  const effect = BOARD_EFFECTS[n];
+  if (effect && effect.type === 'ladder') color = 0xBFE3CC;
+  if (effect && effect.type === 'snake') color = 0xE9C2BC;
+
+  const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.9, flatShading: true });
+  const tile = new THREE.Mesh(tileGeo, mat);
+  const pos = tileCenter(n);
+  tile.position.set(pos.x, 0, pos.z);
+  scene.add(tile);
+
+  const label = new THREE.Mesh(labelGeo, new THREE.MeshBasicMaterial({ map: numberTexture(n), transparent: true }));
+  label.rotation.x = -Math.PI/2;
+  label.position.set(pos.x, TOP_Y + 0.005, pos.z);
+  scene.add(label);
+}
+
+/* board base plinth, slightly larger than the grid */
+const plinth = new THREE.Mesh(
+  new THREE.BoxGeometry(BOARD_N * TILE + 0.5, 0.16, BOARD_N * TILE + 0.5),
+  new THREE.MeshStandardMaterial({ color: 0xC7A46B, roughness: 0.95, flatShading: true })
+);
+plinth.position.y = -0.13;
+scene.add(plinth);
+
+/* ============================== ladders ============================== */
+const railMat = new THREE.MeshStandardMaterial({ color: 0xc9a15a, roughness: 0.8, flatShading: true });
+const rungMat = new THREE.MeshStandardMaterial({ color: 0x9c7a3f, roughness: 0.8, flatShading: true });
+
+function buildLadder(startTile, endTile) {
+  const from = tileCenter(startTile).setY(TOP_Y + 0.05);
+  const to = tileCenter(endTile).setY(TOP_Y + 0.45);
+  const dir = to.clone().sub(from);
+  const length = dir.length();
+  const group = new THREE.Group();
+
+  [-0.17, 0.17].forEach(x => {
+    const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, length, 6), railMat);
+    rail.position.set(x, length/2, 0);
+    group.add(rail);
+  });
+
+  const rungCount = Math.max(3, Math.round(length / 0.4));
+  for (let i = 1; i < rungCount; i++) {
+    const y = (length / rungCount) * i;
+    const rung = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.05, 0.05), rungMat);
+    rung.position.set(0, y, 0);
+    group.add(rung);
+  }
+
+  group.position.copy(from);
+  group.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir.clone().normalize());
+  scene.add(group);
+}
+LADDERS.forEach(([a,b]) => buildLadder(a,b));
+
+/* ============================== snakes ============================== */
+const SNAKE_COLORS = [0x4f8a3b, 0x7a3ba8, 0x2f8a7a, 0xa8503b];
+function buildSnake(startTile, endTile, colorIdx) {
+  const from = tileCenter(startTile).setY(TOP_Y + 0.12);
+  const to = tileCenter(endTile).setY(TOP_Y + 0.12);
+  const mid1 = from.clone().lerp(to, 0.35).add(new THREE.Vector3((Math.random()-0.5)*1.6, 0.5, (Math.random()-0.5)*1.6));
+  const mid2 = from.clone().lerp(to, 0.68).add(new THREE.Vector3((Math.random()-0.5)*1.6, 0.25, (Math.random()-0.5)*1.6));
+  const curve = new THREE.CatmullRomCurve3([from, mid1, mid2, to]);
+  const color = SNAKE_COLORS[colorIdx % SNAKE_COLORS.length];
+  const tubeMat = new THREE.MeshStandardMaterial({ color, roughness: 0.75, flatShading: true });
+  const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 24, 0.13, 6, false), tubeMat);
+  scene.add(tube);
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 6), tubeMat);
+  head.position.copy(from);
+  scene.add(head);
+  [-0.08, 0.08].forEach(o => {
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.035, 6, 4), new THREE.MeshStandardMaterial({ color: 0x181818 }));
+    eye.position.copy(from).add(new THREE.Vector3(o, 0.1, 0.12));
+    scene.add(eye);
+  });
+}
+SNAKES.forEach(([a,b], i) => buildSnake(a,b,i));
+
+/* ============================== dice tray + die ============================== */
+const tray = new THREE.Mesh(
+  new THREE.CylinderGeometry(1.0, 1.05, 0.14, 10),
+  new THREE.MeshStandardMaterial({ color: 0xD8D2C2, roughness: 0.9, flatShading: true })
+);
+tray.position.set(DICE_TRAY_POS.x, 0.07, DICE_TRAY_POS.z);
+scene.add(tray);
+
+const PIP_LAYOUTS = {
+  1: [[0.5,0.5]],
+  2: [[0.28,0.28],[0.72,0.72]],
+  3: [[0.28,0.28],[0.5,0.5],[0.72,0.72]],
+  4: [[0.28,0.28],[0.72,0.28],[0.28,0.72],[0.72,0.72]],
+  5: [[0.28,0.28],[0.72,0.28],[0.5,0.5],[0.28,0.72],[0.72,0.72]],
+  6: [[0.28,0.22],[0.28,0.5],[0.28,0.78],[0.72,0.22],[0.72,0.5],[0.72,0.78]],
+};
+function pipTexture(n) {
+  const size = 128;
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#f6f1e4';
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = '#1c1c1c';
+  PIP_LAYOUTS[n].forEach(([px,py]) => {
+    ctx.beginPath();
+    ctx.arc(px*size, py*size, size*0.1, 0, Math.PI*2);
+    ctx.fill();
+  });
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+const DIE_SIZE = 0.62;
+const dieMaterials = [1,6,2,5,3,4].map(n => new THREE.MeshStandardMaterial({ map: pipTexture(n), roughness: 0.55, flatShading: true }));
+const die = new THREE.Mesh(new THREE.BoxGeometry(DIE_SIZE, DIE_SIZE, DIE_SIZE), dieMaterials);
+die.position.set(DICE_TRAY_POS.x, 0.14 + DIE_SIZE/2, DICE_TRAY_POS.z);
+scene.add(die);
+
+const DICE_EULERS = {
+  1: new THREE.Euler(0, 0, Math.PI/2),
+  2: new THREE.Euler(0, 0, 0),
+  3: new THREE.Euler(-Math.PI/2, 0, 0),
+  4: new THREE.Euler(Math.PI/2, 0, 0),
+  5: new THREE.Euler(Math.PI, 0, 0),
+  6: new THREE.Euler(0, 0, -Math.PI/2),
+};
+function diceFaceQuat(v) { return new THREE.Quaternion().setFromEuler(DICE_EULERS[v]); }
+die.quaternion.copy(diceFaceQuat(2));
+
+function tumbleDie(value, duration = 950) {
+  return new Promise(resolve => {
+    const target = diceFaceQuat(value);
+    const axis = new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).normalize();
+    const spins = 2 + Math.random() * 1.5;
+    const spinQuat = new THREE.Quaternion().setFromAxisAngle(axis, Math.PI * 2 * spins);
+    const startQuat = die.quaternion.clone();
+    const viaQuat = spinQuat.clone().multiply(startQuat);
+    const basePos = die.position.clone();
+    const t0 = performance.now();
+    function frame(now) {
+      const t = Math.min(1, (now - t0) / duration);
+      let q;
+      if (t < 0.6) {
+        q = new THREE.Quaternion().slerpQuaternions(startQuat, viaQuat, easeInOutQuad(t/0.6));
+      } else {
+        q = new THREE.Quaternion().slerpQuaternions(viaQuat, target, easeOutCubic((t-0.6)/0.4));
+      }
+      die.quaternion.copy(q);
+      die.position.y = basePos.y + Math.sin(Math.PI * Math.min(1, t*1.3)) * 0.55 * (1 - t*0.4);
+      if (t < 1) requestAnimationFrame(frame);
+      else { die.quaternion.copy(target); die.position.copy(basePos); resolve(); }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+/* ============================== orbit camera ============================== */
+const camState = { theta: 0.55, phi: 0.82, radius: DEFAULT_RADIUS, target: DEFAULT_TARGET.clone() };
+const MIN_PHI = 0.42, MAX_PHI = 1.15;
+function updateCamera() {
+  const { theta, phi, radius, target } = camState;
+  camera.position.set(
+    target.x + radius * Math.sin(phi) * Math.sin(theta),
+    target.y + radius * Math.cos(phi),
+    target.z + radius * Math.sin(phi) * Math.cos(theta)
+  );
+  camera.lookAt(target);
+}
+updateCamera();
+
+let dragging = false, lastX = 0, lastY = 0;
+canvas.addEventListener('pointerdown', e => { dragging = true; lastX = e.clientX; lastY = e.clientY; canvas.setPointerCapture(e.pointerId); });
+canvas.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  const dx = e.clientX - lastX, dy = e.clientY - lastY;
+  lastX = e.clientX; lastY = e.clientY;
+  camState.theta -= dx * 0.006;
+  camState.phi = Math.min(MAX_PHI, Math.max(MIN_PHI, camState.phi + dy * 0.005));
+  updateCamera();
+});
+function endDrag() { dragging = false; }
+canvas.addEventListener('pointerup', endDrag);
+canvas.addEventListener('pointercancel', endDrag);
+canvas.addEventListener('pointerleave', endDrag);
+
+function tweenCamera(toTarget, toRadius, duration) {
+  return new Promise(resolve => {
+    const fromTarget = camState.target.clone();
+    const fromRadius = camState.radius;
+    const t0 = performance.now();
+    function step(now) {
+      const t = Math.min(1, (now - t0) / duration);
+      const e = easeInOutQuad(t);
+      camState.target.lerpVectors(fromTarget, toTarget, e);
+      camState.radius = lerp(fromRadius, toRadius, e);
+      updateCamera();
+      if (t < 1) requestAnimationFrame(step); else resolve();
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+/* ============================== render loop ============================== */
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+animate();
+
+/* ============================== pawns ============================== */
+function makePawn(colorHex) {
+  const group = new THREE.Group();
+  const mat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.7, flatShading: true });
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.15, 0.05, 8), mat);
+  base.position.y = 0.045;
+  const body = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.28, 7), mat);
+  body.position.y = 0.21;
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 6), mat);
+  head.position.y = 0.4;
+  group.add(base, body, head);
+  return group;
+}
+function tweenPawn(pawn, targetPos, duration, arcHeight = 0) {
+  return new Promise(resolve => {
+    const start = pawn.position.clone();
+    const t0 = performance.now();
+    function step(now) {
+      const t = Math.min(1, (now - t0) / duration);
+      const e = easeInOutQuad(t);
+      pawn.position.set(
+        lerp(start.x, targetPos.x, e),
+        lerp(start.y, targetPos.y, e) + Math.sin(Math.PI * e) * arcHeight,
+        lerp(start.z, targetPos.z, e)
+      );
+      if (t < 1) requestAnimationFrame(step);
+      else { pawn.position.copy(targetPos); resolve(); }
+    }
+    requestAnimationFrame(step);
+  });
+}
+function hopStep(pawn, targetPos, duration) {
+  return new Promise(resolve => {
+    const start = pawn.position.clone();
+    const t0 = performance.now();
+    function step(now) {
+      const t = Math.min(1, (now - t0) / duration);
+      pawn.position.set(
+        lerp(start.x, targetPos.x, t),
+        lerp(start.y, targetPos.y, t) + Math.sin(Math.PI * t) * 0.32,
+        lerp(start.z, targetPos.z, t)
+      );
+      pawn.rotation.y += 0.3;
+      if (t < 1) requestAnimationFrame(step);
+      else { pawn.position.copy(targetPos); resolve(); }
+    }
+    requestAnimationFrame(step);
+  });
+}
+async function hopPath(pawn, playerIndex, tileSequence, hopDuration = 190) {
+  for (const tileNum of tileSequence) {
+    await hopStep(pawn, playerPos(tileNum, playerIndex), hopDuration);
+  }
+}
+
+/* ============================== game state ============================== */
+let players = [];
+let currentIndex = 0;
+
+function resetScene3DPlayers() {
+  players.forEach(p => {
+    p.pawn.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); });
+    scene.remove(p.pawn);
+  });
+  players = [];
+}
+
+function initGame(configs) {
+  resetScene3DPlayers();
+  currentIndex = 0;
+  configs.forEach((cfg, i) => {
+    const pawn = makePawn(cfg.hex);
+    const p0 = playerPos(0, i);
+    pawn.position.copy(p0);
+    scene.add(pawn);
+    players.push({ index: i, name: cfg.name, hex: cfg.hex, pos: 0, pawn });
+  });
+}
+
+/* ============================== turn resolution ============================== */
+async function rollDiceSequence() {
+  diceReadout.classList.remove('show');
+  await tweenCamera(DICE_TRAY_POS.clone(), DICE_RADIUS, 380);
+  const value = 1 + Math.floor(Math.random() * 6);
+  await tumbleDie(value, 950);
+  diceValueEl.textContent = value;
+  diceReadout.classList.add('show');
+  await wait(550);
+  await tweenCamera(DEFAULT_TARGET.clone(), DEFAULT_RADIUS, 380);
+  return value;
+}
+
+async function playTurn() {
+  const player = players[currentIndex];
+  const pawn = player.pawn;
+  const value = await rollDiceSequence();
+
+  const startPos = player.pos;
+  const rawTarget = startPos + value;
+  let finalPos;
+
+  if (rawTarget > 100) {
+    const overshoot = rawTarget - 100;
+    finalPos = 100 - overshoot;
+    await hopPath(pawn, player.index, seqUp(startPos + 1, 100));
+    await hopPath(pawn, player.index, seqDown(99, finalPos));
+  } else {
+    finalPos = rawTarget;
+    await hopPath(pawn, player.index, seqUp(startPos + 1, finalPos));
+  }
+  player.pos = finalPos;
+
+  if (finalPos === 100) { await wait(250); return { win: true }; }
+
+  const effect = BOARD_EFFECTS[finalPos];
+  if (effect) {
+    await wait(200);
+    const isLadder = effect.type === 'ladder';
+    await tweenPawn(pawn, playerPos(effect.to, player.index), isLadder ? 950 : 850, isLadder ? 0.9 : -0.25);
+    player.pos = effect.to;
+    if (player.pos === 100) { await wait(250); return { win: true }; }
+  }
+  return { win: false };
+}
+
+/* ============================== UI wiring ============================== */
+const setupOverlay = document.getElementById('setup-overlay');
+const countBtns = document.getElementById('count-btns');
+const playerRows = document.getElementById('player-rows');
+const startBtn = document.getElementById('start-btn');
+
+const turnSplash = document.getElementById('turn-splash');
+const splashDot = document.getElementById('splash-dot');
+const splashName = document.getElementById('splash-name');
+const splashContinue = document.getElementById('splash-continue');
+
+const hud = document.getElementById('hud');
+const turnDot = document.getElementById('turn-dot');
+const turnName = document.getElementById('turn-name');
+const rollBtn = document.getElementById('roll-btn');
+const diceReadout = document.getElementById('dice-readout');
+const diceValueEl = document.getElementById('dice-value');
+
+const legend = document.getElementById('legend');
+const dragHint = document.getElementById('drag-hint');
+
+const winOverlay = document.getElementById('win-overlay');
+const winName = document.getElementById('win-name');
+const playAgainBtn = document.getElementById('play-again-btn');
+const confettiLayer = document.getElementById('confetti-layer');
+
+let selectedCount = 4;
+let rowConfigs = [];
+
+function defaultRowConfigs(n) {
+  const arr = [];
+  for (let i = 0; i < n; i++) {
+    arr.push({ name: '', colorIdx: i % PALETTE.length });
+  }
+  return arr;
+}
+rowConfigs = defaultRowConfigs(selectedCount);
+
+function renderPlayerRows() {
+  playerRows.innerHTML = rowConfigs.map((cfg, i) => `
+    <div class="player-row" data-i="${i}">
+      <input type="text" maxlength="16" placeholder="Player ${i+1}" value="${cfg.name}">
+      <div class="swatches">
+        ${PALETTE.map((c, ci) => `<span class="swatch${cfg.colorIdx===ci?' active':''}" data-i="${i}" data-ci="${ci}" style="background:#${c.hex.toString(16).padStart(6,'0')}"></span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  playerRows.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const i = Number(e.target.closest('.player-row').dataset.i);
+      rowConfigs[i].name = e.target.value;
+    });
+  });
+  playerRows.querySelectorAll('.swatch').forEach(sw => {
+    sw.addEventListener('click', () => {
+      const i = Number(sw.dataset.i);
+      const ci = Number(sw.dataset.ci);
+      const other = rowConfigs.findIndex((c, idx) => idx !== i && c.colorIdx === ci);
+      if (other !== -1) rowConfigs[other].colorIdx = rowConfigs[i].colorIdx;
+      rowConfigs[i].colorIdx = ci;
+      renderPlayerRows();
+    });
+  });
+}
+renderPlayerRows();
+
+countBtns.querySelectorAll('button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    selectedCount = Number(btn.dataset.n);
+    countBtns.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+    const prev = rowConfigs;
+    rowConfigs = defaultRowConfigs(selectedCount).map((cfg, i) => prev[i] ? prev[i] : cfg);
+    renderPlayerRows();
+  });
+});
+
+startBtn.addEventListener('click', () => {
+  const configs = rowConfigs.map((cfg, i) => ({
+    name: cfg.name.trim() || `Player ${i+1}`,
+    hex: PALETTE[cfg.colorIdx].hex
+  }));
+  initGame(configs);
+  setupOverlay.classList.add('hidden');
+  legend.classList.remove('hidden');
+  dragHint.classList.remove('hidden');
+  showSplash();
+});
+
+function showSplash() {
+  const p = players[currentIndex];
+  splashName.textContent = p.name;
+  splashDot.style.background = '#' + p.hex.toString(16).padStart(6,'0');
+  turnSplash.classList.remove('hidden');
+  hud.classList.add('hidden');
+}
+splashContinue.addEventListener('click', () => {
+  turnSplash.classList.add('hidden');
+  const p = players[currentIndex];
+  turnName.textContent = p.name;
+  turnDot.style.background = '#' + p.hex.toString(16).padStart(6,'0');
+  diceReadout.classList.remove('show');
+  rollBtn.disabled = false;
+  hud.classList.remove('hidden');
+});
+
+rollBtn.addEventListener('click', async () => {
+  rollBtn.disabled = true;
+  const result = await playTurn();
+  if (result.win) {
+    showWin(players[currentIndex]);
+  } else {
+    currentIndex = (currentIndex + 1) % players.length;
+    hud.classList.add('hidden');
+    showSplash();
+  }
+});
+
+function showWin(player) {
+  winName.textContent = `${player.name} Wins!`;
+  winOverlay.classList.remove('hidden');
+  legend.classList.add('hidden');
+  dragHint.classList.add('hidden');
+  spawnConfetti();
+}
+const CONFETTI_COLORS = ['#e6483d','#2f6fed','#f2a71b','#7c4fe0','#156534'];
+function spawnConfetti() {
+  confettiLayer.innerHTML = '';
+  for (let i = 0; i < 90; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.background = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+    el.style.animationDuration = (2.2 + Math.random() * 1.6) + 's';
+    el.style.animationDelay = (Math.random() * 0.8) + 's';
+    el.style.transform = `rotate(${Math.random()*360}deg)`;
+    confettiLayer.appendChild(el);
+  }
+}
+
+playAgainBtn.addEventListener('click', () => {
+  winOverlay.classList.add('hidden');
+  confettiLayer.innerHTML = '';
+  resetScene3DPlayers();
+  camState.theta = 0.55; camState.phi = 0.82; camState.radius = DEFAULT_RADIUS; camState.target = DEFAULT_TARGET.clone();
+  updateCamera();
+  setupOverlay.classList.remove('hidden');
+});
+</script>
+</body>
+</html>
