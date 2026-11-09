@@ -47,6 +47,13 @@
   // the client falls back to a locally-stored best score. To turn it on:
   // run `wrangler kv namespace create WAVE_RUNNER_LEADERBOARD`, then add
   // its real id into kv_namespaces above.
+  //
+  // Book Town (tools/book-town/) — its Atomic Habits escape room keeps a
+  // separate leaderboard in a BOOK_TOWN_LEADERBOARD KV namespace, also not
+  // provisioned yet. Without it /api/book-town/study/* return 503 and the
+  // game falls back to the best time saved on the device. To turn it on:
+  // run `wrangler kv namespace create BOOK_TOWN_LEADERBOARD`, then add its
+  // real id into kv_namespaces above.
   // ANTHROPIC_API_KEY is set as a Worker secret (`wrangler secret put
   // ANTHROPIC_API_KEY`) for the Post-Match Moments tool — not stored here.
   // Optional override, also via secret/env if ever needed:

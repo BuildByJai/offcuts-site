@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="description" content="Explore a blocky town, climb rooftops, collect coins and escape the Atomic Habits study.">
+<meta name="theme-color" content="#8fc6ec">
+<title>Book Town — Offcuts</title>
+<link rel="stylesheet" href="book-town.css">
+</head>
+<body>
+
+<canvas id="game-canvas"></canvas>
+
+<div id="loading">
+  <div class="bar"><span></span></div>
+  <p>Building the town… 0%</p>
+</div>
+
+<div id="hud" hidden>
+  <div class="hud-pill" id="hud-coins">🪙 0 / 50</div>
+  <div class="hud-pill gold" id="hud-gold">⭐ 0 / 5</div>
+</div>
+<button id="btn-pause" type="button" aria-label="Pause" hidden>II</button>
+<div id="interact-prompt"></div>
+<div id="toasts"></div>
+<div id="fade"></div>
+
+<!-- start screen -->
+<div class="overlay" id="start-screen" hidden>
+  <div class="card">
+    <p class="crumb"><a href="../../">offcuts</a> / <a href="../../">games</a> / book-town</p>
+    <span class="tag-inline">games &middot; explore</span>
+    <h1>Book Town</h1>
+    <p class="lede">Run, jump and climb around a blocky little town. Collect 50 coins, hunt down 5 hidden golden ones, scale the clock tower — and step into <b>The Study</b> to escape a room built around the lessons of <i>Atomic Habits</i>.</p>
+    <div class="controls-hint controls-help"></div>
+    <p class="fineprint" id="start-progress"></p>
+    <button class="btn" id="btn-play" type="button">Play</button>
+    <p class="site-footer">offcuts.buildbyjai.workers.dev</p>
+  </div>
+</div>
+
+<!-- pause menu -->
+<div class="overlay" id="pause" hidden>
+  <div class="card scrollable">
+    <span class="tag-inline">paused</span>
+    <h2>Book Town</h2>
+    <div class="stat-row">
+      <div>Coins<b id="stat-coins">0 / 50</b></div>
+      <div>Golden<b id="stat-gold">0 / 5</b></div>
+      <div>Best escape<b id="stat-escape">—</b></div>
+    </div>
+    <h3>Badges</h3>
+    <ul class="badge-list" id="badge-list"></ul>
+    <div class="controls-hint controls-help" id="pause-help" hidden></div>
+    <button class="btn" id="btn-resume" type="button">Resume</button>
+    <div class="btn-row" style="margin-bottom:10px">
+      <button class="btn ghost" id="btn-help" type="button">Controls</button>
+      <button class="btn ghost" id="btn-mute" type="button">Sound: on</button>
+    </div>
+    <div class="btn-row" style="margin-bottom:10px">
+      <button class="btn ghost" id="btn-respawn" type="button">Back to start</button>
+      <button class="btn ghost" id="btn-reset" type="button">Reset progress</button>
+    </div>
+    <div id="reset-confirm" hidden>
+      <p class="fineprint" style="margin:4px 0 10px">Wipe all coins, badges and your best escape time? This can't be undone.</p>
+      <div class="btn-row" style="margin-bottom:10px">
+        <button class="btn danger" id="btn-reset-yes" type="button">Yes, reset</button>
+        <button class="btn ghost" id="btn-reset-no" type="button">Cancel</button>
+      </div>
+    </div>
+    <a class="btn ghost" href="../../">Leave to Offcuts</a>
+  </div>
+</div>
+
+<!-- noticeboard -->
+<div class="overlay" id="notice" hidden>
+  <div class="card scrollable">
+    <span class="tag-inline">noticeboard</span>
+    <h2>Welcome to Book Town</h2>
+    <p class="lede">Every building here will hold a game built around a great book. <b>The Study</b> (north-west, the one with the columns) is open now — walk through its door to play.</p>
+    <p class="lede">There are 50 coins dotted around town and 5 golden ones in sneaky spots. Roofs are fair game: stacks of crates by the café make a decent first step up, and the clock tower has handholds if you're brave.</p>
+    <p class="lede" style="margin-bottom:18px">The other shops are opening soon — keep exploring!</p>
+    <button class="btn" id="btn-notice-close" type="button">Got it</button>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="js/town.js"></script>
+</body>
+</html>
