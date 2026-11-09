@@ -84,6 +84,9 @@ export class Player {
     this.safeTimer = 0;
     this.groundedFor = 0;
     this.sprinting = false;
+    this.ground = null;          // collider we're standing on (null in the air)
+    this.boostTimer = 0;         // speed-pad boost
+    this.boostMult = 1;
     this.onJump = null; this.onLand = null;
     this.rig = buildCharacter();
     scene.add(this.rig.root);
@@ -93,10 +96,24 @@ export class Player {
   teleport(x, y, z, facing = this.facing) {
     this.pos.set(x, y, z);
     this.vel.set(0, 0, 0);
+    this.boostTimer = 0; this.boostMult = 1; this.springing = false; this.ground = null;
     this.facing = facing;
     this.safe.set(x, y, z);
     this.grounded = false;
     this._sync(0);
+  }
+
+  // Speed pads: multiply top speed for a while.
+  boost(mult, seconds) { this.boostMult = mult; this.boostTimer = seconds; }
+  // Springs: launch upwards to a given height regardless of jump input.
+  launch(height) {
+    this.vel.y = Math.sqrt(2 * this.cfg.gravity * height);
+    // springs are meant to be predictable: drop any speed boost and cap sideways speed
+    this.boostTimer = 0; this.boostMult = 1;
+    const hs = Math.hypot(this.vel.x, this.vel.z), cap = this.cfg.walkSpeed;
+    if (hs > cap) { this.vel.x *= cap / hs; this.vel.z *= cap / hs; }
+    this.grounded = false; this.coyote = 0; this.buffer = 0; this.ground = null;
+    this.springing = true;
   }
 
   get jumpVelocity() { return Math.sqrt(2 * this.cfg.gravity * this.cfg.jumpHeight); }
@@ -112,7 +129,8 @@ export class Player {
     const wl = Math.hypot(wx, wz);
     if (wl > 1e-4) { wx /= wl; wz /= wl; }
     this.sprinting = input.sprint && mv.mag > 0.1;
-    const top = (this.sprinting ? c.sprintSpeed : c.walkSpeed) * mv.mag;
+    if (this.boostTimer > 0) { this.boostTimer -= dt; if (this.boostTimer <= 0) this.boostMult = 1; }
+    const top = (this.sprinting ? c.sprintSpeed : c.walkSpeed) * mv.mag * this.boostMult;
 
     if (input.consumeJump()) this.buffer = c.jumpBuffer;
     const held = input.jumpHeld;
@@ -144,7 +162,7 @@ export class Player {
   _step(h, tvx, tvz, mag, held, wx, wz) {
     const c = this.cfg;
     // horizontal acceleration toward the target velocity
-    const accel = c.sprintSpeed / c.accelTime;
+    const accel = c.sprintSpeed * this.boostMult / c.accelTime;
     const decel = c.sprintSpeed / c.stopTime;
     let rate = mag > 0.05 ? accel : decel;
     if (!this.grounded) rate = accel * c.airControl;
@@ -168,7 +186,8 @@ export class Player {
     }
 
     // gravity — extra while rising with jump released = short hop
-    const g = c.gravity * (this.vel.y > 0 && !held ? c.shortHopFactor : 1);
+    if (this.vel.y <= 0) this.springing = false;
+    const g = c.gravity * (this.vel.y > 0 && !held && !this.springing ? c.shortHopFactor : 1);
     this.vel.y = Math.max(this.vel.y - g * h, -c.terminalVelocity);
 
     const wasGrounded = this.grounded;
@@ -228,12 +247,13 @@ export class Player {
   _moveY(d) {
     const p = this.pos, H = this.cfg.height;
     p.y += d;
-    let landed = false, floor = -Infinity, ceil = Infinity;
+    let landed = false, floor = -Infinity, ceil = Infinity, under = null;
     for (const b of this.world.colliders) {
       if (!this._overlaps(b, p.x, p.y, p.z)) continue;
-      if (d <= 0) { floor = Math.max(floor, b.y1); landed = true; }
+      if (d <= 0) { if (b.y1 > floor) { floor = b.y1; under = b; } landed = true; }
       else ceil = Math.min(ceil, b.y0);
     }
+    this.ground = under;
     if (landed) { p.y = floor; this.vel.y = 0; }
     else if (ceil < Infinity) { p.y = ceil - H - EPS; this.vel.y = 0; }
     return landed;

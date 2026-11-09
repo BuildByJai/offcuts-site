@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="description" content="Book Town's Habit Tower: a four-section obstacle climb, one section per law of behaviour change. Race your ghost to the top.">
+<title>Habit Tower — Book Town — Offcuts</title>
+<link rel="stylesheet" href="../book-town.css">
+<style>
+  html, body { background: #20293a; }
+  #loading { background: #20293a; }
+  #loading p { color: #dfe7f2; }
+  #hud { align-items: center; }
+  .hud-pill.dim { opacity: 0.8; font-weight: 500; font-size: 13px; }
+  #btn-restart {
+    position: fixed; top: max(12px, env(safe-area-inset-top)); right: calc(max(12px, env(safe-area-inset-right)) + 54px);
+    z-index: 12; width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer;
+    background: rgba(0,0,0,0.42); color: #fff; font-size: 20px; font-weight: 800; line-height: 44px; padding: 0;
+  }
+  body.touch #btn-restart { width: 64px; height: 64px; line-height: 64px; right: calc(max(12px, env(safe-area-inset-right)) + 74px); font-size: 24px; }
+
+  #banner {
+    position: fixed; left: 50%; top: 22%; transform: translate(-50%, -8px); z-index: 14; text-align: center;
+    background: rgba(12,16,24,0.82); color: #fff; padding: 14px 22px 16px; border-radius: 14px; max-width: min(520px, 88vw);
+    opacity: 0; transition: opacity .3s ease, transform .3s ease; pointer-events: none; border-top: 4px solid var(--sec, #2f7fd6);
+  }
+  #banner.show { opacity: 1; transform: translate(-50%, 0); }
+  #banner .b-sec { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--sec, #8fc6ec); margin-bottom: 4px; }
+  #banner .b-law { font-size: 22px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 4px; }
+  #banner .b-line { font-size: 13.5px; line-height: 1.45; color: #dfe7f2; }
+  @media (max-height: 520px) {
+    #banner { top: max(62px, calc(env(safe-area-inset-top) + 56px)); padding: 8px 16px 10px; }
+    #banner .b-law { font-size: 17px; }
+    #banner .b-line { font-size: 12px; }
+  }
+  #ready-hint {
+    position: fixed; left: 50%; bottom: max(120px, calc(env(safe-area-inset-bottom) + 120px)); transform: translateX(-50%);
+    z-index: 12; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #fff; background: rgba(0,0,0,0.55);
+    padding: 9px 16px; border-radius: 22px; pointer-events: none; white-space: nowrap;
+  }
+
+  #confetti { position: fixed; inset: 0; z-index: 29; pointer-events: none; }
+  #fin-time { font-family: 'JetBrains Mono', monospace; font-size: 42px; font-weight: 800; color: var(--accent); margin: 2px 0; text-align: center; }
+  #fin-best, #fin-rank { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--ink-soft); margin: 0 0 6px; text-align: center; }
+  #fin-rank { margin-bottom: 14px; }
+  #fin-name { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 15px; margin-bottom: 10px; text-align: center; text-transform: uppercase; letter-spacing: 0.04em; }
+  #fin-name:focus { outline: none; border-color: var(--accent); }
+  #fin-status { font-size: 12px; color: var(--ink-soft); margin: -2px 0 12px; min-height: 14px; text-align: center; }
+  .recap { list-style: none; margin: 0 0 16px; padding: 0; }
+  .recap li { padding: 9px 0 9px 12px; border-bottom: 1px solid var(--line); font-size: 14px; line-height: 1.45; border-left: 4px solid var(--c); }
+  .recap li b { display: block; font-size: 13px; }
+  .lb { list-style: none; margin: 0 0 16px; padding: 0; max-height: 320px; overflow-y: auto; }
+  .lb li { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-family: 'JetBrains Mono', monospace; font-size: 13.5px; }
+  .lb .rank { color: var(--ink-soft); width: 28px; }
+  .lb .lname { flex: 1; font-weight: 600; }
+  .lb .ltime { color: var(--accent); font-weight: 700; }
+  .lb li.you { background: var(--accent-soft); border-radius: 6px; padding-left: 8px; }
+  .book-box { border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin: 4px 0 14px; background: #fff; }
+  .book-box .bt { font-weight: 800; font-size: 16px; margin: 0 0 4px; }
+  .book-box .bs { font-size: 13px; color: var(--ink-soft); margin: 0 0 12px; }
+  .fin-badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 0 0 12px; }
+  .fin-badges span { font-size: 12.5px; background: var(--accent-soft); color: var(--accent); padding: 5px 10px; border-radius: 20px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<canvas id="game-canvas"></canvas>
+
+<div id="loading">
+  <div class="bar"><span style="width:100%"></span></div>
+  <p>Building the tower…</p>
+</div>
+
+<div id="hud" hidden>
+  <div class="hud-pill" id="hud-timer">00:00.0</div>
+  <div class="hud-pill dim" id="hud-floor">Floor 1 / 20</div>
+  <div class="hud-pill dim" id="hud-pb" hidden>PB —</div>
+</div>
+<button id="btn-restart" type="button" aria-label="Restart run (R)" title="Restart run (R)" hidden>↺</button>
+<button id="btn-pause" type="button" aria-label="Pause" hidden>II</button>
+<div id="interact-prompt"></div>
+<div id="toasts"></div>
+<div id="banner"><div class="b-sec" id="b-sec">Section 1 of 4</div><div class="b-law" id="b-law">Make it obvious</div><div class="b-line" id="b-line"></div></div>
+<div id="ready-hint" hidden>Move to start the clock</div>
+<canvas id="confetti" hidden></canvas>
+<div id="fade" class="on"></div>
+
+<!-- start -->
+<div class="overlay" id="start-screen" hidden>
+  <div class="card">
+    <p class="crumb"><a href="../../../">offcuts</a> / <a href="../../../">games</a> / <a href="../">book-town</a> / habit-tower</p>
+    <span class="tag-inline">book town &middot; obby</span>
+    <h1>Habit Tower</h1>
+    <p class="lede">Climb four sections, one for each law of behaviour change from <i>Atomic Habits</i>. The clock starts when you move. Glowing pads are checkpoints, and your best run comes back as a ghost to race.</p>
+    <div class="controls-hint controls-help"></div>
+    <p class="fineprint" id="start-pb"></p>
+    <button class="btn" id="btn-start" type="button">Climb</button>
+    <div class="btn-row" style="margin-bottom:10px">
+      <button class="btn ghost" id="btn-start-lb" type="button">Leaderboard</button>
+      <a class="btn ghost" href="../?spawn=tower">&larr; Town</a>
+    </div>
+    <p class="site-footer">offcuts.buildbyjai.workers.dev</p>
+  </div>
+</div>
+
+<!-- pause -->
+<div class="overlay" id="pause" hidden>
+  <div class="card scrollable">
+    <span class="tag-inline">paused &middot; clock stopped</span>
+    <h2>Habit Tower</h2>
+    <div class="controls-hint controls-help" id="pause-help" hidden></div>
+    <button class="btn" id="btn-resume" type="button">Resume</button>
+    <button class="btn ghost" id="btn-p-restart" type="button">Restart run (R)</button>
+    <div class="btn-row" style="margin-bottom:10px">
+      <button class="btn ghost" id="btn-ghost" type="button">Ghost: on</button>
+      <button class="btn ghost" id="btn-mute" type="button">Sound: on</button>
+    </div>
+    <div class="btn-row" style="margin-bottom:10px">
+      <button class="btn ghost" id="btn-help" type="button">Controls</button>
+      <button class="btn ghost" id="btn-p-lb" type="button">Leaderboard</button>
+    </div>
+    <a class="btn ghost" href="../?spawn=tower">&larr; Back to town</a>
+  </div>
+</div>
+
+<!-- finish -->
+<div class="overlay" id="finish" hidden>
+  <div class="card scrollable">
+    <span class="tag-inline">top of the tower</span>
+    <h2 style="text-align:center">You made it!</h2>
+    <div id="fin-time">00:00.0</div>
+    <p id="fin-best"></p>
+    <p id="fin-rank"></p>
+    <div class="fin-badges" id="fin-badges"></div>
+    <input id="fin-name" maxlength="12" placeholder="YOUR INITIALS" autocomplete="off">
+    <p id="fin-status"></p>
+    <div class="btn-row" style="margin-bottom:6px">
+      <button class="btn" id="btn-fin-submit" type="button">Save time</button>
+      <button class="btn ghost" id="btn-fin-lb" type="button">Leaderboard</button>
+    </div>
+    <h3>Four sections, four laws</h3>
+    <ul class="recap" id="recap"></ul>
+    <div class="book-box">
+      <p class="bt">Atomic Habits</p>
+      <p class="bs">The tower is a taster. The book covers all four laws properly.</p>
+      <a class="btn gold" id="btn-book" href="#" target="_blank" rel="sponsored noopener">Get Atomic Habits</a>
+      <p class="fineprint" style="margin:0">We may earn a small commission if you buy through this link.</p>
+    </div>
+    <div class="btn-row" style="margin-bottom:10px">
+      <button class="btn" id="btn-fin-again" type="button">Run again</button>
+      <button class="btn ghost" id="btn-fin-town" type="button">Back to town</button>
+    </div>
+  </div>
+</div>
+
+<!-- leaderboard -->
+<div class="overlay" id="lb-panel" hidden style="z-index:35">
+  <div class="card scrollable">
+    <span class="tag-inline">fastest climbs</span>
+    <h2>Leaderboard</h2>
+    <ul class="lb" id="lb-list"></ul>
+    <p class="fineprint" id="lb-empty" hidden>No times yet — be the first to the top.</p>
+    <button class="btn ghost" id="btn-lb-close" type="button">Close</button>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="tower.js"></script>
+</body>
+</html>

@@ -2,7 +2,8 @@
 // Units: 1 unit ≈ 1 metre. The town square spans x/z −30…30; y is up.
 
 export const CONFIG = {
-  saveKey: 'bookTown.save.v1',
+  saveKey: 'bookTown.save.v2',
+  legacySaveKeys: ['bookTown.save.v1'],   // migrated into saveKey on first load
 
   // Affiliate links. Placeholder until the real URL is ready — while it isn't
   // an http(s) URL the end-screen button shows "link coming soon" instead.
@@ -48,7 +49,14 @@ export const CONFIG = {
   /* ---------------- spawns ---------------- */
   spawns: {
     default: { x: 0, y: 0, z: 34, facing: Math.PI },   // south entrance, facing the square
-    study:   { x: -18, y: 0, z: -26.5, facing: 0 }      // outside The Study door, facing the square
+    study:   { x: -18, y: 0, z: -26.5, facing: 0 },     // outside The Study door, facing the square
+    tower:   { x: -26.6, y: 0, z: -16, facing: Math.PI / 2 } // outside the Habit Tower door, facing the square
+  },
+
+  /* ---------------- Habit Tower (obby) ---------------- */
+  tower: {
+    targetMs: 120000,      // finish under this for the Speed Habit badge
+    ghostHz: 20            // ghost replay sample rate
   },
 
   /* ---------------- buildings ----------------
@@ -75,8 +83,8 @@ export const CONFIG = {
     { id: 'se-house', name: 'House',      status: 'filler',
       x0: 30,  x1: 44,  z0: 18,  z1: 44,  h: 5,   wall: 0xf0e2a8, trim: 0xffffff, roof: 0x5b6e7c, style: 'house' },
 
-    { id: 'gym',      name: 'Gym',        sign: 'Gym', status: 'locked',
-      x0: -44, x1: -30, z0: -30, z1: -1.5, h: 6,  wall: 0x8fa3b8, trim: 0x23303d, roof: 0x3d4a57, style: 'shop',
+    { id: 'tower',    name: 'Habit Tower', sign: 'Habit Tower', status: 'live', href: 'tower/',
+      x0: -44, x1: -30, z0: -30, z1: -1.5, h: 6,  wall: 0x8fa3b8, trim: 0x23303d, roof: 0x3d4a57, style: 'tower',
       door: { face: 'east', at: -16 } },
     { id: 'cinema',   name: 'Cinema',     sign: 'Cinema', status: 'locked',
       x0: -44, x1: -30, z0: 1.5, z1: 28,  h: 7,   wall: 0x9c2f3a, trim: 0xf6d77a, roof: 0x4a1d23, style: 'cinema',
@@ -101,6 +109,11 @@ export const CONFIG = {
       position: [-25.55, 4.5, 23], rotationY: Math.PI / 2, size: [5.6, 2.24] },
     { id: 'shopfront-arcade', image: 'assets/ads/placeholder-3.png', link: null, label: 'Advertise here',
       position: [29.94, 4.25, -21], rotationY: -Math.PI / 2, size: [8, 1.6] },
+    { id: 'tower-banner',    image: 'assets/ads/placeholder-5.png', link: null, label: 'Advertise here',
+      position: [-31.94, 17, -16], rotationY: Math.PI / 2, size: [3, 7.5] },
+    // scene: 'tower' slots render inside the Habit Tower, not in the town square
+    { id: 'tower-interior',  image: 'assets/ads/placeholder-1.png', link: null, label: 'Advertise here', scene: 'tower',
+      position: [0, 6, -9.9], rotationY: 0, size: [7, 2.8] },
     { id: 'bus-stop',        image: 'assets/ads/placeholder-4.png', link: null, label: 'Advertise here',
       position: [-7, 1.3, 32.7], rotationY: Math.PI, size: [1.4, 2.1] }
   ],
@@ -156,7 +169,9 @@ export const CONFIG = {
     { id: 'rooftop-runner', name: 'Rooftop Runner',  desc: 'Reach the top of the clock tower.',   icon: '🕰️' },
     { id: 'golden-hunter',  name: 'Golden Hunter',   desc: 'Find all 5 golden coins.',            icon: '⭐' },
     { id: 'collector',      name: 'Collector',       desc: 'Collect all 50 coins.',               icon: '💰' },
-    { id: 'habit-breaker',  name: 'Habit Breaker',   desc: 'Escape The Study.',                   icon: '📘' }
+    { id: 'habit-breaker',  name: 'Habit Breaker',   desc: 'Escape The Study.',                   icon: '📘' },
+    { id: 'tower-climber',  name: 'Tower Climber',   desc: 'Reach the top of the Habit Tower.',   icon: '🗼' },
+    { id: 'speed-habit',    name: 'Speed Habit',     desc: 'Climb the Habit Tower in under 2:00.', icon: '⚡' }
   ],
 
   // clock tower footprint + top height (used for the Rooftop Runner badge)
