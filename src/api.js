@@ -183,9 +183,12 @@ async function handleStudyLeaderboard(env) {
   );
 }
 
-// Book Town's Atomic Habits study has its own board so times aren't mixed
-// with the original Study. Same shape, separate (optional) KV namespace.
-async function handleBookTownStudySubmitScore(request, env) {
+// Book Town boards (Atomic Habits study, Habit Tower, …) share one optional
+// KV namespace, keyed by board prefix, so times never mix with the original
+// Study. Fastest time wins on every board.
+const BOOK_TOWN_BOARDS = new Set(["study", "tower"]);
+
+async function handleBookTownSubmitScore(board, request, env) {
   if (!env.BOOK_TOWN_LEADERBOARD) return json({ error: "Leaderboard isn't set up yet" }, 503);
 
   let body;
@@ -205,15 +208,15 @@ async function handleBookTownStudySubmitScore(request, env) {
 
   const id = generateId();
   const record = { name, timeMs: Math.round(timeMs), createdAt: new Date().toISOString() };
-  await env.BOOK_TOWN_LEADERBOARD.put(`study:${id}`, JSON.stringify(record));
+  await env.BOOK_TOWN_LEADERBOARD.put(`${board}:${id}`, JSON.stringify(record));
 
   return json({ id });
 }
 
-async function handleBookTownStudyLeaderboard(env) {
+async function handleBookTownLeaderboard(board, env) {
   if (!env.BOOK_TOWN_LEADERBOARD) return json({ error: "Leaderboard isn't set up yet" }, 503);
 
-  const list = await env.BOOK_TOWN_LEADERBOARD.list({ prefix: "study:" });
+  const list = await env.BOOK_TOWN_LEADERBOARD.list({ prefix: `${board}:` });
   const entries = await Promise.all(
     list.keys.map(async (key) => {
       const raw = await env.BOOK_TOWN_LEADERBOARD.get(key.name);
@@ -316,11 +319,11 @@ export default {
     if (url.pathname === "/api/study/leaderboard" && request.method === "GET") {
       return handleStudyLeaderboard(env);
     }
-    if (url.pathname === "/api/book-town/study/score" && request.method === "POST") {
-      return handleBookTownStudySubmitScore(request, env);
-    }
-    if (url.pathname === "/api/book-town/study/leaderboard" && request.method === "GET") {
-      return handleBookTownStudyLeaderboard(env);
+    const bookTownMatch = url.pathname.match(/^\/api\/book-town\/([a-z-]+)\/(score|leaderboard)$/);
+    if (bookTownMatch && BOOK_TOWN_BOARDS.has(bookTownMatch[1])) {
+      const [, board, action] = bookTownMatch;
+      if (action === "score" && request.method === "POST") return handleBookTownSubmitScore(board, request, env);
+      if (action === "leaderboard" && request.method === "GET") return handleBookTownLeaderboard(board, env);
     }
     if (url.pathname === "/api/wave-runner/score" && request.method === "POST") {
       return handleWaveRunnerSubmitScore(request, env);

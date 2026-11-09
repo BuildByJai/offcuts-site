@@ -11,7 +11,8 @@ import { toast, awardBadge, setPrompt, fadeOut, fadeIn, controlsHelpHTML } from 
 
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
-const spawnKey = params.get('spawn') === 'study' ? 'study' : 'default';
+const spawnParam = params.get('spawn');
+const spawnKey = spawnParam && spawnParam !== 'default' && CONFIG.spawns[spawnParam] ? spawnParam : 'default';
 
 /* =============== renderer / scene =============== */
 const canvas = $('game-canvas');
@@ -126,7 +127,9 @@ function facade(b) {
   return F;
 }
 
-const adRects = CONFIG.adSlots.map((a) => ({ a }));
+// slots with `scene` set live inside a building, not on the square
+const TOWN_ADS = CONFIG.adSlots.filter((a) => !a.scene || a.scene === 'town');
+const adRects = TOWN_ADS.map((a) => ({ a }));
 function overlapsAd(F, b, u0, u1, y0, y1) {
   for (const { a } of adRects) {
     const [ax, ay, az] = a.position;
@@ -156,7 +159,7 @@ function padlock() {
 
 /* ---------- buildings ---------- */
 const GLASS = 0x9ccfe8, DOOR = 0x5a3a24;
-let studyDoor = null;
+const liveDoors = [];   // walk-in doors for live buildings
 let towerFlag = null, flagMesh = null;
 
 function buildBuilding(b) {
@@ -211,6 +214,7 @@ function buildBuilding(b) {
 
   // ----- style extras -----
   if (b.style === 'library') buildLibraryFront(b, F, doorAt);
+  if (b.style === 'tower') buildHabitTower(b, F, doorAt);
   if (b.style === 'cafe') buildCafeFront(b, F);
   if (b.style === 'cinema') {
     F.box(doorAt - 3.2, doorAt + 3.2, 3.0, 4.4, 0, 1.4, 0x2a0f12, true);
@@ -232,11 +236,11 @@ function buildBuilding(b) {
   const doorPoint = F.pt(doorAt, 0, 1.3);
   const nrm = { south: [0, 1], north: [0, -1], west: [-1, 0], east: [1, 0] }[F.face];
   if (b.status === 'live') {
-    studyDoor = { b, x: F.pt(doorAt, 0, 0.6)[0], z: F.pt(doorAt, 0, 0.6)[2], nx: nrm[0], nz: nrm[1] };
+    liveDoors.push({ b, x: F.pt(doorAt, 0, 0.6)[0], z: F.pt(doorAt, 0, 0.6)[2], nx: nrm[0], nz: nrm[1], y: doorBase });
     // glowing "OPEN" board + welcome mat
     const open = signMesh('OPEN', { w: 1.4, h: 0.6, bg: '#156534', fg: '#ffffff' });
     F.place(open, doorAt + 2.1, doorBase + 1.6, 0.14);
-    interactables.push({ x: doorPoint[0], z: doorPoint[2], y: 0, r: 1.9, label: `Enter ${b.name}`, act: enterStudy });
+    interactables.push({ x: doorPoint[0], z: doorPoint[2], y: 0, r: 1.9, label: `Enter ${b.name}`, act: () => enterBuilding(b) });
   } else {
     const lock = padlock();
     F.place(lock, doorAt, doorBase + 1.25, 0.2);
@@ -266,6 +270,42 @@ function buildHouseRoof(b) {
   const cx = alongX ? b.x0 + 3 : (b.x0 + b.x1) / 2 + 2, cz = alongX ? (b.z0 + b.z1) / 2 + 2 : b.z0 + 3;
   B.box(cx - 0.6, cx + 0.6, base, base + 3.4, cz - 0.6, cz + 0.6, 0x8a5a44);
   world.add(cx - 0.6, cx + 0.6, base, base + 3.4, cz - 0.6, cz + 0.6);
+}
+
+// Habit Tower: the old gym block becomes the base of a tall striped tower
+// that's visible from anywhere on the square.
+let towerBeacon = null;
+function buildHabitTower(b, F, at) {
+  const x0 = -40, x1 = -32, z0 = -20, z1 = -12, top = 40;
+  const bands = [0x2f7fd6, 0xe9a23b, 0x3fae5c, 0xd8452f];   // one colour per law/section
+  for (let i = 0; i < 4; i++) {
+    const y0 = b.h + 0.3 + i * ((top - b.h) / 4), y1 = b.h + 0.3 + (i + 1) * ((top - b.h) / 4);
+    B.box(x0, x1, y0, y1, z0, z1, i % 2 ? 0xe9e4d8 : 0xf6f2e8);
+    B.box(x0 - 0.15, x1 + 0.15, y1 - 0.6, y1, z0 - 0.15, z1 + 0.15, bands[i]);
+    // windows on all four sides
+    for (let y = y0 + 1.5; y < y1 - 1.6; y += 3) {
+      for (let u = -2.4; u <= 2.4; u += 2.4) {
+        B.box(x1, x1 + 0.06, y, y + 1.4, -16 + u - 0.45, -16 + u + 0.45, 0x9ccfe8);
+        B.box(x0 - 0.06, x0, y, y + 1.4, -16 + u - 0.45, -16 + u + 0.45, 0x9ccfe8);
+        B.box(-36 + u - 0.45, -36 + u + 0.45, y, y + 1.4, z1, z1 + 0.06, 0x9ccfe8);
+        B.box(-36 + u - 0.45, -36 + u + 0.45, y, y + 1.4, z0 - 0.06, z0, 0x9ccfe8);
+      }
+    }
+  }
+  world.add(x0, x1, b.h, top + 0.3, z0, z1);
+  // crown + glowing beacon
+  B.box(x0 - 0.6, x1 + 0.6, top + 0.3, top + 1.1, z0 - 0.6, z1 + 0.6, 0x23303d);
+  world.add(x0 - 0.6, x1 + 0.6, top + 0.3, top + 1.1, z0 - 0.6, z1 + 0.6);
+  B.box(-37.5, -34.5, top + 1.1, top + 3.5, -17.5, -14.5, 0x23303d);
+  towerBeacon = new THREE.Mesh(new THREE.OctahedronGeometry(1.3, 0), new THREE.MeshBasicMaterial({ color: 0xffd23f }));
+  towerBeacon.position.set(-36, top + 5, -16);
+  scene.add(towerBeacon);
+  // big vertical name board facing the square, under the banner ad
+  const board = signMesh('HABIT TOWER', { w: 7, h: 1.1, bg: '#23303d', fg: '#ffd23f' });
+  board.position.set(-31.94, 9, -16); board.rotation.y = Math.PI / 2; scene.add(board);
+  // a little entrance canopy with the four law colours
+  for (let i = 0; i < 4; i++) F.box(at - 2 + i, at - 1 + i, 2.9, 3.1, 0, 1.6, bands[i], i === 0);
+  world.add(-30 + 0, -30 + 1.6, 2.9, 3.1, at - 2, at + 2);
 }
 
 function buildLibraryFront(b, F, at) {
@@ -564,7 +604,7 @@ B.box(-11, 11, 0, 1.2, 39.5, 40.5, 0x3f8a3a); world.add(-11, 11, 0, 1.2, 39.5, 4
 
 /* ---------- ad slots ---------- */
 const adMeshes = [];
-for (const slot of CONFIG.adSlots) {
+for (const slot of TOWN_ADS) {
   const tex = texLoader.load(slot.image);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 4;
@@ -713,22 +753,24 @@ function updateInteract() {
 }
 
 let leaving = false;
-async function enterStudy() {
+async function enterBuilding(b) {
   if (leaving) return;
   leaving = true;
   input.setPlaying(false);
   setPrompt(input, null);
   await fadeOut();
-  location.href = 'study/';
+  location.href = b.href;
 }
-// walking into the Study door also enters it
+// walking into a live building's door also enters it
 function checkDoorWalkIn() {
-  if (!studyDoor || leaving) return;
-  const dx = player.pos.x - studyDoor.x, dz = player.pos.z - studyDoor.z;
-  const along = dx * studyDoor.nz - dz * studyDoor.nx;     // sideways offset from the door centre
-  const out = dx * studyDoor.nx + dz * studyDoor.nz;       // distance in front of the door
-  const into = -(player.vel.x * studyDoor.nx + player.vel.z * studyDoor.nz);
-  if (Math.abs(along) < 0.95 && out < 0.15 && out > -0.5 && player.pos.y < 1.5 && into > 0.5) enterStudy();
+  if (leaving) return;
+  for (const d of liveDoors) {
+    const dx = player.pos.x - d.x, dz = player.pos.z - d.z;
+    const along = dx * d.nz - dz * d.nx;     // sideways offset from the door centre
+    const out = dx * d.nx + dz * d.nz;       // distance in front of the door
+    const into = -(player.vel.x * d.nx + player.vel.z * d.nz);
+    if (Math.abs(along) < 0.95 && out < 0.15 && out > -0.5 && player.pos.y < d.y + 1 && into > 0.5) { enterBuilding(d.b); return; }
+  }
 }
 
 /* =============== menus =============== */
@@ -848,6 +890,7 @@ function tick() {
   if (waterMesh) waterMesh.position.y = 0.4 + Math.sin(t * 1.5) * 0.02;
   if (sprayMesh) { sprayMesh.rotation.y = t * 0.6; sprayMesh.scale.y = 1 + Math.sin(t * 6) * 0.06; }
   if (towerFlag) towerFlag.rotation.y = Math.sin(t * 2) * 0.25;
+  if (towerBeacon) { towerBeacon.rotation.y = t; towerBeacon.position.y = 45 + Math.sin(t * 1.5) * 0.4; }
   if (flagMesh) flagMesh.rotation.y = Math.sin(t * 1.7) * 0.2;
   if ((Math.floor(t * 2) & 1) === 0 || clockHands._init !== true) {
     const d = new Date(), hr = (d.getHours() % 12) + d.getMinutes() / 60, mn = d.getMinutes() + d.getSeconds() / 60;
@@ -863,8 +906,8 @@ function tick() {
 refreshHud();
 const finishLoading = () => {
   $('loading').hidden = true;
-  if (spawnKey === 'study') {
-    // coming back from the escape room — straight into play
+  if (spawnKey !== 'default') {
+    // coming back from a building — straight into play
     $('start-screen').hidden = true;
     setState('playing');
     fadeIn();
@@ -881,7 +924,7 @@ const finishLoading = () => {
 manager.onLoad = finishLoading;
 manager.onError = (url) => console.warn('Failed to load', url);
 // If every texture was cached / there was nothing to load, onLoad may never fire.
-if (CONFIG.adSlots.length === 0) setTimeout(finishLoading, 0);
+if (TOWN_ADS.length === 0) setTimeout(finishLoading, 0);
 // bfcache: coming "back" to this page should never leave it faded out
 addEventListener('pageshow', (e) => { if (e.persisted) { leaving = false; fadeIn(); if (state !== 'start') setState('playing'); } });
 
