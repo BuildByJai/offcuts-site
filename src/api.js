@@ -186,7 +186,8 @@ async function handleStudyLeaderboard(env) {
 // Book Town boards (Atomic Habits study, Habit Tower, …) share one optional
 // KV namespace, keyed by board prefix, so times never mix with the original
 // Study. Fastest time wins on every board.
-const BOOK_TOWN_BOARDS = new Set(["study", "tower"]);
+// trial-* boards are the three town time trials (CONFIG.trials[].board).
+const BOOK_TOWN_BOARDS = new Set(["study", "tower", "trial-square", "trial-roofs", "trial-sky"]);
 
 async function handleBookTownSubmitScore(board, request, env) {
   if (!env.BOOK_TOWN_LEADERBOARD) return json({ error: "Leaderboard isn't set up yet" }, 503);

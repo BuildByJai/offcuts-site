@@ -9,6 +9,9 @@ import { Input } from '../js/input.js';
 import { Save } from '../js/save.js';
 import { Sfx } from '../js/audio.js';
 import { toast, awardBadge, fadeOut, fadeIn, controlsHelpHTML } from '../js/hud.js';
+import { createGfx, qualityPicker, U } from '../js/gfx.js';
+import { attachJuice } from '../js/fx.js';
+import { MoveHud } from '../js/movehud.js';
 import { TOWER, SECTIONS, FOG_BAND, PLATFORMS, COINS, START } from './levels.js';
 
 const $ = (id) => document.getElementById(id);
@@ -24,34 +27,22 @@ const LESSONS = [
 
 /* =============== renderer / scene =============== */
 const canvas = $('game-canvas');
-const isCoarse = window.matchMedia && matchMedia('(pointer: coarse)').matches;
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: !isCoarse, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFShadowMap;
 
 const BG = new THREE.Color(0x9fc4e6), FOGC = new THREE.Color(0x8d98a8);
 const scene = new THREE.Scene();
 scene.background = BG.clone();
 scene.fog = new THREE.Fog(BG.clone(), 40, 160);
 const camera = new THREE.PerspectiveCamera(CONFIG.camera.fov, innerWidth / innerHeight, 0.1, 300);
-function resize() {
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
-}
-addEventListener('resize', resize);
-addEventListener('orientationchange', () => setTimeout(resize, 200));
-resize();
 
 scene.add(new THREE.HemisphereLight(0xffffff, 0x4a5a70, 1.35));
 const sun = new THREE.DirectionalLight(0xfff3dc, 1.6);
 sun.castShadow = true;
-sun.shadow.mapSize.set(isCoarse ? 1024 : 2048, isCoarse ? 1024 : 2048);
-Object.assign(sun.shadow.camera, { left: -14, right: 14, top: 14, bottom: -14, near: 1, far: 60 });
 sun.shadow.bias = -0.0008;
 scene.add(sun, sun.target);
+// shared renderer: tone mapping + quality tiers (shadow size, pixel ratio, bloom)
+const gfx = createGfx({ canvas, scene, camera, sun, exposure: 1.0 });
+const renderer = gfx.renderer;
+Object.assign(sun.shadow.camera, { left: -14, right: 14, top: 14, bottom: -14, near: 1, far: 60 });
 
 /* =============== tower shell =============== */
 const world = new World();
@@ -296,10 +287,16 @@ function updateGhost(ms) {
 
 /* =============== player / camera / input =============== */
 const input = new Input(canvas);
-const player = new Player(scene, world);
+// New moves work in here too; the super jump is capped (see CONFIG.tower.moveOverrides).
+const player = new Player(scene, world, { moves: TCFG.moveOverrides });
+player.setUnlocks(Save.unlocks());
+input.setMoves(Save.unlocks());
 const cam = new FollowCamera(camera, world, { distance: 7.5, pitch: 0.45 });
+cam.player = player;
 player.onJump = () => Sfx.jump();
-player.onLand = () => Sfx.land();
+const juice = attachJuice({ scene, player, cam, camera, renderer });
+const moveHud = new MoveHud(player);
+moveHud.show(false);
 function facingToward(from, to) { return Math.atan2(to.x - from.x, to.z - from.z); }
 const startFacing = facingToward(START, PLATFORMS[1]);
 
@@ -355,6 +352,7 @@ function setState(s) {
   input.setPlaying(live);
   input.consumePause();
   $('hud').hidden = s === 'start';
+  moveHud.show(s !== 'start');
   $('btn-pause').hidden = !live;
   $('btn-restart').hidden = !live;
   $('ready-hint').hidden = s !== 'ready';
@@ -665,7 +663,7 @@ $('btn-fin-submit').addEventListener('click', async () => {
 /* ---------- menus ---------- */
 function renderControls() {
   const extra = input.touchMode ? '<br><b>Restart</b>: ↺ button (top right)' : '<br><b>Restart run</b>: R';
-  document.querySelectorAll('.controls-help').forEach((el) => { el.innerHTML = controlsHelpHTML(input.touchMode) + extra; });
+  document.querySelectorAll('.controls-help').forEach((el) => { el.innerHTML = controlsHelpHTML(input.touchMode, Save.unlocks()) + extra; });
 }
 input.onTouchModeChange = renderControls;
 renderControls();
@@ -716,6 +714,7 @@ function updateFog() {
 function tick() {
   const dt = Math.min(0.05, clock.getDelta());
   const t = clock.elapsedTime;
+  U.time.value = t;
 
   if (state === 'ready' || state === 'running') {
     if (input.consumePause()) openPause();
@@ -755,11 +754,16 @@ function tick() {
   sun.position.set(player.pos.x + 8, player.pos.y + 20, player.pos.z + 6);
   sun.target.position.set(player.pos.x, player.pos.y, player.pos.z);
 
-  renderer.render(scene, camera);
+  juice.update(dt);
+  moveHud.update(dt);
+  gfx.monitor(dt, state === 'running' || state === 'ready');
+  gfx.render();
   requestAnimationFrame(tick);
 }
 
 /* =============== boot =============== */
+qualityPicker($('quality-picker'), gfx);
+gfx.onAutoDrop = (t) => toast(`Graphics set to ${t} for smoother play.`);
 player.teleport(START.x, START.y, START.z, startFacing);
 cam.snapBehind(startFacing);
 resetWorld();

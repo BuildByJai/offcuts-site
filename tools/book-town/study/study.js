@@ -9,6 +9,9 @@ import { Input } from '../js/input.js';
 import { Save } from '../js/save.js';
 import { Sfx } from '../js/audio.js';
 import { toast, setPrompt, fadeOut, fadeIn, controlsHelpHTML, badgeInfo } from '../js/hud.js';
+import { createGfx } from '../js/gfx.js';
+import { attachJuice } from '../js/fx.js';
+import { MoveHud } from '../js/movehud.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -48,24 +51,9 @@ const LESSON_SHORT = [
 
 /* =============== renderer / scene =============== */
 const canvas = $('game-canvas');
-const isCoarse = window.matchMedia && matchMedia('(pointer: coarse)').matches;
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFShadowMap;
-
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x120e0b);
 const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.05, 60);
-function resize() {
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
-}
-addEventListener('resize', resize);
-addEventListener('orientationchange', () => setTimeout(resize, 200));
-resize();
 
 // Dim until the desk lamp is switched on (that's puzzle 1).
 const ambient = new THREE.AmbientLight(0x8a9bc4, 0.32);
@@ -76,8 +64,10 @@ scene.add(moon);
 const lampLight = new THREE.PointLight(0xffc77a, 0, 16, 1.6);
 lampLight.position.set(-3.75, 1.75, -4.0);
 lampLight.castShadow = true;
-lampLight.shadow.mapSize.set(isCoarse ? 512 : 1024, isCoarse ? 512 : 1024);
 scene.add(lampLight);
+// shared renderer: tone mapping + quality tiers (lamp shadow size, pixel ratio)
+const gfx = createGfx({ canvas, scene, camera, extraShadowLights: [lampLight], exposure: 1.25, post: false });
+const renderer = gfx.renderer;
 const ceilingGlow = new THREE.PointLight(0xfff0d8, 0, 20, 1.2);
 ceilingGlow.position.set(0, 3.6, 0);
 scene.add(ceilingGlow);
@@ -357,11 +347,16 @@ addI('door', 0, HZ - 1.0, 'Examine the exit door', 1.6);
 /* =============== player / camera / input =============== */
 const input = new Input(canvas);
 const player = new Player(scene, world);
-const cam = new FollowCamera(camera, world, { distance: 4.4, minDistance: 1.8, maxDistance: 6, pitch: 0.42, maxPitch: 1.0 });
+player.setUnlocks(Save.unlocks());
+input.setMoves(Save.unlocks());
+const cam = new FollowCamera(camera, world, { distance: 4.4, minDistance: 1.8, maxDistance: 6, pitch: 0.42, maxPitch: 1.0, speedPullBack: 0.6 });
+cam.player = player;
+const juice = attachJuice({ scene, player, cam, camera, renderer });
+const moveHud = new MoveHud(player);
+moveHud.show(false);
 player.teleport(0, 0, 3.2, Math.PI);
 cam.snapBehind(Math.PI);
 player.onJump = () => Sfx.jump();
-player.onLand = () => Sfx.land();
 
 /* =============== game state =============== */
 const solved = [false, false, false, false];
@@ -384,13 +379,14 @@ function setState(s) {
   input.consumePause();
   if (s !== 'playing') { setPrompt(input, null); current = null; }
   $('hud').hidden = s === 'start' || s === 'won';
+  moveHud.show(!(s === 'start' || s === 'won'));
   $('btn-pause').hidden = s !== 'playing';
 }
 function openPanel(id) { setState('panel'); $(id).hidden = false; }
 function closePanel(id) { $(id).hidden = true; if (state === 'panel') setState('playing'); }
 
 function renderControls() {
-  document.querySelectorAll('.controls-help').forEach((el) => { el.innerHTML = controlsHelpHTML(input.touchMode); });
+  document.querySelectorAll('.controls-help').forEach((el) => { el.innerHTML = controlsHelpHTML(input.touchMode, Save.unlocks()); });
 }
 input.onTouchModeChange = renderControls;
 renderControls();
@@ -819,7 +815,10 @@ function tick() {
   doorPivot.rotation.y = doorAngle;
   tvScreen.material.color.setHSL(0.62, 0.3, 0.2 + Math.sin(performance.now() * 0.004) * 0.04);
 
-  renderer.render(scene, camera);
+  juice.update(dt);
+  moveHud.update(dt);
+  gfx.monitor(dt, state === 'playing');
+  gfx.render();
   requestAnimationFrame(tick);
 }
 

@@ -1,5 +1,10 @@
 // Unified input: keyboard + mouse on desktop, floating joystick / camera drag /
 // buttons on touch. Game code reads a small state object each frame.
+//
+// Phase 3 adds the Charge button (C / Ctrl: super jump, slide, ground pound)
+// and Dash (Q, or double-tap a direction / flick the joystick twice). On touch
+// the right thumb gets an arc of Jump + Charge + Dash; Dash stays hidden until
+// it's bought (setMoves).
 import { CONFIG } from '../config.js';
 
 const MOVE_KEYS = {
@@ -16,6 +21,10 @@ export class Input {
     this.jumpKey = false;
     this.jumpBtn = false;
     this._jumpPressed = false;
+    this.chargeKey = false; this.chargeBtn = false; this._chargePressed = false;
+    this._dash = false;
+    this._lastTap = { key: null, t: 0 };
+    this._flick = { armed: true, t: 0, x: 0, y: 0 };
     this._interact = false;
     this._pause = false;
     this.lookDX = 0; this.lookDY = 0; this.zoom = 0;
@@ -49,7 +58,10 @@ export class Input {
     return this.stick.active && Math.hypot(this.stick.x, this.stick.y) >= CONFIG.movement.joystickSprintAt;
   }
   get jumpHeld() { return this.enabled && (this.jumpKey || this.jumpBtn); }
+  get chargeHeld() { return this.enabled && (this.chargeKey || this.chargeBtn); }
   consumeJump() { const j = this._jumpPressed; this._jumpPressed = false; return j && this.enabled; }
+  consumeCharge() { const c = this._chargePressed; this._chargePressed = false; return c && this.enabled; }
+  consumeDash() { const d = this._dash; this._dash = false; return d && this.enabled; }
   consumeInteract() { const i = this._interact; this._interact = false; return i && this.enabled; }
   consumePause() { const p = this._pause; this._pause = false; return p; }
   consumeLook() { const r = { dx: this.lookDX, dy: this.lookDY }; this.lookDX = 0; this.lookDY = 0; return r; }
@@ -58,7 +70,8 @@ export class Input {
   clear() {
     this.keys = { f: false, b: false, l: false, r: false };
     this.shift = this.jumpKey = this.jumpBtn = false;
-    this._jumpPressed = this._interact = false;
+    this.chargeKey = this.chargeBtn = false;
+    this._jumpPressed = this._interact = this._chargePressed = this._dash = false;
     this.lookDX = this.lookDY = this.zoom = 0;
     this._releaseStick();
   }
@@ -67,7 +80,22 @@ export class Input {
   _bindKeyboard() {
     addEventListener('keydown', (e) => {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
-      if (MOVE_KEYS[e.code]) { this.keys[MOVE_KEYS[e.code]] = true; if (this.enabled) e.preventDefault(); }
+      if (MOVE_KEYS[e.code]) {
+        const k = MOVE_KEYS[e.code];
+        // double-tap a direction = dash
+        if (!e.repeat) {
+          const now = performance.now();
+          if (this._lastTap.key === k && now - this._lastTap.t < 260) { this._dash = true; this._lastTap.key = null; }
+          else this._lastTap = { key: k, t: now };
+        }
+        this.keys[k] = true;
+        if (this.enabled) e.preventDefault();
+      }
+      if ((e.code === 'KeyC' || e.code === 'ControlLeft' || e.code === 'ControlRight') && !e.repeat) {
+        this._chargePressed = true; this.chargeKey = true;
+        if (this.enabled) e.preventDefault();
+      }
+      if (e.code === 'KeyQ' && !e.repeat) this._dash = true;
       if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') this.shift = true;
       if (e.code === 'Space') {
         if (!e.repeat) this._jumpPressed = true;
@@ -81,6 +109,7 @@ export class Input {
       if (MOVE_KEYS[e.code]) this.keys[MOVE_KEYS[e.code]] = false;
       if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') this.shift = false;
       if (e.code === 'Space') this.jumpKey = false;
+      if (e.code === 'KeyC' || e.code === 'ControlLeft' || e.code === 'ControlRight') this.chargeKey = false;
     });
     addEventListener('blur', () => this.clear());
   }
@@ -146,6 +175,12 @@ export class Input {
       </button>
       <button id="btn-jump" class="touch-btn" type="button" aria-label="Jump">
         <span class="touch-btn-icon">⤒</span><span>Jump</span>
+      </button>
+      <button id="btn-charge" class="touch-btn small" type="button" aria-label="Charge: super jump, slide, ground pound">
+        <span class="touch-btn-icon">⚡</span><span>Charge</span>
+      </button>
+      <button id="btn-dash" class="touch-btn small" type="button" aria-label="Dash" hidden>
+        <span class="touch-btn-icon">💨</span><span>Dash</span>
       </button>`;
     document.body.appendChild(wrap);
     this.touchUI = wrap;
@@ -166,6 +201,25 @@ export class Input {
     jump.addEventListener('pointercancel', jumpUp);
     jump.addEventListener('lostpointercapture', jumpUp);
 
+    const charge = wrap.querySelector('#btn-charge');
+    charge.addEventListener('pointerdown', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      this._chargePressed = true; this.chargeBtn = true;
+      charge.classList.add('down');
+      try { charge.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    const chargeUp = () => { this.chargeBtn = false; charge.classList.remove('down'); };
+    charge.addEventListener('pointerup', chargeUp);
+    charge.addEventListener('pointercancel', chargeUp);
+    charge.addEventListener('lostpointercapture', chargeUp);
+    this.btnDash = wrap.querySelector('#btn-dash');
+    this.btnDash.addEventListener('pointerdown', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      this._dash = true;
+      this.btnDash.classList.add('down');
+      setTimeout(() => this.btnDash.classList.remove('down'), 120);
+    });
+
     this.btnInteract.addEventListener('pointerdown', (e) => {
       e.preventDefault(); e.stopPropagation();
       this._interact = true;
@@ -185,6 +239,12 @@ export class Input {
     this._syncTouchUI();
   }
   _syncTouchUI() { this.touchUI.hidden = !(this.touchMode && this.enabled); }
+
+  // Show the touch buttons for moves the player owns.
+  setMoves(unlocks) {
+    if (this.btnDash) this.btnDash.hidden = !(unlocks && unlocks.dash);
+    if (this.touchUI) this.touchUI.classList.toggle('has-dash', !!(unlocks && unlocks.dash));
+  }
 
   setInteract(label) {
     if (label) {
@@ -209,11 +269,21 @@ export class Input {
     const d = Math.hypot(dx, dy);
     if (d > R) { dx = dx / d * R; dy = dy / d * R; }
     this.stick.x = dx / R; this.stick.y = dy / R;
+    // two quick flicks in the same direction = dash
+    const mag = Math.hypot(this.stick.x, this.stick.y), f = this._flick;
+    if (mag < 0.3) f.armed = true;
+    else if (mag > 0.85 && f.armed) {
+      f.armed = false;
+      const now = performance.now(), nx = this.stick.x / mag, ny = this.stick.y / mag;
+      if (now - f.t < 320 && nx * f.x + ny * f.y > 0.75) { this._dash = true; f.t = 0; }
+      else { f.t = now; f.x = nx; f.y = ny; }
+    }
     this.stickKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
     this.stickBase.classList.toggle('sprint', Math.hypot(this.stick.x, this.stick.y) >= CONFIG.movement.joystickSprintAt);
   }
   _releaseStick() {
     this.stick.active = false; this.stick.x = 0; this.stick.y = 0;
+    if (this._flick) this._flick.armed = true;
     if (this.stickBase) this.stickBase.classList.remove('show', 'sprint');
   }
 }

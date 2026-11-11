@@ -2,6 +2,7 @@
 // merges every box into a few draw calls (vertex-coloured), canvas textures.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { toon } from './gfx.js';
 
 export class World {
   constructor() {
@@ -56,54 +57,79 @@ const _q = new THREE.Quaternion();
 const _e = new THREE.Euler();
 const _c = new THREE.Color();
 const BOX = new THREE.BoxGeometry(1, 1, 1);
+// Box with an extra row of vertices near the bottom so fake ambient occlusion
+// (darker base) stays a short gradient instead of spanning the whole wall.
+const AO_BOX = new THREE.BoxGeometry(1, 1, 1, 1, 2, 1);
 
-// Collects coloured box geometry and merges it into one mesh per shadow bucket.
+// Collects coloured box geometry and merges it into one mesh per bucket:
+//   cast  – casts + receives shadows (buildings, props)
+//   flat  – receive only (ground, roads, decals)
+//   glow  – like cast, but its material glows at night (windows, lamp heads)
 export class Batcher {
   constructor() {
-    this.cast = [];     // geometries that cast + receive shadows
-    this.flat = [];     // receive only (ground, roads, decals)
+    this.lists = { cast: [], flat: [], glow: [] };
   }
   // Add an arbitrary geometry with a uniform colour and transform.
-  geom(geometry, color, { x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0, sx = 1, sy = 1, sz = 1, cast = true } = {}) {
+  geom(geometry, color, { x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0, sx = 1, sy = 1, sz = 1, cast = true, bucket = null, ao = 0, aoRise = 0.9, shade = null } = {}) {
     let g = geometry.index ? geometry.toNonIndexed() : geometry.clone();
     for (const name of Object.keys(g.attributes)) {
       if (name !== 'position' && name !== 'normal') g.deleteAttribute(name);
+    }
+    const isAO = ao > 0 && geometry === AO_BOX;
+    if (isAO) {
+      // pull the middle row of vertices down to aoRise metres above the base
+      const pa = g.attributes.position;
+      const k = Math.min(0.45, aoRise / Math.max(0.01, sy));
+      for (let i = 0; i < pa.count; i++) if (Math.abs(pa.getY(i)) < 1e-4) pa.setY(i, -0.5 + k);
     }
     _e.set(rx, ry, rz);
     _q.setFromEuler(_e);
     _m.compose(new THREE.Vector3(x, y, z), _q, new THREE.Vector3(sx, sy, sz));
     g.applyMatrix4(_m);
-    _c.set(color);
-    // vertex colours are linear; convert from sRGB hex
-    _c.convertSRGBToLinear();
+    _c.set(color);   // THREE.Color converts sRGB hex to linear vertex colours
     const n = g.attributes.position.count;
     const cols = new Float32Array(n * 3);
-    for (let i = 0; i < n; i++) { cols[i * 3] = _c.r; cols[i * 3 + 1] = _c.g; cols[i * 3 + 2] = _c.b; }
+    const pos = g.attributes.position, nrm = g.attributes.normal;
+    const base = y - sy / 2;
+    for (let i = 0; i < n; i++) {
+      let f = 1;
+      if (isAO && Math.abs(pos.getY(i) - base) < 1e-3) f = 1 - ao;
+      // top faces a hair brighter, undersides darker: reads as soft bounce light
+      if (shade !== false && nrm) { const ny = nrm.getY(i); if (ny > 0.5) f *= 1.04; else if (ny < -0.5) f *= 0.82; }
+      cols[i * 3] = _c.r * f; cols[i * 3 + 1] = _c.g * f; cols[i * 3 + 2] = _c.b * f;
+    }
     g.setAttribute('color', new THREE.BufferAttribute(cols, 3));
-    (cast ? this.cast : this.flat).push(g);
+    this.lists[bucket || (cast ? 'cast' : 'flat')].push(g);
   }
-  // Box from min/max extents.
+  // Box from min/max extents. Boxes standing on the ground get a darker base (fake AO).
   box(x0, x1, y0, y1, z0, z1, color, opts = {}) {
-    this.geom(BOX, color, Object.assign({
+    const lo = Math.min(y0, y1), h = Math.abs(y1 - y0);
+    const groundAO = opts.ao !== undefined ? opts.ao : (lo < 0.05 && h > 0.7 && opts.cast !== false ? 0.36 : 0);
+    this.geom(groundAO > 0 ? AO_BOX : BOX, color, Object.assign({
       x: (x0 + x1) / 2, y: (y0 + y1) / 2, z: (z0 + z1) / 2,
-      sx: Math.abs(x1 - x0), sy: Math.abs(y1 - y0), sz: Math.abs(z1 - z0)
-    }, opts));
+      sx: Math.abs(x1 - x0), sy: h, sz: Math.abs(z1 - z0)
+    }, opts, { ao: groundAO }));
   }
   // Box from centre + size.
   cbox(x, y, z, w, h, d, color, opts = {}) {
     this.geom(BOX, color, Object.assign({ x, y, z, sx: w, sy: h, sz: d }, opts));
   }
   build(scene) {
-    const mat = new THREE.MeshLambertMaterial({ vertexColors: true });
+    const mats = {
+      cast: Batcher.material(),
+      flat: Batcher.material(),
+      glow: Batcher.glowMaterial()
+    };
     const out = [];
-    for (const [list, cast] of [[this.cast, true], [this.flat, false]]) {
+    for (const key of ['cast', 'glow', 'flat']) {
+      const list = this.lists[key];
       if (!list.length) continue;
       // chunk to keep individual buffers a sensible size
       for (let i = 0; i < list.length; i += 400) {
         const merged = mergeGeometries(list.slice(i, i + 400), false);
         merged.computeBoundingSphere();
-        const mesh = new THREE.Mesh(merged, mat);
-        mesh.castShadow = cast;
+        const mesh = new THREE.Mesh(merged, mats[key]);
+        mesh.castShadow = key !== 'flat';
         mesh.receiveShadow = true;
         mesh.matrixAutoUpdate = false;
         mesh.updateMatrix();
@@ -111,8 +137,17 @@ export class Batcher {
         out.push(mesh);
       }
     }
-    this.cast = []; this.flat = [];
+    this.lists = { cast: [], flat: [], glow: [] };
     return out;
+  }
+  static material() {
+    if (!Batcher._mat) Batcher._mat = toon({ vertexColors: true });
+    return Batcher._mat;
+  }
+  // Shared by every batch: drive .emissive / .emissiveIntensity from the day cycle.
+  static glowMaterial() {
+    if (!Batcher._glow) Batcher._glow = toon({ vertexColors: true, emissive: 0xffc46b, emissiveIntensity: 0 });
+    return Batcher._glow;
   }
 }
 
@@ -126,22 +161,44 @@ export function canvasTexture(w, h, draw) {
   return tex;
 }
 
-// A flat textured sign. Returns the mesh (not batched — it needs its own texture).
-export function signMesh(text, { w = 4, h = 1, bg = '#2b2b2b', fg = '#ffffff', font = 'bold', px = 96, border = null } = {}) {
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+
+// A painted shop sign: rounded board, inset border, lettering with a soft
+// drop shadow. style: 'sans' (default) or 'serif' for the older buildings.
+// Returns the mesh (not batched — it needs its own texture).
+export function signMesh(text, { w = 4, h = 1, bg = '#2b2b2b', fg = '#ffffff', font = 'bold', px = 96, border = null, style = 'sans', glow = false } = {}) {
   const cw = 512, ch = Math.max(64, Math.round(512 * h / w));
+  const family = style === 'serif'
+    ? "Georgia, 'Times New Roman', serif"
+    : "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif";
   const tex = canvasTexture(cw, ch, (ctx) => {
     ctx.fillStyle = bg; ctx.fillRect(0, 0, cw, ch);
-    if (border) { ctx.strokeStyle = border; ctx.lineWidth = 10; ctx.strokeRect(5, 5, cw - 10, ch - 10); }
-    ctx.fillStyle = fg;
+    // subtle top highlight + bottom shade so it reads as a raised board
+    const grd = ctx.createLinearGradient(0, 0, 0, ch);
+    grd.addColorStop(0, 'rgba(255,255,255,0.16)'); grd.addColorStop(0.5, 'rgba(255,255,255,0)'); grd.addColorStop(1, 'rgba(0,0,0,0.18)');
+    ctx.fillStyle = grd; ctx.fillRect(0, 0, cw, ch);
+    const inset = Math.max(6, ch * 0.08);
+    ctx.lineWidth = Math.max(3, ch * 0.035);
+    ctx.strokeStyle = border || 'rgba(255,255,255,0.35)';
+    roundRect(ctx, inset, inset, cw - inset * 2, ch - inset * 2, inset);
+    ctx.stroke();
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    let size = Math.min(px, ch * 0.62);
-    ctx.font = `${font} ${size}px system-ui, -apple-system, 'Segoe UI', sans-serif`;
-    while (ctx.measureText(text).width > cw * 0.9 && size > 12) {
-      size -= 2;
-      ctx.font = `${font} ${size}px system-ui, -apple-system, 'Segoe UI', sans-serif`;
-    }
+    let size = Math.min(px, ch * 0.58);
+    const setFont = () => { ctx.font = `${font} ${size}px ${family}`; };
+    setFont();
+    if (style === 'serif') { try { ctx.letterSpacing = '2px'; } catch (e) { /* older canvases */ } }
+    while (ctx.measureText(text).width > cw * 0.84 && size > 12) { size -= 2; setFont(); }
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fillText(text, cw / 2 + size * 0.04, ch / 2 + 2 + size * 0.06);
+    ctx.fillStyle = fg;
     ctx.fillText(text, cw / 2, ch / 2 + 2);
   });
-  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshLambertMaterial({ map: tex }));
+  const mat = glow ? toon({ map: tex, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0 }) : toon({ map: tex });
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
+  if (glow) m.userData.nightGlow = true;
   return m;
 }

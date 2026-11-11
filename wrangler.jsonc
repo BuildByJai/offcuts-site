@@ -50,7 +50,7 @@
   //
   // Book Town (tools/book-town/) — its Atomic Habits escape room and Habit
   // Tower keep their leaderboards in a BOOK_TOWN_LEADERBOARD KV namespace
-  // (keys prefixed study:/tower:), also not provisioned yet. Without it
+  // (keys prefixed study:/tower:/trial-*:), also not provisioned yet. Without it
   // /api/book-town/{study,tower}/* return 503 and the games fall back to
   // the best time saved on the device. To turn it on:
   // run `wrangler kv namespace create BOOK_TOWN_LEADERBOARD`, then add its
