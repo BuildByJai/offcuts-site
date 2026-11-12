@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="description" content="Book Town graphics proof: the town square rebuilt in a soft, bright, semi-realistic style.">
+<meta name="theme-color" content="#9ec9ea">
+<title>Book Town — Graphics Proof</title>
+<link rel="stylesheet" href="../book-town.css">
+<link rel="stylesheet" href="proof.css">
+</head>
+<body>
+
+<canvas id="game-canvas"></canvas>
+
+<div id="loading">
+  <div class="logo"><span class="logo-book">📚</span><span class="logo-word">Book<b>Town</b></span></div>
+  <div class="bar"><span></span></div>
+  <p id="load-text">Preparing the square… 0%</p>
+  <p class="tip" id="load-tip"></p>
+</div>
+
+<div id="hud" hidden>
+  <div class="hud-chip" id="hud-hint">WASD move · Shift sprint · Space jump · drag to look · scroll to zoom out to the overview</div>
+</div>
+<button id="btn-pause" type="button" aria-label="Menu" hidden>≡</button>
+<div id="interact-prompt"></div>
+<div id="toasts"></div>
+<div id="fade"></div>
+
+<!-- start screen -->
+<div class="overlay title" id="start-screen" hidden>
+  <div class="card">
+    <p class="crumb"><a href="../../../">offcuts</a> / <a href="../">book-town</a> / proof</p>
+    <span class="tag-inline">graphics proof</span>
+    <h1 class="title-logo">📚 Book<b>Town</b></h1>
+    <p class="lede">The town square, rebuilt as a proof of the look we're after: soft bright lighting, real materials, lush gardens and a character that moves smoothly. Walk around, zoom out for the overview, and try the time-of-day presets in the menu.</p>
+    <div class="controls-hint controls-help"></div>
+    <p class="fineprint" id="start-note"></p>
+    <button class="btn" id="btn-play" type="button">Walk around</button>
+    <p class="site-footer">offcuts.buildbyjai.workers.dev</p>
+  </div>
+</div>
+
+<!-- menu -->
+<div class="overlay" id="pause" hidden>
+  <div class="card scrollable">
+    <span class="tag-inline">menu</span>
+    <h2>Graphics proof</h2>
+    <h3>Time of day</h3>
+    <div class="seg" id="preset-picker"></div>
+    <h3>Graphics</h3>
+    <div class="seg" id="quality-picker"></div>
+    <p class="fineprint" id="gfx-note"></p>
+    <div class="controls-hint controls-help" id="pause-help" hidden></div>
+    <button class="btn" id="btn-resume" type="button">Resume</button>
+    <div class="btn-row" style="margin-bottom:10px">
+      <button class="btn ghost" id="btn-help" type="button">Controls</button>
+      <button class="btn ghost" id="btn-debug" type="button">Debug panel</button>
+    </div>
+    <a class="btn ghost" href="../">Current town</a>
+  </div>
+</div>
+
+<div id="debug-panel" hidden></div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.webgpu.js",
+    "three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.webgpu.js",
+    "three/tsl": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.webgpu.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+    "@dimforge/rapier3d-compat": "https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-compat@0.14.0/rapier.es.js"
+  }
+}
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

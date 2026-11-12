@@ -1,0 +1,34 @@
+/* Graphics proof: on top of book-town.css (cards, HUD, touch controls). */
+html, body { background: #9ec9ea; }
+#loading { background: radial-gradient(circle at 50% 30%, #d7ecf8, #9ec9ea 55%, #7fb2d8); }
+
+#hud { pointer-events: none; }
+#hud-hint { max-width: min(70vw, 560px); white-space: normal; line-height: 1.45; opacity: 0.9; }
+body.touch #hud-hint { display: none; }
+
+.seg { display: flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
+.seg-btn { flex: 1; padding: 10px 6px; border: none; background: #fff; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: var(--ink-soft); cursor: pointer; }
+.seg-btn + .seg-btn { border-left: 1px solid var(--line); }
+.seg-btn.on { background: var(--accent); color: #fff; }
+
+/* debug panel (?debug=1) */
+#debug-panel {
+  position: fixed; right: max(12px, env(safe-area-inset-right)); top: max(64px, calc(env(safe-area-inset-top) + 58px)); z-index: 14;
+  width: 250px; max-height: calc(100vh - 90px); overflow-y: auto; background: rgba(18,22,28,0.86); color: #e8eef4; border-radius: 12px;
+  padding: 10px 12px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; line-height: 1.5; border: 1px solid rgba(255,255,255,0.12);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+#debug-panel h4 { margin: 8px 0 4px; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: #9cc; }
+#debug-panel .row { display: flex; justify-content: space-between; align-items: center; gap: 6px; padding: 2px 0; }
+#debug-panel .row b { color: #ffe27a; font-weight: 700; }
+#debug-panel label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+#debug-panel select, #debug-panel input[type=range] { width: 120px; }
+#debug-panel select { background: #0f1318; color: #fff; border: 1px solid #345; border-radius: 6px; padding: 2px 4px; font: inherit; }
+#debug-panel .stat { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; }
+#debug-panel .close { position: absolute; right: 8px; top: 6px; background: none; border: none; color: #9ab; cursor: pointer; font-size: 16px; }
+
+/* soft HUD chip for the start note */
+#start-note { min-height: 0; }
+
+/* blob shadow fallback hint */
+.fineprint.warn { color: #a3501a; }
