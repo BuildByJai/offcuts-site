@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Sudoku — Offcuts</title>
-<meta name="description" content="Free Sudoku with daily puzzles, combos, challenges and badges. Play in 4×4, 6×6 or 9×9 using Western, Eastern Arabic, Roman, Chinese, emoji or colour symbols.">
+<title>Sudoku Shudoku — Offcuts</title>
+<meta name="description" content="Sudoku Shudoku: free Sudoku with daily puzzles, combos, challenges and badges. Play in 4×4, 6×6 or 9×9 using Western, Eastern Arabic, Roman, Chinese, emoji or colour symbols.">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
   :root {
@@ -40,17 +40,39 @@
   .tabs { display:flex; gap:6px; margin-bottom:10px; }
   .tab { flex:1; padding:9px; border:1px solid var(--line); background:#fff; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer; }
   .tab.active { background:var(--ink); color:#fff; border-color:var(--ink); }
-  .setup[hidden] { display:none !important; }
-  .setup { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-bottom:10px; }
+  [hidden] { display:none !important; }
   .seg { display:flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:#fff; }
-  .seg button { border:0; background:transparent; padding:7px 10px; font-family:'JetBrains Mono',monospace; font-size:12px; cursor:pointer; color:var(--ink-soft); }
+  .seg button { flex:1; border:0; background:transparent; padding:8px 6px; font-family:'JetBrains Mono',monospace; font-size:12px; cursor:pointer; color:var(--ink-soft); }
+  .seg button + button { border-left:1px solid var(--line); }
   .seg button.active { background:var(--accent); color:#fff; }
   .btn { padding:8px 14px; border-radius:8px; border:1px solid var(--accent); background:var(--accent); color:#fff; font-size:14px; font-weight:600; cursor:pointer; }
   .btn:hover { opacity:.92; }
   .btn.ghost { background:#fff; color:var(--ink); border-color:var(--line); }
   .btn.ghost:hover { border-color:var(--accent); color:var(--accent); }
-  .grow { flex:1; }
-  .dailyinfo { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft); }
+  .dailyinfo { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft); margin:0 0 14px; padding:10px 12px; background:var(--paper); border:1px solid var(--line); border-radius:8px; }
+
+  /* menu */
+  .card { border:1px solid var(--line); border-radius:12px; background:#fff; padding:16px; margin-bottom:18px; }
+  .card .tabs { margin-bottom:14px; }
+  .optrow { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+  .optrow > .lab { width:72px; flex:0 0 auto; margin:0; }
+  .optrow .seg { flex:1; }
+  .optblock { margin-bottom:14px; }
+  .bigbtn { display:block; width:100%; padding:13px; font-size:16px; border-radius:10px; }
+  .bigbtn + .bigbtn { margin-top:8px; }
+  .mtabs { display:flex; border-bottom:1px solid var(--line); margin:0 0 14px; overflow-x:auto; scrollbar-width:none; }
+  .mtabs button { flex:1 0 auto; border:0; background:none; padding:10px 8px; font-size:13.5px; font-weight:600; color:var(--ink-soft); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
+  .mtabs button.active { color:var(--ink); border-bottom-color:var(--accent); }
+  .panel.copy h2 { font-size:15px; margin:14px 0 6px; display:block; }
+  .panel.copy h2:first-child { margin-top:0; }
+  .panel.copy p { color:var(--ink-soft); font-size:14px; margin:0 0 10px; }
+
+  /* play screen */
+  .topbar { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:8px; padding:18px 0 12px; }
+  .back { justify-self:start; border:1px solid var(--line); background:#fff; border-radius:8px; padding:7px 12px; font-size:13px; font-weight:600; cursor:pointer; }
+  .back:hover { border-color:var(--accent); color:var(--accent); }
+  .gtitle { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft); text-align:center; white-space:nowrap; }
+  .gbrand { justify-self:end; font-weight:800; font-size:13px; letter-spacing:-.01em; }
 
   /* status */
   .status { display:grid; grid-template-columns: repeat(4, 1fr); gap:6px; margin-bottom:10px; }
@@ -96,7 +118,8 @@
   /* controls */
   .controls { display:grid; grid-template-columns: repeat(5,1fr); gap:6px; margin:10px 0; }
   .ctl { background:#fff; border:1px solid var(--line); border-radius:8px; padding:7px 2px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; font-size:18px; position:relative; }
-  .ctl small { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--ink-soft); }
+  .ctl { line-height:22px; justify-content:center; }                 /* fixed icon line so labels line up */
+  .ctl small { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--ink-soft); line-height:1.2; }
   .ctl.on { background:var(--accent-soft); border-color:var(--accent); }
   .ctl.on small { color:var(--accent); font-weight:700; }
   .ctl:disabled { opacity:.4; cursor:default; }
@@ -104,17 +127,20 @@
   .keypad { display:grid; gap:6px; margin-bottom:14px; }
   .key { background:#fff; border:1px solid var(--line); border-radius:8px; padding:8px 0 5px; font-size:22px; font-weight:600; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; color:var(--accent); min-width:0; }
   .key:active { background:var(--accent-soft); }
-  .key small { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--ink-soft); font-weight:400; }
+  .key { line-height:28px; justify-content:center; }                 /* tall and short symbols share one line height */
+  .key small { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--ink-soft); font-weight:400; line-height:1.2; }
   .key.done { opacity:.25; pointer-events:none; }
   .key .long { font-size:.6em; } .key .mid { font-size:.8em; }
   .notesmode .key { color:var(--ink-soft); }
 
-  .numerals { margin-bottom:14px; }
   .lab { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; margin:0 0 6px; }
-  .chips { display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; scrollbar-width:thin; }
-  .chip { flex:0 0 auto; padding:6px 11px; border:1px solid var(--line); border-radius:20px; background:#fff; font-size:13px; cursor:pointer; white-space:nowrap; }
-  .chip.active { background:var(--accent); color:#fff; border-color:var(--accent); }
-  .chip .dot { width:.7em; height:.7em; margin-right:1px; }
+  .chips { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+  .chip { padding:7px 4px; border:1px solid var(--line); border-radius:8px; background:#fff; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:1px; min-width:0; }
+  .chip .pv { font-size:15px; font-weight:600; white-space:nowrap; line-height:1.3; }
+  .chip .nm { font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+  .chip.active { background:var(--accent-soft); border-color:var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .chip.active .nm { color:var(--accent); font-weight:700; }
+  .chip .dot { width:.75em; height:.75em; margin:0 1px; }
 
   /* panels */
   .panel { border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:14px; background:#fff; }
@@ -163,19 +189,18 @@
   .toast.gold { background:var(--gold); }
   .toast.green { background:var(--accent); }
 
-  section.copy { margin: 28px 0; }
-  section.copy h2 { font-size:18px; font-weight:700; margin:0 0 8px; }
-  section.copy p, section.copy li { color: var(--ink-soft); font-size:14.5px; }
-  section.copy p { margin:0 0 12px; }
   footer { border-top: 1px solid var(--line); padding: 24px 0 50px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft); }
-  @media (max-width:420px){ h1{font-size:26px} .status .stat .v{font-size:15px} .seg button{padding:7px 8px} }
+  @media (max-width:420px){ h1{font-size:26px} .status .stat .v{font-size:15px} .optrow > .lab{width:60px} .gbrand{display:none} }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <p class="crumb"><a href="../../">offcuts</a> / games / sudoku</p>
-  <h1>Sudoku <span class="tag-inline">games</span></h1>
-  <p class="lede">Fill every row, column and box with each symbol once. Build combos, clear daily challenges, collect badges, and play in the number system you like.</p>
+
+<!-- ================= MENU ================= -->
+<div id="menu">
+  <p class="crumb"><a href="../../">offcuts</a> / games / sudoku shudoku</p>
+  <h1>Sudoku Shudoku <span class="tag-inline">games</span></h1>
+  <p class="lede">Fill every row, column and box with each symbol once. Build combos, clear daily challenges and collect badges.</p>
 
   <div class="player">
     <span class="lvl" id="lvl">LV 1</span>
@@ -187,23 +212,89 @@
     <span class="streak" id="streak" title="Daily streak">🔥 0</span>
   </div>
 
-  <div class="tabs">
-    <button class="tab active" data-mode="classic">Classic</button>
-    <button class="tab" data-mode="daily">Daily puzzle</button>
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" data-mode="classic">Classic</button>
+      <button class="tab" data-mode="daily">Daily puzzle</button>
+    </div>
+
+    <div id="setupClassic">
+      <div class="optrow">
+        <p class="lab">Size</p>
+        <div class="seg" id="segSize"><button data-n="4">4×4</button><button data-n="6">6×6</button><button data-n="9">9×9</button></div>
+      </div>
+      <div class="optrow">
+        <p class="lab">Level</p>
+        <div class="seg" id="segDiff"><button data-d="easy">Easy</button><button data-d="medium">Medium</button><button data-d="hard">Hard</button><button data-d="expert">Expert</button></div>
+      </div>
+    </div>
+    <div id="setupDaily" hidden>
+      <p class="dailyinfo" id="dailyInfo">9×9 · Medium · same puzzle for everyone today</p>
+    </div>
+
+    <div class="optblock">
+      <p class="lab">Symbols</p>
+      <div class="chips" id="numChips"></div>
+    </div>
+
+    <button class="btn bigbtn" id="continueBtn" hidden>Continue</button>
+    <button class="btn bigbtn" id="startBtn">Start game</button>
   </div>
 
-  <div class="setup" id="setupClassic">
-    <div class="seg" id="segSize">
-      <button data-n="4">4×4</button><button data-n="6">6×6</button><button data-n="9">9×9</button>
-    </div>
-    <div class="seg" id="segDiff">
-      <button data-d="easy">Easy</button><button data-d="medium">Med</button><button data-d="hard">Hard</button><button data-d="expert">Expert</button>
-    </div>
-    <span class="grow"></span>
-    <button class="btn" id="newBtn">New game</button>
+  <nav class="mtabs" id="mtabs">
+    <button data-p="challenges" class="active">Challenges</button>
+    <button data-p="badges">Badges</button>
+    <button data-p="stats">Stats</button>
+    <button data-p="settings">Settings</button>
+    <button data-p="help">How to play</button>
+  </nav>
+
+  <div class="panel mpanel" data-p="challenges">
+    <h2>Today's challenges <span id="qDate"></span></h2>
+    <div id="quests"></div>
   </div>
-  <div class="setup" id="setupDaily" hidden>
-    <span class="dailyinfo" id="dailyInfo">9×9 · Medium · same puzzle for everyone today</span>
+
+  <div class="panel mpanel" data-p="badges" hidden>
+    <h2>Badges <span id="bCount"></span></h2>
+    <div class="badges" id="badges"></div>
+  </div>
+
+  <div class="panel mpanel" data-p="stats" hidden>
+    <h2>Stats</h2>
+    <div class="stats">
+      <div class="stat"><div class="k">Solved</div><div class="v" id="stSolved">0</div></div>
+      <div class="stat"><div class="k">Best combo</div><div class="v" id="stCombo">×1</div></div>
+      <div class="stat"><div class="k">Best streak</div><div class="v" id="stStreak">0</div></div>
+    </div>
+    <table class="besttbl" id="bestTbl"></table>
+  </div>
+
+  <div class="panel mpanel settings" data-p="settings" hidden>
+    <h2>Settings</h2>
+    <label><input type="checkbox" id="optStrikes"> 3-strike limit (game over after 3 mistakes)</label>
+    <label><input type="checkbox" id="optHighlight"> Highlight matching symbols</label>
+    <label><input type="checkbox" id="optAutoNotes"> Auto-clear notes when a symbol is placed</label>
+  </div>
+
+  <div class="panel mpanel copy" data-p="help" hidden>
+    <h2>How to play Sudoku</h2>
+    <p>The grid is split into rows, columns and boxes. Every row, column and box must contain each symbol exactly once. Some cells start filled in. Use logic to work out the rest. You never need to guess, and you never need to do maths.</p>
+    <p>Tap a cell, then tap a symbol. Turn on <strong>Notes</strong> to pencil in candidates. Wrong entries turn red and count as a mistake. On a keyboard, use the arrow keys and number keys, N for notes, Z to undo, H for a hint and P to pause.</p>
+    <h2>Scoring</h2>
+    <p>Every correct placement scores points, more on harder puzzles. Correct placements in a row build a combo multiplier (×2 after 4, up to ×5). A mistake or hint resets it. Finishing a row, column or box gives a bonus. At the end you get a time bonus, plus extras for zero mistakes and no hints. All your points also count as XP towards your level.</p>
+    <h2>Other numeral systems</h2>
+    <p>Sudoku is about logic, not arithmetic, so any set of symbols works. Pick Western digits, Eastern Arabic (١٢٣), Roman numerals, Chinese, Devanagari, letters, animals, fruit or colours. You can change symbols mid-game: head back to the menu, pick a new set and continue where you left off.</p>
+  </div>
+
+  <footer>offcuts.buildbyjai.workers.dev</footer>
+</div>
+
+<!-- ================= PLAY ================= -->
+<div id="play" hidden>
+  <div class="topbar">
+    <button class="back" id="backBtn">← Menu</button>
+    <div class="gtitle" id="gTitle"></div>
+    <div class="gbrand">Sudoku Shudoku</div>
   </div>
 
   <div class="status">
@@ -228,50 +319,8 @@
   </div>
 
   <div class="keypad" id="keypad"></div>
+</div>
 
-  <div class="numerals">
-    <p class="lab">Symbols</p>
-    <div class="chips" id="numChips"></div>
-  </div>
-
-  <div class="panel">
-    <h2>Today's challenges <span id="qDate"></span></h2>
-    <div id="quests"></div>
-  </div>
-
-  <div class="panel">
-    <h2>Badges <span id="bCount"></span></h2>
-    <div class="badges" id="badges"></div>
-  </div>
-
-  <div class="panel">
-    <h2>Stats</h2>
-    <div class="stats">
-      <div class="stat"><div class="k">Solved</div><div class="v" id="stSolved">0</div></div>
-      <div class="stat"><div class="k">Best combo</div><div class="v" id="stCombo">×1</div></div>
-      <div class="stat"><div class="k">Best streak</div><div class="v" id="stStreak">0</div></div>
-    </div>
-    <table class="besttbl" id="bestTbl"></table>
-  </div>
-
-  <div class="panel settings">
-    <h2>Settings</h2>
-    <label><input type="checkbox" id="optStrikes"> 3-strike limit (game over after 3 mistakes)</label>
-    <label><input type="checkbox" id="optHighlight"> Highlight matching symbols</label>
-    <label><input type="checkbox" id="optAutoNotes"> Auto-clear notes when a symbol is placed</label>
-  </div>
-
-  <section class="copy">
-    <h2>How to play Sudoku</h2>
-    <p>The grid is split into rows, columns and boxes. Every row, column and box must contain each symbol exactly once. Some cells start filled in. Use logic to work out the rest. You never need to guess, and you never need to do maths.</p>
-    <p>Tap a cell, then tap a symbol. Turn on <strong>Notes</strong> to pencil in candidates. Wrong entries turn red and count as a mistake.</p>
-    <h2>Scoring</h2>
-    <p>Every correct placement scores points, more on harder puzzles. Correct placements in a row build a combo multiplier (×2 after 4, up to ×5). A mistake or hint resets it. Finishing a row, column or box gives a bonus. At the end you get a time bonus, plus extras for zero mistakes and no hints. All your points also count as XP towards your level.</p>
-    <h2>Other numeral systems</h2>
-    <p>Sudoku is about logic, not arithmetic, so any set of symbols works. You can switch between Western digits, Eastern Arabic (١٢٣), Roman numerals, Chinese, Devanagari, letters, animals, fruit or colours at any time, even mid-game.</p>
-  </section>
-
-  <footer>offcuts.buildbyjai.workers.dev</footer>
 </div>
 
 <div class="modal" id="modal"><div class="mbox" id="mbox"></div></div>
@@ -433,7 +482,7 @@ const saveProg = () => LS.set(K_PROG, P);
 const saveSet = () => LS.set(K_SET, S);
 
 let G = null;              // current game
-let notesMode = false, paused = false, lastSaveTick = 0;
+let notesMode = false, paused = false, lastSaveTick = 0, inPlay = false;
 const geoOf = () => geometry(G.N);
 
 function levelOf(xp) {
@@ -467,19 +516,61 @@ function loadGame(mode) {
   G = g; notesMode = false; paused = false;
   buildBoard(); render(); return true;
 }
-function switchMode(mode) {
-  if (G) saveGame();
-  S.mode = mode; saveSet();
+/* ---------- screens ---------- */
+function savedGame(mode) {
+  if (G && G.mode === mode) return G;
+  const g = LS.get(K_GAME + mode, null);
+  if (!g || !g.solution) return null;
+  if (mode === 'daily' && g.dateKey !== todayKey()) return null;
+  return g;
+}
+function inProgress(g) { return !!(g && g.started && !g.done && !g.failed); }
+function selectMode(mode) { S.mode = mode; saveSet(); renderMenu(); }
+function renderMenu() {
+  const mode = S.mode;
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
   $('#setupClassic').hidden = mode !== 'classic';
   $('#setupDaily').hidden = mode !== 'daily';
+  const cont = $('#continueBtn'), start = $('#startBtn');
   if (mode === 'daily') {
-    const done = P.daily[todayKey()];
+    const done = P.daily[todayKey()], g = savedGame('daily');
     $('#dailyInfo').textContent = done
       ? `Solved today · ${fmtTime(done.elapsed)} · ${fmtNum(done.score)} pts · come back tomorrow`
       : `${prettyDate(todayKey())} · 9×9 · Medium · same puzzle for everyone`;
+    cont.hidden = true;
+    start.textContent = done ? 'View today\'s puzzle' : inProgress(g) ? `Continue today's puzzle · ${fmtTime(g.elapsed)}` : g && g.failed ? 'Retry today\'s puzzle' : 'Play today\'s puzzle';
+    start.classList.remove('ghost');
+  } else {
+    const g = savedGame('classic'), live = inProgress(g);
+    cont.hidden = !live;
+    if (live) cont.textContent = `Continue · ${g.N}×${g.N} ${DIFF_LABEL[g.diff]} · ${fmtTime(g.elapsed)}`;
+    start.textContent = `${live ? 'New game' : 'Start game'} · ${S.N}×${S.N} ${DIFF_LABEL[S.diff]}`;
+    start.classList.toggle('ghost', live);
   }
-  if (!loadGame(mode)) newGame(mode);
+}
+function showPlay(push = true) {
+  if (!G) return;
+  inPlay = true; paused = false;
+  $('#menu').hidden = true; $('#play').hidden = false;
+  if (push && location.hash !== '#play') history.pushState({ sudoku: 1 }, '', '#play');
+  sizeFonts(); render(); window.scrollTo(0, 0);
+}
+function showMenu() {
+  if (G) saveGame();
+  inPlay = false; closeModal();
+  $('#play').hidden = true; $('#menu').hidden = false;
+  renderSetup(); renderMeta(); renderMenu(); window.scrollTo(0, 0);
+}
+function goMenu() {
+  if (location.hash === '#play' && history.state && history.state.sudoku) history.back();   // popstate shows the menu
+  else { history.replaceState(null, '', location.pathname + location.search); showMenu(); }
+}
+function startClassic() { confirmNew(() => { newGame('classic'); showPlay(); }); }
+function startDaily() {
+  const g = savedGame('daily');
+  if (g && g.failed && !P.daily[todayKey()]) newGame('daily');           // a failed daily goes straight to a fresh try
+  else if (!loadGame('daily')) newGame('daily');
+  showPlay();
 }
 
 /* ---------- board DOM ---------- */
@@ -575,6 +666,7 @@ function render() {
   $('#pauseCover').classList.toggle('show', paused && !G.done && !G.failed);
   $('#failCover').classList.toggle('show', !!G.failed);
   $('#pauseBtn').querySelector('small').textContent = paused ? 'Resume' : 'Pause';
+  $('#gTitle').textContent = `${G.mode === 'daily' ? 'Daily · ' + prettyDate(G.dateKey) : 'Classic'} · ${N}×${N} · ${DIFF_LABEL[G.diff]}`;
 }
 function renderMeta() {
   const lv = levelOf(P.xp);
@@ -605,7 +697,7 @@ function renderSetup() {
   document.querySelectorAll('#segDiff button').forEach(b => b.classList.toggle('active', b.dataset.d === S.diff));
   $('#numChips').innerHTML = Object.entries(NUMERALS).map(([k, n]) => {
     const prev = n.colour ? n.s.slice(0, 3).map(c => `<span class="dot" style="background:${c}"></span>`).join('') : n.s.slice(0, 3).join(n.emoji ? '' : ' ');
-    return `<button class="chip ${S.numeral === k ? 'active' : ''}" data-k="${k}">${prev} · ${n.name}</button>`;
+    return `<button class="chip ${S.numeral === k ? 'active' : ''}" data-k="${k}"><span class="pv">${prev}</span><span class="nm">${n.name}</span></button>`;
   }).join('');
   $('#optStrikes').checked = S.strikes; $('#optHighlight').checked = S.highlight; $('#optAutoNotes').checked = S.autoNotes;
 }
@@ -752,7 +844,6 @@ function finish() {
   const newB = [];
   for (const b of BADGES) if (!P.badges.includes(b.id) && b.test(res, P)) { P.badges.push(b.id); newB.push(b); }
   saveProg(); saveGame(); renderMeta(); render();
-  if (G.mode === 'daily') switchModeInfo();
 
   const rows = [['Placements & combos', play], ['Time bonus', timeBonus], ['Zero mistakes', flawless], ['No hints', noHint]];
   let html = `<h3>${G.mode === 'daily' ? 'Daily solved! 🎉' : 'Solved! 🎉'}</h3>
@@ -765,19 +856,14 @@ function finish() {
   newB.forEach(b => html += `<div class="unlock">${b.ic} Badge unlocked: <strong>${b.nm}</strong></div>`);
   if (firstDaily) html += `<div class="unlock">🔥 Daily streak: <strong>${P.streak}</strong></div>`;
   html += `<div class="mbtns">`;
-  if (G.mode === 'daily') html += `<button class="btn" id="mShare">Share result</button><button class="btn ghost" id="mClassic">Play Classic</button>`;
-  else html += `<button class="btn" id="mNew">New game</button><button class="btn ghost" id="mClose">Close</button>`;
+  if (G.mode === 'daily') html += `<button class="btn" id="mShare">Share result</button><button class="btn ghost" id="mMenu">Menu</button>`;
+  else html += `<button class="btn" id="mNew">New game</button><button class="btn ghost" id="mMenu">Menu</button>`;
   html += `</div>`;
   openModal(html);
   $('#mNew') && ($('#mNew').onclick = () => { closeModal(); newGame('classic'); });
-  $('#mClose') && ($('#mClose').onclick = closeModal);
-  $('#mClassic') && ($('#mClassic').onclick = () => { closeModal(); switchMode('classic'); });
+  $('#mMenu').onclick = () => { closeModal(); goMenu(); };
   $('#mShare') && ($('#mShare').onclick = share);
   confetti();
-}
-function switchModeInfo() {
-  const done = P.daily[todayKey()];
-  if (done) $('#dailyInfo').textContent = `Solved today · ${fmtTime(done.elapsed)} · ${fmtNum(done.score)} pts · come back tomorrow`;
 }
 function retry() {
   if (!G) return;
@@ -794,7 +880,7 @@ function fail() {
 async function share() {
   const d = P.daily[todayKey()]; if (!d) return;
   const set = NUMERALS[d.numeral];
-  const txt = `Offcuts Sudoku · Daily ${prettyDate(todayKey())}\n⏱ ${fmtTime(d.elapsed)} · ❌ ${d.mistakes} · 💡 ${d.hints}\n🏆 ${fmtNum(d.score)} pts · ×${d.maxMult} combo · 🔥 ${P.streak}\nPlayed in ${set.name}${set.colour ? ' 🌈' : ' ' + set.s.slice(0, 3).join('')}\noffcuts.buildbyjai.workers.dev/tools/sudoku/`;
+  const txt = `Sudoku Shudoku · Daily ${prettyDate(todayKey())}\n⏱ ${fmtTime(d.elapsed)} · ❌ ${d.mistakes} · 💡 ${d.hints}\n🏆 ${fmtNum(d.score)} pts · ×${d.maxMult} combo · 🔥 ${P.streak}\nPlayed in ${set.name}${set.colour ? ' 🌈' : ' ' + set.s.slice(0, 3).join('')}\noffcuts.buildbyjai.workers.dev/tools/sudoku/`;
   try {
     if (navigator.share) { await navigator.share({ text: txt }); return; }
     await navigator.clipboard.writeText(txt); toast('Result copied to clipboard', 'green');
@@ -824,7 +910,7 @@ function confetti() {
   })();
 }
 function confirmNew(fn) {
-  if (G && G.started && !G.done && !G.failed) {
+  if (inProgress(savedGame('classic'))) {
     openModal(`<h3>Start a new puzzle?</h3><p class="sub">Your current puzzle will be abandoned.</p><div class="mbtns"><button class="btn" id="mYes">New puzzle</button><button class="btn ghost" id="mNo">Keep playing</button></div>`);
     $('#mYes').onclick = () => { closeModal(); fn(); };
     $('#mNo').onclick = closeModal;
@@ -832,10 +918,18 @@ function confirmNew(fn) {
 }
 
 /* ---------- wiring ---------- */
-document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => { if (S.mode !== t.dataset.mode) switchMode(t.dataset.mode); }));
-$('#segSize').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.N = +b.dataset.n; saveSet(); renderSetup(); confirmNew(() => newGame('classic')); });
-$('#segDiff').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.diff = b.dataset.d; saveSet(); renderSetup(); confirmNew(() => newGame('classic')); });
-$('#newBtn').addEventListener('click', () => confirmNew(() => newGame('classic')));
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => selectMode(t.dataset.mode)));
+$('#segSize').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.N = +b.dataset.n; saveSet(); renderSetup(); renderMenu(); });
+$('#segDiff').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.diff = b.dataset.d; saveSet(); renderSetup(); renderMenu(); });
+$('#startBtn').addEventListener('click', () => S.mode === 'daily' ? startDaily() : startClassic());
+$('#continueBtn').addEventListener('click', () => { if (loadGame('classic')) showPlay(); });
+$('#backBtn').addEventListener('click', goMenu);
+$('#mtabs').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('#mtabs button').forEach(x => x.classList.toggle('active', x === b));
+  document.querySelectorAll('.mpanel').forEach(x => { x.hidden = x.dataset.p !== b.dataset.p; });
+});
+window.addEventListener('popstate', () => { if (location.hash === '#play' && G) showPlay(false); else showMenu(); });
 $('#numChips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; S.numeral = b.dataset.k; saveSet(); renderSetup(); render(); });
 $('#undoBtn').addEventListener('click', undo);
 $('#eraseBtn').addEventListener('click', erase);
@@ -851,7 +945,7 @@ $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeM
 
 document.addEventListener('keydown', e => {
   if ($('#modal').classList.contains('show')) { if (e.key === 'Escape') closeModal(); return; }
-  if (e.target.tagName === 'INPUT') return;
+  if (!inPlay || e.target.tagName === 'INPUT') return;
   const k = e.key;
   if (/^[1-9]$/.test(k) && G && +k <= G.N) { input(+k); e.preventDefault(); }
   else if (k === 'ArrowUp') { move(-1, 0); e.preventDefault(); }
@@ -864,20 +958,22 @@ document.addEventListener('keydown', e => {
   else if (k === 'h' || k === 'H') hint();
   else if (k === 'p' || k === 'P' || k === ' ') { togglePause(); e.preventDefault(); }
 });
-document.addEventListener('visibilitychange', () => { if (document.hidden) { togglePause(true); saveGame(); } });
+document.addEventListener('visibilitychange', () => { if (document.hidden && inPlay) { togglePause(true); saveGame(); } });
 window.addEventListener('resize', sizeFonts);
 window.addEventListener('pagehide', saveGame);
 
 setInterval(() => {
-  if (!G || G.done || G.failed || paused || !G.started || document.hidden) return;
+  if (!inPlay || !G || G.done || G.failed || paused || !G.started || document.hidden) return;
   G.elapsed++;
   $('#sTime').textContent = fmtTime(G.elapsed);
   if (G.elapsed - lastSaveTick >= 5) { lastSaveTick = G.elapsed; saveGame(); }
 }, 1000);
 
 /* ---------- boot ---------- */
-renderSetup(); renderMeta();
-switchMode(S.mode === 'daily' ? 'daily' : 'classic');
+if (S.mode !== 'daily') S.mode = 'classic';
+renderSetup(); renderMeta(); renderMenu();
+if (location.hash === '#play' && loadGame(S.mode)) showPlay(false);       // refresh mid-game stays on the board
+else if (location.hash) history.replaceState(null, '', location.pathname + location.search);
 })();
 </script>
 </body>
