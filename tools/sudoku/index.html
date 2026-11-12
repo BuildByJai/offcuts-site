@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Sudoku — Offcuts</title>
+<meta name="description" content="Free Sudoku with daily puzzles, combos, challenges and badges. Play in 4×4, 6×6 or 9×9 using Western, Eastern Arabic, Roman, Chinese, emoji or colour symbols.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
+  :root {
+    --paper: #FAFAF8; --ink: #181818; --ink-soft: #5C5C58;
+    --line: #E3E1DA; --accent: #156534; --accent-soft: #E9F3ED;
+    --bad: #A32D2D; --bad-soft: #FBEAEA; --gold: #B7791F; --gold-soft: #FDF3E1;
+    --peer: #F1F0EB; --same: #D7EBDD;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Inter', system-ui, sans-serif; line-height: 1.5; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 0 16px 80px; }
+  .crumb { padding: 28px 0 0; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink-soft); }
+  .crumb a { color: var(--accent); text-decoration: none; }
+  .crumb a:hover { text-decoration: underline; }
+  h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; margin: 12px 0 6px; }
+  .tag-inline { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent); background:var(--accent-soft); padding:3px 9px; border-radius:4px; vertical-align:middle; margin-left:8px; transform: translateY(-2px); }
+  .lede { font-size: 15px; color: var(--ink-soft); margin: 0 0 18px; }
+  .mono { font-family:'JetBrains Mono',monospace; }
+  button { font-family: inherit; color: inherit; }
+
+  /* player bar */
+  .player { display:flex; align-items:center; gap:12px; border:1px solid var(--line); background:#fff; border-radius:10px; padding:10px 14px; margin-bottom:12px; }
+  .lvl { font-family:'JetBrains Mono',monospace; font-size:12px; background:var(--accent); color:#fff; border-radius:6px; padding:4px 8px; white-space:nowrap; }
+  .xpwrap { flex:1; min-width:0; }
+  .xptitle { font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .xpbar { height:6px; background:var(--line); border-radius:4px; overflow:hidden; margin-top:4px; }
+  .xpbar i { display:block; height:100%; background:var(--accent); width:0; transition: width .5s; }
+  .xpnum { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft); margin-top:2px; }
+  .streak { font-family:'JetBrains Mono',monospace; font-size:13px; white-space:nowrap; }
+
+  /* tabs + setup */
+  .tabs { display:flex; gap:6px; margin-bottom:10px; }
+  .tab { flex:1; padding:9px; border:1px solid var(--line); background:#fff; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer; }
+  .tab.active { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .setup[hidden] { display:none !important; }
+  .setup { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-bottom:10px; }
+  .seg { display:flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:#fff; }
+  .seg button { border:0; background:transparent; padding:7px 10px; font-family:'JetBrains Mono',monospace; font-size:12px; cursor:pointer; color:var(--ink-soft); }
+  .seg button.active { background:var(--accent); color:#fff; }
+  .btn { padding:8px 14px; border-radius:8px; border:1px solid var(--accent); background:var(--accent); color:#fff; font-size:14px; font-weight:600; cursor:pointer; }
+  .btn:hover { opacity:.92; }
+  .btn.ghost { background:#fff; color:var(--ink); border-color:var(--line); }
+  .btn.ghost:hover { border-color:var(--accent); color:var(--accent); }
+  .grow { flex:1; }
+  .dailyinfo { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft); }
+
+  /* status */
+  .status { display:grid; grid-template-columns: repeat(4, 1fr); gap:6px; margin-bottom:10px; }
+  .stat { background:#fff; border:1px solid var(--line); border-radius:8px; padding:6px 8px; text-align:center; }
+  .stat .k { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; }
+  .stat .v { font-size:17px; font-weight:700; font-variant-numeric: tabular-nums; }
+  .stat.bad .v { color:var(--bad); }
+  .combo { position:relative; }
+  .combo .v { color:var(--gold); }
+  .pop { animation: pop .35s ease; }
+  @keyframes pop { 0%{transform:scale(1)} 40%{transform:scale(1.25)} 100%{transform:scale(1)} }
+
+  /* board */
+  .boardwrap { position:relative; }
+  .board { display:grid; width:100%; aspect-ratio:1; border:2.5px solid var(--ink); border-radius:6px; overflow:hidden; background:#fff; user-select:none; touch-action:manipulation; }
+  .cell { position:relative; border:0; border-right:1px solid var(--line); border-bottom:1px solid var(--line); background:#fff; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:600; color:var(--accent); font-size: var(--fs); line-height:1; min-width:0; min-height:0; overflow:hidden; }
+  .cell.bxr { border-right:2px solid var(--ink); }
+  .cell.bxb { border-bottom:2px solid var(--ink); }
+  .cell.lastc { border-right:0; } .cell.lastr { border-bottom:0; }
+  .cell.given { color:var(--ink); font-weight:700; }
+  .cell.peer { background:var(--peer); }
+  .cell.same { background:var(--same); }
+  .cell.sel { background:#BFE0C9; box-shadow: inset 0 0 0 2px var(--accent); }
+  .cell.wrong { color:var(--bad); background:var(--bad-soft); }
+  .cell.wrong.sel { box-shadow: inset 0 0 0 2px var(--bad); }
+  .cell.flash { animation: flash .7s ease; }
+  @keyframes flash { 0%{background:#FFE9A8} 100%{} }
+  .cell.shake { animation: shake .35s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-3px)} 75%{transform:translateX(3px)} }
+  .cell .sym.long { font-size: .62em; letter-spacing:-.04em; }
+  .cell .sym.mid { font-size: .8em; }
+  .notes { position:absolute; inset:2px; display:grid; align-items:center; justify-items:center; color:var(--ink-soft); font-weight:500; font-size: var(--nfs); line-height:1; }
+  .notes span { min-width:0; overflow:hidden; white-space:nowrap; }
+  .notes .long { font-size:.7em; }
+  .dot { display:inline-block; width:.85em; height:.85em; border-radius:50%; vertical-align:middle; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+  .notes .dot { width:.8em; height:.8em; }
+  .cell:not(.given) > .dot { box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px var(--accent); }
+  .cell.wrong .dot { outline:2px solid var(--bad); outline-offset:2px; }
+  .pausecover { position:absolute; inset:0; background:rgba(250,250,248,.96); display:none; flex-direction:column; align-items:center; justify-content:center; gap:12px; border-radius:6px; z-index:2; }
+  .pausecover.show { display:flex; }
+  .pausecover p { margin:0; font-weight:700; font-size:20px; }
+
+  /* controls */
+  .controls { display:grid; grid-template-columns: repeat(5,1fr); gap:6px; margin:10px 0; }
+  .ctl { background:#fff; border:1px solid var(--line); border-radius:8px; padding:7px 2px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; font-size:18px; position:relative; }
+  .ctl small { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--ink-soft); }
+  .ctl.on { background:var(--accent-soft); border-color:var(--accent); }
+  .ctl.on small { color:var(--accent); font-weight:700; }
+  .ctl:disabled { opacity:.4; cursor:default; }
+  .badge-n { position:absolute; top:3px; right:6px; font-family:'JetBrains Mono',monospace; font-size:10px; background:var(--accent); color:#fff; border-radius:8px; padding:0 5px; }
+  .keypad { display:grid; gap:6px; margin-bottom:14px; }
+  .key { background:#fff; border:1px solid var(--line); border-radius:8px; padding:8px 0 5px; font-size:22px; font-weight:600; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; color:var(--accent); min-width:0; }
+  .key:active { background:var(--accent-soft); }
+  .key small { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--ink-soft); font-weight:400; }
+  .key.done { opacity:.25; pointer-events:none; }
+  .key .long { font-size:.6em; } .key .mid { font-size:.8em; }
+  .notesmode .key { color:var(--ink-soft); }
+
+  .numerals { margin-bottom:14px; }
+  .lab { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; margin:0 0 6px; }
+  .chips { display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; scrollbar-width:thin; }
+  .chip { flex:0 0 auto; padding:6px 11px; border:1px solid var(--line); border-radius:20px; background:#fff; font-size:13px; cursor:pointer; white-space:nowrap; }
+  .chip.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .chip .dot { width:.7em; height:.7em; margin-right:1px; }
+
+  /* panels */
+  .panel { border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:14px; background:#fff; }
+  .panel h2 { font-size:16px; margin:0 0 10px; display:flex; justify-content:space-between; align-items:baseline; }
+  .panel h2 span { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft); font-weight:400; }
+  .quest { display:flex; gap:10px; align-items:center; padding:8px 0; border-top:1px solid var(--line); font-size:14px; }
+  .quest:first-of-type { border-top:0; }
+  .qchk { width:22px; height:22px; border-radius:50%; border:2px solid var(--line); flex:0 0 auto; display:flex; align-items:center; justify-content:center; font-size:12px; color:#fff; }
+  .quest.done .qchk { background:var(--accent); border-color:var(--accent); }
+  .quest.done .qtxt { color:var(--ink-soft); text-decoration: line-through; }
+  .qtxt { flex:1; }
+  .qxp { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--gold); }
+  .badges { display:grid; grid-template-columns: repeat(auto-fill, minmax(96px,1fr)); gap:8px; }
+  .bdg { border:1px solid var(--line); border-radius:8px; padding:10px 6px; text-align:center; background:var(--paper); }
+  .bdg .ic { font-size:24px; filter: grayscale(1); opacity:.35; }
+  .bdg .nm { font-size:12px; font-weight:600; margin-top:2px; color:var(--ink-soft); }
+  .bdg .ds { font-size:10.5px; color:var(--ink-soft); line-height:1.3; margin-top:2px; }
+  .bdg.got { background:var(--gold-soft); border-color:#EBCB8B; }
+  .bdg.got .ic { filter:none; opacity:1; }
+  .bdg.got .nm { color:var(--ink); }
+  .stats { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
+  .stats .stat .v { font-size:16px; }
+  .besttbl { width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
+  .besttbl th, .besttbl td { padding:5px 4px; text-align:center; border-top:1px solid var(--line); font-variant-numeric: tabular-nums; }
+  .besttbl th { font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--ink-soft); font-weight:500; }
+  .settings label { display:flex; align-items:center; gap:10px; font-size:14px; padding:6px 0; cursor:pointer; }
+  .settings input { width:18px; height:18px; accent-color: var(--accent); }
+
+  /* modal + toasts */
+  .modal { position:fixed; inset:0; background:rgba(24,24,24,.45); display:none; align-items:center; justify-content:center; z-index:50; padding:16px; }
+  .modal.show { display:flex; }
+  .mbox { background:#fff; border-radius:14px; max-width:400px; width:100%; padding:22px; max-height:90vh; overflow:auto; animation: rise .25s ease; }
+  @keyframes rise { from{transform:translateY(16px);opacity:0} to{transform:none;opacity:1} }
+  .mbox h3 { margin:0 0 4px; font-size:22px; }
+  .mbox .sub { color:var(--ink-soft); font-size:14px; margin:0 0 14px; }
+  .big { font-size:40px; font-weight:800; color:var(--accent); letter-spacing:-.02em; }
+  .brk { width:100%; border-collapse:collapse; margin:10px 0 14px; font-size:14px; }
+  .brk td { padding:5px 0; border-top:1px solid var(--line); }
+  .brk td:last-child { text-align:right; font-family:'JetBrains Mono',monospace; }
+  .brk tr.tot td { font-weight:700; }
+  .unlock { background:var(--gold-soft); border-radius:8px; padding:8px 10px; font-size:13px; margin-bottom:6px; }
+  .mbtns { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+  .mbtns .btn { flex:1; }
+  .toasts { position:fixed; left:50%; bottom:20px; transform:translateX(-50%); display:flex; flex-direction:column; gap:6px; z-index:60; pointer-events:none; width:max-content; max-width:92vw; }
+  .toast { background:var(--ink); color:#fff; padding:9px 14px; border-radius:20px; font-size:13px; font-weight:600; text-align:center; animation: rise .25s ease; }
+  .toast.gold { background:var(--gold); }
+  .toast.green { background:var(--accent); }
+
+  section.copy { margin: 28px 0; }
+  section.copy h2 { font-size:18px; font-weight:700; margin:0 0 8px; }
+  section.copy p, section.copy li { color: var(--ink-soft); font-size:14.5px; }
+  section.copy p { margin:0 0 12px; }
+  footer { border-top: 1px solid var(--line); padding: 24px 0 50px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft); }
+  @media (max-width:420px){ h1{font-size:26px} .status .stat .v{font-size:15px} .seg button{padding:7px 8px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="crumb"><a href="../../">offcuts</a> / games / sudoku</p>
+  <h1>Sudoku <span class="tag-inline">games</span></h1>
+  <p class="lede">Fill every row, column and box with each symbol once. Build combos, clear daily challenges, collect badges, and play in the number system you like.</p>
+
+  <div class="player">
+    <span class="lvl" id="lvl">LV 1</span>
+    <div class="xpwrap">
+      <div class="xptitle" id="lvlTitle">Novice</div>
+      <div class="xpbar"><i id="xpFill"></i></div>
+      <div class="xpnum" id="xpNum">0 XP</div>
+    </div>
+    <span class="streak" id="streak" title="Daily streak">🔥 0</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-mode="classic">Classic</button>
+    <button class="tab" data-mode="daily">Daily puzzle</button>
+  </div>
+
+  <div class="setup" id="setupClassic">
+    <div class="seg" id="segSize">
+      <button data-n="4">4×4</button><button data-n="6">6×6</button><button data-n="9">9×9</button>
+    </div>
+    <div class="seg" id="segDiff">
+      <button data-d="easy">Easy</button><button data-d="medium">Med</button><button data-d="hard">Hard</button><button data-d="expert">Expert</button>
+    </div>
+    <span class="grow"></span>
+    <button class="btn" id="newBtn">New game</button>
+  </div>
+  <div class="setup" id="setupDaily" hidden>
+    <span class="dailyinfo" id="dailyInfo">9×9 · Medium · same puzzle for everyone today</span>
+  </div>
+
+  <div class="status">
+    <div class="stat"><div class="k">Time</div><div class="v" id="sTime">0:00</div></div>
+    <div class="stat" id="sMistBox"><div class="k">Mistakes</div><div class="v" id="sMist">0/3</div></div>
+    <div class="stat"><div class="k">Score</div><div class="v" id="sScore">0</div></div>
+    <div class="stat combo"><div class="k">Combo</div><div class="v" id="sCombo">×1</div></div>
+  </div>
+
+  <div class="boardwrap">
+    <div class="board" id="board" role="grid" aria-label="Sudoku board"></div>
+    <div class="pausecover" id="pauseCover"><p>Paused</p><button class="btn" id="resumeBtn">Resume</button></div>
+  </div>
+
+  <div class="controls">
+    <button class="ctl" id="undoBtn">↶<small>Undo</small></button>
+    <button class="ctl" id="eraseBtn">⌫<small>Erase</small></button>
+    <button class="ctl" id="notesBtn">✎<small>Notes off</small></button>
+    <button class="ctl" id="hintBtn">💡<small>Hint</small><span class="badge-n" id="hintN">3</span></button>
+    <button class="ctl" id="pauseBtn">⏸<small>Pause</small></button>
+  </div>
+
+  <div class="keypad" id="keypad"></div>
+
+  <div class="numerals">
+    <p class="lab">Symbols</p>
+    <div class="chips" id="numChips"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Today's challenges <span id="qDate"></span></h2>
+    <div id="quests"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Badges <span id="bCount"></span></h2>
+    <div class="badges" id="badges"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Stats</h2>
+    <div class="stats">
+      <div class="stat"><div class="k">Solved</div><div class="v" id="stSolved">0</div></div>
+      <div class="stat"><div class="k">Best combo</div><div class="v" id="stCombo">×1</div></div>
+      <div class="stat"><div class="k">Best streak</div><div class="v" id="stStreak">0</div></div>
+    </div>
+    <table class="besttbl" id="bestTbl"></table>
+  </div>
+
+  <div class="panel settings">
+    <h2>Settings</h2>
+    <label><input type="checkbox" id="optStrikes"> 3-strike limit (game over after 3 mistakes)</label>
+    <label><input type="checkbox" id="optHighlight"> Highlight matching symbols</label>
+    <label><input type="checkbox" id="optAutoNotes"> Auto-clear notes when a symbol is placed</label>
+  </div>
+
+  <section class="copy">
+    <h2>How to play Sudoku</h2>
+    <p>The grid is split into rows, columns and boxes. Every row, column and box must contain each symbol exactly once. Some cells start filled in. Use logic to work out the rest. You never need to guess, and you never need to do maths.</p>
+    <p>Tap a cell, then tap a symbol. Turn on <strong>Notes</strong> to pencil in candidates. Wrong entries turn red and count as a mistake.</p>
+    <h2>Scoring</h2>
+    <p>Every correct placement scores points, more on harder puzzles. Correct placements in a row build a combo multiplier (×2 after 4, up to ×5). A mistake or hint resets it. Finishing a row, column or box gives a bonus. At the end you get a time bonus, plus extras for zero mistakes and no hints. All your points also count as XP towards your level.</p>
+    <h2>Other numeral systems</h2>
+    <p>Sudoku is about logic, not arithmetic, so any set of symbols works. You can switch between Western digits, Eastern Arabic (١٢٣), Roman numerals, Chinese, Devanagari, letters, animals, fruit or colours at any time, even mid-game.</p>
+  </section>
+
+  <footer>offcuts.buildbyjai.workers.dev</footer>
+</div>
+
+<div class="modal" id="modal"><div class="mbox" id="mbox"></div></div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+const K_PROG = 'offcuts-sudoku-progress', K_SET = 'offcuts-sudoku-settings', K_GAME = 'offcuts-sudoku-game-';
+
+/* ---------- config ---------- */
+const GEO = { 4: [2, 2], 6: [2, 3], 9: [3, 3] };      // [box rows, box cols]
+const DIFF_LABEL = { easy: 'Easy', medium: 'Medium', hard: 'Hard', expert: 'Expert' };
+const CLUES = { 4: { easy: 10, medium: 8, hard: 6, expert: 5 }, 6: { easy: 22, medium: 18, hard: 14, expert: 11 }, 9: { easy: 40, medium: 33, hard: 28, expert: 24 } };
+const PAR = { 4: { easy: 60, medium: 90, hard: 120, expert: 150 }, 6: { easy: 240, medium: 300, hard: 420, expert: 540 }, 9: { easy: 600, medium: 900, hard: 1200, expert: 1800 } };
+const BASE = { easy: 10, medium: 20, hard: 30, expert: 50 };
+const SCALE = { 4: 0.4, 6: 0.6, 9: 1 };
+const MAX_HINTS = 3;
+
+const NUMERALS = {
+  western:    { name: 'Western',        s: ['1','2','3','4','5','6','7','8','9'] },
+  eastern:    { name: 'Eastern Arabic', s: ['١','٢','٣','٤','٥','٦','٧','٨','٩'] },
+  roman:      { name: 'Roman',          s: ['I','II','III','IV','V','VI','VII','VIII','IX'] },
+  chinese:    { name: 'Chinese',        s: ['一','二','三','四','五','六','七','八','九'] },
+  devanagari: { name: 'Devanagari',     s: ['१','२','३','४','५','६','७','८','९'] },
+  letters:    { name: 'Letters',        s: ['A','B','C','D','E','F','G','H','I'] },
+  animals:    { name: 'Animals',        s: ['🐶','🐱','🐭','🐰','🦊','🐻','🐼','🐸','🐵'], emoji: true },
+  fruit:      { name: 'Fruit',          s: ['🍎','🍌','🍇','🍓','🍊','🍐','🍒','🍍','🥝'], emoji: true },
+  colours:    { name: 'Colours',        s: ['#E53E3E','#ED8936','#ECC94B','#38A169','#319795','#3182CE','#805AD5','#D53F8C','#4A3B2A'], colour: true,
+                names: ['red','orange','yellow','green','teal','blue','purple','pink','brown'] }
+};
+
+const LEVEL_TITLES = ['Novice','Scribbler','Pencil Pusher','Grid Walker','Box Breaker','Row Ranger','Logic Hound','Number Ninja','Deduction Duke','Sudoku Sage','Grandmaster'];
+
+/* ---------- daily challenge pool ---------- */
+const QUESTS = [
+  { id: 'flawless',  t: 'Solve a puzzle with zero mistakes',         xp: 150, test: r => r.mistakes === 0 },
+  { id: 'medplus',   t: 'Solve a Medium or harder puzzle',           xp: 150, test: r => r.diff !== 'easy' },
+  { id: 'hardplus',  t: 'Solve a Hard or Expert puzzle',             xp: 250, test: r => r.diff === 'hard' || r.diff === 'expert' },
+  { id: 'nohint',    t: 'Solve a 9×9 without using a hint',          xp: 150, test: r => r.N === 9 && r.hints === 0 },
+  { id: 'nonotes',   t: 'Solve any puzzle without pencil notes',     xp: 150, test: r => !r.notesUsed },
+  { id: 'combo3',    t: 'Reach a ×3 combo',                          xp: 100, test: r => r.maxMult >= 3 },
+  { id: 'combo5',    t: 'Reach the max ×5 combo',                    xp: 200, test: r => r.maxMult >= 5 },
+  { id: 'foreign',   t: 'Solve using any non-Western symbols',       xp: 100, test: r => r.numeral !== 'western' },
+  { id: 'roman',     t: 'Solve using Roman numerals',                xp: 150, test: r => r.numeral === 'roman' },
+  { id: 'eastern',   t: 'Solve using Eastern Arabic numerals',       xp: 150, test: r => r.numeral === 'eastern' },
+  { id: 'emoji',     t: 'Solve using Animals or Fruit',              xp: 100, test: r => r.numeral === 'animals' || r.numeral === 'fruit' },
+  { id: 'colour',    t: 'Solve using Colours',                       xp: 150, test: r => r.numeral === 'colours' },
+  { id: 'fast9',     t: 'Solve a 9×9 in under 10 minutes',           xp: 200, test: r => r.N === 9 && r.elapsed < 600 },
+  { id: 'mini',      t: 'Solve a mini puzzle (4×4 or 6×6)',          xp: 75,  test: r => r.N < 9 },
+  { id: 'daily',     t: 'Complete today\'s Daily puzzle',            xp: 150, test: r => r.mode === 'daily' },
+  { id: 'score2k',   t: 'Score 2,000+ points in one game',           xp: 200, test: r => r.score >= 2000 }
+];
+
+/* ---------- badges ---------- */
+const BADGES = [
+  { id: 'first',    ic: '🎉', nm: 'First Solve',  ds: 'Solve any puzzle',                  test: (r, P) => P.solves >= 1 },
+  { id: 'ten',      ic: '🔟', nm: 'Regular',      ds: 'Solve 10 puzzles',                  test: (r, P) => P.solves >= 10 },
+  { id: 'fifty',    ic: '🏛️', nm: 'Veteran',      ds: 'Solve 50 puzzles',                  test: (r, P) => P.solves >= 50 },
+  { id: 'flawless', ic: '💎', nm: 'Flawless',     ds: '9×9 with zero mistakes',             test: r => r.N === 9 && r.mistakes === 0 },
+  { id: 'purist',   ic: '🧠', nm: 'Purist',       ds: '9×9 with no notes',                  test: r => r.N === 9 && !r.notesUsed },
+  { id: 'solo',     ic: '🕯️', nm: 'Self-Reliant', ds: 'Hard 9×9 with no hints',             test: r => r.N === 9 && (r.diff === 'hard' || r.diff === 'expert') && r.hints === 0 },
+  { id: 'speed',    ic: '⚡', nm: 'Speedrunner',  ds: '9×9 in under 5 minutes',             test: r => r.N === 9 && r.elapsed < 300 },
+  { id: 'expert',   ic: '🎓', nm: 'Expert',       ds: 'Solve an Expert 9×9',                test: r => r.N === 9 && r.diff === 'expert' },
+  { id: 'combo',    ic: '🔥', nm: 'Combo King',   ds: 'Hit a ×5 combo',                     test: r => r.maxMult >= 5 },
+  { id: 'roman',    ic: '🏺', nm: 'Roman Holiday', ds: 'Solve in Roman numerals',           test: r => r.numeral === 'roman' },
+  { id: 'eastern',  ic: '🕌', nm: 'Mashriq',      ds: 'Solve in Eastern Arabic',            test: r => r.numeral === 'eastern' },
+  { id: 'poly',     ic: '🌍', nm: 'Polyglot',     ds: 'Solve with 4 different symbol sets', test: (r, P) => P.numerals.length >= 4 },
+  { id: 'rainbow',  ic: '🌈', nm: 'Rainbow',      ds: 'Solve a 9×9 in Colours',             test: r => r.N === 9 && r.numeral === 'colours' },
+  { id: 'mini',     ic: '🧩', nm: 'Mini Master',  ds: 'Solve a 4×4 and a 6×6',              test: (r, P) => P.sizes.includes(4) && P.sizes.includes(6) },
+  { id: 'streak3',  ic: '📅', nm: 'Habit',        ds: '3-day Daily streak',                 test: (r, P) => P.streak >= 3 },
+  { id: 'streak7',  ic: '🗓️', nm: 'Week Warrior', ds: '7-day Daily streak',                 test: (r, P) => P.streak >= 7 },
+  { id: 'lvl5',     ic: '⭐', nm: 'Rising Star',  ds: 'Reach level 5',                      test: (r, P) => levelOf(P.xp).L >= 5 },
+  { id: 'lvl10',    ic: '👑', nm: 'Royalty',      ds: 'Reach level 10',                     test: (r, P) => levelOf(P.xp).L >= 10 }
+];
+
+/* ---------- utils ---------- */
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function shuffle(a, rng) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function pc(x) { let c = 0; while (x) { x &= x - 1; c++; } return c; }
+const pad = n => String(n).padStart(2, '0');
+function todayKey(d = new Date()) { return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
+function yesterdayKey() { const d = new Date(); d.setDate(d.getDate() - 1); return todayKey(d); }
+function fmtTime(s) { const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return h ? `${h}:${pad(m)}:${pad(x)}` : `${m}:${pad(x)}`; }
+function fmtNum(n) { return n.toLocaleString('en-GB'); }
+function prettyDate(k) { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); }
+
+/* ---------- geometry ---------- */
+const geoCache = {};
+function geometry(N) {
+  if (geoCache[N]) return geoCache[N];
+  const [br, bc] = GEO[N], box = [], rows = [], cols = [], boxes = [];
+  for (let k = 0; k < N; k++) { rows.push([]); cols.push([]); boxes.push([]); }
+  for (let i = 0; i < N * N; i++) {
+    const r = (i / N) | 0, c = i % N, b = Math.floor(r / br) * (N / bc) + Math.floor(c / bc);
+    box.push(b); rows[r].push(i); cols[c].push(i); boxes[b].push(i);
+  }
+  return (geoCache[N] = { N, br, bc, box, rows, cols, boxes });
+}
+
+/* ---------- solver / generator ---------- */
+function solve(grid, geo, limit, rng) {
+  const { N, box } = geo, full = (1 << N) - 1, R = new Array(N).fill(0), C = new Array(N).fill(0), B = new Array(N).fill(0), g = grid.slice();
+  for (let i = 0; i < N * N; i++) {
+    const v = g[i]; if (!v) continue;
+    const bit = 1 << (v - 1), r = (i / N) | 0, c = i % N, b = box[i];
+    if ((R[r] | C[c] | B[b]) & bit) return { count: 0, first: null };
+    R[r] |= bit; C[c] |= bit; B[b] |= bit;
+  }
+  let count = 0, first = null;
+  (function rec() {
+    let best = -1, bm = 0, bc = 99;
+    for (let i = 0; i < N * N; i++) {
+      if (g[i]) continue;
+      const m = full & ~(R[(i / N) | 0] | C[i % N] | B[box[i]]), k = pc(m);
+      if (k === 0) return;
+      if (k < bc) { bc = k; best = i; bm = m; if (k === 1) break; }
+    }
+    if (best < 0) { count++; if (!first) first = g.slice(); return; }
+    const vals = [];
+    for (let v = 1; v <= N; v++) if (bm & (1 << (v - 1))) vals.push(v);
+    if (rng) shuffle(vals, rng);
+    const r = (best / N) | 0, c = best % N, b = box[best];
+    for (const v of vals) {
+      const bit = 1 << (v - 1);
+      g[best] = v; R[r] |= bit; C[c] |= bit; B[b] |= bit;
+      rec();
+      g[best] = 0; R[r] &= ~bit; C[c] &= ~bit; B[b] &= ~bit;
+      if (count >= limit) return;
+    }
+  })();
+  return { count, first };
+}
+function generate(N, diff, seed) {
+  const rng = mulberry32(seed), geo = geometry(N);
+  const solution = solve(new Array(N * N).fill(0), geo, 1, rng).first;
+  const puzzle = solution.slice(), target = CLUES[N][diff];
+  let clues = N * N;
+  for (const i of shuffle([...Array(N * N).keys()], rng)) {
+    if (clues <= target) break;
+    const v = puzzle[i]; puzzle[i] = 0;
+    if (solve(puzzle, geo, 2).count !== 1) puzzle[i] = v; else clues--;
+  }
+  return { puzzle, solution };
+}
+
+/* ---------- persistent state ---------- */
+const defaultProg = { xp: 0, solves: 0, best: {}, numerals: [], sizes: [], badges: [], quests: {}, daily: {}, streak: 0, bestStreak: 0, lastDaily: null, bestMult: 1 };
+let P = Object.assign({}, defaultProg, LS.get(K_PROG, {}));
+let S = Object.assign({ N: 9, diff: 'easy', numeral: 'western', strikes: true, highlight: true, autoNotes: true, mode: 'classic' }, LS.get(K_SET, {}));
+const saveProg = () => LS.set(K_PROG, P);
+const saveSet = () => LS.set(K_SET, S);
+
+let G = null;              // current game
+let notesMode = false, paused = false, lastSaveTick = 0;
+const geoOf = () => geometry(G.N);
+
+function levelOf(xp) {
+  let L = 1; while (xp >= 500 * L * (L + 1)) L++;
+  const lo = 500 * (L - 1) * L, hi = 500 * L * (L + 1);
+  return { L, pct: (xp - lo) / (hi - lo), next: hi };
+}
+function multOf(combo) { return Math.min(5, 1 + Math.floor(combo / 4)); }
+
+/* ---------- game lifecycle ---------- */
+function newGame(mode, opts = {}) {
+  const N = mode === 'daily' ? 9 : S.N, diff = mode === 'daily' ? 'medium' : S.diff;
+  const dateKey = todayKey();
+  const seed = mode === 'daily' ? hashStr('offcuts-sudoku-' + dateKey) : (opts.seed ?? (Math.random() * 2 ** 32) >>> 0);
+  const { puzzle, solution } = generate(N, diff, seed);
+  G = {
+    mode, N, diff, seed, dateKey, puzzle, solution,
+    board: puzzle.slice(), notes: new Array(N * N).fill(0), given: puzzle.map(v => v > 0),
+    sel: -1, mistakes: 0, hints: 0, notesUsed: false, elapsed: 0,
+    score: 0, combo: 0, maxMult: 1, scored: [], units: [], history: [],
+    done: false, failed: false, started: false
+  };
+  notesMode = false; paused = false;
+  buildBoard(); render(); saveGame();
+}
+function saveGame() { if (G) LS.set(K_GAME + G.mode, G); }
+function loadGame(mode) {
+  const g = LS.get(K_GAME + mode, null);
+  if (!g || !g.solution) return false;
+  if (mode === 'daily' && g.dateKey !== todayKey()) return false;
+  G = g; notesMode = false; paused = false;
+  buildBoard(); render(); return true;
+}
+function switchMode(mode) {
+  if (G) saveGame();
+  S.mode = mode; saveSet();
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
+  $('#setupClassic').hidden = mode !== 'classic';
+  $('#setupDaily').hidden = mode !== 'daily';
+  if (mode === 'daily') {
+    const done = P.daily[todayKey()];
+    $('#dailyInfo').textContent = done
+      ? `Solved today · ${fmtTime(done.elapsed)} · ${fmtNum(done.score)} pts · come back tomorrow`
+      : `${prettyDate(todayKey())} · 9×9 · Medium · same puzzle for everyone`;
+  }
+  if (!loadGame(mode)) newGame(mode);
+}
+
+/* ---------- board DOM ---------- */
+let cells = [];
+function buildBoard() {
+  const { N, br, bc } = geoOf(), board = $('#board');
+  board.style.gridTemplateColumns = `repeat(${N}, 1fr)`;
+  board.style.gridTemplateRows = `repeat(${N}, 1fr)`;
+  board.innerHTML = ''; cells = [];
+  for (let i = 0; i < N * N; i++) {
+    const r = (i / N) | 0, c = i % N, el = document.createElement('button');
+    el.className = 'cell';
+    if (c % bc === bc - 1 && c !== N - 1) el.classList.add('bxr');
+    if (r % br === br - 1 && r !== N - 1) el.classList.add('bxb');
+    if (c === N - 1) el.classList.add('lastc');
+    if (r === N - 1) el.classList.add('lastr');
+    el.setAttribute('role', 'gridcell');
+    el.addEventListener('click', () => select(i));
+    board.appendChild(el); cells.push(el);
+  }
+  sizeFonts();
+  buildKeypad();
+}
+function sizeFonts() {
+  if (!G) return;
+  const w = $('#board').clientWidth || 340, cw = w / G.N, { bc } = geoOf();
+  const board = $('#board');
+  board.style.setProperty('--fs', Math.round(cw * 0.55) + 'px');
+  board.style.setProperty('--nfs', Math.max(8, Math.round(cw / bc * 0.62)) + 'px');
+}
+function symHTML(v, inNotes) {
+  const set = NUMERALS[S.numeral];
+  if (set.colour) return `<span class="dot" style="background:${set.s[v - 1]}"></span>`;
+  const s = set.s[v - 1], cls = s.length >= 3 ? 'long' : s.length === 2 && !set.emoji ? 'mid' : '';
+  return inNotes ? `<span class="${cls}">${s}</span>` : `<span class="sym ${cls}">${s}</span>`;
+}
+function symLabel(v) { const set = NUMERALS[S.numeral]; return set.colour ? set.names[v - 1] : set.s[v - 1]; }
+function buildKeypad() {
+  const N = G.N, kp = $('#keypad');
+  kp.style.gridTemplateColumns = `repeat(${N <= 6 ? N : 9}, 1fr)`;
+  kp.innerHTML = '';
+  for (let v = 1; v <= N; v++) {
+    const b = document.createElement('button');
+    b.className = 'key'; b.dataset.v = v;
+    b.addEventListener('click', () => input(v));
+    kp.appendChild(b);
+  }
+}
+
+/* ---------- render ---------- */
+function render() {
+  if (!G) return;
+  const { N, bc } = geoOf(), geo = geoOf(), sel = G.sel;
+  const selR = sel >= 0 ? (sel / N) | 0 : -1, selC = sel >= 0 ? sel % N : -1, selB = sel >= 0 ? geo.box[sel] : -1;
+  const selV = sel >= 0 ? G.board[sel] : 0;
+  for (let i = 0; i < N * N; i++) {
+    const el = cells[i], v = G.board[i], r = (i / N) | 0, c = i % N;
+    el.classList.toggle('given', G.given[i]);
+    el.classList.toggle('sel', i === sel);
+    el.classList.toggle('peer', sel >= 0 && i !== sel && (r === selR || c === selC || geo.box[i] === selB));
+    el.classList.toggle('same', S.highlight && selV > 0 && v === selV && i !== sel && v === G.solution[i]);
+    el.classList.toggle('wrong', v > 0 && v !== G.solution[i]);
+    let html;
+    if (v) html = symHTML(v);
+    else if (G.notes[i]) {
+      html = `<div class="notes" style="grid-template-columns:repeat(${bc},1fr)">`;
+      for (let k = 1; k <= N; k++) html += G.notes[i] & (1 << (k - 1)) ? symHTML(k, true) : '<span></span>';
+      html += '</div>';
+    } else html = '';
+    if (el._h !== html) { el.innerHTML = html; el._h = html; }
+    el.setAttribute('aria-label', `Row ${r + 1} column ${c + 1}${v ? ', ' + symLabel(v) : ', empty'}`);
+  }
+  // keypad
+  const counts = new Array(N + 1).fill(0);
+  for (let i = 0; i < N * N; i++) if (G.board[i] && G.board[i] === G.solution[i]) counts[G.board[i]]++;
+  document.querySelectorAll('#keypad .key').forEach(k => {
+    const v = +k.dataset.v, left = N - counts[v], html = symHTML(v) + `<small>${left}</small>`;
+    if (k._h !== html) { k.innerHTML = html; k._h = html; }
+    k.classList.toggle('done', left === 0);
+    k.setAttribute('aria-label', symLabel(v));
+  });
+  $('#keypad').classList.toggle('notesmode', notesMode);
+  // status
+  $('#sTime').textContent = fmtTime(G.elapsed);
+  $('#sMist').textContent = S.strikes ? `${G.mistakes}/3` : String(G.mistakes);
+  $('#sMistBox').classList.toggle('bad', G.mistakes > 0);
+  $('#sScore').textContent = fmtNum(G.score);
+  $('#sCombo').textContent = '×' + multOf(G.combo);
+  const nb = $('#notesBtn'); nb.classList.toggle('on', notesMode); nb.querySelector('small').textContent = notesMode ? 'Notes on' : 'Notes off';
+  $('#hintN').textContent = MAX_HINTS - G.hints;
+  $('#hintBtn').disabled = G.hints >= MAX_HINTS || G.done || G.failed;
+  $('#undoBtn').disabled = !G.history.length || G.done || G.failed;
+  $('#pauseCover').classList.toggle('show', paused && !G.done && !G.failed);
+  $('#pauseBtn').querySelector('small').textContent = paused ? 'Resume' : 'Pause';
+}
+function renderMeta() {
+  const lv = levelOf(P.xp);
+  $('#lvl').textContent = 'LV ' + lv.L;
+  $('#lvlTitle').textContent = LEVEL_TITLES[Math.min(lv.L - 1, LEVEL_TITLES.length - 1)];
+  $('#xpFill').style.width = Math.round(lv.pct * 100) + '%';
+  $('#xpNum').textContent = `${fmtNum(P.xp)} / ${fmtNum(lv.next)} XP`;
+  const streakAlive = P.lastDaily === todayKey() || P.lastDaily === yesterdayKey();
+  $('#streak').textContent = '🔥 ' + (streakAlive ? P.streak : 0);
+  // quests
+  const tk = todayKey(), qs = todaysQuests(), done = P.quests[tk] || [];
+  $('#qDate').textContent = prettyDate(tk);
+  $('#quests').innerHTML = qs.map(q => `<div class="quest ${done.includes(q.id) ? 'done' : ''}"><span class="qchk">${done.includes(q.id) ? '✓' : ''}</span><span class="qtxt">${q.t}</span><span class="qxp">+${q.xp} XP</span></div>`).join('')
+    + (qs.every(q => done.includes(q.id)) ? `<div class="quest done"><span class="qchk">★</span><span class="qtxt" style="text-decoration:none;color:var(--accent);font-weight:600">All done! Bonus +300 XP earned</span></div>` : `<div class="quest"><span class="qchk" style="border-color:var(--gold);color:var(--gold)">★</span><span class="qtxt">Clear all three for a bonus</span><span class="qxp">+300 XP</span></div>`);
+  // badges
+  $('#bCount').textContent = `${P.badges.length}/${BADGES.length}`;
+  $('#badges').innerHTML = BADGES.map(b => `<div class="bdg ${P.badges.includes(b.id) ? 'got' : ''}"><div class="ic">${b.ic}</div><div class="nm">${b.nm}</div><div class="ds">${b.ds}</div></div>`).join('');
+  // stats
+  $('#stSolved').textContent = P.solves;
+  $('#stCombo').textContent = '×' + P.bestMult;
+  $('#stStreak').textContent = P.bestStreak;
+  let t = '<tr><th></th>' + ['easy', 'medium', 'hard', 'expert'].map(d => `<th>${DIFF_LABEL[d]}</th>`).join('') + '</tr>';
+  for (const N of [4, 6, 9]) t += `<tr><th>${N}×${N}</th>` + ['easy', 'medium', 'hard', 'expert'].map(d => `<td>${P.best[N + '-' + d] != null ? fmtTime(P.best[N + '-' + d]) : '–'}</td>`).join('') + '</tr>';
+  $('#bestTbl').innerHTML = t;
+}
+function renderSetup() {
+  document.querySelectorAll('#segSize button').forEach(b => b.classList.toggle('active', +b.dataset.n === S.N));
+  document.querySelectorAll('#segDiff button').forEach(b => b.classList.toggle('active', b.dataset.d === S.diff));
+  $('#numChips').innerHTML = Object.entries(NUMERALS).map(([k, n]) => {
+    const prev = n.colour ? n.s.slice(0, 3).map(c => `<span class="dot" style="background:${c}"></span>`).join('') : n.s.slice(0, 3).join(n.emoji ? '' : ' ');
+    return `<button class="chip ${S.numeral === k ? 'active' : ''}" data-k="${k}">${prev} · ${n.name}</button>`;
+  }).join('');
+  $('#optStrikes').checked = S.strikes; $('#optHighlight').checked = S.highlight; $('#optAutoNotes').checked = S.autoNotes;
+}
+function todaysQuests() {
+  const rng = mulberry32(hashStr('quests-' + todayKey()));
+  return shuffle(QUESTS.slice(), rng).slice(0, 3);
+}
+
+/* ---------- interactions ---------- */
+function select(i) { if (!G || paused) return; G.sel = i; render(); }
+function active() { return G && !G.done && !G.failed && !paused; }
+function pushHist(i) { G.history.push({ i, v: G.board[i], n: G.notes[i] }); if (G.history.length > 200) G.history.shift(); }
+function peersOf(i) {
+  const geo = geoOf(), N = G.N, r = (i / N) | 0, c = i % N;
+  return new Set([...geo.rows[r], ...geo.cols[c], ...geo.boxes[geo.box[i]]]);
+}
+function input(v) {
+  if (!active()) return;
+  const i = G.sel; if (i < 0 || G.given[i]) return;
+  if (G.board[i] && G.board[i] === G.solution[i]) return;        // locked once correct
+  G.started = true;
+  if (notesMode) {
+    if (G.board[i]) return;
+    pushHist(i); G.notes[i] ^= 1 << (v - 1); G.notesUsed = true;
+    render(); saveGame(); return;
+  }
+  if (G.board[i] === v) return;
+  pushHist(i);
+  G.board[i] = v;
+  if (v === G.solution[i]) {
+    G.notes[i] = 0;
+    if (S.autoNotes) peersOf(i).forEach(p => { G.notes[p] &= ~(1 << (v - 1)); });
+    const prevMult = multOf(G.combo);
+    G.combo++;
+    const mult = multOf(G.combo);
+    G.maxMult = Math.max(G.maxMult, mult);
+    if (!G.scored.includes(i)) { G.scored.push(i); G.score += Math.round(BASE[G.diff] * SCALE[G.N]) * mult; }
+    if (mult > prevMult) { toast(`×${mult} combo!`, 'gold'); bump('#sCombo'); }
+    checkUnits(i, mult);
+    bump('#sScore');
+    if (G.board.every((x, k) => x === G.solution[k])) { render(); return finish(); }
+  } else {
+    G.mistakes++; G.combo = 0; G.score = Math.max(0, G.score - 50);
+    cells[i].classList.remove('shake'); void cells[i].offsetWidth; cells[i].classList.add('shake');
+    if (navigator.vibrate) try { navigator.vibrate(80); } catch (e) {}
+    if (S.strikes && G.mistakes >= 3) { render(); return fail(); }
+  }
+  render(); saveGame();
+}
+function checkUnits(i, mult) {
+  const geo = geoOf(), N = G.N, r = (i / N) | 0, c = i % N, b = geo.box[i];
+  const units = [['r' + r, geo.rows[r], 'Row'], ['c' + c, geo.cols[c], 'Column'], ['b' + b, geo.boxes[b], 'Box']];
+  const done = [];
+  for (const [key, list, name] of units) {
+    if (G.units.includes(key)) continue;
+    if (list.every(k => G.board[k] === G.solution[k])) {
+      G.units.push(key); done.push(name);
+      G.score += Math.round(50 * SCALE[G.N]);
+      list.forEach(k => { cells[k].classList.remove('flash'); void cells[k].offsetWidth; cells[k].classList.add('flash'); });
+    }
+  }
+  if (done.length) toast(done.length > 1 ? `${done.length}× unit clear! +bonus` : `${done[0]} complete +${Math.round(50 * SCALE[G.N])}`, 'green');
+}
+function erase() {
+  if (!active()) return;
+  const i = G.sel; if (i < 0 || G.given[i]) return;
+  if (G.board[i] && G.board[i] === G.solution[i]) return;
+  if (!G.board[i] && !G.notes[i]) return;
+  pushHist(i); G.board[i] = 0; G.notes[i] = 0; render(); saveGame();
+}
+function undo() {
+  if (!active() || !G.history.length) return;
+  const h = G.history.pop();
+  G.board[h.i] = h.v; G.notes[h.i] = h.n; G.sel = h.i; render(); saveGame();
+}
+function hint() {
+  if (!active() || G.hints >= MAX_HINTS) return;
+  let i = G.sel;
+  if (i < 0 || G.given[i] || G.board[i] === G.solution[i]) {
+    const open = []; for (let k = 0; k < G.board.length; k++) if (G.board[k] !== G.solution[k]) open.push(k);
+    if (!open.length) return;
+    i = open[Math.floor(Math.random() * open.length)];
+  }
+  G.started = true;
+  G.hints++; G.combo = 0; G.score = Math.max(0, G.score - 100);
+  G.board[i] = G.solution[i]; G.notes[i] = 0; G.sel = i;
+  if (!G.scored.includes(i)) G.scored.push(i);
+  if (S.autoNotes) peersOf(i).forEach(p => { G.notes[p] &= ~(1 << (G.solution[i] - 1)); });
+  cells[i].classList.remove('flash'); void cells[i].offsetWidth; cells[i].classList.add('flash');
+  checkUnits(i, 1);
+  toast(`Hint used · −100`, '');
+  if (G.board.every((x, k) => x === G.solution[k])) { render(); return finish(); }
+  render(); saveGame();
+}
+function togglePause(force) {
+  if (!G || G.done || G.failed) return;
+  paused = force ?? !paused; render();
+}
+function move(dr, dc) {
+  if (!G || paused) return;
+  const N = G.N; let i = G.sel < 0 ? 0 : G.sel;
+  let r = ((i / N) | 0) + dr, c = (i % N) + dc;
+  r = (r + N) % N; c = (c + N) % N; G.sel = r * N + c; render();
+}
+
+/* ---------- finish / fail ---------- */
+function finish() {
+  G.done = true;
+  const s = SCALE[G.N], par = PAR[G.N][G.diff];
+  const play = G.score;
+  const timeBonus = Math.round(Math.max(0, par - G.elapsed) * 2 * s);
+  const flawless = G.mistakes === 0 ? Math.round(500 * s) : 0;
+  const noHint = G.hints === 0 ? Math.round(250 * s) : 0;
+  G.score = play + timeBonus + flawless + noHint;
+  const res = { mode: G.mode, N: G.N, diff: G.diff, elapsed: G.elapsed, mistakes: G.mistakes, hints: G.hints, notesUsed: G.notesUsed, maxMult: G.maxMult, numeral: S.numeral, score: G.score };
+
+  // progress
+  const tk = todayKey();
+  const firstDaily = G.mode === 'daily' && !P.daily[tk];
+  P.solves++; P.xp += G.score;
+  P.bestMult = Math.max(P.bestMult, G.maxMult);
+  const bk = G.N + '-' + G.diff, newBest = P.best[bk] == null || G.elapsed < P.best[bk];
+  if (newBest) P.best[bk] = G.elapsed;
+  if (!P.numerals.includes(S.numeral)) P.numerals.push(S.numeral);
+  if (!P.sizes.includes(G.N)) P.sizes.push(G.N);
+  if (firstDaily) {
+    P.daily[tk] = { elapsed: G.elapsed, score: G.score, mistakes: G.mistakes, hints: G.hints, numeral: S.numeral, maxMult: G.maxMult };
+    P.streak = P.lastDaily === yesterdayKey() ? P.streak + 1 : (P.lastDaily === tk ? P.streak : 1);
+    P.lastDaily = tk; P.bestStreak = Math.max(P.bestStreak, P.streak);
+  }
+  // quests
+  const qDone = P.quests[tk] || (P.quests[tk] = []), qs = todaysQuests(), newQ = [];
+  for (const q of qs) if (!qDone.includes(q.id) && q.test(res)) { qDone.push(q.id); newQ.push(q); P.xp += q.xp; }
+  let allBonus = false;
+  if (newQ.length && qs.every(q => qDone.includes(q.id))) { P.xp += 300; allBonus = true; }
+  // prune old quest days
+  Object.keys(P.quests).forEach(k => { if (k < yesterdayKey()) delete P.quests[k]; });
+  // badges
+  const newB = [];
+  for (const b of BADGES) if (!P.badges.includes(b.id) && b.test(res, P)) { P.badges.push(b.id); newB.push(b); }
+  saveProg(); saveGame(); renderMeta(); render();
+  if (G.mode === 'daily') switchModeInfo();
+
+  const rows = [['Placements & combos', play], ['Time bonus', timeBonus], ['Zero mistakes', flawless], ['No hints', noHint]];
+  let html = `<h3>${G.mode === 'daily' ? 'Daily solved! 🎉' : 'Solved! 🎉'}</h3>
+    <p class="sub">${G.N}×${G.N} · ${DIFF_LABEL[G.diff]} · ${fmtTime(G.elapsed)}${newBest ? ' · <strong style="color:var(--accent)">New best time!</strong>' : ''}</p>
+    <div class="big">${fmtNum(G.score)}</div>
+    <table class="brk">${rows.map(([k, v]) => `<tr><td>${k}</td><td>${v ? '+' + fmtNum(v) : '–'}</td></tr>`).join('')}
+    <tr class="tot"><td>Total</td><td>${fmtNum(G.score)}</td></tr></table>`;
+  newQ.forEach(q => html += `<div class="unlock">✅ Challenge: ${q.t} <strong>+${q.xp} XP</strong></div>`);
+  if (allBonus) html += `<div class="unlock">★ All of today's challenges cleared <strong>+300 XP</strong></div>`;
+  newB.forEach(b => html += `<div class="unlock">${b.ic} Badge unlocked: <strong>${b.nm}</strong></div>`);
+  if (firstDaily) html += `<div class="unlock">🔥 Daily streak: <strong>${P.streak}</strong></div>`;
+  html += `<div class="mbtns">`;
+  if (G.mode === 'daily') html += `<button class="btn" id="mShare">Share result</button><button class="btn ghost" id="mClassic">Play Classic</button>`;
+  else html += `<button class="btn" id="mNew">New game</button><button class="btn ghost" id="mClose">Close</button>`;
+  html += `</div>`;
+  openModal(html);
+  $('#mNew') && ($('#mNew').onclick = () => { closeModal(); newGame('classic'); });
+  $('#mClose') && ($('#mClose').onclick = closeModal);
+  $('#mClassic') && ($('#mClassic').onclick = () => { closeModal(); switchMode('classic'); });
+  $('#mShare') && ($('#mShare').onclick = share);
+  confetti();
+}
+function switchModeInfo() {
+  const done = P.daily[todayKey()];
+  if (done) $('#dailyInfo').textContent = `Solved today · ${fmtTime(done.elapsed)} · ${fmtNum(done.score)} pts · come back tomorrow`;
+}
+function fail() {
+  G.failed = true; saveGame(); render();
+  openModal(`<h3>Out of strikes</h3><p class="sub">Three mistakes on this ${G.N}×${G.N} ${DIFF_LABEL[G.diff]}. Try the same puzzle again, or switch off the strike limit in Settings for relaxed play.</p>
+    <div class="mbtns"><button class="btn" id="mRetry">Retry puzzle</button>${G.mode === 'classic' ? '<button class="btn ghost" id="mNew">New puzzle</button>' : ''}</div>`);
+  $('#mRetry').onclick = () => { closeModal(); const m = G.mode; if (m === 'daily') newGame('daily'); else newGame('classic', { seed: G.seed }); };
+  $('#mNew') && ($('#mNew').onclick = () => { closeModal(); newGame('classic'); });
+}
+async function share() {
+  const d = P.daily[todayKey()]; if (!d) return;
+  const set = NUMERALS[d.numeral];
+  const txt = `Offcuts Sudoku · Daily ${prettyDate(todayKey())}\n⏱ ${fmtTime(d.elapsed)} · ❌ ${d.mistakes} · 💡 ${d.hints}\n🏆 ${fmtNum(d.score)} pts · ×${d.maxMult} combo · 🔥 ${P.streak}\nPlayed in ${set.name}${set.colour ? ' 🌈' : ' ' + set.s.slice(0, 3).join('')}\noffcuts.buildbyjai.workers.dev/tools/sudoku/`;
+  try {
+    if (navigator.share) { await navigator.share({ text: txt }); return; }
+    await navigator.clipboard.writeText(txt); toast('Result copied to clipboard', 'green');
+  } catch (e) {
+    try { await navigator.clipboard.writeText(txt); toast('Result copied to clipboard', 'green'); } catch (e2) { toast('Could not share', ''); }
+  }
+}
+
+/* ---------- ui helpers ---------- */
+function openModal(html) { $('#mbox').innerHTML = html; $('#modal').classList.add('show'); }
+function closeModal() { $('#modal').classList.remove('show'); }
+function toast(msg, cls) {
+  const t = document.createElement('div'); t.className = 'toast ' + (cls || ''); t.textContent = msg;
+  $('#toasts').appendChild(t); setTimeout(() => t.remove(), 1800);
+}
+function bump(sel) { const e = $(sel); e.classList.remove('pop'); void e.offsetWidth; e.classList.add('pop'); }
+function confetti() {
+  const colors = ['#156534', '#B7791F', '#3182CE', '#E53E3E', '#805AD5', '#ECC94B'];
+  const c = document.createElement('canvas'); c.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:55';
+  c.width = innerWidth; c.height = innerHeight; document.body.appendChild(c);
+  const x = c.getContext('2d'), ps = Array.from({ length: 120 }, () => ({ x: innerWidth / 2, y: innerHeight / 3, vx: (Math.random() - .5) * 12, vy: Math.random() * -10 - 3, s: 4 + Math.random() * 5, col: colors[Math.random() * colors.length | 0], r: Math.random() * 6 }));
+  let f = 0;
+  (function tick() {
+    x.clearRect(0, 0, c.width, c.height);
+    ps.forEach(p => { p.vy += .3; p.x += p.vx; p.y += p.vy; p.r += .1; x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.col; x.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * .6); x.restore(); });
+    if (++f < 110) requestAnimationFrame(tick); else c.remove();
+  })();
+}
+function confirmNew(fn) {
+  if (G && G.started && !G.done && !G.failed) {
+    openModal(`<h3>Start a new puzzle?</h3><p class="sub">Your current puzzle will be abandoned.</p><div class="mbtns"><button class="btn" id="mYes">New puzzle</button><button class="btn ghost" id="mNo">Keep playing</button></div>`);
+    $('#mYes').onclick = () => { closeModal(); fn(); };
+    $('#mNo').onclick = closeModal;
+  } else fn();
+}
+
+/* ---------- wiring ---------- */
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => { if (S.mode !== t.dataset.mode) switchMode(t.dataset.mode); }));
+$('#segSize').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.N = +b.dataset.n; saveSet(); renderSetup(); confirmNew(() => newGame('classic')); });
+$('#segDiff').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.diff = b.dataset.d; saveSet(); renderSetup(); confirmNew(() => newGame('classic')); });
+$('#newBtn').addEventListener('click', () => confirmNew(() => newGame('classic')));
+$('#numChips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; S.numeral = b.dataset.k; saveSet(); renderSetup(); render(); });
+$('#undoBtn').addEventListener('click', undo);
+$('#eraseBtn').addEventListener('click', erase);
+$('#notesBtn').addEventListener('click', () => { notesMode = !notesMode; render(); });
+$('#hintBtn').addEventListener('click', hint);
+$('#pauseBtn').addEventListener('click', () => togglePause());
+$('#resumeBtn').addEventListener('click', () => togglePause(false));
+$('#optStrikes').addEventListener('change', e => { S.strikes = e.target.checked; saveSet(); render(); });
+$('#optHighlight').addEventListener('change', e => { S.highlight = e.target.checked; saveSet(); render(); });
+$('#optAutoNotes').addEventListener('change', e => { S.autoNotes = e.target.checked; saveSet(); });
+$('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+
+document.addEventListener('keydown', e => {
+  if ($('#modal').classList.contains('show')) { if (e.key === 'Escape') closeModal(); return; }
+  if (e.target.tagName === 'INPUT') return;
+  const k = e.key;
+  if (/^[1-9]$/.test(k) && G && +k <= G.N) { input(+k); e.preventDefault(); }
+  else if (k === 'ArrowUp') { move(-1, 0); e.preventDefault(); }
+  else if (k === 'ArrowDown') { move(1, 0); e.preventDefault(); }
+  else if (k === 'ArrowLeft') { move(0, -1); e.preventDefault(); }
+  else if (k === 'ArrowRight') { move(0, 1); e.preventDefault(); }
+  else if (k === 'Backspace' || k === 'Delete' || k === '0') { erase(); e.preventDefault(); }
+  else if (k === 'n' || k === 'N') { notesMode = !notesMode; render(); }
+  else if ((k === 'z' || k === 'Z') ) { undo(); e.preventDefault(); }
+  else if (k === 'h' || k === 'H') hint();
+  else if (k === 'p' || k === 'P' || k === ' ') { togglePause(); e.preventDefault(); }
+});
+document.addEventListener('visibilitychange', () => { if (document.hidden) { togglePause(true); saveGame(); } });
+window.addEventListener('resize', sizeFonts);
+window.addEventListener('pagehide', saveGame);
+
+setInterval(() => {
+  if (!G || G.done || G.failed || paused || !G.started || document.hidden) return;
+  G.elapsed++;
+  $('#sTime').textContent = fmtTime(G.elapsed);
+  if (G.elapsed - lastSaveTick >= 5) { lastSaveTick = G.elapsed; saveGame(); }
+}, 1000);
+
+/* ---------- boot ---------- */
+renderSetup(); renderMeta();
+switchMode(S.mode === 'daily' ? 'daily' : 'classic');
+})();
+</script>
+</body>
+</html>
