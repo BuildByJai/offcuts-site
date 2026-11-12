@@ -1,0 +1,434 @@
+{
+  "id": "fan-velveteen",
+  "blurb": "a toy rabbit learns what it means to become Real.",
+  "chapterWord": "Part",
+  "source": "Text: The Velveteen Rabbit, or How Toys Become Real, by Margery Williams (1922). Public domain. Split into three parts for Chapterlands.",
+  "chapterFiles": [
+    {
+      "n": 1,
+      "file": "01.md",
+      "title": "Part 1: Christmas in the Nursery"
+    },
+    {
+      "n": 2,
+      "file": "02.md",
+      "title": "Part 2: Summer in the Garden"
+    },
+    {
+      "n": 3,
+      "file": "03.md",
+      "title": "Part 3: The Fairy"
+    }
+  ],
+  "theme": {
+    "palette": {
+      "ground": "#c9a27a",
+      "ground2": "#b8916a",
+      "wall": "#f3e6d0",
+      "trim": "#7a4e30",
+      "roof": "#c97a8a",
+      "accent": "#e9a23b",
+      "accent2": "#6a9fd6",
+      "wood": "#9a6a44",
+      "leaf": "#5aa24f",
+      "stone": "#d8cfbf",
+      "sky": "#9fcbe8",
+      "fog": "#e6eef2",
+      "item": "#ffd23f"
+    },
+    "props": [
+      "block",
+      "bed",
+      "cupboard",
+      "bookcase",
+      "chair",
+      "table",
+      "block"
+    ],
+    "vaultProps": [
+      "block",
+      "bookcase",
+      "chair",
+      "block"
+    ],
+    "building": {
+      "wall": "#f3e6d0",
+      "trim": "#7a4e30",
+      "roof": "#c97a8a",
+      "style": "house",
+      "sign": "The Nursery",
+      "h": 5
+    }
+  },
+  "streets": [
+    {
+      "id": "nursery",
+      "name": "The Nursery",
+      "chapters": [
+        1
+      ],
+      "template": "COLLECT",
+      "game": "Toy hunt",
+      "blurb": "Nana has been \"tidying up\" again and the toys are scattered all over the nursery floor.",
+      "how": "Find the six toys from the Boy's stocking and the nursery, then talk to the Skin Horse by the fender.",
+      "params": {
+        "area": [
+          34,
+          30
+        ],
+        "floor": "floor",
+        "platforms": 5,
+        "label": "toys found",
+        "objective": "Find the six scattered toys",
+        "items": [
+          {
+            "name": "The toy engine",
+            "icon": "🚂"
+          },
+          {
+            "name": "The clockwork mouse",
+            "icon": "🐭"
+          },
+          {
+            "name": "The model boat",
+            "icon": "⛵"
+          },
+          {
+            "name": "Timothy, the wooden lion",
+            "icon": "🦁"
+          },
+          {
+            "name": "The china dog",
+            "icon": "🐕"
+          },
+          {
+            "name": "Nuts and oranges",
+            "icon": "🍊"
+          }
+        ],
+        "finale": {
+          "npc": {
+            "kind": "horse",
+            "name": "the Skin Horse",
+            "look": {
+              "coat": "0x8a5a3a",
+              "bald": true
+            },
+            "scale": 0.8
+          },
+          "say": "Thank you, little one. You asked me once what Real is. Real isn't how you are made. It's a thing that happens to you — when a child loves you for a long, long time."
+        },
+        "done": "The nursery is tidy again, and the Skin Horse has told you about Real."
+      }
+    },
+    {
+      "id": "garden",
+      "name": "The Garden",
+      "chapters": [
+        2
+      ],
+      "template": "CHASE",
+      "game": "Follow the Boy",
+      "blurb": "A long June evening. The Boy runs off to the wood after tea, and the Rabbit goes too.",
+      "how": "Follow the Boy through the garden to the wood. Hop over the flower borders and go round the wheelbarrows. The wild rabbits are shy — they hop away if you get close.",
+      "params": {
+        "mode": "follow",
+        "length": 95,
+        "width": 11,
+        "obstacles": [
+          "hurdle",
+          "block"
+        ],
+        "density": 0.35,
+        "target": {
+          "kind": "child",
+          "name": "the Boy",
+          "look": {
+            "shirt": "0x2f7fd6",
+            "pants": "0x3a3a46",
+            "hair": "0x6a3a1a"
+          }
+        },
+        "critters": [
+          {
+            "kind": "rabbit",
+            "name": "a wild rabbit",
+            "count": 5,
+            "look": {
+              "coat": "0x9a7a5a",
+              "waistcoat": null,
+              "watch": false,
+              "eyes": "0x1b1b1b"
+            }
+          }
+        ],
+        "collect": {
+          "item": {
+            "name": "A raspberry",
+            "icon": "🍓"
+          },
+          "count": 6,
+          "label": "raspberries"
+        },
+        "objective": "Follow the Boy to the wood",
+        "finishText": "THE WOOD",
+        "done": "You made it to the wood, where the bracken is soft and cosy.",
+        "palette": {
+          "ground": "#7fbf6a",
+          "ground2": "#6fb35b",
+          "sky": "#9fd0f0",
+          "fog": "#e8f2e0"
+        }
+      }
+    },
+    {
+      "id": "fairy",
+      "name": "The Fairy",
+      "chapters": [
+        3
+      ],
+      "template": "CLIMB",
+      "game": "Rise with the Fairy",
+      "blurb": "The Fairy gathers the little Rabbit up in her arms and flies with him into the wood.",
+      "how": "Hop up from flower to flower, following the Fairy, until you reach the moonlit wood at the top.",
+      "params": {
+        "height": 14,
+        "layout": "spiral",
+        "core": "tree",
+        "dark": true,
+        "floor": "grass",
+        "guide": {
+          "npc": {
+            "kind": "fairy",
+            "name": "the Fairy"
+          }
+        },
+        "collect": {
+          "item": {
+            "name": "A dew-drop",
+            "icon": "💧"
+          },
+          "count": 5,
+          "label": "dew-drops"
+        },
+        "goalIcon": "🌙",
+        "objective": "Rise with the Fairy to the moonlit wood",
+        "done": "The bracken shines like frosted silver. The wild rabbits are waiting to dance.",
+        "palette": {
+          "ground": "#3e6a4a",
+          "ground2": "#355e41",
+          "sky": "#26305a",
+          "fog": "#323d68",
+          "accent": "#f2c4e8",
+          "wood": "#6a4a3a",
+          "leaf": "#4a8a5a"
+        }
+      }
+    }
+  ],
+  "skyRun": {
+    "id": "sky",
+    "name": "The Toy-Cupboard Tower",
+    "template": "CLIMB",
+    "game": "Sky Run",
+    "blurb": "a tower of nursery blocks, all the way up to the top of the toy cupboard.",
+    "how": "Climb the stack of nursery blocks to the top of the toy cupboard. Some blocks slide — time your jumps.",
+    "params": {
+      "height": 22,
+      "layout": "spiral",
+      "core": "blocks",
+      "moving": 2,
+      "collect": {
+        "item": {
+          "name": "A star",
+          "icon": "⭐"
+        },
+        "count": 6,
+        "label": "stars"
+      },
+      "goalIcon": "🏆",
+      "objective": "Climb to the top of the toy cupboard",
+      "done": "You can see the whole nursery from up here!"
+    }
+  },
+  "npcs": [
+    {
+      "id": "skin-horse",
+      "name": "the Skin Horse",
+      "kind": "horse",
+      "look": {
+        "coat": "0x8a5a3a",
+        "bald": true
+      },
+      "at": [
+        -8,
+        -6.5
+      ],
+      "facing": 0,
+      "idle": "Nursery magic is very strange and wonderful.",
+      "thanks": "My tail feels quite splendid again. Thank you!"
+    }
+  ],
+  "sideQuest": {
+    "id": "fan-velveteen-tail",
+    "title": "The Skin Horse's Tail",
+    "giver": "skin-horse",
+    "steps": [
+      {
+        "type": "talk",
+        "params": {
+          "npc": "skin-horse"
+        },
+        "text": "Talk to the Skin Horse outside the Nursery.",
+        "say": "Most of the hairs in my tail were pulled out to string bead necklaces, long ago. A few have blown about the garden. Would you find five of them for me?"
+      },
+      {
+        "type": "collect",
+        "params": {
+          "items": [
+            {
+              "id": "vr-hair-1",
+              "name": "A tail hair",
+              "shape": "strand",
+              "colour": "#5a3a24",
+              "at": [
+                9,
+                -5.5
+              ]
+            },
+            {
+              "id": "vr-hair-2",
+              "name": "A tail hair",
+              "shape": "strand",
+              "colour": "#5a3a24",
+              "at": [
+                -9.5,
+                2
+              ]
+            },
+            {
+              "id": "vr-hair-3",
+              "name": "A tail hair",
+              "shape": "strand",
+              "colour": "#5a3a24",
+              "at": [
+                9.5,
+                4
+              ]
+            },
+            {
+              "id": "vr-hair-4",
+              "name": "A tail hair",
+              "shape": "strand",
+              "colour": "#5a3a24",
+              "at": [
+                0,
+                7
+              ]
+            },
+            {
+              "id": "vr-hair-5",
+              "name": "A tail hair",
+              "shape": "strand",
+              "colour": "#5a3a24",
+              "at": [
+                -3,
+                -9
+              ]
+            }
+          ]
+        },
+        "text": "Find the Skin Horse's five lost tail hairs around the Nursery."
+      },
+      {
+        "type": "talk",
+        "params": {
+          "npc": "skin-horse"
+        },
+        "text": "Take the tail hairs back to the Skin Horse.",
+        "say": "Five! How kind. I'm old and shabby, you know — but that doesn't matter at all, once you are Real."
+      }
+    ],
+    "reward": {
+      "coins": 20
+    }
+  },
+  "vault": {
+    "name": "What Makes You Real?",
+    "blurb": "an escape room about the whole story, in the old nursery.",
+    "intro": "The nursery at night, by the light of the night-light. Three locks hold the door. To open them, remember the little Rabbit's whole story — and what really made him Real.",
+    "room": {
+      "wall": "#f3e6d0",
+      "floor": "#8a6440",
+      "rug": "#c97a8a"
+    },
+    "stations": [
+      {
+        "id": "cupboard",
+        "object": "toy",
+        "label": "The toy cupboard",
+        "lock": "Lock 1 · The Rabbit's story",
+        "text": "Inside the toy cupboard, five of the Rabbit's memories have been jumbled up. Put them back in the order they happened.",
+        "lesson": "Being Real happened bit by bit, over a long time — just as the Skin Horse said.",
+        "solve": {
+          "type": "order",
+          "prompt": "First at the top, last at the bottom.",
+          "items": [
+            "Christmas morning, in the top of the Boy's stocking",
+            "The Skin Horse explains what Real means",
+            "The Boy says: \"He isn't a toy. He's REAL!\"",
+            "The wild rabbits say he isn't real",
+            "A flower grows where his tear fell, and the Fairy steps out"
+          ],
+          "hint": "Christmas comes first. The Fairy comes last."
+        }
+      },
+      {
+        "id": "fender",
+        "object": "board",
+        "label": "The Skin Horse's corner",
+        "lock": "Lock 2 · What made him Real",
+        "text": "By the nursery fender, where the Rabbit and the Skin Horse used to talk, someone has chalked a question on a little slate.",
+        "lesson": "Not his whiskers, not being new — being loved for a long, long time.",
+        "solve": {
+          "type": "choice",
+          "prompt": "What really made the little Rabbit Real?",
+          "options": [
+            "The Boy loved him for a long, long time",
+            "He had real thread whiskers",
+            "He was fat and bunchy and new"
+          ],
+          "answer": 0,
+          "hint": "Think about what the Skin Horse said happens when a child REALLY loves you."
+        }
+      },
+      {
+        "id": "window",
+        "object": "window",
+        "label": "The nursery window",
+        "text": "Out of the window you can see the wood behind the house. Two rabbits peep out of the bracken. One of them has strange markings under his fur, as though long ago he had been spotted."
+      }
+    ],
+    "quiz": {
+      "object": "book",
+      "label": "The reading desk",
+      "lock": "Lock 3 · The whole book",
+      "lesson": "You know the whole story now: the nursery, the garden, the Fairy — and the Boy, who never stopped loving him."
+    },
+    "openText": "Click, click, click. The nursery door swings open onto the moonlit garden.",
+    "outro": "You remembered the whole story — and what really makes you Real."
+  },
+  "unlock": {
+    "badges": [
+      {
+        "id": "first-book",
+        "name": "First Book",
+        "icon": "📗",
+        "desc": "Finish your first book: The Velveteen Rabbit.",
+        "requires": [
+          "fan-velveteen"
+        ]
+      }
+    ]
+  }
+}

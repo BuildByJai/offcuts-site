@@ -2,113 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="description" content="Explore a blocky town, climb rooftops, collect coins and escape the Atomic Habits study.">
-<meta name="theme-color" content="#8fc6ec">
-<title>Book Town — Offcuts</title>
-<link rel="stylesheet" href="book-town.css">
+<title>Chapterlands — Offcuts</title>
+<meta name="robots" content="noindex">
+<!-- Book Town is now Chapterlands. _redirects normally handles this; this page is the fallback. -->
+<meta http-equiv="refresh" content="0; url=../chapterlands/">
+<link rel="canonical" href="../chapterlands/">
+<script>location.replace('../chapterlands/' + location.search + location.hash);</script>
 </head>
-<body>
-
-<canvas id="game-canvas"></canvas>
-
-<div id="loading">
-  <div class="logo"><span class="logo-book">📚</span><span class="logo-word">Book<b>Town</b></span></div>
-  <div class="bar"><span></span></div>
-  <p>Building the town… 0%</p>
-  <p class="tip"></p>
-</div>
-
-<div id="hud" hidden>
-  <div class="hud-pill wallet" id="hud-wallet" title="Coins to spend"><span class="hud-ico">🪙</span><b>0</b></div>
-  <div class="hud-col">
-    <div class="hud-chip" id="hud-coins">0 / 63 found</div>
-    <div class="hud-chip gold" id="hud-gold">⭐ 0 / 8</div>
-  </div>
-</div>
-<button id="btn-pause" type="button" aria-label="Pause" hidden>II</button>
-<div id="interact-prompt"></div>
-<div id="toasts"></div>
-<div id="fade"></div>
-<canvas id="confetti" hidden></canvas>
-
-<!-- start screen -->
-<div class="overlay title" id="start-screen" hidden>
-  <div class="card">
-    <p class="crumb"><a href="../../">offcuts</a> / <a href="../../">adventure</a> / book-town</p>
-    <span class="tag-inline">games &middot; explore</span>
-    <h1 class="title-logo">📚 Book<b>Town</b></h1>
-    <p class="lede">Run, double jump, slide and super-jump around a blocky little town. Collect <span id="start-coins">63</span> coins, hunt down <span id="start-gold">8</span> golden ones, buy new moves at the market stall, race the time trials — and step into <b>The Study</b> or the <b>Habit Tower</b> for games built around <i>Atomic Habits</i>.</p>
-    <div class="controls-hint controls-help"></div>
-    <p class="fineprint" id="start-progress"></p>
-    <button class="btn" id="btn-play" type="button">Play</button>
-    <p class="site-footer">offcuts.buildbyjai.workers.dev</p>
-  </div>
-</div>
-
-<!-- pause menu -->
-<div class="overlay" id="pause" hidden>
-  <div class="card scrollable">
-    <span class="tag-inline">paused</span>
-    <h2>Book Town</h2>
-    <div class="stat-row">
-      <div>Wallet<b id="stat-wallet">0</b></div>
-      <div>Coins<b id="stat-coins">0 / 63</b></div>
-      <div>Golden<b id="stat-gold">0 / 8</b></div>
-      <div>Escape<b id="stat-escape">—</b></div>
-    </div>
-    <button class="btn danger" id="btn-quit-trial" type="button" hidden style="margin-top:12px">Quit time trial</button>
-    <h3>Moves</h3>
-    <div class="move-list" id="move-list"></div>
-    <h3>Time of day</h3>
-    <div id="time-picker"></div>
-    <h3>Graphics</h3>
-    <div id="quality-picker"></div>
-    <h3>Badges</h3>
-    <ul class="badge-list" id="badge-list"></ul>
-    <div class="controls-hint controls-help" id="pause-help" hidden></div>
-    <button class="btn" id="btn-resume" type="button">Resume</button>
-    <div class="btn-row" style="margin-bottom:10px">
-      <button class="btn ghost" id="btn-help" type="button">Controls</button>
-      <button class="btn ghost" id="btn-mute" type="button">Sound: on</button>
-    </div>
-    <button class="btn ghost" id="btn-debug" type="button" style="margin-bottom:10px">Debug panel (FPS, draw calls)</button>
-    <div class="btn-row" style="margin-bottom:10px">
-      <button class="btn ghost" id="btn-respawn" type="button">Back to start</button>
-      <button class="btn ghost" id="btn-reset" type="button">Reset progress</button>
-    </div>
-    <div id="reset-confirm" hidden>
-      <p class="fineprint" style="margin:4px 0 10px">Wipe all coins, badges and your best escape time? This can't be undone.</p>
-      <div class="btn-row" style="margin-bottom:10px">
-        <button class="btn danger" id="btn-reset-yes" type="button">Yes, reset</button>
-        <button class="btn ghost" id="btn-reset-no" type="button">Cancel</button>
-      </div>
-    </div>
-    <a class="btn ghost" href="../../">Leave to Offcuts</a>
-  </div>
-</div>
-
-<!-- noticeboard -->
-<div class="overlay" id="notice" hidden>
-  <div class="card scrollable">
-    <span class="tag-inline">noticeboard</span>
-    <h2>Welcome to Book Town</h2>
-    <p class="lede">Every building here will hold a game built around a great book. <b>The Study</b> (north-west, the one with the columns) is open now — walk through its door to play.</p>
-    <p class="lede">There are <span id="notice-coins">63</span> coins dotted around town and <span id="notice-gold">8</span> golden ones in sneaky spots. Roofs are fair game: stacks of crates by the café make a decent first step up, and the clock tower has handholds if you're brave.</p>
-    <p class="lede"><b>New:</b> double jump, super jump (hold Charge), slide and ledge grab are yours from the start. The market stall by the billboard sells dash, wall jump, glide, ground pound and triple jump. Mushrooms, jump rings, ziplines, rails and a cannon are scattered round the square, and the chequered flags start three time trials.</p>
-    <p class="lede" style="margin-bottom:18px">The other shops are opening soon — keep exploring!</p>
-    <button class="btn" id="btn-notice-close" type="button">Got it</button>
-  </div>
-</div>
-
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
-<script type="module" src="js/town.js"></script>
-</body>
+<body><p>Book Town is now <a href="../chapterlands/">Chapterlands</a>.</p></body>
 </html>
