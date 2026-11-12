@@ -216,6 +216,7 @@
   <div class="boardwrap">
     <div class="board" id="board" role="grid" aria-label="Sudoku board"></div>
     <div class="pausecover" id="pauseCover"><p>Paused</p><button class="btn" id="resumeBtn">Resume</button></div>
+    <div class="pausecover" id="failCover"><p>Out of strikes</p><button class="btn" id="retryBtn">Retry puzzle</button></div>
   </div>
 
   <div class="controls">
@@ -359,7 +360,8 @@ function shuffle(a, rng) { for (let i = a.length - 1; i > 0; i--) { const j = Ma
 function pc(x) { let c = 0; while (x) { x &= x - 1; c++; } return c; }
 const pad = n => String(n).padStart(2, '0');
 function todayKey(d = new Date()) { return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
-function yesterdayKey() { const d = new Date(); d.setDate(d.getDate() - 1); return todayKey(d); }
+function dayBefore(k) { const [y, m, d] = k.split('-').map(Number); return todayKey(new Date(y, m - 1, d - 1)); }
+function yesterdayKey() { return dayBefore(todayKey()); }
 function fmtTime(s) { const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return h ? `${h}:${pad(m)}:${pad(x)}` : `${m}:${pad(x)}`; }
 function fmtNum(n) { return n.toLocaleString('en-GB'); }
 function prettyDate(k) { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); }
@@ -571,6 +573,7 @@ function render() {
   $('#hintBtn').disabled = G.hints >= MAX_HINTS || G.done || G.failed;
   $('#undoBtn').disabled = !G.history.length || G.done || G.failed;
   $('#pauseCover').classList.toggle('show', paused && !G.done && !G.failed);
+  $('#failCover').classList.toggle('show', !!G.failed);
   $('#pauseBtn').querySelector('small').textContent = paused ? 'Resume' : 'Pause';
 }
 function renderMeta() {
@@ -635,11 +638,12 @@ function input(v) {
   if (v === G.solution[i]) {
     G.notes[i] = 0;
     if (S.autoNotes) peersOf(i).forEach(p => { G.notes[p] &= ~(1 << (v - 1)); });
+    const first = !G.scored.includes(i);                           // undo + replay of the same cell earns nothing extra
     const prevMult = multOf(G.combo);
-    G.combo++;
+    if (first) G.combo++;
     const mult = multOf(G.combo);
     G.maxMult = Math.max(G.maxMult, mult);
-    if (!G.scored.includes(i)) { G.scored.push(i); G.score += Math.round(BASE[G.diff] * SCALE[G.N]) * mult; }
+    if (first) { G.scored.push(i); G.score += Math.round(BASE[G.diff] * SCALE[G.N]) * mult; }
     if (mult > prevMult) { toast(`×${mult} combo!`, 'gold'); bump('#sCombo'); }
     checkUnits(i, mult);
     bump('#sScore');
@@ -721,7 +725,8 @@ function finish() {
 
   // progress
   const tk = todayKey();
-  const firstDaily = G.mode === 'daily' && !P.daily[tk];
+  const dk = G.mode === 'daily' ? G.dateKey : tk;                  // a daily finished after midnight still belongs to its own day
+  const firstDaily = G.mode === 'daily' && !P.daily[dk];
   P.solves++; P.xp += G.score;
   P.bestMult = Math.max(P.bestMult, G.maxMult);
   const bk = G.N + '-' + G.diff, newBest = P.best[bk] == null || G.elapsed < P.best[bk];
@@ -729,9 +734,12 @@ function finish() {
   if (!P.numerals.includes(S.numeral)) P.numerals.push(S.numeral);
   if (!P.sizes.includes(G.N)) P.sizes.push(G.N);
   if (firstDaily) {
-    P.daily[tk] = { elapsed: G.elapsed, score: G.score, mistakes: G.mistakes, hints: G.hints, numeral: S.numeral, maxMult: G.maxMult };
-    P.streak = P.lastDaily === yesterdayKey() ? P.streak + 1 : (P.lastDaily === tk ? P.streak : 1);
-    P.lastDaily = tk; P.bestStreak = Math.max(P.bestStreak, P.streak);
+    P.daily[dk] = { elapsed: G.elapsed, score: G.score, mistakes: G.mistakes, hints: G.hints, numeral: S.numeral, maxMult: G.maxMult };
+    if (!P.lastDaily || P.lastDaily <= dk) {                       // a stale daily never rewinds newer streak progress
+      P.streak = P.lastDaily === dayBefore(dk) ? P.streak + 1 : (P.lastDaily === dk ? P.streak : 1);
+      P.lastDaily = dk;
+    }
+    P.bestStreak = Math.max(P.bestStreak, P.streak);
   }
   // quests
   const qDone = P.quests[tk] || (P.quests[tk] = []), qs = todaysQuests(), newQ = [];
@@ -771,11 +779,16 @@ function switchModeInfo() {
   const done = P.daily[todayKey()];
   if (done) $('#dailyInfo').textContent = `Solved today · ${fmtTime(done.elapsed)} · ${fmtNum(done.score)} pts · come back tomorrow`;
 }
+function retry() {
+  if (!G) return;
+  closeModal();
+  if (G.mode === 'daily') newGame('daily'); else newGame('classic', { seed: G.seed });
+}
 function fail() {
   G.failed = true; saveGame(); render();
   openModal(`<h3>Out of strikes</h3><p class="sub">Three mistakes on this ${G.N}×${G.N} ${DIFF_LABEL[G.diff]}. Try the same puzzle again, or switch off the strike limit in Settings for relaxed play.</p>
     <div class="mbtns"><button class="btn" id="mRetry">Retry puzzle</button>${G.mode === 'classic' ? '<button class="btn ghost" id="mNew">New puzzle</button>' : ''}</div>`);
-  $('#mRetry').onclick = () => { closeModal(); const m = G.mode; if (m === 'daily') newGame('daily'); else newGame('classic', { seed: G.seed }); };
+  $('#mRetry').onclick = retry;
   $('#mNew') && ($('#mNew').onclick = () => { closeModal(); newGame('classic'); });
 }
 async function share() {
@@ -830,6 +843,7 @@ $('#notesBtn').addEventListener('click', () => { notesMode = !notesMode; render(
 $('#hintBtn').addEventListener('click', hint);
 $('#pauseBtn').addEventListener('click', () => togglePause());
 $('#resumeBtn').addEventListener('click', () => togglePause(false));
+$('#retryBtn').addEventListener('click', retry);
 $('#optStrikes').addEventListener('change', e => { S.strikes = e.target.checked; saveSet(); render(); });
 $('#optHighlight').addEventListener('change', e => { S.highlight = e.target.checked; saveSet(); render(); });
 $('#optAutoNotes').addEventListener('change', e => { S.autoNotes = e.target.checked; saveSet(); });
