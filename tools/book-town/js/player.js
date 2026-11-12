@@ -162,6 +162,9 @@ export class Player {
     this._turnCd = 0;
     this._wasSprinting = false;
     this.frozen = false;         // e.g. inside a cannon
+    this.lookTarget = null;      // world point the head turns towards (set by the scene), or null
+    this.headYaw = 0; this.headPitch = 0;
+    this.idleFor = 0; this.lookAround = 0; this.nextLookAround = 6 + Math.random() * 4;
 
     this.rig = buildCharacter(opts.look);
     this.umbrella = buildUmbrella();
@@ -856,6 +859,33 @@ export class Player {
     lerp(r.body.position, 'y', bob, Math.min(1, dt * 18));
     // spins: double jump and ground-pound hover
     r.body.rotation.y = this.spinT > 0 ? (1 - this.spinT / (this.pound ? 0.3 : 0.42)) * TAU * (this.pound ? -1 : 1) : 0;
+
+    // head: turn towards something worth looking at, or glance around when idle
+    let hy = 0, hp = 0;
+    const calm = !this.ride && !this.ledge && !this.charging && !this.pound && this.dashT <= 0 && !this.gliding;
+    if (calm && this.lookTarget) {
+      const dx = this.lookTarget.x - this.pos.x, dz = this.lookTarget.z - this.pos.z;
+      let a = Math.atan2(dx, dz) - this.facing;
+      while (a > Math.PI) a -= TAU;
+      while (a < -Math.PI) a += TAU;
+      if (Math.abs(a) < 1.9) {            // only things roughly in front or to the side
+        hy = THREE.MathUtils.clamp(a, -0.85, 0.85);
+        hp = THREE.MathUtils.clamp(Math.atan2(this.lookTarget.y - (this.pos.y + 1.5), Math.hypot(dx, dz)), -0.4, 0.45);
+      }
+    }
+    if (calm && this.grounded && speed < 0.3) this.idleFor += dt; else { this.idleFor = 0; this.lookAround = 0; }
+    if (this.idleFor > this.nextLookAround) { this.lookAround = 2.4; this.idleFor = 0; this.nextLookAround = 7 + Math.random() * 6; }
+    if (this.lookAround > 0) {
+      this.lookAround -= dt;
+      const tt = 2.4 - this.lookAround;
+      hy += Math.sin(tt * 2.6) * 0.6 * Math.min(1, this.lookAround * 2);
+      hp += Math.sin(tt * 1.3) * 0.08;
+    }
+    const kh = Math.min(1, dt * 6);
+    this.headYaw += (hy - this.headYaw) * kh;
+    this.headPitch += (hp - this.headPitch) * kh;
+    r.head.rotation.y = this.headYaw;
+    r.head.rotation.x = -this.headPitch;
 
     // squash & stretch
     let sy = 1, sxz = 1;

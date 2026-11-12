@@ -305,3 +305,20 @@ body.touch #combo { top: 22%; }
   #btn-dash, #touch-ui.has-dash #btn-dash { right: max(100px, calc(env(safe-area-inset-right) + 92px)); bottom: max(86px, calc(env(safe-area-inset-bottom) + 80px)); }
   #touch-ui.has-dash #btn-interact { bottom: max(150px, calc(env(safe-area-inset-bottom) + 144px)); }
 }
+
+/* ---------- debug panel (?debug=1 or pause menu) ---------- */
+#debug-panel {
+  position: fixed; right: max(12px, env(safe-area-inset-right)); top: max(64px, calc(env(safe-area-inset-top) + 58px)); z-index: 26;
+  width: 236px; max-height: calc(100vh - 140px); overflow-y: auto; background: rgba(16,20,26,0.88); color: #e8eef4;
+  border-radius: 12px; padding: 10px 12px 12px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; line-height: 1.5;
+  border: 1px solid rgba(255,255,255,0.14); pointer-events: auto;
+}
+#debug-panel h4 { margin: 8px 0 4px; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: #8fd0c8; }
+#debug-panel .dbg-grid { display: grid; grid-template-columns: 1fr auto; gap: 1px 8px; }
+#debug-panel .dbg-grid b, #debug-panel .dbg-row b { color: #ffe27a; font-weight: 700; }
+#debug-panel .dbg-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 3px 0; }
+#debug-panel .dbg-check { display: flex; align-items: center; gap: 6px; padding: 2px 0; cursor: pointer; }
+#debug-panel select { background: #0d1116; color: #fff; border: 1px solid #345; border-radius: 6px; padding: 2px 4px; font: inherit; }
+#debug-panel input[type=range] { width: 110px; }
+#debug-panel .dbg-close { position: absolute; right: 6px; top: 4px; background: none; border: none; color: #9ab; font-size: 18px; cursor: pointer; }
+body.touch #debug-panel { top: auto; bottom: max(200px, calc(env(safe-area-inset-bottom) + 200px)); max-height: 45vh; }

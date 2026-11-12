@@ -21,7 +21,7 @@ function blank() {
   return {
     v: 3, coins: {}, golden: {}, badges: {}, bestEscapeMs: null, muted: false, pendingToasts: [],
     tower: blankTower(),
-    wallet: 0, earned: 0, unlocks: {}, quality: null, trials: {}, seen: {}, crates: {}
+    wallet: 0, earned: 0, unlocks: {}, quality: null, timeOfDay: null, trials: {}, seen: {}, crates: {}
   };
 }
 
@@ -29,7 +29,7 @@ function migrate(old) {
   const out = blank();
   if (old && typeof old === 'object') {
     for (const k of ['coins', 'golden', 'badges', 'bestEscapeMs', 'muted', 'pendingToasts',
-      'wallet', 'earned', 'unlocks', 'quality', 'trials', 'seen', 'crates']) {
+      'wallet', 'earned', 'unlocks', 'quality', 'timeOfDay', 'trials', 'seen', 'crates']) {
       if (old[k] !== undefined && old[k] !== null) out[k] = old[k];
     }
     if (old.tower && typeof old.tower === 'object') out.tower = Object.assign(blankTower(), old.tower);
@@ -118,6 +118,9 @@ export const Save = {
   /* ---------- graphics ---------- */
   quality() { return read().quality; },
   setQuality(q) { read().quality = q; write(); },
+  // Pause-menu time of day: null = live day/night cycle, otherwise a fixed hour.
+  timeOfDay() { const t = read().timeOfDay; return typeof t === 'number' ? t : null; },
+  setTimeOfDay(h) { read().timeOfDay = h; write(); },
 
   hasBadge(id) { return !!read().badges[id]; },
   // Returns true only the first time a badge is earned.
@@ -183,10 +186,11 @@ export const Save = {
   setMuted(m) { read().muted = !!m; write(); },
 
   reset() {
-    const { muted, quality } = read();
+    const { muted, quality, timeOfDay } = read();
     memory = blank();
     memory.muted = muted;
     memory.quality = quality;
+    memory.timeOfDay = timeOfDay;
     write();
     changed('reset');
   }

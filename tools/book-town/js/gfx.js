@@ -142,8 +142,12 @@ export function createGfx({ canvas, scene, camera, sun = null, extraShadowLights
       if (changed) listeners.forEach((fn) => fn(t, this.tierCfg));
     },
     resize,
+    // Debug-panel overrides (null = follow the tier). Not saved.
+    overrides: { shadows: null, post: null },
+    get postOn() { return this.overrides.post !== null ? this.overrides.post : this.tierCfg.post; },
+    refresh() { applyTier(); },
     render() {
-      if (this.composer && this.tierCfg.post) this.composer.render();
+      if (this.composer && this.postOn) this.composer.render();
       else renderer.render(scene, camera);
     },
     // Called every frame with real dt; active = the player is in control.
@@ -155,15 +159,17 @@ export function createGfx({ canvas, scene, camera, sun = null, extraShadowLights
     const c = gfx.tierCfg;
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, c.pixelRatio));
     const lights = [sun, ...extraShadowLights].filter(Boolean);
+    const shadowSize = c.shadows > 0 ? c.shadows : 1024;   // a debug override can turn shadows on for Low
+    const shadowsOn = gfx.overrides.shadows !== null ? gfx.overrides.shadows : c.shadows > 0;
     for (const l of lights) {
-      const size = l.isPointLight ? Math.min(1024, c.shadows / 2) : c.shadows;
-      l.castShadow = c.shadows > 0;
-      if (c.shadows > 0 && l.shadow.mapSize.x !== size) {
+      const size = l.isPointLight ? Math.min(1024, shadowSize / 2) : shadowSize;
+      l.castShadow = shadowsOn;
+      if (shadowsOn && l.shadow.mapSize.x !== size) {
         if (l.shadow.map) { l.shadow.map.dispose(); l.shadow.map = null; }
         l.shadow.mapSize.set(size, size);
       }
     }
-    if (c.post && post && !gfx.composer && !gfx._postLoading) buildPost();
+    if ((c.post || gfx.overrides.post) && post && !gfx.composer && !gfx._postLoading) buildPost();
     resize();
   }
 
@@ -407,6 +413,13 @@ export class DayCycle {
     this.update(0);
   }
   setHour(h) { this.hour = ((h % 24) + 24) % 24; this.update(0); }
+  // Freeze the clock at an hour (null = let the day run).
+  setLock(h) {
+    this.locked = h == null ? null : ((h % 24) + 24) % 24;
+    if (this.locked != null) this.hour = this.locked;
+    this.update(0);
+  }
+  get isLive() { return this.locked == null || isNaN(this.locked); }
   update(dt) {
     if (this.locked == null || isNaN(this.locked)) this.hour = (this.hour + dt * 24 / G.dayLengthSec) % 24;
     const h = this.hour;

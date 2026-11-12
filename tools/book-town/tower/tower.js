@@ -12,6 +12,7 @@ import { toast, awardBadge, fadeOut, fadeIn, controlsHelpHTML } from '../js/hud.
 import { createGfx, qualityPicker, U } from '../js/gfx.js';
 import { attachJuice } from '../js/fx.js';
 import { MoveHud } from '../js/movehud.js';
+import { DebugPanel } from '../js/debug.js';
 import { TOWER, SECTIONS, FOG_BAND, PLATFORMS, COINS, START } from './levels.js';
 
 const $ = (id) => document.getElementById(id);
@@ -296,6 +297,8 @@ cam.player = player;
 player.onJump = () => Sfx.jump();
 const juice = attachJuice({ scene, player, cam, camera, renderer });
 const moveHud = new MoveHud(player);
+// FPS / draw-call panel with ?debug=1
+const debug = new URLSearchParams(location.search).get('debug') === '1' ? new DebugPanel({ gfx, player }) : null;
 moveHud.show(false);
 function facingToward(from, to) { return Math.atan2(to.x - from.x, to.z - from.z); }
 const startFacing = facingToward(START, PLATFORMS[1]);
@@ -757,7 +760,9 @@ function tick() {
   juice.update(dt);
   moveHud.update(dt);
   gfx.monitor(dt, state === 'running' || state === 'ready');
+  if (debug) debug.beginFrame();
   gfx.render();
+  if (debug) debug.update(dt);
   requestAnimationFrame(tick);
 }
 

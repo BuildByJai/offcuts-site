@@ -18,6 +18,7 @@ import { TownLife } from './life.js';
 import { MoveHud, Combo } from './movehud.js';
 import { Trials } from './trials.js';
 import { Shop } from './shop.js';
+import { DebugPanel } from './debug.js';
 
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
@@ -43,6 +44,7 @@ const gfx = createGfx({ canvas, scene, camera, sun });
 const renderer = gfx.renderer;
 const sky = new Sky(scene);
 const day = new DayCycle({ scene, sun, hemi, sky });
+if (!params.has('time') && Save.timeOfDay() !== null) day.setLock(Save.timeOfDay());
 
 /* =============== loading =============== */
 const manager = new THREE.LoadingManager();
@@ -1009,7 +1011,8 @@ const input = new Input(canvas);
 const player = new Player(scene, world);
 player.setUnlocks(Save.unlocks());
 input.setMoves(Save.unlocks());
-const cam = new FollowCamera(camera, world);
+// overview: zoom right out and the camera tilts up over the square (town only)
+const cam = new FollowCamera(camera, world, { overview: true });
 cam.player = player;
 const spawn = CONFIG.spawns[spawnKey];
 player.teleport(spawn.x, spawn.y, spawn.z, spawn.facing);
@@ -1203,6 +1206,7 @@ function closePause() {
   setState('playing');
 }
 function renderPause() {
+  syncTime();
   $('stat-coins').textContent = `${Save.coinCount()} / ${coins.length}`;
   $('stat-gold').textContent = `${Save.goldenCount()} / ${goldens.length}`;
   $('stat-wallet').textContent = Save.DEBUG ? '∞' : Save.wallet();
@@ -1266,6 +1270,58 @@ addEventListener('keydown', (e) => {
   if (e.code === 'KeyR' && !e.repeat && state === 'playing' && trials.running) trials.restart();
 });
 
+/* =============== head turning: what the player glances at =============== */
+const _look = new THREE.Vector3();
+function pickLookTarget() {
+  const p = player.pos;
+  let best = null, bd = 5;
+  for (const n of life.npcs) {
+    if (!n.rig.root.visible) continue;
+    const q = n.rig.root.position, d = Math.hypot(q.x - p.x, q.z - p.z);
+    if (d < bd && Math.abs(q.y - p.y) < 2) { bd = d; best = _look.set(q.x, q.y + 1.4, q.z); }
+  }
+  if (best) return best;
+  const c = life.cat.g.position;
+  if (Math.hypot(c.x - p.x, c.z - p.z) < 3.5 && Math.abs(c.y - p.y) < 1.5) return _look.set(c.x, c.y + 0.4, c.z);
+  if (current && current._icon) return _look.copy(current._icon.position);
+  return null;
+}
+
+/* =============== time-of-day picker (pause menu) =============== */
+const TIME_PRESETS = [['Live', null], ['Morning', 8], ['Midday', 12.5], ['Golden', 18.5], ['Night', 22.5]];
+let syncTime = () => {};
+{
+  const box = $('time-picker');
+  box.classList.add('seg');
+  const btns = TIME_PRESETS.map(([label, h]) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'seg-btn'; b.textContent = label;
+    b.addEventListener('click', () => { day.setLock(h); Save.setTimeOfDay(h); syncTime(); debug.sync(); });
+    box.appendChild(b);
+    return b;
+  });
+  syncTime = () => {
+    const lock = day.isLive ? null : day.locked;
+    btns.forEach((b, i) => b.classList.toggle('on', TIME_PRESETS[i][1] === lock));
+  };
+  syncTime();
+}
+
+/* =============== debug panel (?debug=1 or pause menu) =============== */
+const debug = new DebugPanel({
+  gfx, player, day,
+  toggles: [
+    { label: 'Townspeople, birds and cat', get: () => life.npcs.some((n) => n.rig.root.visible) || life.cat.g.visible,
+      set: (on) => {
+        life.setTier(gfx.tierCfg);   // restores the tier's people + birds
+        if (!on) { life.npcs.forEach((n) => { n.rig.root.visible = false; n.rig.blob.visible = false; }); life.birds.forEach((b) => { b.g.visible = false; }); }
+        life.cat.g.visible = on;
+      } },
+    { label: 'Grass and flowers', get: () => life.tufts.visible, set: (on) => { life.tufts.visible = on; life.flowers.visible = on; } }
+  ]
+});
+$('btn-debug').addEventListener('click', () => { debug.show(true); closePause(); });
+
 /* =============== main loop =============== */
 const clock = new THREE.Clock();
 function tick() {
@@ -1291,6 +1347,7 @@ function tick() {
     }
     if (player.ride && player.ride.camYaw !== undefined) cam.yaw += (player.ride.camYaw - cam.yaw) * Math.min(1, dt * 6);
     cam.update(dt, player.pos, input);
+    player.lookTarget = pickLookTarget();
   } else if (state === 'paused' || state === 'sign' || state === 'shop' || state === 'trial-card') {
     if (input.consumePause()) {
       if (state === 'paused') closePause();
@@ -1309,7 +1366,8 @@ function tick() {
 
   day.update(dt);
   const tc = gfx.tierCfg;
-  followShadow(sun, cam.orbit ? cam.orbit.center : player.pos, day.lightDir, cam.orbit ? 60 : tc.shadowRange, 90);
+  const shadowRange = cam.orbit ? 60 : (tc.shadowRange ? THREE.MathUtils.lerp(tc.shadowRange, 60, cam.overviewK) : 0);
+  followShadow(sun, cam.orbit ? cam.orbit.center : player.pos, day.lightDir, shadowRange, 90);
   sky.update(dt, camera.position);
   const night = day.night;
   Batcher.glowMaterial().emissiveIntensity = night * 1.15;
@@ -1337,7 +1395,9 @@ function tick() {
   }
 
   gfx.monitor(dt, state === 'playing');
+  debug.beginFrame();
   gfx.render();
+  debug.update(dt);
   requestAnimationFrame(tick);
 }
 

@@ -467,6 +467,15 @@ export class TownLife {
       r.legL.rotation.x = s; r.legR.rotation.x = -s; r.armL.rotation.x = -s * 0.8; r.armR.rotation.x = s * 0.8;
       r.body.position.y = near ? 0 : Math.abs(Math.cos(n.phase)) * 0.04;
       if (near) { r.armR.rotation.x = -2.2 + Math.sin(t * 8) * 0.3; }    // wave hello
+      // turn the head to watch the player when they're close and in front-ish
+      const dpx = pl.pos.x - px, dpz = pl.pos.z - pz, dist = Math.hypot(dpx, dpz);
+      let hy = 0;
+      if (dist < 4.5 && Math.abs(pl.pos.y) < 2.5) {
+        hy = Math.atan2(dpx, dpz) - r.root.rotation.y;
+        while (hy > Math.PI) hy -= Math.PI * 2; while (hy < -Math.PI) hy += Math.PI * 2;
+        hy = Math.abs(hy) < 1.9 ? Math.max(-0.9, Math.min(0.9, hy)) : 0;
+      }
+      r.head.rotation.y += (hy - r.head.rotation.y) * Math.min(1, dt * 5);
       r.blob.position.set(px, 0.02, pz);
     }
   }
