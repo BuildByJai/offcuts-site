@@ -12,6 +12,7 @@ import { toast, setPrompt, fadeOut, fadeIn, controlsHelpHTML, badgeInfo } from '
 import { createGfx } from '../js/gfx.js';
 import { attachJuice } from '../js/fx.js';
 import { MoveHud } from '../js/movehud.js';
+import { DebugPanel } from '../js/debug.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -353,6 +354,8 @@ const cam = new FollowCamera(camera, world, { distance: 4.4, minDistance: 1.8, m
 cam.player = player;
 const juice = attachJuice({ scene, player, cam, camera, renderer });
 const moveHud = new MoveHud(player);
+// FPS / draw-call panel with ?debug=1
+const debug = new URLSearchParams(location.search).get('debug') === '1' ? new DebugPanel({ gfx, player }) : null;
 moveHud.show(false);
 player.teleport(0, 0, 3.2, Math.PI);
 cam.snapBehind(Math.PI);
@@ -818,7 +821,9 @@ function tick() {
   juice.update(dt);
   moveHud.update(dt);
   gfx.monitor(dt, state === 'playing');
+  if (debug) debug.beginFrame();
   gfx.render();
+  if (debug) debug.update(dt);
   requestAnimationFrame(tick);
 }
 

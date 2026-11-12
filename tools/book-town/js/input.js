@@ -119,6 +119,8 @@ export class Input {
     const c = this.canvas;
     this._lookId = null; this._stickId = null;
     this._last = { x: 0, y: 0 };
+    this._camTouches = new Map();   // touch pointers on the camera side of the screen
+    this._pinch = 0;                // finger spread while pinching (0 = not pinching)
     c.addEventListener('contextmenu', (e) => e.preventDefault());
     c.addEventListener('pointerdown', (e) => {
       if (e.pointerType === 'touch') {
@@ -126,9 +128,14 @@ export class Input {
         if (e.clientX < innerWidth / 2 && this._stickId === null) {
           this._stickId = e.pointerId;
           this._startStick(e.clientX, e.clientY);
-        } else if (this._lookId === null) {
-          this._lookId = e.pointerId;
-          this._last = { x: e.clientX, y: e.clientY };
+        } else {
+          // camera-side touches: one finger looks, two fingers pinch-zoom
+          this._camTouches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+          if (this._camTouches.size === 2) { this._lookId = null; this._pinch = this._spread(); }
+          else if (this._lookId === null && this._camTouches.size === 1) {
+            this._lookId = e.pointerId;
+            this._last = { x: e.clientX, y: e.clientY };
+          }
         }
       } else {
         this._lookId = e.pointerId;
@@ -139,6 +146,16 @@ export class Input {
     });
     c.addEventListener('pointermove', (e) => {
       if (e.pointerId === this._stickId) { this._moveStick(e.clientX, e.clientY); return; }
+      if (this._camTouches.has(e.pointerId)) {
+        this._camTouches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (this._pinch) {
+          // fingers apart → zoom in; together → zoom out (same steps as the mouse wheel)
+          const d = this._spread();
+          if (d > 0 && this._pinch > 0) this.zoom += Math.log(this._pinch / d) / Math.log(1.12);
+          this._pinch = d;
+          return;
+        }
+      }
       if (e.pointerId === this._lookId) {
         const sens = e.pointerType === 'touch' ? CONFIG.camera.touchSensitivity : CONFIG.camera.mouseSensitivity;
         this.lookDX += (e.clientX - this._last.x) * sens;
@@ -149,6 +166,12 @@ export class Input {
     const end = (e) => {
       if (e.pointerId === this._stickId) { this._stickId = null; this._releaseStick(); }
       if (e.pointerId === this._lookId) this._lookId = null;
+      if (this._camTouches.delete(e.pointerId) && this._camTouches.size < 2) {
+        this._pinch = 0;
+        // the finger left behind carries on as the look finger
+        const [rest] = this._camTouches.entries();
+        if (rest && this._lookId === null) { this._lookId = rest[0]; this._last = { x: rest[1].x, y: rest[1].y }; }
+      }
     };
     c.addEventListener('pointerup', end);
     c.addEventListener('pointercancel', end);
@@ -253,6 +276,11 @@ export class Input {
     } else {
       this.btnInteract.hidden = true;
     }
+  }
+
+  _spread() {
+    const [a, b] = [...this._camTouches.values()];
+    return a && b ? Math.hypot(a.x - b.x, a.y - b.y) : 0;
   }
 
   _startStick(x, y) {

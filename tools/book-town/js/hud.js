@@ -100,7 +100,7 @@ export function controlsHelpHTML(touch, u = {}) {
     if (u.groundPound) extra.push('<b>Ground pound</b>: ⚡ in mid-air');
     if (u.tripleJump) extra.push('<b>Triple jump</b>: tap Jump a third time');
     return `<b>Move</b>: drag anywhere on the left half (push far to sprint)<br>
-       <b>Look</b>: drag on the right half<br>
+       <b>Look</b>: drag on the right half &nbsp;·&nbsp; <b>Zoom</b>: pinch (all the way out for an overview)<br>
        <b>Jump</b>: big button (hold for higher, tap again mid-air to double jump)<br>
        <b>Super jump</b>: hold ⚡ Charge, release &nbsp;·&nbsp; <b>Slide</b>: ⚡ while sprinting<br>
        <b>Interact</b>: hand button appears near doors &amp; signs` + (extra.length ? '<br>' + extra.join('<br>') : '');
@@ -113,6 +113,6 @@ export function controlsHelpHTML(touch, u = {}) {
   return `<b>Move</b>: WASD / arrow keys &nbsp;·&nbsp; <b>Sprint</b>: Shift<br>
        <b>Jump</b>: Space (hold for higher) &nbsp;·&nbsp; <b>Double jump</b>: Space again in mid-air<br>
        <b>Super jump</b>: hold C (or Ctrl), release &nbsp;·&nbsp; <b>Slide</b>: C while sprinting<br>
-       <b>Camera</b>: click-drag to orbit, scroll to zoom<br>
+       <b>Camera</b>: click-drag to orbit, scroll to zoom (all the way out for an overview)<br>
        <b>Interact</b>: E &nbsp;·&nbsp; <b>Pause</b>: Esc / P` + (extra.length ? '<br>' + extra.join('<br>') : '');
 }

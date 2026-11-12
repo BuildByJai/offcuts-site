@@ -165,6 +165,12 @@ export const CONFIG = {
     mouseSensitivity: 0.005,
     touchSensitivity: 0.008,
     easeOut: 4,            // how quickly the camera eases back out after a wall pushes it in
+    rotDamping: 14,        // how quickly the view catches up with a drag (higher = snappier)
+    lookAhead: 0.12,       // seconds of travel the view leads by…
+    lookAheadMax: 1.4,     // …capped at this many metres
+    // overview (town only — see FollowCamera opts): zoom past overviewFrom and the
+    // camera tilts up to overviewPitch, out to overviewDistance, pivot raised by overviewLift
+    overview: false, overviewFrom: 13, overviewDistance: 42, overviewPitch: 1.0, overviewLift: 2,
     sprintFovKick: 7,      // degrees added while sprinting / dashing
     speedPullBack: 2.2,    // extra distance at high speed and during super jumps
     shake: 1               // global multiplier for camera shake
