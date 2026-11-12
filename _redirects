@@ -1,0 +1,3 @@
+# Book Town was renamed to Chapterlands (Nov 2026). Keep the old links working.
+/tools/book-town /tools/chapterlands/ 301
+/tools/book-town/* /tools/chapterlands/:splat 301

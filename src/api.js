@@ -199,7 +199,7 @@ async function handleBookTownSubmitScore(board, request, env) {
     return json({ error: "Invalid JSON body" }, 400);
   }
 
-  const name = typeof body.name === "string" ? body.name.trim().slice(0, 12) : "";
+  const name = typeof body.name === "string" ? body.name.trim().slice(0, 16) : "";  // Chapterlands library-card names ("CURIOUS NOTEBOOK") are up to 16 chars
   const timeMs = Number(body.timeMs);
 
   if (!name) return json({ error: "Name is required" }, 400);

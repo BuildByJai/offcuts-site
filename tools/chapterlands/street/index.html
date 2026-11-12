@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="description" content="A Chapterlands street: a short game about the chapter you just read.">
+<meta name="theme-color" content="#8fc6ec">
+<title>Street — Chapterlands — Offcuts</title>
+<link rel="stylesheet" href="../chapterlands.css">
+</head>
+<body>
+
+<canvas id="game-canvas"></canvas>
+
+<div id="loading">
+  <div class="logo"><span class="logo-book">📚</span><span class="logo-word game-logo">Chapter<b>lands</b></span></div>
+  <div class="bar"><span style="width:60%"></span></div>
+  <p id="loading-text">Building the street…</p>
+</div>
+
+<div id="hud" hidden>
+  <div class="hud-pill wallet" id="hud-wallet" title="Coins to spend"><span class="hud-ico">🪙</span><b>0</b></div>
+  <div class="hud-col">
+    <div class="hud-chip" id="hud-progress"></div>
+    <div class="hud-chip gold lives" id="hud-lives" hidden></div>
+    <div class="hud-chip" id="hud-timer" hidden></div>
+  </div>
+</div>
+<div class="objective" id="objective" hidden><div class="ob-name" id="ob-name"></div><div class="ob-text" id="ob-text"></div><div class="ob-sub" id="ob-sub"></div></div>
+<button id="btn-pause" type="button" aria-label="Pause" hidden>II</button>
+<button id="help-btn" type="button" hidden>🪙 Help</button>
+<div id="interact-prompt"></div>
+<div id="toasts"></div>
+<div id="fade" class="on"></div>
+<canvas id="confetti" hidden></canvas>
+
+<!-- start -->
+<div class="overlay" id="start-screen" hidden>
+  <div class="card scrollable">
+    <p class="crumb" id="crumb"></p>
+    <span class="tag-inline" id="start-tag">street</span>
+    <h1 id="start-title">Street</h1>
+    <p class="lede" id="start-lede"></p>
+    <div class="controls-hint" id="start-how"></div>
+    <div class="controls-hint controls-help" id="start-controls"></div>
+    <button class="btn" id="btn-start" type="button">Start</button>
+    <a class="btn ghost" id="btn-back-start" href="../">&larr; Back to the district</a>
+    <p class="site-footer">offcuts.buildbyjai.workers.dev</p>
+  </div>
+</div>
+
+<!-- locked -->
+<div class="overlay" id="locked" hidden>
+  <div class="card">
+    <span class="tag-inline">not open yet</span>
+    <h2 id="locked-title">This street isn't open yet</h2>
+    <p class="lede" id="locked-text">Read the chapter and answer its three questions to open it.</p>
+    <a class="btn" id="btn-locked-back" href="../">&larr; Back to the district</a>
+  </div>
+</div>
+
+<!-- talk / clue -->
+<div class="panel" id="say" hidden>
+  <div class="sheet scrollable">
+    <p class="obj-label" id="say-who">Someone</p>
+    <p class="obj-text" id="say-text"></p>
+    <div id="say-extra"></div>
+    <button class="btn" id="btn-say-close" type="button">OK</button>
+  </div>
+</div>
+
+<!-- coin help -->
+<div class="overlay" id="help" hidden>
+  <div class="card">
+    <span class="tag-inline">coins buy help · never answers</span>
+    <h2>Need a hand?</h2>
+    <div id="help-list"></div>
+    <button class="btn ghost" id="btn-help-close" type="button">Back to the game</button>
+  </div>
+</div>
+
+<!-- pause -->
+<div class="overlay" id="pause" hidden>
+  <div class="card scrollable">
+    <span class="tag-inline">paused</span>
+    <h2 id="pause-title">Street</h2>
+    <div class="controls-hint controls-help"></div>
+    <button class="btn" id="btn-resume" type="button">Resume</button>
+    <div class="btn-row" style="margin-bottom:10px">
+      <button class="btn ghost" id="btn-mute" type="button">Sound: on</button>
+      <button class="btn ghost" id="btn-restart" type="button">Restart</button>
+    </div>
+    <a class="btn ghost" id="btn-back-pause" href="../">&larr; Back to the district</a>
+  </div>
+</div>
+
+<!-- finished -->
+<div class="overlay" id="finish" hidden>
+  <div class="card scrollable" style="text-align:center">
+    <span class="tag-inline" id="finish-tag">street done</span>
+    <div class="tip-icon" id="finish-icon">🎉</div>
+    <h2 id="finish-title">Well done!</h2>
+    <p class="lede" id="finish-text"></p>
+    <p class="fineprint" id="finish-pay"></p>
+    <a class="btn" id="btn-finish-back" href="../">Back to the district</a>
+    <button class="btn ghost" id="btn-finish-again" type="button">Play again</button>
+  </div>
+</div>
+
+<!-- failed -->
+<div class="overlay" id="fail" hidden>
+  <div class="card" style="text-align:center">
+    <span class="tag-inline">try again</span>
+    <div class="tip-icon">💫</div>
+    <h2 id="fail-title">Nearly!</h2>
+    <p class="lede" id="fail-text"></p>
+    <button class="btn" id="btn-fail-again" type="button">Try again</button>
+    <a class="btn ghost" id="btn-fail-back" href="../">Back to the district</a>
+  </div>
+</div>
+
+<div id="arcade" hidden><canvas id="arcade-canvas" width="960" height="600"></canvas></div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="street.js"></script>
+</body>
+</html>

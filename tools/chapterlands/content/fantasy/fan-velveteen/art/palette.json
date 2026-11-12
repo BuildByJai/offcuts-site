@@ -1,0 +1,15 @@
+{
+  "ground": "#c9a27a",
+  "ground2": "#b8916a",
+  "wall": "#f3e6d0",
+  "trim": "#7a4e30",
+  "roof": "#c97a8a",
+  "accent": "#e9a23b",
+  "accent2": "#6a9fd6",
+  "wood": "#9a6a44",
+  "leaf": "#5aa24f",
+  "stone": "#d8cfbf",
+  "sky": "#9fcbe8",
+  "fog": "#e6eef2",
+  "item": "#ffd23f"
+}

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="description" content="Chapterlands: a world that grows as you read. Climb lookout towers, find lost books and unlock new districts.">
+<meta name="theme-color" content="#8fc6ec">
+<title>Chapterlands — Offcuts</title>
+<link rel="stylesheet" href="chapterlands.css">
+</head>
+<body>
+
+<canvas id="game-canvas"></canvas>
+
+<div id="loading">
+  <div class="logo"><span class="logo-book">📚</span><span class="logo-word game-logo">Chapter<b>lands</b></span></div>
+  <div class="bar"><span></span></div>
+  <p>Building the town… 0%</p>
+  <p class="tip"></p>
+</div>
+
+<div id="hud" hidden>
+  <div class="hud-pill wallet" id="hud-wallet" title="Coins to spend"><span class="hud-ico">🪙</span><b>0</b></div>
+  <div class="hud-col">
+    <div class="hud-chip" id="hud-coins">0 / 63 found</div>
+    <div class="hud-chip gold" id="hud-gold">⭐ 0 / 8</div>
+  </div>
+</div>
+<button id="btn-card" type="button" aria-label="Library card" title="Library card" hidden>🪪</button>
+<div id="quest-tracker" hidden></div>
+<button id="btn-pause" type="button" aria-label="Pause" hidden>II</button>
+<div id="interact-prompt"></div>
+<div id="toasts"></div>
+<div id="fade"></div>
+<canvas id="confetti" hidden></canvas>
+
+<!-- start screen -->
+<div class="overlay title" id="start-screen" hidden>
+  <div class="card">
+    <p class="crumb"><a href="../../" data-grownup>offcuts</a> / <a href="../../" data-grownup>games</a> / chapterlands</p>
+    <span class="tag-inline">games &middot; reading &middot; explore</span>
+    <h1 class="title-logo game-logo">📚 Chapter<b>lands</b></h1>
+    <p class="lede">A world that grows as you read. Every road out of Library Square is a kind of story, and every book is a district waiting under the fog. Read a chapter to open a street, climb the <b>Lookout Tower</b> to see what's coming, and help find the <b>lost books</b>. There are <span id="start-coins">63</span> coins and <span id="start-gold">8</span> golden ones to find on the way.</p>
+    <div class="name-row"><span>Your library card: <b id="start-name">—</b></span><button class="btn ghost mini-btn" id="btn-start-reroll" type="button">🎲 New name</button></div>
+    <div class="controls-hint controls-help"></div>
+    <p class="fineprint" id="start-progress"></p>
+    <button class="btn" id="btn-play" type="button">Play</button>
+    <p class="site-footer">offcuts.buildbyjai.workers.dev</p>
+  </div>
+</div>
+
+<!-- pause menu -->
+<div class="overlay" id="pause" hidden>
+  <div class="card scrollable">
+    <span class="tag-inline">paused</span>
+    <h2 class="game-name">Chapterlands</h2>
+    <div class="seg tabs" id="pause-tabs">
+      <button class="seg-btn on" type="button" data-tab="game">Game</button>
+      <button class="seg-btn" type="button" data-tab="card">Library card</button>
+      <button class="seg-btn" type="button" data-tab="quests">Quests</button>
+    </div>
+    <div class="tab" id="tab-game">
+    <div class="stat-row">
+      <div>Wallet<b id="stat-wallet">0</b></div>
+      <div>Coins<b id="stat-coins">0 / 63</b></div>
+      <div>Golden<b id="stat-gold">0 / 8</b></div>
+      <div>Stamps<b id="stat-stamps">0</b></div>
+    </div>
+    <button class="btn danger" id="btn-quit-trial" type="button" hidden style="margin-top:12px">Quit time trial</button>
+    <h3>Moves</h3>
+    <div class="move-list" id="move-list"></div>
+    <h3>Time of day</h3>
+    <div id="time-picker"></div>
+    <h3>Graphics</h3>
+    <div id="quality-picker"></div>
+    <h3>Badges</h3>
+    <ul class="badge-list" id="badge-list"></ul>
+    <div class="controls-hint controls-help" id="pause-help" hidden></div>
+    </div>
+    <div class="tab" id="tab-card" hidden></div>
+    <div class="tab" id="tab-quests" hidden></div>
+    <button class="btn" id="btn-resume" type="button">Resume</button>
+    <div class="btn-row" style="margin-bottom:10px">
+      <button class="btn ghost" id="btn-help" type="button">Controls</button>
+      <button class="btn ghost" id="btn-mute" type="button">Sound: on</button>
+    </div>
+    <button class="btn ghost" id="btn-debug" type="button" style="margin-bottom:10px">Debug panel (FPS, draw calls)</button>
+    <div class="btn-row" style="margin-bottom:10px">
+      <button class="btn ghost" id="btn-respawn" type="button">Back to the square</button>
+      <button class="btn ghost" id="btn-reset" type="button">Reset progress</button>
+    </div>
+    <div id="reset-confirm" hidden>
+      <p class="fineprint" style="margin:4px 0 10px">Wipe all coins, badges, stamps, Keys and reading progress? This can't be undone.</p>
+      <div class="btn-row" style="margin-bottom:10px">
+        <button class="btn danger" id="btn-reset-yes" type="button">Yes, reset</button>
+        <button class="btn ghost" id="btn-reset-no" type="button">Cancel</button>
+      </div>
+    </div>
+    <a class="btn ghost" href="../../" data-grownup data-label="Go to Offcuts">Leave to Offcuts</a>
+  </div>
+</div>
+
+<!-- noticeboard (south entrance) -->
+<div class="overlay" id="notice" hidden>
+  <div class="card scrollable">
+    <span class="tag-inline">noticeboard</span>
+    <h2>Welcome to <span class="game-name">Chapterlands</span></h2>
+    <p class="lede">This is <b>Library Square</b>. Each of the seven roads leading out of it is one part of the library — Fantasy, Adventure, Animals &amp; Nature, Friends &amp; Family, Mystery, Sci-Fi and Life Skills. Every book is a district along its road: the easiest books sit nearest the square, the hardest at the far end.</p>
+    <p class="lede"><b>Reading opens doors.</b> Read a chapter in the <b>Reading Room</b> (the building with the columns), answer three quick questions, and that chapter's street opens. Finish a whole book to earn its <b>Key</b> and a stamp on your library card.</p>
+    <p class="lede">The roads are foggy. Climb the <b>Lookout Tower</b> on the Fantasy road to see what's coming. The Librarian has lost some books, and someone small and white is in a terrible hurry near the café…</p>
+    <p class="lede" style="margin-bottom:18px">There are <span id="notice-coins">63</span> coins dotted around town and <span id="notice-gold">8</span> golden ones in sneaky spots. The market stall sells new moves.</p>
+    <button class="btn" id="btn-notice-close" type="button">Got it</button>
+  </div>
+</div>
+
+<!-- NPC speech -->
+<div class="panel" id="say" hidden>
+  <div class="sheet">
+    <p class="obj-label" id="say-who">Someone</p>
+    <p class="obj-text" id="say-text"></p>
+    <button class="btn" id="btn-say-close" type="button">OK</button>
+  </div>
+</div>
+
+<!-- banner (Lookout Tower reveal) -->
+<div class="overlay" id="banner" hidden>
+  <div class="card banner-card">
+    <span class="tag-inline" id="banner-tag">lookout tower</span>
+    <h2 id="banner-title"></h2>
+    <ul class="reveal-list" id="banner-list"></ul>
+    <button class="btn" id="btn-banner-close" type="button">Brilliant</button>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="js/town.js"></script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+# Not served as site assets (Workers static assets ignore list).
+# Internal planning docs — keep them in the repo but off the public site.
+docs/

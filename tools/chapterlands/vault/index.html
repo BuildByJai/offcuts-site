@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="description" content="A Chapterlands Vault: an escape room about a whole book.">
+<title>Vault — Chapterlands — Offcuts</title>
+<link rel="stylesheet" href="../chapterlands.css">
+<style>
+  html, body { background: #1c1712; }
+  #loading { background: #1c1712; }
+  #loading p { color: #e8dcc6; }
+</style>
+</head>
+<body>
+
+<canvas id="game-canvas"></canvas>
+
+<div id="loading">
+  <div class="bar"><span style="width:100%"></span></div>
+  <p>Unlocking the vault…</p>
+</div>
+
+<div id="hud" hidden>
+  <div class="hud-pill" id="hud-timer">00:00.0</div>
+  <div class="hud-pill" id="hud-locks">🔒 0 / 0</div>
+</div>
+<button id="btn-pause" type="button" aria-label="Pause" hidden>II</button>
+<div id="interact-prompt"></div>
+<div id="toasts"></div>
+<div id="fade" class="on"></div>
+<canvas id="confetti" hidden></canvas>
+
+<!-- start -->
+<div class="overlay" id="start-screen" hidden>
+  <div class="card scrollable">
+    <p class="crumb" id="crumb">chapterlands / vault</p>
+    <span class="tag-inline" id="start-tag">the vault</span>
+    <h1 id="start-title">The Vault</h1>
+    <p class="lede" id="start-lede"></p>
+    <div class="controls-hint controls-help"></div>
+    <button class="btn" id="btn-start" type="button">Start</button>
+    <a class="btn ghost back-link" href="../">&larr; Back to the district</a>
+    <p class="site-footer">offcuts.buildbyjai.workers.dev</p>
+  </div>
+</div>
+
+<!-- locked -->
+<div class="overlay" id="locked" hidden>
+  <div class="card">
+    <span class="tag-inline">not open yet</span>
+    <h2 id="locked-title">The Vault is locked</h2>
+    <p class="lede" id="locked-text">Finish every street in this district first.</p>
+    <a class="btn back-link" href="../">&larr; Back to the district</a>
+  </div>
+</div>
+
+<!-- clue / station -->
+<div class="panel" id="clue" hidden>
+  <div class="sheet scrollable">
+    <p class="obj-label" id="clue-label">Object</p>
+    <p class="obj-text" id="clue-text"></p>
+    <div id="clue-extra"></div>
+    <button class="btn ghost" id="btn-clue-close" type="button">Close</button>
+  </div>
+</div>
+
+<!-- exit door -->
+<div class="panel" id="door-panel" hidden>
+  <div class="sheet scrollable">
+    <p class="obj-label">The vault door</p>
+    <p class="obj-text" style="margin-bottom:10px">Each lock opens when you solve something in the room.</p>
+    <ul class="lock-list" id="lock-list"></ul>
+    <button class="btn ghost" id="btn-door-close" type="button">Close</button>
+  </div>
+</div>
+
+<!-- lesson card -->
+<div class="panel" id="lesson" hidden>
+  <div class="sheet">
+    <span class="tag-inline" id="lesson-tag">lock open</span>
+    <p class="lesson-law" id="lesson-law" style="font-size:22px;font-weight:800;margin:0 0 8px"></p>
+    <p class="lesson-text" id="lesson-text" style="font-size:16px;line-height:1.55;margin:0 0 18px"></p>
+    <button class="btn" id="btn-lesson-close" type="button">Keep going</button>
+  </div>
+</div>
+
+<!-- pause -->
+<div class="overlay" id="pause" hidden>
+  <div class="card">
+    <span class="tag-inline">paused</span>
+    <h2 id="pause-title">The Vault</h2>
+    <div class="controls-hint controls-help"></div>
+    <button class="btn" id="btn-resume" type="button">Resume</button>
+    <div class="btn-row" style="margin-bottom:10px">
+      <button class="btn ghost" id="btn-mute" type="button">Sound: on</button>
+      <button class="btn ghost" id="btn-restart" type="button">Restart</button>
+    </div>
+    <a class="btn ghost back-link" href="../">&larr; Back to the district</a>
+  </div>
+</div>
+
+<!-- win -->
+<div class="overlay" id="win" hidden>
+  <div class="card scrollable" style="text-align:center">
+    <span class="tag-inline">vault cracked</span>
+    <div class="tip-icon">🗝️</div>
+    <h2 id="win-title">You cracked the Vault!</h2>
+    <p class="lede" id="win-text"></p>
+    <p class="fineprint" id="win-pay"></p>
+    <ul class="recap" id="recap" style="list-style:none;padding:0;text-align:left"></ul>
+    <a class="btn gold back-link" id="btn-win-town" href="../">Back to the district</a>
+    <button class="btn ghost" id="btn-win-retry" type="button">Play again</button>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="vault.js"></script>
+</body>
+</html>
