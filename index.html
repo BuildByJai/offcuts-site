@@ -135,7 +135,7 @@
   <header>
     <p class="eyebrow">offcuts /</p>
     <h1>Random tools, built on request.</h1>
-    <p class="sub">A running log of small, single-purpose things — finance calculators, football stats, games, whatever comes up. No theme. Newest first.</p>
+    <p class="sub">A running log of small games and toys — adventures, arcade, puzzles, word games and quick fun. Newest first.</p>
     <p class="count"><span class="dot"></span><span id="tool-count">9</span> tools built</p>
   </header>
 
@@ -148,33 +148,39 @@
 
 <script>
   const tools = [
-    { name: "Sudoku Shudoku",          desc: "Daily puzzles, combos, challenges and badges — play in Eastern Arabic, Roman, emoji or colours.", tag: "games", date: "Nov 2026", href: "tools/sudoku/" },
-    { name: "Book Town",               desc: "Explore a blocky town, climb rooftops, collect coins and escape the Atomic Habits study.", tag: "games", date: "Nov 2026", href: "tools/book-town/" },
-    { name: "Snakes & Ladders: Chaos Mode", desc: "The classic board in full 3D — roll, climb, slide, and race to tile 100.", tag: "games", date: "Sep 2026", href: "tools/snakes-and-ladders-chaos/" },
-    { name: "Wave Runner",             desc: "Third-person space dodge-and-shoot — clear 10 escalating waves of asteroids and enemy ships.", tag: "games", date: "Sep 2026", href: "tools/wave-runner/" },
-    { name: "The Study",               desc: "Third-person escape room — explore a cluttered study, deduce the safe code, race the clock.", tag: "games", date: "Sep 2026", href: "tools/the-study/" },
-    { name: "G4: Scooter Racer",       desc: "First-person scooter chase across 4 modelled routes — outrun the cat, unlock the next street.", tag: "games", date: "Sep 2026", href: "tools/g4-scooter-race/" },
-    { name: "Post-Match Moments",      desc: "Paste a match report and get animated pitch clips of its talking-point moments.", tag: "football", date: "Aug 2026", href: "tools/post-match-moments/" },
-    { name: "Memory Match",            desc: "Flip cards and find every matching pair, from picture matching to speed memory.", tag: "games", date: "Aug 2026", href: "tools/word-games/memory-match/" },
-    { name: "Hangman Reimagined",      desc: "Guess the word letter by letter — no gallows, just a friendly growing plant.",   tag: "games", date: "Aug 2026", href: "tools/word-games/hangman/" },
-    { name: "Word Scramble",           desc: "Unscramble the jumbled letters to spell the word, timed or untimed.",           tag: "games", date: "Aug 2026", href: "tools/word-games/scramble/" },
-    { name: "Emoji Word Guess",        desc: "Work out the word from an emoji clue — multiple choice or type it in.",         tag: "games", date: "Aug 2026", href: "tools/word-games/emoji-guess/" },
-    { name: "Word Builder",            desc: "Pop the letters in the right order to spell the word before time runs out.",    tag: "games", date: "Aug 2026", href: "tools/word-games/word-builder/" },
-    { name: "Word Search",             desc: "Find every hidden word in a fresh letter grid, generated each round.",          tag: "games", date: "Aug 2026", href: "tools/word-games/word-search/" },
-    { name: "Rhyme Time",              desc: "Pick the word that rhymes — great for phonics and quick thinking.",             tag: "games", date: "Aug 2026", href: "tools/word-games/rhyme-time/" },
-    { name: "World Cup Fantasy Draft", desc: "Draft a 5-player squad from the 8 remaining teams and climb the leaderboard.", tag: "football", date: "Jul 2026", href: "tools/fantasy-draft/" },
-    { name: "PAYE Tax Calculator",    desc: "Detailed PAYE breakdown for 2025/26 — annual, monthly and weekly take-home.", tag: "finance", date: "Jun 2026", href: "tools/paye-tax-calculator/" },
-    { name: "Tax Calculator UK",      desc: "Estimate your income tax and take-home pay for the 2025/26 tax year.",        tag: "finance", date: "Jun 2026", href: "tools/tax-calculator/" },
-    { name: "VAT Percentage UK",      desc: "Current UK VAT rates explained. Find the implied VAT rate from your figures.", tag: "finance", date: "Jun 2026", href: "tools/vat-percentage/" },
-    { name: "Reverse VAT Calculator", desc: "Extract the net price and VAT element from any VAT-inclusive amount.",        tag: "finance", date: "Jun 2026", href: "tools/reverse-vat-calculator/" },
-    { name: "VAT Calculator UK",      desc: "Add or remove VAT from any amount. Standard 20% rate or custom.",             tag: "finance", date: "Jun 2026", href: "tools/vat-calculator/" },
-    { name: "Do Nothing Timer",       desc: "Track how long you can stay completely idle. Any interaction resets the timer.", tag: "boredom", date: "Jun 2026", href: "tools/do-nothing-timer/" },
-    { name: "Reaction Time Test",     desc: "Test your visual reaction speed in milliseconds. Click when it turns green.",  tag: "games",   date: "Jun 2026", href: "tools/reaction-time/" },
-    { name: "Family Truth or Dare",   desc: "Kid-safe Truth or Dare prompts for families. Mixed, ages 5–8, or ages 9–12.", tag: "games",   date: "Jun 2026", href: "tools/truth-or-dare/" }
+    { name: "Sudoku Shudoku",          desc: "Daily puzzles, combos, challenges and badges — play in Eastern Arabic, Roman, emoji or colours.", tag: "puzzle", date: "Nov 2026", href: "tools/sudoku/" },
+    { name: "Book Town",               desc: "Explore a blocky town, climb rooftops, collect coins and escape the Atomic Habits study.", tag: "adventure", date: "Nov 2026", href: "tools/book-town/" },
+    { name: "Wave Runner",             desc: "Third-person space dodge-and-shoot — clear 10 escalating waves of asteroids and enemy ships.", tag: "arcade", date: "Sep 2026", href: "tools/wave-runner/" },
+    { name: "The Study",               desc: "Third-person escape room — explore a cluttered study, deduce the safe code, race the clock.", tag: "adventure", date: "Sep 2026", href: "tools/the-study/" },
+    { name: "G4: Scooter Racer",       desc: "First-person scooter chase across 4 modelled routes — outrun the cat, unlock the next street.", tag: "arcade", date: "Sep 2026", href: "tools/g4-scooter-race/" },
+    { name: "Memory Match",            desc: "Flip cards and find every matching pair, from picture matching to speed memory.", tag: "puzzle", date: "Aug 2026", href: "tools/word-games/memory-match/" },
+    { name: "Hangman Reimagined",      desc: "Guess the word letter by letter — no gallows, just a friendly growing plant.",   tag: "word", date: "Aug 2026", href: "tools/word-games/hangman/" },
+    { name: "Word Scramble",           desc: "Unscramble the jumbled letters to spell the word, timed or untimed.",           tag: "word", date: "Aug 2026", href: "tools/word-games/scramble/" },
+    { name: "Emoji Word Guess",        desc: "Work out the word from an emoji clue — multiple choice or type it in.",         tag: "word", date: "Aug 2026", href: "tools/word-games/emoji-guess/" },
+    { name: "Word Builder",            desc: "Pop the letters in the right order to spell the word before time runs out.",    tag: "word", date: "Aug 2026", href: "tools/word-games/word-builder/" },
+    { name: "Word Search",             desc: "Find every hidden word in a fresh letter grid, generated each round.",          tag: "word", date: "Aug 2026", href: "tools/word-games/word-search/" },
+    { name: "Rhyme Time",              desc: "Pick the word that rhymes — great for phonics and quick thinking.",             tag: "word", date: "Aug 2026", href: "tools/word-games/rhyme-time/" },
+    { name: "Do Nothing Timer",       desc: "Track how long you can stay completely idle. Any interaction resets the timer.", tag: "quick", date: "Jun 2026", href: "tools/do-nothing-timer/" },
+    { name: "Reaction Time Test",     desc: "Test your visual reaction speed in milliseconds. Click when it turns green.",  tag: "quick",   date: "Jun 2026", href: "tools/reaction-time/" },
+    { name: "Family Truth or Dare",   desc: "Kid-safe Truth or Dare prompts for families. Mixed, ages 5–8, or ages 9–12.", tag: "family",   date: "Jun 2026", href: "tools/truth-or-dare/" }
   ];
 
-  const CATS = ['all', 'finance', 'football', 'games', 'boredom'];
-  const CAT_LABELS = { all: 'All', finance: 'Finance', football: 'Football', games: 'Games', boredom: 'Boredom' };
+  // Archived Nov 2026 — hidden from the homepage, but the pages (and their
+  // API routes) are still deployed at their old URLs. To restore one, move
+  // it back into tools[] above with a current category tag.
+  const archived = [
+    { name: "Snakes & Ladders: Chaos Mode", href: "tools/snakes-and-ladders-chaos/", was: "family" },
+    { name: "Post-Match Moments",      href: "tools/post-match-moments/",     was: "football" },
+    { name: "World Cup Fantasy Draft", href: "tools/fantasy-draft/",          was: "football" },
+    { name: "PAYE Tax Calculator",     href: "tools/paye-tax-calculator/",    was: "finance" },
+    { name: "Tax Calculator UK",       href: "tools/tax-calculator/",         was: "finance" },
+    { name: "VAT Percentage UK",       href: "tools/vat-percentage/",         was: "finance" },
+    { name: "Reverse VAT Calculator",  href: "tools/reverse-vat-calculator/", was: "finance" },
+    { name: "VAT Calculator UK",       href: "tools/vat-calculator/",         was: "finance" }
+  ];
+
+  const CATS = ['all', 'adventure', 'arcade', 'puzzle', 'word', 'family', 'quick'];
+  const CAT_LABELS = { all: 'All', adventure: 'Adventure', arcade: 'Arcade', puzzle: 'Puzzle', word: 'Word', family: 'Family', quick: 'Quick Fun' };
   let activeCat = 'all';
 
   const listEl  = document.getElementById('tool-list');
@@ -202,7 +208,7 @@
       <a class="row" href="${t.href}" style="animation-delay:${i*0.04}s">
         <span class="row-meta">${t.date}</span>
         <span class="row-body">
-          <p class="name">${t.name}<span class="tag">${t.tag}</span></p>
+          <p class="name">${t.name}<span class="tag">${CAT_LABELS[t.tag].toLowerCase()}</span></p>
           <p class="desc">${t.desc}</p>
         </span>
         <span class="arrow">&rarr;</span>
