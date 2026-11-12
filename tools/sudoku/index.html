@@ -494,7 +494,7 @@ function multOf(combo) { return Math.min(5, 1 + Math.floor(combo / 4)); }
 
 /* ---------- game lifecycle ---------- */
 function newGame(mode, opts = {}) {
-  const N = mode === 'daily' ? 9 : S.N, diff = mode === 'daily' ? 'medium' : S.diff;
+  const N = mode === 'daily' ? 9 : (opts.N ?? S.N), diff = mode === 'daily' ? 'medium' : (opts.diff ?? S.diff);
   const dateKey = todayKey();
   const seed = mode === 'daily' ? hashStr('offcuts-sudoku-' + dateKey) : (opts.seed ?? (Math.random() * 2 ** 32) >>> 0);
   const { puzzle, solution } = generate(N, diff, seed);
@@ -868,7 +868,7 @@ function finish() {
 function retry() {
   if (!G) return;
   closeModal();
-  if (G.mode === 'daily') newGame('daily'); else newGame('classic', { seed: G.seed });
+  if (G.mode === 'daily') newGame('daily'); else newGame('classic', { seed: G.seed, N: G.N, diff: G.diff });   // same puzzle, even if the menu has moved on
 }
 function fail() {
   G.failed = true; saveGame(); render();
