@@ -151,7 +151,6 @@
     { name: "Sudoku Shudoku",          desc: "Daily puzzles, combos, challenges and badges — play in Eastern Arabic, Roman, emoji or colours.", tag: "puzzle", date: "Nov 2026", href: "tools/sudoku/" },
     { name: "Book Town",               desc: "Explore a blocky town, climb rooftops, collect coins and escape the Atomic Habits study.", tag: "adventure", date: "Nov 2026", href: "tools/book-town/" },
     { name: "Wave Runner",             desc: "Third-person space dodge-and-shoot — clear 10 escalating waves of asteroids and enemy ships.", tag: "arcade", date: "Sep 2026", href: "tools/wave-runner/" },
-    { name: "The Study",               desc: "Third-person escape room — explore a cluttered study, deduce the safe code, race the clock.", tag: "adventure", date: "Sep 2026", href: "tools/the-study/" },
     { name: "G4: Scooter Racer",       desc: "First-person scooter chase across 4 modelled routes — outrun the cat, unlock the next street.", tag: "arcade", date: "Sep 2026", href: "tools/g4-scooter-race/" },
     { name: "Memory Match",            desc: "Flip cards and find every matching pair, from picture matching to speed memory.", tag: "puzzle", date: "Aug 2026", href: "tools/word-games/memory-match/" },
     { name: "Hangman Reimagined",      desc: "Guess the word letter by letter — no gallows, just a friendly growing plant.",   tag: "word", date: "Aug 2026", href: "tools/word-games/hangman/" },
@@ -169,6 +168,7 @@
   // API routes) are still deployed at their old URLs. To restore one, move
   // it back into tools[] above with a current category tag.
   const archived = [
+    { name: "The Study",               href: "tools/the-study/",              was: "adventure" },
     { name: "Snakes & Ladders: Chaos Mode", href: "tools/snakes-and-ladders-chaos/", was: "family" },
     { name: "Post-Match Moments",      href: "tools/post-match-moments/",     was: "football" },
     { name: "World Cup Fantasy Draft", href: "tools/fantasy-draft/",          was: "football" },
