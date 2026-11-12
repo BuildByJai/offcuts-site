@@ -55,8 +55,8 @@ export class Trees {
       }
       // canopy: a dark low-poly core so gaps between cards don't show sky, then cards on a flattened sphere
       const cy = H + R * 0.35, n = t.far ? 10 : 22;
-      const core = new THREE.IcosahedronGeometry(R * 0.62, 1); core.scale(1, 0.8, 1); core.translate(t.x, cy, t.z);
-      uvFromBox(core, 1.2); tintGeometry(core, 0x2f5a28); trunks.push(core);
+      const core = new THREE.IcosahedronGeometry(R * 0.45, 1); core.scale(1, 0.8, 1); core.translate(t.x, cy, t.z);
+      uvFromBox(core, 1.2); tintGeometry(core, 0x4a7a3a); trunks.push(core);
       for (let i = 0; i < n; i++) {
         const u = rnd() * Math.PI * 2, v = Math.acos(2 * rnd() - 1);
         const r = R * (0.45 + rnd() * 0.55);

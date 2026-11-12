@@ -7,9 +7,9 @@ import { PROOF } from '../config.js';
 
 const G = PROOF.grass;
 
-function bladeGeometry(h) {
+function bladeGeometry(h, w) {
   // 3-segment tapered blade, slight forward curve, double-sided
-  const segs = 3, w = 0.055;
+  const segs = 3;
   const pos = [], uvs = [], idx = [];
   for (let i = 0; i <= segs; i++) {
     const t = i / segs, y = t * h, ww = w * (1 - t * 0.85), bend = t * t * 0.06;
@@ -51,7 +51,7 @@ export class Grass {
     mat.colorNode = mix(base, tip, hgt).mul(shade);
     mat.normalNode = transformNormalToView(vec3(0.0, 1.0, 0.0));
 
-    const geo = bladeGeometry(G.bladeHeight);
+    const geo = bladeGeometry(G.bladeHeight, G.bladeWidth || 0.04);
     const mesh = new THREE.InstancedMesh(geo, mat, spots.length);
     const m = new THREE.Matrix4(), q = new THREE.Quaternion(), s = new THREE.Vector3(), p = new THREE.Vector3(), e = new THREE.Euler();
     spots.forEach(([x, z, sc], i) => {

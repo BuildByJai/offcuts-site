@@ -78,6 +78,17 @@ async function boot() {
 
   const input = new Input(canvas);
   app.input = input;
+  // Pinch to zoom on touch screens: every ~12% change in finger spread is one zoom step.
+  let pinch = null;
+  const spread = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  canvas.addEventListener('touchstart', (e) => { if (e.touches.length === 2) pinch = spread(e.touches); }, { passive: true });
+  canvas.addEventListener('touchmove', (e) => {
+    if (e.touches.length !== 2 || !pinch || !input.enabled) return;
+    const d = spread(e.touches);
+    if (d > pinch * 1.12) { input.zoom -= 1; pinch = d; }        // fingers apart → zoom in
+    else if (d < pinch / 1.12) { input.zoom += 1; pinch = d; }   // fingers together → zoom out
+  }, { passive: true });
+  canvas.addEventListener('touchend', (e) => { if (e.touches.length < 2) pinch = null; }, { passive: true });
   const cam = new SpringCamera(camera, phys, ctrl.collider);
   cam.snapBehind(spawn.facing);
   app.cam = cam;

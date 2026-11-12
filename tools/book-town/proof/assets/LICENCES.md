@@ -21,7 +21,7 @@ Downloaded at 1K `.hdr`, used as the environment map and sky.
 
 ## PBR texture sets (`assets/textures/`)
 
-Each set is three WebP files: `<name>_col` (albedo), `<name>_nrm` (OpenGL normal), `<name>_arm` (R = ambient occlusion, G = roughness, B = metalness). Resized to 1K (2K for the ground sets marked ²ᴷ) and converted with Pillow.
+Each set is three WebP files: `<name>_col` (albedo), `<name>_nrm` (OpenGL normal), `<name>_arm` (R = ambient occlusion, G = roughness, B = metalness). Resized to 1K (2K for the set marked ²ᴷ) and converted with Pillow.
 
 ### Poly Haven — CC0 (https://polyhaven.com/textures)
 
@@ -29,12 +29,12 @@ Each set is three WebP files: `<name>_col` (albedo), `<name>_nrm` (OpenGL normal
 |---|---|
 | `bark_brown_02` | https://polyhaven.com/a/bark_brown_02 |
 | `beige_wall_001` | https://polyhaven.com/a/beige_wall_001 |
-| `brick_wall_006` | https://polyhaven.com/a/brick_wall_006 |
 | `clay_roof_tiles_02` | https://polyhaven.com/a/clay_roof_tiles_02 |
-| `cobblestone_floor_08` ²ᴷ | https://polyhaven.com/a/cobblestone_floor_08 |
-| `grass_path_2` | https://polyhaven.com/a/grass_path_2 |
+| `cobblestone_floor_08` | https://polyhaven.com/a/cobblestone_floor_08 |
 | `grey_roof_tiles_02` | https://polyhaven.com/a/grey_roof_tiles_02 |
 | `painted_plaster_wall` | https://polyhaven.com/a/painted_plaster_wall |
+| `patterned_paving_02` ²ᴷ | https://polyhaven.com/a/patterned_paving_02 |
+| `precast_stone_paving` | https://polyhaven.com/a/precast_stone_paving |
 | `rectangular_paving` | https://polyhaven.com/a/rectangular_paving |
 | `red_brick` | https://polyhaven.com/a/red_brick |
 | `roof_slates_02` | https://polyhaven.com/a/roof_slates_02 |
@@ -48,15 +48,9 @@ Each set is three WebP files: `<name>_col` (albedo), `<name>_nrm` (OpenGL normal
 | `Bricks059` | https://ambientcg.com/a/Bricks059 |
 | `Bricks075A` | https://ambientcg.com/a/Bricks075A |
 | `Fabric086` | https://ambientcg.com/a/Fabric086 |
-| `Grass004` ²ᴷ | https://ambientcg.com/a/Grass004 |
-| `Ground037` | https://ambientcg.com/a/Ground037 |
-| `Metal032` | https://ambientcg.com/a/Metal032 |
+| `Grass004` | https://ambientcg.com/a/Grass004 |
 | `PaintedPlaster012` | https://ambientcg.com/a/PaintedPlaster012 |
 | `PaintedPlaster017` | https://ambientcg.com/a/PaintedPlaster017 |
-| `PavingStones151` ²ᴷ | https://ambientcg.com/a/PavingStones151 |
-| `RoofingTiles013A` | https://ambientcg.com/a/RoofingTiles013A |
-| `WoodSiding008` | https://ambientcg.com/a/WoodSiding008 |
-| `WoodSiding009` | https://ambientcg.com/a/WoodSiding009 |
 
 ## Models (`assets/models/`) — Poly Haven, CC0 (https://polyhaven.com/models)
 
@@ -74,7 +68,6 @@ Downloaded as 1K glTF, converted to GLB with meshopt compression and WebP textur
 | `grass_medium_01.glb` | https://polyhaven.com/a/grass_medium_01 |
 | `metal_trash_can.glb` | https://polyhaven.com/a/metal_trash_can |
 | `outdoor_table_chair_set_01.glb` | https://polyhaven.com/a/outdoor_table_chair_set_01 |
-| `plastic_monobloc_chair_01.glb` | https://polyhaven.com/a/plastic_monobloc_chair_01 |
 | `potted_plant_02.glb` | https://polyhaven.com/a/potted_plant_02 |
 | `potted_plant_04.glb` | https://polyhaven.com/a/potted_plant_04 |
 | `shrub_01.glb` | https://polyhaven.com/a/shrub_01 |

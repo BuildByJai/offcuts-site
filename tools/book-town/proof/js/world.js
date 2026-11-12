@@ -422,8 +422,18 @@ export class World {
     for (let i = 0; i < 40; i++) { const a = i / 40 * Math.PI * 2, r = 54 + (i % 3) * 6; this.treeSpots.push({ x: Math.cos(a) * r, z: Math.sin(a) * r, s: 1.2 + (i % 4) * 0.25, far: true }); }
     for (const L of this.lawns) { if (L.outer) continue; for (let i = 0; i < 5; i++) P(['shrub_04', 'shrub_01', 'shrub_sorrel_01'][i % 3], L.x0 + 0.8 + Math.random() * (L.x1 - L.x0 - 1.6), L.z1 - 0.9 - Math.random() * 0.8, Math.random() * 6, 0.9 + Math.random() * 0.4); }
     for (const fb of this.flowerBeds) for (let i = 0; i < 22; i++) P(['celandine_01', 'flower_heliophila', 'dandelion_01'][i % 3], fb.x + (Math.random() - 0.5) * fb.w, fb.z + (Math.random() - 0.5) * fb.d, Math.random() * 6, 0.8 + Math.random() * 0.5);
-    // grass tufts along kerbs and round trees
-    for (const t of this.treeSpots) if (!t.far) for (let i = 0; i < 6; i++) { const a = Math.random() * 6.28, r = 0.6 + Math.random() * 1.2; P('grass_medium_01', t.x + Math.cos(a) * r, t.z + Math.sin(a) * r, Math.random() * 6, 0.7 + Math.random() * 0.5); }
+    // trees standing on paving get a round grass bed with a stone edge; tufts stay inside it
+    const bedGrass = this.mat('Grass004', { size: 2.6, roughness: 1 }), edge = this.mat('precast_stone_paving', { size: 1.2 });
+    const onLawn = (x, z) => this.lawns.some((L) => x > L.x0 && x < L.x1 && z > L.z0 && z < L.z1);
+    for (const t of this.treeSpots) {
+      if (t.far) continue;
+      if (!onLawn(t.x, t.z)) {
+        this.B.geom(bedGrass, new THREE.CircleGeometry(1.5, 28).rotateX(-Math.PI / 2), { tint: 0xd3dfb0, tile: 2.6, matrix: new THREE.Matrix4().setPosition(t.x, 0.075, t.z), cast: false });
+        const ring = new THREE.TorusGeometry(1.55, 0.09, 6, 32); uvFromBox(ring, 1.2);
+        this.B.geom(edge, ring, { tint: 0xe6e0d4, matrix: new THREE.Matrix4().makeRotationX(Math.PI / 2).setPosition(t.x, 0.07, t.z), cast: false });
+      }
+      for (let i = 0; i < 5; i++) { const a = Math.random() * 6.28, r = 0.5 + Math.random() * 0.8; P('grass_medium_01', t.x + Math.cos(a) * r, t.z + Math.sin(a) * r, Math.random() * 6, 0.6 + Math.random() * 0.4, 0.08); }
+    }
   }
   _bounds() {
     const BND = 46;

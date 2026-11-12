@@ -14,7 +14,7 @@ export const PROOF = {
     fogColor: 0xd9e7f2,           // overridden per preset
     fogNear: 80, fogFar: 260,
     // Post-processing (High tier). Medium drops AO; Low drops everything.
-    ao: { radius: 0.35, scale: 1.0, thickness: 1.0, distanceExponent: 1.0, distanceFallOff: 1.0 },
+    ao: { strength: 0.6, radius: 0.3, scale: 1.0, thickness: 1.0, distanceExponent: 1.0, distanceFallOff: 1.0 },
     bloom: { strength: 0.14, radius: 0.55, threshold: 1.05 },
     grade: { warmth: 0.035, lift: 0.01, saturation: 1.14, contrast: 1.06, vignette: 0.2 },
     dof: { enabled: true, aperture: 0.00006, maxBlur: 0.012, minDistance: 11 }   // only when the camera is zoomed out
@@ -72,7 +72,7 @@ export const PROOF = {
   // pastel tints for the plain-plaster houses (by building id)
   houseTints: { 'nw-house': 0xcfe0c6, 'se-house': 0xf7e6b8, 'sw-house': 0xe6d6ec, 's-house-1': 0xcfe1ef, 's-house-2': 0xf7dcc8 },
 
-  grass: { bladeHeight: 0.24, density: 55, windAmp: 0.07, windSpeed: 1.4 },
+  grass: { bladeHeight: 0.22, bladeWidth: 0.032, density: 95, windAmp: 0.07, windSpeed: 1.4 },
   water: { color: 0x86c3dc, deep: 0x3f8aa8 },
 
   // Ambient life

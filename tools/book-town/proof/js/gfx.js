@@ -96,8 +96,13 @@ export class Gfx {
   _applyShadows() {
     const c = this.tierCfg, sun = this.sun;
     const on = c.shadows && this.toggles.shadows;
+    // Toggle at the renderer only: in three r170, setting castShadow = false makes every material
+    // rebuild dispose the same ShadowNode again (null.dispose crash). The renderer check comes first.
     this.renderer.shadowMap.enabled = on;
-    sun.castShadow = on;
+    sun.castShadow = true;
+    // materials cache their lighting setup, so force a rebuild when shadows flip
+    if (this._shadowsOn !== undefined && this._shadowsOn !== on) this.scene.traverse((o) => { if (o.material) [].concat(o.material).forEach((m) => { m.needsUpdate = true; }); });
+    this._shadowsOn = on;
     if (on) {
       if (sun.shadow.mapSize.x !== c.shadowMap) {
         if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; }
@@ -138,7 +143,8 @@ export class Gfx {
       aoPass.radius.value = R.ao.radius; aoPass.scale.value = R.ao.scale; aoPass.thickness.value = R.ao.thickness;
       aoPass.distanceExponent.value = R.ao.distanceExponent; aoPass.distanceFallOff.value = R.ao.distanceFallOff;
       this.aoPass = aoPass;
-      color = aoPass.getTextureNode().mul(color);
+      // blend AO in gently (strength < 1) so dense grass and foliage don't turn black
+      color = mix(float(1), aoPass.getTextureNode().r, float(R.ao.strength || 1)).mul(color);
     }
     if (c.bloom && T.bloom) {
       const b = R.bloom;
