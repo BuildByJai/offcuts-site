@@ -400,6 +400,7 @@ $('start-screen').hidden = false;
 setState('start');
 fadeIn();
 addEventListener('pageshow', (e) => { if (e.persisted) fadeIn(); });
-window.__vault = { player, solve, solved, LOCKS, interact: (i) => interact(interactables[i]), win: () => { solved.fill(true); openExit(); winGame(); } };
+window.__vault = { player, solve, solved, LOCKS, interact: (i) => interact(interactables[i]),
+  stationIndex: (S) => stations.indexOf(S), stationSolve: (i) => stations[i].solve, win: () => { solved.fill(true); openExit(); winGame(); } };
 tick();
 }

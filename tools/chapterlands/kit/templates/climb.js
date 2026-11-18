@@ -8,11 +8,13 @@
 //   fade: true                               some ledges fade in and out (Cheshire Cat)
 //   moving: N                                N ledges slide back and forth
 //   collect: { item: {name, icon, colour}, count, need }   pickups on the way
+//   finale: { npc, say, solve? }   someone at the top; with `solve` (see kit/solve.js) you answer to finish
 //   goalIcon, objective, done
 import * as THREE from 'three';
 import { spawnItems, checkpointPad, goalMarker, npcAt } from '../common.js';
 import { hex } from '../props.js';
 import { toast } from '../../js/hud.js';
+import { renderSolve } from '../solve.js';
 
 const RISE = 1.3;
 
@@ -141,7 +143,7 @@ export function build(A) {
     }
     pick = spawnItems(A, [c.item], pos, { label: c.label || 'collected', beam: false });
   }
-  let bestY = 0, done = false;
+  let bestY = 0, done = false, solvedTop = false;
   A.onUpdate(() => {
     const pl = A.player.pos;
     bestY = Math.max(bestY, pl.y);
@@ -154,7 +156,11 @@ export function build(A) {
         return;
       }
       done = true;
-      if (p.finale && p.finale.npc) A.say(p.finale.npc.name, p.finale.say || '', () => A.win(p.done));
+      if (p.finale && p.finale.solve) {
+        // a puzzle at the top (Humpty Dumpty's words): solve it to finish
+        const box = A.say(p.finale.npc ? p.finale.npc.name : 'At the top', p.finale.say || '', () => { if (!solvedTop) done = false; });
+        renderSolve(box, p.finale.solve, (ok) => { if (ok) { solvedTop = true; A.closePanel(); A.win(p.done); } });
+      } else if (p.finale && p.finale.npc) A.say(p.finale.npc.name, p.finale.say || '', () => A.win(p.done));
       else A.win(p.done);
     }
   });
