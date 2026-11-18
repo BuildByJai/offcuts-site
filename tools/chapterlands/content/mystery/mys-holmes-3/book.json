@@ -1,0 +1,849 @@
+{
+  "id": "mys-holmes-3",
+  "blurb": "twelve cases for the world’s only consulting detective, from his rooms at 221B Baker Street.",
+  "chapterWord": "Story",
+  "source": "The Adventures of Sherlock Holmes by Arthur Conan Doyle (1892). Read it in your own copy, or borrow it free from your library.",
+  "theme": {
+    "palette": {
+      "ground": "#9a9a92",
+      "ground2": "#8a8a84",
+      "wall": "#a8583f",
+      "trim": "#2a2420",
+      "roof": "#4a4f5a",
+      "accent": "#c9a24a",
+      "accent2": "#2f4a7a",
+      "wood": "#5a3a24",
+      "leaf": "#4f7a4a",
+      "stone": "#a8a49a",
+      "sky": "#b8c0c8",
+      "fog": "#c8ccd0",
+      "water": "#4a6a8a",
+      "item": "#ffd23f"
+    },
+    "props": [
+      "lamp",
+      "barrel",
+      "crate",
+      "cart",
+      "statue",
+      "fence"
+    ],
+    "vaultProps": [
+      "bookcase",
+      "chair",
+      "table",
+      "bookcase"
+    ],
+    "edge": "fence",
+    "hide": "crate",
+    "building": {
+      "wall": "#a8583f",
+      "trim": "#2a2420",
+      "roof": "#4a4f5a",
+      "style": "house",
+      "sign": "221B Baker Street",
+      "h": 7
+    }
+  },
+  "streets": [
+    {
+      "id": "scandal",
+      "name": "A Scandal in Bohemia",
+      "chapters": [
+        1
+      ],
+      "template": "PUZZLE",
+      "game": "Find the photograph",
+      "blurb": "A king needs a photograph back, and only Holmes can find where Irene Adler has hidden it.",
+      "how": "Look round Irene Adler’s sitting-room, then say where the photograph is hidden.",
+      "params": {
+        "room": {
+          "w": 14,
+          "d": 12
+        },
+        "objective": "Work out where the photograph is hidden",
+        "clues": [
+          {
+            "object": "window",
+            "label": "The window",
+            "text": "Watson throws a smoke-rocket through the window, and the cry goes up: “Fire!”"
+          },
+          {
+            "object": "lamp",
+            "label": "The bell-pull",
+            "text": "When she thought the house was on fire, Irene Adler rushed straight to a spot just above the right bell-pull."
+          },
+          {
+            "object": "chair",
+            "label": "The sofa",
+            "text": "Holmes, dressed as a clergyman, was carried in and laid on the sofa — the perfect place to watch."
+          }
+        ],
+        "solve": {
+          "object": "safe",
+          "label": "The hiding place",
+          "type": "choice",
+          "prompt": "Where is the photograph?",
+          "options": [
+            "In a recess behind a sliding panel above the right bell-pull",
+            "Under the sofa cushions",
+            "In the king’s pocket"
+          ],
+          "answer": 0,
+          "hint": "Where did she rush when she thought the house was on fire?"
+        },
+        "palette": {
+          "ground": "#8a6440",
+          "ground2": "#7a5636"
+        }
+      }
+    },
+    {
+      "id": "red-headed",
+      "name": "The Red-Headed League",
+      "chapters": [
+        2
+      ],
+      "template": "SNEAK",
+      "game": "Wait in the vault",
+      "blurb": "A pawnbroker is paid to copy out an encyclopaedia — while someone digs under his shop.",
+      "how": "Creep through the dark bank cellar to your hiding place by the crates without the lantern-light catching you.",
+      "params": {
+        "area": [
+          36,
+          44
+        ],
+        "floor": "stone",
+        "dark": true,
+        "watchers": 3,
+        "hides": 6,
+        "cover": 7,
+        "goal": {
+          "name": "crates",
+          "icon": "📦"
+        },
+        "watcher": {
+          "kind": "person",
+          "name": "the lookout",
+          "look": {
+            "shirt": "0x3a3a46",
+            "hair": "0xd8452f"
+          }
+        },
+        "objective": "Reach the crates without being seen",
+        "palette": {
+          "sky": "#2a2f3a",
+          "fog": "#2a2f3a"
+        }
+      }
+    },
+    {
+      "id": "identity",
+      "name": "A Case of Identity",
+      "chapters": [
+        3
+      ],
+      "template": "PUZZLE",
+      "game": "The typewriter clues",
+      "blurb": "Miss Mary Sutherland’s fiancé vanished on their wedding morning.",
+      "how": "Look at the letters and the typewriter, then work out who Hosmer Angel really was.",
+      "params": {
+        "room": {
+          "w": 14,
+          "d": 12
+        },
+        "objective": "Work out who Hosmer Angel really was",
+        "clues": [
+          {
+            "object": "note",
+            "label": "Hosmer’s letters",
+            "text": "Every letter is typewritten — even the signature."
+          },
+          {
+            "object": "desk",
+            "label": "The typewriter",
+            "text": "A typewriter has little quirks: one letter slurred, another with no tail. Hosmer’s letters have exactly the same quirks as notes from Mr. Windibank."
+          },
+          {
+            "object": "picture",
+            "label": "The description",
+            "text": "Hosmer wore tinted glasses and whiskers, and only ever met Mary in the evening. Her stepfather was always away “abroad” when Hosmer came."
+          }
+        ],
+        "solve": {
+          "object": "sign",
+          "label": "The answer",
+          "type": "choice",
+          "prompt": "Who was “Hosmer Angel”?",
+          "options": [
+            "Her stepfather, Mr. Windibank, in disguise",
+            "A real man who ran away to sea",
+            "Sherlock Holmes in disguise"
+          ],
+          "answer": 0,
+          "hint": "Whose typewriter matches the letters?"
+        }
+      }
+    },
+    {
+      "id": "boscombe",
+      "name": "The Boscombe Valley Mystery",
+      "chapters": [
+        4
+      ],
+      "template": "COLLECT",
+      "game": "Footprints at the pool",
+      "blurb": "A man is found by the Boscombe Pool, and his son is accused.",
+      "how": "Search the ground round the pool for six sets of footprints.",
+      "params": {
+        "area": [
+          36,
+          36
+        ],
+        "item": {
+          "name": "A footprint",
+          "icon": "👣"
+        },
+        "count": 6,
+        "label": "footprints",
+        "objective": "Find the footprints round the pool",
+        "finale": {
+          "npc": {
+            "kind": "person",
+            "name": "Sherlock Holmes",
+            "look": {
+              "shirt": "0x4a4a4a",
+              "pants": "0x3a3a3a",
+              "hair": "0x1b1b1b"
+            }
+          },
+          "say": "Here are three separate tracks of the same feet — and a fourth. A tall man, left-footed, with a limp…"
+        }
+      }
+    },
+    {
+      "id": "pips",
+      "name": "The Five Orange Pips",
+      "chapters": [
+        5
+      ],
+      "template": "PUZZLE",
+      "game": "The postmarks",
+      "blurb": "A young man brings Holmes an envelope that held five dried orange pips.",
+      "how": "Look at the envelopes and their postmarks, then work out how the senders were travelling.",
+      "params": {
+        "room": {
+          "w": 14,
+          "d": 12
+        },
+        "objective": "Work out how the senders travelled",
+        "clues": [
+          {
+            "object": "note",
+            "label": "The first envelope",
+            "text": "Postmark: Pondicherry."
+          },
+          {
+            "object": "note",
+            "label": "The second envelope",
+            "text": "Postmark: Dundee."
+          },
+          {
+            "object": "map",
+            "label": "The map",
+            "text": "Pondicherry, Dundee, London — every one of them a seaport. And there were weeks between the letters."
+          }
+        ],
+        "solve": {
+          "object": "sign",
+          "label": "Holmes’s deduction",
+          "type": "choice",
+          "prompt": "How were the senders travelling?",
+          "options": [
+            "By sailing-ship, from port to port",
+            "By train",
+            "They never left London"
+          ],
+          "answer": 0,
+          "hint": "What do all three postmarks have in common?"
+        }
+      }
+    },
+    {
+      "id": "twisted-lip",
+      "name": "The Man with the Twisted Lip",
+      "chapters": [
+        6
+      ],
+      "template": "PUZZLE",
+      "game": "See through the disguise",
+      "blurb": "Neville St. Clair has vanished, and a beggar called Hugh Boone was in the room where he was last seen.",
+      "how": "Look round the room by the river, then work out who the beggar really is.",
+      "params": {
+        "room": {
+          "w": 14,
+          "d": 12
+        },
+        "objective": "Work out who Hugh Boone really is",
+        "clues": [
+          {
+            "object": "window",
+            "label": "The window",
+            "text": "Mrs. St. Clair saw her husband at this window — and then he was gone."
+          },
+          {
+            "object": "box",
+            "label": "The coat",
+            "text": "Neville St. Clair’s coat, its pockets stuffed with pennies and halfpennies."
+          },
+          {
+            "object": "chest",
+            "label": "Holmes’s bag",
+            "text": "Holmes has brought a very large bath-sponge."
+          }
+        ],
+        "solve": {
+          "object": "sign",
+          "label": "The beggar",
+          "type": "choice",
+          "prompt": "Who is the beggar Hugh Boone?",
+          "options": [
+            "Neville St. Clair in disguise",
+            "A thief who stole the coat",
+            "Inspector Bradstreet"
+          ],
+          "answer": 0,
+          "hint": "What will happen when Holmes uses the sponge?"
+        }
+      }
+    },
+    {
+      "id": "carbuncle",
+      "name": "The Blue Carbuncle",
+      "chapters": [
+        7
+      ],
+      "template": "CHASE",
+      "game": "Track the goose",
+      "blurb": "A precious blue stone turns up inside a Christmas goose.",
+      "how": "Race through London and pick up the trail of goose feathers — find at least four before the end.",
+      "params": {
+        "mode": "race",
+        "length": 110,
+        "obstacles": [
+          "hurdle",
+          "block",
+          "low"
+        ],
+        "density": 0.45,
+        "time": 75,
+        "floor": "stone",
+        "palette": {
+          "ground": "#9a9a92",
+          "ground2": "#8a8a84",
+          "sky": "#b8c0c8",
+          "fog": "#c8ccd0"
+        },
+        "collect": {
+          "item": {
+            "name": "A goose feather",
+            "icon": "🪶"
+          },
+          "count": 6,
+          "need": 4,
+          "label": "feathers"
+        },
+        "objective": "Follow the goose trail across London",
+        "finishText": "COVENT GARDEN"
+      }
+    },
+    {
+      "id": "speckled-band",
+      "name": "The Speckled Band",
+      "chapters": [
+        8
+      ],
+      "template": "SNEAK",
+      "game": "The night watch",
+      "blurb": "Helen Stoner is afraid of the same fate as her sister, and of a strange whistle in the night.",
+      "how": "Slip through the dark grounds to the bell-pull in the bedroom without being seen.",
+      "params": {
+        "area": [
+          36,
+          44
+        ],
+        "floor": "grass",
+        "dark": true,
+        "watchers": 3,
+        "hides": 7,
+        "goal": {
+          "name": "the bell-pull",
+          "icon": "🔔"
+        },
+        "watcher": {
+          "kind": "person",
+          "name": "Dr. Roylott",
+          "look": {
+            "shirt": "0x2a2420",
+            "pants": "0x2a2420",
+            "hair": "0x5a5a5a"
+          }
+        },
+        "objective": "Reach the bell-pull without being seen",
+        "palette": {
+          "sky": "#1d2540",
+          "fog": "#2a3456"
+        }
+      }
+    },
+    {
+      "id": "thumb",
+      "name": "The Engineer's Thumb",
+      "chapters": [
+        9
+      ],
+      "template": "CHASE",
+      "game": "Escape the press",
+      "blurb": "An engineer is called out at night to look at a machine — and finds himself in great danger.",
+      "how": "Run! Get out of the press-room and away before the Colonel catches you.",
+      "params": {
+        "mode": "flee",
+        "length": 90,
+        "obstacles": [
+          "hurdle",
+          "block",
+          "low"
+        ],
+        "floor": "floor",
+        "chaser": {
+          "kind": "person",
+          "name": "the Colonel",
+          "look": {
+            "shirt": "0x2a2420"
+          }
+        },
+        "chaserSpeed": 6.2,
+        "objective": "Escape the press-room!",
+        "finishText": "THE WINDOW"
+      }
+    },
+    {
+      "id": "noble-bachelor",
+      "name": "The Noble Bachelor",
+      "chapters": [
+        10
+      ],
+      "template": "COLLECT",
+      "game": "Wedding clues",
+      "blurb": "Lord St. Simon’s bride has vanished from the wedding breakfast.",
+      "how": "Gather the six clues the bride left behind.",
+      "params": {
+        "area": [
+          34,
+          32
+        ],
+        "floor": "stone",
+        "label": "clues",
+        "objective": "Find the six wedding clues",
+        "items": [
+          {
+            "name": "The wedding ring",
+            "icon": "💍"
+          },
+          {
+            "name": "The bouquet",
+            "icon": "💐"
+          },
+          {
+            "name": "A note signed “F.H.M.”",
+            "icon": "📝"
+          },
+          {
+            "name": "The wedding dress",
+            "icon": "👗"
+          },
+          {
+            "name": "A hotel bill",
+            "icon": "🧾"
+          },
+          {
+            "name": "A cab ticket",
+            "icon": "🎫"
+          }
+        ]
+      }
+    },
+    {
+      "id": "beryl",
+      "name": "The Beryl Coronet",
+      "chapters": [
+        11
+      ],
+      "template": "COLLECT",
+      "game": "Footprints in the snow",
+      "blurb": "A banker’s priceless coronet is damaged in the night, and his son is blamed.",
+      "how": "Follow the footprints across the snowy garden.",
+      "params": {
+        "area": [
+          36,
+          36
+        ],
+        "floor": "snow",
+        "item": {
+          "name": "A footprint in the snow",
+          "icon": "👣"
+        },
+        "count": 7,
+        "label": "footprints",
+        "objective": "Read the story written in the snow",
+        "palette": {
+          "sky": "#d8e0e8",
+          "fog": "#e8eef4"
+        }
+      }
+    },
+    {
+      "id": "copper-beeches",
+      "name": "The Copper Beeches",
+      "chapters": [
+        12
+      ],
+      "template": "SNEAK",
+      "game": "The locked wing",
+      "blurb": "A governess is paid well to cut her hair and wear an electric-blue dress — and told never to go into one wing of the house.",
+      "how": "Sneak past Mr. Rucastle to the door of the locked wing.",
+      "params": {
+        "area": [
+          36,
+          44
+        ],
+        "floor": "floor",
+        "watchers": 3,
+        "hides": 6,
+        "goal": {
+          "name": "the locked wing",
+          "icon": "🔒"
+        },
+        "watcher": {
+          "kind": "person",
+          "name": "Mr. Rucastle",
+          "look": {
+            "shirt": "0x6a4a3a",
+            "hair": "0x6a5a4a"
+          }
+        },
+        "objective": "Reach the locked wing unseen"
+      }
+    }
+  ],
+  "skyRun": {
+    "id": "sky",
+    "name": "The Rooftop Chase",
+    "template": "CLIMB",
+    "game": "Sky Run",
+    "blurb": "a chase across London’s rooftops and chimney pots.",
+    "how": "Leap from chimney stack to chimney stack, up over the rooftops of London.",
+    "params": {
+      "height": 20,
+      "layout": "scatter",
+      "core": "none",
+      "moving": 2,
+      "collect": {
+        "item": {
+          "name": "A clue",
+          "icon": "🔍"
+        },
+        "count": 6,
+        "label": "clues"
+      },
+      "palette": {
+        "accent": "#a8583f",
+        "wood": "#4a4f5a",
+        "sky": "#b8c0c8",
+        "fog": "#c8ccd0"
+      },
+      "goalIcon": "🎩",
+      "objective": "Reach the highest chimney",
+      "done": "All London lies below you in the fog."
+    }
+  },
+  "npcs": [
+    {
+      "id": "wiggins",
+      "name": "Wiggins",
+      "kind": "child",
+      "look": {
+        "shirt": "0x6a4a3a",
+        "pants": "0x3a3a46",
+        "hair": "0x3a2618"
+      },
+      "at": [
+        -8,
+        -6.5
+      ],
+      "idle": "The Baker Street Irregulars, at your service!",
+      "thanks": "Holmes says you’re the best Irregular we’ve had."
+    },
+    {
+      "id": "mrs-hudson",
+      "name": "Mrs. Hudson",
+      "kind": "person",
+      "look": {
+        "shirt": "0x6a5acd",
+        "hair": "0xbababa"
+      },
+      "at": [
+        9,
+        -6.5
+      ],
+      "idle": "Mr. Holmes is out, dear. He usually is."
+    },
+    {
+      "id": "lestrade",
+      "name": "Inspector Lestrade",
+      "kind": "person",
+      "look": {
+        "shirt": "0x3a3a46",
+        "hair": "0x3a2618"
+      },
+      "at": [
+        -9.5,
+        4
+      ],
+      "idle": "Holmes again? Well, he does have his uses."
+    },
+    {
+      "id": "cabman",
+      "name": "the cabman",
+      "kind": "person",
+      "look": {
+        "shirt": "0x2f3b3a",
+        "hair": "0x5a3a24"
+      },
+      "at": [
+        9.5,
+        4
+      ],
+      "idle": "Where to, guv’nor?"
+    }
+  ],
+  "sideQuest": {
+    "id": "mys-holmes-3-irregulars",
+    "title": "The Baker Street Irregulars",
+    "giver": "wiggins",
+    "steps": [
+      {
+        "type": "talk",
+        "params": {
+          "npc": "wiggins"
+        },
+        "text": "Talk to Wiggins outside 221B Baker Street.",
+        "say": "Mr. Holmes has three messages to go out, sharp. I’ve dropped ’em in the street, ain’t I! Find all three and deliver them for me?"
+      },
+      {
+        "type": "collect",
+        "params": {
+          "items": [
+            {
+              "id": "bs-msg-1",
+              "name": "A message for Mrs. Hudson",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                0,
+                -9.5
+              ]
+            },
+            {
+              "id": "bs-msg-2",
+              "name": "A message for Inspector Lestrade",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                -9.5,
+                -1
+              ]
+            },
+            {
+              "id": "bs-msg-3",
+              "name": "A message for the cabman",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                0,
+                7.5
+              ]
+            }
+          ]
+        },
+        "text": "Find Mr. Holmes’s three messages around Baker Street."
+      },
+      {
+        "type": "deliver",
+        "params": {
+          "pairs": [
+            {
+              "item": "bs-msg-1",
+              "target": [
+                8,
+                -5
+              ],
+              "label": "Give Mrs. Hudson her message"
+            },
+            {
+              "item": "bs-msg-2",
+              "target": [
+                -8.5,
+                5
+              ],
+              "label": "Give Lestrade his message"
+            },
+            {
+              "item": "bs-msg-3",
+              "target": [
+                8.5,
+                5
+              ],
+              "label": "Give the cabman his message"
+            }
+          ]
+        },
+        "text": "Deliver each message: Mrs. Hudson, Inspector Lestrade and the cabman."
+      },
+      {
+        "type": "talk",
+        "params": {
+          "npc": "wiggins"
+        },
+        "text": "Report back to Wiggins.",
+        "say": "All three? You’re quick! Here’s your shilling — well, your coins."
+      }
+    ],
+    "reward": {
+      "coins": 30
+    }
+  },
+  "vault": {
+    "name": "221B Baker Street",
+    "blurb": "an escape room in Holmes’s sitting-room, testing all twelve cases.",
+    "intro": "Holmes has locked the sitting-room door and left you three locks to open. “You know my methods, Watson. Apply them.”",
+    "room": {
+      "wall": "#a8583f",
+      "floor": "#5a3a24",
+      "rug": "#2f4a7a"
+    },
+    "stations": [
+      {
+        "id": "scrapbook",
+        "object": "book",
+        "label": "Holmes’s scrapbook",
+        "lock": "Lock 1 · The clue that cracked it",
+        "text": "Each page holds a case. Match each one to the clue that cracked it.",
+        "lesson": "Holmes notices the one small thing everyone else ignores.",
+        "solve": {
+          "type": "match",
+          "prompt": "Match each case to its clue.",
+          "pairs": [
+            [
+              "A Scandal in Bohemia",
+              "A cry of “Fire!”"
+            ],
+            [
+              "The Red-Headed League",
+              "A tunnel to the bank"
+            ],
+            [
+              "The Blue Carbuncle",
+              "A Christmas goose"
+            ],
+            [
+              "The Speckled Band",
+              "A bell-rope that rings no bell"
+            ]
+          ],
+          "hint": "Think about the one strange detail in each case."
+        }
+      },
+      {
+        "id": "final",
+        "object": "note",
+        "label": "The last case",
+        "lock": "Lock 2 · Your own case",
+        "text": "Mrs. Hudson’s silver teapot has vanished from 221B! The ransom note is typewritten — even the signature. Deep footmarks in the snow outside the window show someone stood there a long time. The only typewriter in the house belongs to the lodger upstairs, who “never goes out”.",
+        "lesson": "Like Holmes: put the small clues together, and the answer is “simplicity itself”.",
+        "solve": {
+          "type": "choice",
+          "prompt": "Who took the teapot?",
+          "options": [
+            "The lodger upstairs",
+            "A passing cabman",
+            "Mrs. Hudson herself"
+          ],
+          "answer": 0,
+          "hint": "Whose typewriter is it? Someone who “never goes out” stood in the snow…"
+        }
+      }
+    ],
+    "quiz": {
+      "object": "desk",
+      "label": "Holmes’s desk",
+      "lock": "Lock 3 · The casebook",
+      "lesson": "Twelve cases, all solved."
+    },
+    "openText": "“Excellent!” The door swings open. “Elementary.”",
+    "outro": "You know his methods — and you applied them."
+  },
+  "unlock": {
+    "badges": []
+  },
+  "chapterFiles": [
+    {
+      "n": 1,
+      "title": "A Scandal in Bohemia"
+    },
+    {
+      "n": 2,
+      "title": "The Red-Headed League"
+    },
+    {
+      "n": 3,
+      "title": "A Case of Identity"
+    },
+    {
+      "n": 4,
+      "title": "The Boscombe Valley Mystery"
+    },
+    {
+      "n": 5,
+      "title": "The Five Orange Pips"
+    },
+    {
+      "n": 6,
+      "title": "The Man with the Twisted Lip"
+    },
+    {
+      "n": 7,
+      "title": "The Adventure of the Blue Carbuncle"
+    },
+    {
+      "n": 8,
+      "title": "The Adventure of the Speckled Band"
+    },
+    {
+      "n": 9,
+      "title": "The Adventure of the Engineer's Thumb"
+    },
+    {
+      "n": 10,
+      "title": "The Adventure of the Noble Bachelor"
+    },
+    {
+      "n": 11,
+      "title": "The Adventure of the Beryl Coronet"
+    },
+    {
+      "n": 12,
+      "title": "The Adventure of the Copper Beeches"
+    }
+  ]
+}

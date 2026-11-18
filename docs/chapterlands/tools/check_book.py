@@ -36,13 +36,14 @@ def main(d, textdir=None):
     meta = next(b for b in cat['books'] if b['id'] == book['id'])
     chapters = {}
     for c in book.get('chapterFiles', []):
+        if 'file' not in c: continue
         p = os.path.join(d, 'chapters', c['file'])
         if os.path.exists(p):
             chapters[c['n']] = open(p, encoding='utf-8').read()
     # held-back books: verify evidence against a local, uncommitted copy of the text
     if textdir and not chapters:
         for c in book.get('chapterFiles', []):
-            p = os.path.join(textdir, c['file'])
+            p = os.path.join(textdir, c.get('file') or f"{c['n']:02d}.md")
             if os.path.exists(p): chapters[c['n']] = open(p, encoding='utf-8').read()
     problems = []
     for s in book['streets']:

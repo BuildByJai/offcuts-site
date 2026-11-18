@@ -1,0 +1,572 @@
+{
+  "book": "mys-holmes-3",
+  "_about": "answer = index of the right option (shuffled on screen); evidence = supporting sentence, review only; hint = gentle \"look again\" line.",
+  "streets": {
+    "scandal": [
+      {
+        "kind": "what",
+        "q": "Where did Irene Adler hide the photograph?",
+        "options": [
+          "In a recess behind a sliding panel, above the right bell-pull",
+          "Under a loose floorboard",
+          "Inside a book on the shelf"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "The photograph is in a recess behind a sliding panel just above the right bellpull.",
+        "hint": "Think about what Holmes tells Watson after the cry of fire."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Holmes arrange for someone to cry “Fire!”?",
+        "options": [
+          "A person who thinks their house is on fire rushes to what they value most",
+          "To get everyone out of the house",
+          "To call the police"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "When a woman thinks that her house is on fire, her instinct is at once to rush to the thing which she values most.",
+        "hint": "Think about how Holmes explains his plan."
+      },
+      {
+        "kind": "think",
+        "q": "In the end, Irene Adler outwits Holmes. What does Watson say about it?",
+        "options": [
+          "His plans were beaten by a woman’s wit",
+          "Holmes was beaten by bad luck",
+          "Holmes let her win on purpose"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "Sherlock Holmes were beaten by a woman’s wit.",
+        "hint": "Think about the very last lines of the story."
+      }
+    ],
+    "red-headed": [
+      {
+        "kind": "what",
+        "q": "What sort of business did Jabez Wilson run?",
+        "options": [
+          "A small pawnbroker’s business",
+          "A bank",
+          "A newspaper shop"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "I have a small pawnbroker’s business at Coburg Square, near the City.",
+        "hint": "Think about how Jabez Wilson introduces himself."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Holmes think the assistant kept going down to the cellar?",
+        "options": [
+          "He was digging a tunnel to another building",
+          "He was developing photographs",
+          "He was hiding from customers"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "I could think of nothing save that he was running a tunnel to some other building.",
+        "hint": "Think about how Holmes explains the case afterwards."
+      },
+      {
+        "kind": "think",
+        "q": "Holmes thumped the pavement outside the shop with his stick. What was he doing?",
+        "options": [
+          "Testing which way the cellar ran under the street",
+          "Calling for a cab",
+          "Showing he was angry"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "Finally he returned to the pawnbroker’s, and, having thumped vigorously upon the pavement with his stick two or three times, he went up to the door and knocked.",
+        "hint": "Think about what lies under the pavement."
+      }
+    ],
+    "identity": [
+      {
+        "kind": "what",
+        "q": "What was strange about Hosmer Angel’s letters?",
+        "options": [
+          "Even the signature was typewritten",
+          "They were written in code",
+          "They had no stamps"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "“Not only that, but the signature is typewritten.",
+        "hint": "Think about what Holmes notices when he reads the letters."
+      },
+      {
+        "kind": "why",
+        "q": "How did Holmes know Mary’s “father” was really her stepfather?",
+        "options": [
+          "They had different names",
+          "He was too young",
+          "She told him straight away"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "“Your father,” said Holmes, “your stepfather, surely, since the name is different.”",
+        "hint": "Think about their names."
+      },
+      {
+        "kind": "think",
+        "q": "Holmes shows Mr. Windibank a typewritten letter Windibank sent. What is Holmes about to prove?",
+        "options": [
+          "The same typewriter wrote Hosmer Angel’s letters",
+          "Windibank cannot spell",
+          "The letter was posted late"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "“I think that this typewritten letter is from you, in which you made an appointment with me for six o’clock?”",
+        "hint": "Think about how a typewriter can give someone away."
+      }
+    ],
+    "boscombe": [
+      {
+        "kind": "what",
+        "q": "What call did the young man and his father use as a signal?",
+        "options": [
+          "“Cooee!”",
+          "A whistle",
+          "Ringing a bell"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "When about a hundred yards from the pool I heard a cry of “Cooee!”",
+        "hint": "Think about what the son heard near the pool."
+      },
+      {
+        "kind": "why",
+        "q": "The dying man said something about “a rat”. Why did that puzzle everyone?",
+        "options": [
+          "It didn’t seem to make any sense",
+          "There were no rats nearby",
+          "He said it in another language"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "Witness: He mumbled a few words, but I could only catch some allusion to a rat.",
+        "hint": "Think about the son’s evidence at the inquest."
+      },
+      {
+        "kind": "think",
+        "q": "At the pool, what did Holmes notice about the footprints?",
+        "options": [
+          "Three separate tracks were made by the same feet",
+          "There were no footprints at all",
+          "They were all washed away"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "But here are three separate tracks of the same feet.”",
+        "hint": "Think about Holmes lying on the ground by the pool."
+      }
+    ],
+    "pips": [
+      {
+        "kind": "what",
+        "q": "What fell out of the envelope onto the plate?",
+        "options": [
+          "Five little dried orange pips",
+          "A gold coin",
+          "A key"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "Opening it hurriedly, out there jumped five little dried orange pips, which pattered down upon his plate.",
+        "hint": "Think about the very first envelope."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Holmes think the senders were on a sailing-ship?",
+        "options": [
+          "The letters came from seaports, with weeks between them",
+          "They wrote about the sea",
+          "The envelopes were wet"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "“There is at least a presumption that the vessel in which the man or men are is a sailing-ship.",
+        "hint": "Think about where the letters were posted."
+      },
+      {
+        "kind": "think",
+        "q": "What did Holmes think the weeks between a letter and its senders showed?",
+        "options": [
+          "A fast mail-boat carried the letter, a slower sailing ship carried the men",
+          "The post office was slow",
+          "The senders forgot to post it"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "I think that those seven weeks represented the difference between the mail-boat which brought the letter and the sailing vessel which brought the writer.”",
+        "hint": "Think about how fast different ships travel."
+      }
+    ],
+    "twisted-lip": [
+      {
+        "kind": "what",
+        "q": "What did Hugh Boone do for a living?",
+        "options": [
+          "He was a professional beggar",
+          "He was a sailor",
+          "He kept a shop"
+        ],
+        "answer": 0,
+        "chapter": 6,
+        "evidence": "He is a professional beggar, though in order to avoid the police regulations he pretends to a small trade in wax vestas.",
+        "hint": "Think about how Holmes describes Hugh Boone."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Holmes bring a large bath-sponge to the prison?",
+        "options": [
+          "To wash the beggar’s face and show who he really was",
+          "To clean the cell",
+          "To mop up the river"
+        ],
+        "answer": 0,
+        "chapter": 6,
+        "evidence": "Holmes stooped to the water-jug, moistened his sponge, and then rubbed it twice vigorously across and down the prisoner’s face.",
+        "hint": "Think about what happens in the cell."
+      },
+      {
+        "kind": "think",
+        "q": "How could Neville St. Clair disguise himself so well?",
+        "options": [
+          "He had been an actor and knew all about make-up",
+          "He wore a mask",
+          "He had a twin brother"
+        ],
+        "answer": 0,
+        "chapter": 6,
+        "evidence": "When an actor I had, of course, learned all the secrets of making up, and had been famous in the green room for my skill.",
+        "hint": "Think about what he says about his past."
+      }
+    ],
+    "carbuncle": [
+      {
+        "kind": "what",
+        "q": "Where was the blue carbuncle found?",
+        "options": [
+          "In the crop of a goose",
+          "In a hat",
+          "At the bottom of a well"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "See what my wife found in its crop!”",
+        "hint": "Think about what Peterson brings to Baker Street."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Holmes study the old, battered hat so closely?",
+        "options": [
+          "To work out who its owner was",
+          "To see if it would fit him",
+          "To find the stone inside it"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "A lens and a forceps lying upon the seat of the chair suggested that the hat had been suspended in this manner for the purpose of examination.",
+        "hint": "Think about what Holmes can tell from a hat."
+      },
+      {
+        "kind": "think",
+        "q": "Holmes lets the thief go, saying “it is the season of forgiveness”. What does this show about Holmes?",
+        "options": [
+          "He can be kind as well as clever",
+          "He didn’t care about the jewel",
+          "He was too tired to arrest him"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "Besides, it is the season of forgiveness.",
+        "hint": "Think about what time of year it is."
+      }
+    ],
+    "speckled-band": [
+      {
+        "kind": "what",
+        "q": "What did the “speckled band” turn out to be?",
+        "options": [
+          "A snake",
+          "A scarf",
+          "A ribbon on a hat"
+        ],
+        "answer": 0,
+        "chapter": 8,
+        "evidence": "Of course he must recall the snake before the morning light revealed it to the victim.",
+        "hint": "Think about what Holmes explains at the end."
+      },
+      {
+        "kind": "why",
+        "q": "What did Holmes find out about the bell-rope?",
+        "options": [
+          "It was a dummy — it didn’t ring any bell",
+          "It was broken",
+          "It rang in the kitchen"
+        ],
+        "answer": 0,
+        "chapter": 8,
+        "evidence": "“Why, it’s a dummy,” said he.",
+        "hint": "Think about what happens when Holmes pulls it."
+      },
+      {
+        "kind": "think",
+        "q": "Why did Holmes think the ventilator was odd?",
+        "options": [
+          "It opened into another room instead of to the outside air",
+          "It was too small",
+          "It was painted red"
+        ],
+        "answer": 0,
+        "chapter": 8,
+        "evidence": "For example, what a fool a builder must be to open a ventilator into another room, when, with the same trouble, he might have communicated with the outside air!”",
+        "hint": "Think about where a ventilator should lead."
+      }
+    ],
+    "thumb": [
+      {
+        "kind": "what",
+        "q": "What machine did the engineer go to look at?",
+        "options": [
+          "A hydraulic press",
+          "A steam engine",
+          "A printing press"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "This we have now been doing for some time, and in order to help us in our operations we erected a hydraulic press.",
+        "hint": "Think about what the Colonel asked him to fix."
+      },
+      {
+        "kind": "why",
+        "q": "Why was it dangerous to stand inside the machine?",
+        "options": [
+          "If anyone turned it on, it would press down on them",
+          "It was very hot",
+          "It was full of water"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "“ ‘We are now,’ said he, ‘actually within the hydraulic press, and it would be a particularly unpleasant thing for us if anyone were to turn it on.",
+        "hint": "Think about what a press does."
+      },
+      {
+        "kind": "think",
+        "q": "The engineer wondered why anyone would need such a press for digging earth. What does this show?",
+        "options": [
+          "He was starting to suspect something was wrong",
+          "He wanted to buy the press",
+          "He didn’t know much about machines"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "‘The only point which I could not quite understand was what use you could make of a hydraulic press in excavating fuller’s-earth, which, as I understand, is dug out like gravel from a pit.’",
+        "hint": "Think about what the engineer asks the Colonel."
+      }
+    ],
+    "noble-bachelor": [
+      {
+        "kind": "what",
+        "q": "What was the name of the bride’s first husband?",
+        "options": [
+          "Francis Hay Moulton",
+          "Lord St. Simon",
+          "Mr. Lestrade"
+        ],
+        "answer": 0,
+        "chapter": 10,
+        "evidence": "Francis Hay Moulton.",
+        "hint": "Think about the initials on the note."
+      },
+      {
+        "kind": "why",
+        "q": "Why did the bride think it was all right to marry Lord St. Simon?",
+        "options": [
+          "She believed her first husband was dead",
+          "Her father made her",
+          "She had never been married before"
+        ],
+        "answer": 0,
+        "chapter": 10,
+        "evidence": "Not a word of news came for a year and more, so that I never doubted that Frank was really dead.",
+        "hint": "Think about the bride’s story at the end."
+      },
+      {
+        "kind": "think",
+        "q": "Why did Frank want to be married “right away” before he went off to seek his fortune?",
+        "options": [
+          "So he would feel sure of her",
+          "So he could take her with him",
+          "Because her father asked him to"
+        ],
+        "answer": 0,
+        "chapter": 10,
+        "evidence": "‘Why shouldn’t we be married right away, then,’ said he, ‘and then I will feel sure of you; and I won’t claim to be your husband until I come back?’",
+        "hint": "Think about the bride’s story of meeting Frank."
+      }
+    ],
+    "beryl": [
+      {
+        "kind": "what",
+        "q": "How many beryls were in the coronet?",
+        "options": [
+          "Thirty-nine",
+          "Three",
+          "Twelve"
+        ],
+        "answer": 0,
+        "chapter": 11,
+        "evidence": "‘There are thirty-nine enormous beryls,’ said he, ‘and the price of the gold chasing is incalculable.",
+        "hint": "Think about what the banker was told."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Holmes go out to look at the garden alone?",
+        "options": [
+          "Extra footmarks would make his job harder",
+          "He didn’t trust the banker",
+          "He wanted to smoke his pipe"
+        ],
+        "answer": 0,
+        "chapter": 11,
+        "evidence": "He went alone, at his own request, for he explained that any unnecessary footmarks might make his task more difficult.",
+        "hint": "Think about the snow."
+      },
+      {
+        "kind": "think",
+        "q": "Some footmarks had pressed right through the snow. What did that tell Holmes?",
+        "options": [
+          "Someone had stood there for a long time",
+          "Someone very heavy had walked past",
+          "It had stopped snowing"
+        ],
+        "answer": 0,
+        "chapter": 11,
+        "evidence": "His footmarks had pressed right through the snow, so long had he stood there.",
+        "hint": "Think about how deep footprints get."
+      }
+    ],
+    "copper-beeches": [
+      {
+        "kind": "what",
+        "q": "What colour dress did the Rucastles want Violet Hunter to wear?",
+        "options": [
+          "Electric blue",
+          "Bright red",
+          "Plain black"
+        ],
+        "answer": 0,
+        "chapter": 12,
+        "evidence": "My wife is fond of a particular shade of electric blue and would like you to wear such a dress indoors in the morning.",
+        "hint": "Think about Mr. Rucastle’s strange requests."
+      },
+      {
+        "kind": "why",
+        "q": "Whose dress did Mr. Rucastle say would fit Violet?",
+        "options": [
+          "His daughter Alice’s",
+          "His wife’s",
+          "The last governess’s"
+        ],
+        "answer": 0,
+        "chapter": 12,
+        "evidence": "You need not, however, go to the expense of purchasing one, as we have one belonging to my dear daughter Alice (now in Philadelphia), which would, I should think, fit you very well.",
+        "hint": "Think about where Alice is said to be."
+      },
+      {
+        "kind": "think",
+        "q": "Violet finds a coil of hair just like her own in a locked drawer. Why does it worry her?",
+        "options": [
+          "Something strange is being hidden in that house",
+          "She thinks it was stolen from her",
+          "She doesn’t like the colour"
+        ],
+        "answer": 0,
+        "chapter": 12,
+        "evidence": "How could my hair have been locked in the drawer?",
+        "hint": "Think about what else is locked in that house."
+      }
+    ]
+  },
+  "vault": [
+    {
+      "q": "In “A Scandal in Bohemia”, why did a cry of “Fire!” help Holmes?",
+      "options": [
+        "People rush to what they value most when they think their house is on fire",
+        "It woke up the police",
+        "It made the king run away"
+      ],
+      "answer": 0,
+      "chapter": 1,
+      "evidence": "When a woman thinks that her house is on fire, her instinct is at once to rush to the thing which she values most.",
+      "hint": "Think about the first case."
+    },
+    {
+      "q": "In which case was a gang digging a tunnel to a bank?",
+      "options": [
+        "The Red-Headed League",
+        "The Speckled Band",
+        "The Copper Beeches"
+      ],
+      "answer": 0,
+      "chapter": 2,
+      "evidence": "I could think of nothing save that he was running a tunnel to some other building.",
+      "hint": "Think about the pawnbroker’s shop."
+    },
+    {
+      "q": "Where did the blue carbuncle end up?",
+      "options": [
+        "In the crop of a Christmas goose",
+        "In a pawnbroker’s safe",
+        "In a bank vault"
+      ],
+      "answer": 0,
+      "chapter": 7,
+      "evidence": "See what my wife found in its crop!”",
+      "hint": "Think about Christmas."
+    },
+    {
+      "q": "What did Holmes use to show that a beggar was really a missing gentleman?",
+      "options": [
+        "A wet bath-sponge",
+        "A magnifying glass",
+        "A photograph"
+      ],
+      "answer": 0,
+      "chapter": 6,
+      "evidence": "Holmes stooped to the water-jug, moistened his sponge, and then rubbed it twice vigorously across and down the prisoner’s face.",
+      "hint": "Think about The Man with the Twisted Lip."
+    },
+    {
+      "q": "In “The Speckled Band”, what was strange about the bell-rope?",
+      "options": [
+        "It was a dummy that rang no bell",
+        "It was made of gold",
+        "It was far too short"
+      ],
+      "answer": 0,
+      "chapter": 8,
+      "evidence": "“Why, it’s a dummy,” said he.",
+      "hint": "Think about Helen Stoner’s room."
+    },
+    {
+      "q": "In “The Beryl Coronet”, what did Holmes study to find out what happened in the night?",
+      "options": [
+        "Footmarks in the snow",
+        "Letters in the desk",
+        "The banker’s diary"
+      ],
+      "answer": 0,
+      "chapter": 11,
+      "evidence": "His footmarks had pressed right through the snow, so long had he stood there.",
+      "hint": "Think about the winter garden."
+    }
+  ]
+}
