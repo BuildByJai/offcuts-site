@@ -1,0 +1,650 @@
+{
+  "id": "sci-time",
+  "blurb": "A Victorian inventor builds a machine, travels to the year 802,701, and meets the gentle Eloi — and the Morlocks who live below.",
+  "chapterWord": "Chapter",
+  "source": "Text: The Time Machine by H. G. Wells (1895), from the Standard Ebooks edition. Public domain.",
+  "theme": {
+    "palette": {
+      "ground": "#7fbf6a",
+      "ground2": "#6fb35b",
+      "wall": "#e8e4d8",
+      "trim": "#8a6a2a",
+      "roof": "#4a8a6a",
+      "accent": "#c9a24a",
+      "accent2": "#6a4ab0",
+      "wood": "#7a4e30",
+      "leaf": "#4f8a3a",
+      "stone": "#d8d4c8",
+      "sky": "#c8e0f0",
+      "fog": "#e8f0f4",
+      "water": "#4a8ab8",
+      "item": "#ffd23f"
+    },
+    "props": [
+      "tree",
+      "flower",
+      "statue",
+      "bush",
+      "flower",
+      "tree"
+    ],
+    "vaultProps": [
+      "clock",
+      "table",
+      "chair",
+      "bookcase"
+    ],
+    "edge": "hedge",
+    "hide": "bush",
+    "building": {
+      "wall": "#e8e4d8",
+      "trim": "#8a6a2a",
+      "roof": "#4a8a6a",
+      "style": "house",
+      "sign": "The Year 802,701",
+      "h": 7
+    }
+  },
+  "streets": [
+    {
+      "id": "demonstration",
+      "name": "The Demonstration",
+      "chapters": [
+        1,
+        2
+      ],
+      "template": "PUZZLE",
+      "game": "The little model",
+      "blurb": "At a Thursday dinner, the Time Traveller shows his guests a tiny model machine of brass and ivory.",
+      "how": "Look at the clues in the smoking-room, then work out what happened to the model.",
+      "params": {
+        "room": {
+          "w": 14,
+          "d": 12
+        },
+        "objective": "Work out where the model went",
+        "clues": [
+          {
+            "object": "book",
+            "label": "Four dimensions",
+            "text": "Every real thing has Length, Breadth, Thickness — and Duration. Time is the fourth dimension."
+          },
+          {
+            "object": "clock",
+            "label": "The lever",
+            "text": "One lever sends the machine gliding into the future; the other reverses the motion."
+          },
+          {
+            "object": "table",
+            "label": "The empty table",
+            "text": "A candle blew out. The little machine swung round, became a ghost — and vanished."
+          }
+        ],
+        "solve": {
+          "object": "door",
+          "label": "The model",
+          "type": "choice",
+          "prompt": "Where did the little model go?",
+          "options": [
+            "Off through time — it was a time machine",
+            "Under the table",
+            "Up the chimney"
+          ],
+          "answer": 0,
+          "hint": "What does the lever do?"
+        }
+      }
+    },
+    {
+      "id": "through-time",
+      "name": "Through Time",
+      "chapters": [
+        3
+      ],
+      "template": "CHASE",
+      "game": "Faster and faster",
+      "blurb": "The Time Traveller pulls the lever. Night follows day like the flapping of a black wing.",
+      "how": "Race through the years! Jump the hurdles and collect the dial readings as time flies past.",
+      "params": {
+        "mode": "race",
+        "length": 120,
+        "obstacles": [
+          "hurdle",
+          "block",
+          "gap"
+        ],
+        "density": 0.45,
+        "time": 80,
+        "collect": {
+          "item": {
+            "name": "A dial reading",
+            "icon": "⏱️"
+          },
+          "count": 6,
+          "label": "dials"
+        },
+        "palette": {
+          "sky": "#6a7ab8",
+          "fog": "#8a9ac8"
+        },
+        "objective": "Travel to the year 802,701",
+        "finishText": "THE YEAR 802,701"
+      }
+    },
+    {
+      "id": "eloi",
+      "name": "The Eloi",
+      "chapters": [
+        4,
+        5
+      ],
+      "template": "COLLECT",
+      "game": "Meet the little people",
+      "blurb": "In the far future, small, gentle people in bright robes welcome the Time Traveller with garlands of flowers.",
+      "how": "Explore the gardens of the future and find six things the little people show you.",
+      "params": {
+        "area": [
+          38,
+          36
+        ],
+        "floor": "grass",
+        "label": "found",
+        "objective": "Explore the future gardens",
+        "palette": {
+          "ground": "#7fbf6a",
+          "ground2": "#6fb35b",
+          "sky": "#c8e0f0",
+          "fog": "#e8f0f4",
+          "leaf": "#4f8a3a"
+        },
+        "items": [
+          {
+            "name": "A chain of flowers",
+            "icon": "💐"
+          },
+          {
+            "name": "Strange fruit",
+            "icon": "🍑"
+          },
+          {
+            "name": "A bright robe",
+            "icon": "👘"
+          },
+          {
+            "name": "The White Sphinx",
+            "icon": "🗿"
+          },
+          {
+            "name": "A great hall",
+            "icon": "🏛️"
+          },
+          {
+            "name": "A tall white flower",
+            "icon": "🌷"
+          }
+        ],
+        "finale": {
+          "npc": {
+            "kind": "child",
+            "name": "Weena",
+            "look": {
+              "shirt": "0xf4e8f8",
+              "pants": "0xf4e8f8",
+              "skin": "0xf8e0d0",
+              "hair": "0xf2d38a"
+            }
+          },
+          "say": "Weena! (She gives you a flower, and holds your hand.)"
+        }
+      }
+    },
+    {
+      "id": "missing-machine",
+      "name": "The Missing Machine",
+      "chapters": [
+        5,
+        6
+      ],
+      "template": "PUZZLE",
+      "game": "Where is the machine?",
+      "blurb": "Back at the little lawn by moonlight — the Time Machine is gone!",
+      "how": "Search the lawn for clues, then work out where the machine has been taken.",
+      "params": {
+        "outdoors": true,
+        "room": {
+          "w": 18,
+          "d": 16,
+          "floor": "grass"
+        },
+        "objective": "Find out where the machine went",
+        "palette": {
+          "sky": "#1a1e30",
+          "fog": "#2a2e40",
+          "ground": "#3a4a30",
+          "ground2": "#34422c"
+        },
+        "clues": [
+          {
+            "object": "sign",
+            "label": "The levers",
+            "text": "The Time Traveller unscrewed the little levers and put them in his pocket. Nobody can drive the machine away."
+          },
+          {
+            "object": "barrel",
+            "label": "A groove",
+            "text": "A groove is ripped in the turf, between the marks of his feet and the pedestal of the sphinx."
+          },
+          {
+            "object": "statue",
+            "label": "The pedestal",
+            "text": "The bronze pedestal has deep framed panels on each side. He taps it: the pedestal is hollow."
+          }
+        ],
+        "solve": {
+          "object": "statue",
+          "label": "The White Sphinx",
+          "type": "choice",
+          "prompt": "Where is the Time Machine?",
+          "options": [
+            "Inside the hollow bronze pedestal of the White Sphinx",
+            "Floating in the river",
+            "Gone back to the past by itself"
+          ],
+          "answer": 0,
+          "hint": "Where does the groove lead?"
+        }
+      }
+    },
+    {
+      "id": "wells",
+      "name": "Into the Wells",
+      "chapters": [
+        6,
+        7
+      ],
+      "template": "CLIMB",
+      "game": "Down the shaft",
+      "blurb": "Deep round wells dot the land. The Time Traveller climbs down one, into the dark Under-world.",
+      "how": "Climb down the shaft on the metal hooks, all the way to the bottom. Collect the matches on the way.",
+      "params": {
+        "direction": "down",
+        "height": 20,
+        "layout": "spiral",
+        "core": "shaft",
+        "collect": {
+          "item": {
+            "name": "A match",
+            "icon": "🔥"
+          },
+          "count": 6,
+          "label": "matches"
+        },
+        "palette": {
+          "sky": "#1a1a24",
+          "fog": "#24242e"
+        },
+        "goalIcon": "🕳️",
+        "objective": "Climb to the bottom of the well",
+        "done": "You reach the bottom — and strike a match."
+      }
+    },
+    {
+      "id": "palace",
+      "name": "The Palace of Green Porcelain",
+      "chapters": [
+        8
+      ],
+      "template": "COLLECT",
+      "game": "The ruined museum",
+      "blurb": "A huge green building turns out to be an ancient museum, full of fossils, machines and rotted books.",
+      "how": "Explore the dusty galleries and find six useful things.",
+      "params": {
+        "area": [
+          32,
+          30
+        ],
+        "floor": "floor",
+        "label": "found",
+        "objective": "Search the museum",
+        "palette": {
+          "sky": "#a8c8b0",
+          "fog": "#c0d8c8"
+        },
+        "items": [
+          {
+            "name": "A box of matches",
+            "icon": "🔥"
+          },
+          {
+            "name": "A lump of camphor",
+            "icon": "🧊"
+          },
+          {
+            "name": "A fossil",
+            "icon": "🦴"
+          },
+          {
+            "name": "An old machine",
+            "icon": "⚙️"
+          },
+          {
+            "name": "A crumbling book",
+            "icon": "📕"
+          },
+          {
+            "name": "A metal lever",
+            "icon": "🔩"
+          }
+        ],
+        "finale": {
+          "npc": {
+            "kind": "child",
+            "name": "Weena",
+            "look": {
+              "shirt": "0xf4e8f8",
+              "pants": "0xf4e8f8",
+              "skin": "0xf8e0d0",
+              "hair": "0xf2d38a"
+            }
+          },
+          "say": "(Weena gazes at the strange old galleries, then runs to pick more flowers.)"
+        }
+      }
+    },
+    {
+      "id": "forest",
+      "name": "The Forest Fire",
+      "chapters": [
+        9,
+        10
+      ],
+      "template": "CHASE",
+      "game": "Back to the Sphinx",
+      "blurb": "Night falls in the forest. The Time Traveller lights a fire to keep the Morlocks away — and it spreads.",
+      "how": "Run through the dark forest away from the spreading fire, and get back to the White Sphinx.",
+      "params": {
+        "mode": "race",
+        "length": 120,
+        "obstacles": [
+          "log",
+          "hurdle",
+          "gap"
+        ],
+        "density": 0.45,
+        "time": 85,
+        "palette": {
+          "sky": "#3a1a1a",
+          "fog": "#5a2a1a",
+          "accent": "#e8702a"
+        },
+        "objective": "Get back to the White Sphinx",
+        "finishText": "THE WHITE SPHINX"
+      }
+    }
+  ],
+  "skyRun": {
+    "id": "sky",
+    "name": "The Ruined Towers",
+    "template": "CLIMB",
+    "game": "Sky Run",
+    "blurb": "up the crumbling towers of the year 802,701.",
+    "how": "Leap up the ruined towers to see the whole future valley. Some ledges move — wait for them!",
+    "params": {
+      "height": 22,
+      "layout": "zigzag",
+      "core": "tower",
+      "moving": 3,
+      "collect": {
+        "item": {
+          "name": "A white flower",
+          "icon": "🌼"
+        },
+        "count": 6,
+        "label": "flowers"
+      },
+      "palette": {
+        "accent": "#c9a24a",
+        "stone": "#d8d4c8"
+      },
+      "goalIcon": "🗿",
+      "objective": "Reach the top of the highest tower"
+    }
+  },
+  "npcs": [
+    {
+      "kind": "child",
+      "name": "Weena",
+      "look": {
+        "shirt": "0xf4e8f8",
+        "pants": "0xf4e8f8",
+        "skin": "0xf8e0d0",
+        "hair": "0xf2d38a"
+      },
+      "id": "weena",
+      "at": [
+        -8,
+        -6.5
+      ],
+      "idle": "(Weena smiles and follows you everywhere.)",
+      "thanks": "(Weena tucks the flowers into your pockets, laughing.)"
+    }
+  ],
+  "sideQuest": {
+    "id": "sci-time-flowers",
+    "title": "Flowers for Weena",
+    "giver": "weena",
+    "steps": [
+      {
+        "type": "talk",
+        "params": {
+          "npc": "weena"
+        },
+        "text": "Talk to Weena in the garden.",
+        "say": "(Weena points at the gardens, then at her empty hands. She wants to make a garland.)"
+      },
+      {
+        "type": "collect",
+        "params": {
+          "items": [
+            {
+              "id": "tm-fl-1",
+              "name": "A white flower",
+              "shape": "gem",
+              "colour": "#f4f4f0",
+              "at": [
+                9,
+                -6
+              ]
+            },
+            {
+              "id": "tm-fl-2",
+              "name": "A purple flower",
+              "shape": "gem",
+              "colour": "#8a5ab0",
+              "at": [
+                -9.5,
+                1
+              ]
+            },
+            {
+              "id": "tm-fl-3",
+              "name": "A pink flower",
+              "shape": "gem",
+              "colour": "#f0a0c0",
+              "at": [
+                9.5,
+                4
+              ]
+            },
+            {
+              "id": "tm-fl-4",
+              "name": "A yellow flower",
+              "shape": "gem",
+              "colour": "#f2d34a",
+              "at": [
+                -5,
+                7.5
+              ]
+            },
+            {
+              "id": "tm-fl-5",
+              "name": "A blue flower",
+              "shape": "gem",
+              "colour": "#6a9ad8",
+              "at": [
+                5,
+                7.5
+              ]
+            },
+            {
+              "id": "tm-fl-6",
+              "name": "A red flower",
+              "shape": "gem",
+              "colour": "#d84a4a",
+              "at": [
+                0,
+                -9.5
+              ]
+            }
+          ]
+        },
+        "text": "Find six flowers around the town."
+      },
+      {
+        "type": "talk",
+        "params": {
+          "npc": "weena"
+        },
+        "text": "Bring the flowers to Weena.",
+        "say": "(Weena laughs, makes a garland, and puts it round your neck.)"
+      }
+    ],
+    "reward": {
+      "coins": 30
+    }
+  },
+  "vault": {
+    "name": "The Laboratory",
+    "blurb": "an escape room in the Time Traveller’s laboratory: the far future, the return, and the two white flowers.",
+    "intro": "The Time Traveller’s laboratory, years later. The machine is gone again. Open three locks to understand what he saw — and what he left behind.",
+    "room": {
+      "wall": "#d8cfbf",
+      "floor": "#5a3a24",
+      "rug": "#6a4ab0"
+    },
+    "stations": [
+      {
+        "id": "future",
+        "object": "clock",
+        "label": "The dials",
+        "lock": "Lock 1 · The far future",
+        "text": "Put the journey in order, from the dinner party to the far future.",
+        "lesson": "He travelled further and further — until the sun itself was red and still.",
+        "solve": {
+          "type": "order",
+          "prompt": "Put the journey in order.",
+          "items": [
+            "The little model vanishes at dinner",
+            "He arrives in the year 802,701",
+            "The Morlocks hide his machine in the sphinx",
+            "He escapes and travels far into the future",
+            "He sees a red sun over a silent beach"
+          ],
+          "hint": "Start with the model, end with the red sun."
+        }
+      },
+      {
+        "id": "flowers",
+        "object": "table",
+        "label": "Two white flowers",
+        "lock": "Lock 2 · What lasts",
+        "text": "The narrator keeps two strange white flowers, shrivelled and brown, that Weena put in the Time Traveller’s pocket.",
+        "lesson": "“Even when mind and strength had gone, gratitude and a mutual tenderness still lived on in the heart of man.”",
+        "solve": {
+          "type": "choice",
+          "prompt": "What do the two white flowers show?",
+          "options": [
+            "That kindness and gratitude can last, even in a dark future",
+            "That flowers never die",
+            "That the story was made up"
+          ],
+          "answer": 0,
+          "hint": "Who gave him the flowers, and why?"
+        }
+      }
+    ],
+    "quiz": {
+      "object": "book",
+      "label": "The Traveller’s story",
+      "lock": "Lock 3 · The whole story",
+      "lesson": "From a Thursday dinner to the end of the world — and back."
+    },
+    "openText": "The laboratory door creaks open. The machine is gone.",
+    "outro": "The Time Traveller went off with a camera and a knapsack — and has not come back. Perhaps he is still travelling."
+  },
+  "unlock": {
+    "badges": []
+  },
+  "chapterFiles": [
+    {
+      "n": 1,
+      "file": "01.md",
+      "title": "Chapter 1"
+    },
+    {
+      "n": 2,
+      "file": "02.md",
+      "title": "Chapter 2"
+    },
+    {
+      "n": 3,
+      "file": "03.md",
+      "title": "Chapter 3"
+    },
+    {
+      "n": 4,
+      "file": "04.md",
+      "title": "Chapter 4"
+    },
+    {
+      "n": 5,
+      "file": "05.md",
+      "title": "Chapter 5"
+    },
+    {
+      "n": 6,
+      "file": "06.md",
+      "title": "Chapter 6"
+    },
+    {
+      "n": 7,
+      "file": "07.md",
+      "title": "Chapter 7"
+    },
+    {
+      "n": 8,
+      "file": "08.md",
+      "title": "Chapter 8"
+    },
+    {
+      "n": 9,
+      "file": "09.md",
+      "title": "Chapter 9"
+    },
+    {
+      "n": 10,
+      "file": "10.md",
+      "title": "Chapter 10"
+    },
+    {
+      "n": 11,
+      "file": "11.md",
+      "title": "Chapter 11"
+    },
+    {
+      "n": 12,
+      "file": "12.md",
+      "title": "Chapter 12"
+    }
+  ]
+}
