@@ -2,8 +2,9 @@
 // solves the Vault through its own UI, checks Key + stamp + badges.
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path');
-const ROOT = '/home/user/offcuts-site/tools/chapterlands/';
-const THREE_DIR = path.join(__dirname, 'three/node_modules/three');
+// The game folder, found from this script's own location (docs/chapterlands/tools → tools/chapterlands).
+const ROOT = process.env.CHAPTERLANDS_ROOT || path.join(__dirname, '../../../tools/chapterlands') + '/';
+const THREE_DIR = process.env.THREE_DIR || path.join(__dirname, 'three/node_modules/three');
 const id = process.argv[2];
 const cat = JSON.parse(fs.readFileSync(ROOT + 'catalogue/books.json'));
 const meta = cat.books.find((b) => b.id === id);

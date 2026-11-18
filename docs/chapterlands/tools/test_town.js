@@ -1,7 +1,8 @@
 // node test_town.js <bookId> — district side quest end to end in the town, plus the series bridge.
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path');
-const ROOT = '/home/user/offcuts-site/tools/chapterlands/';
+// The game folder, found from this script's own location (docs/chapterlands/tools → tools/chapterlands).
+const ROOT = process.env.CHAPTERLANDS_ROOT || path.join(__dirname, '../../../tools/chapterlands') + '/';
 // three.js r160 is loaded from unpkg in the pages; point THREE_DIR at a local copy (npm i three@0.160.0) when unpkg is unreachable.
 const THREE_DIR = process.env.THREE_DIR || path.join(__dirname, 'three/node_modules/three');
 const id = process.argv[2];
