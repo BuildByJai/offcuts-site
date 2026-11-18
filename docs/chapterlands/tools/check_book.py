@@ -22,7 +22,8 @@ TERMS = [  # whole-word, case-insensitive. Hits are listed for a human to judge.
     r'deformed', r'disabled', r'dumb', r'lame', r'queer', r'fag\w*', r'spinsters?', r'wench\w*', r'harlots?',
     r'turks?', r'orientals?', r'eskimos?', r'red indians?', r'blacks', r'coloured', r'darkies', r'cannibals?', r'slaves?', r'oriental',
 ]
-PG = re.compile(r'gutenberg|this ebook|\be-?texts?\b|\blicen[cs]e\b|www\.', re.I)
+# "licence" alone is ordinary story text (e.g. a cabman's six-days' licence), so only flag it in ebook-boilerplate phrases.
+PG = re.compile(r'gutenberg|this ebook|\be-?texts?\b|\blicen[cs]e (?:agreement|terms)|full licen[cs]e|www\.', re.I)
 
 def norm(s):
     s = re.sub(r'(^|\n)>\s?', ' ', s)

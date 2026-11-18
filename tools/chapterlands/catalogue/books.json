@@ -358,10 +358,11 @@
       "chapters": 49,
       "rights": "pd",
       "readable": true,
-      "status": "planned",
+      "status": "live",
       "requiresKey": null,
       "contentPath": "content/animals/ani-beauty/",
-      "place": "Birtwick Park"
+      "place": "Birtwick Park",
+      "keyName": "Black Beauty"
     },
     {
       "id": "ani-jungle",

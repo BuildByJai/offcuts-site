@@ -1,0 +1,1019 @@
+{
+  "id": "ani-beauty",
+  "blurb": "A horse tells his own life story — from a happy meadow, through kind and cruel owners, to a safe home at last.",
+  "chapterWord": "Chapter",
+  "source": "Text: Black Beauty by Anna Sewell (1877), from the Standard Ebooks edition. Public domain.",
+  "theme": {
+    "palette": {
+      "ground": "#7fbf6a",
+      "ground2": "#6fb35b",
+      "wall": "#c8a878",
+      "trim": "#5a3a22",
+      "roof": "#8a3a2a",
+      "accent": "#c0392b",
+      "accent2": "#2f6a8a",
+      "wood": "#7a4e30",
+      "leaf": "#4f8a3a",
+      "stone": "#c0b8a8",
+      "sky": "#b8dcf0",
+      "fog": "#eaf0e6",
+      "water": "#4a8ab8",
+      "item": "#ffd23f"
+    },
+    "props": [
+      "tree",
+      "fence",
+      "bush",
+      "tree",
+      "hay",
+      "flower"
+    ],
+    "vaultProps": [
+      "hay",
+      "barrel",
+      "table",
+      "chair"
+    ],
+    "edge": "fence",
+    "hide": "bush",
+    "building": {
+      "wall": "#c8a878",
+      "trim": "#5a3a22",
+      "roof": "#8a3a2a",
+      "style": "house",
+      "sign": "Birtwick Stables",
+      "h": 7
+    }
+  },
+  "streets": [
+    {
+      "id": "early-home",
+      "name": "My Early Home",
+      "chapters": [
+        1,
+        2,
+        3
+      ],
+      "template": "CHASE",
+      "game": "Gallop the meadow",
+      "blurb": "A young black colt runs with his mother in a pleasant meadow — until it is time to be broken in.",
+      "how": "Gallop across the meadow. Jump the hedges and ditches and collect the apples on the way.",
+      "params": {
+        "mode": "race",
+        "length": 100,
+        "obstacles": [
+          "hurdle",
+          "log",
+          "block"
+        ],
+        "density": 0.4,
+        "time": 70,
+        "collect": {
+          "item": {
+            "name": "An apple",
+            "icon": "🍎"
+          },
+          "count": 6,
+          "label": "apples"
+        },
+        "objective": "Gallop to the end of the meadow",
+        "finishText": "THE PLEASANT MEADOW"
+      }
+    },
+    {
+      "id": "birtwick",
+      "name": "Birtwick Park",
+      "chapters": [
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "template": "COLLECT",
+      "game": "A new home",
+      "blurb": "Beauty’s new home has a kind master, a good coachman, a pony called Merrylegs and a mare called Ginger.",
+      "how": "Explore the stable yard at Birtwick and find six things that make it a good home.",
+      "params": {
+        "area": [
+          34,
+          32
+        ],
+        "floor": "grass",
+        "label": "found",
+        "objective": "Explore Birtwick Park",
+        "items": [
+          {
+            "name": "A roomy loose box",
+            "icon": "🏠"
+          },
+          {
+            "name": "Sweet hay",
+            "icon": "🌾"
+          },
+          {
+            "name": "A bucket of clean water",
+            "icon": "🪣"
+          },
+          {
+            "name": "A carrot",
+            "icon": "🥕"
+          },
+          {
+            "name": "A soft brush",
+            "icon": "🪮"
+          },
+          {
+            "name": "The orchard gate",
+            "icon": "🍏"
+          }
+        ],
+        "finale": {
+          "npc": {
+            "kind": "person",
+            "name": "John Manly",
+            "look": {
+              "shirt": "0x2f4a3a",
+              "pants": "0x3a2a1a",
+              "skin": "0xf0c8a0",
+              "hair": "0x5a3a1a"
+            }
+          },
+          "say": "Welcome, Black Beauty. A kind word and a gentle hand go further than any whip."
+        }
+      }
+    },
+    {
+      "id": "storm",
+      "name": "The Storm",
+      "chapters": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "template": "PUZZLE",
+      "game": "The wooden bridge",
+      "blurb": "A wild stormy day: a tree crashes across the road, and the river is rising over the bridge.",
+      "how": "Look for the clues on the stormy road, then work out why Beauty will not cross the bridge.",
+      "params": {
+        "outdoors": true,
+        "room": {
+          "w": 18,
+          "d": 16,
+          "floor": "grass"
+        },
+        "objective": "Work out why Beauty stopped",
+        "palette": {
+          "sky": "#5a6878",
+          "fog": "#7a8898",
+          "ground": "#5a7a4a",
+          "ground2": "#4f6f40"
+        },
+        "clues": [
+          {
+            "object": "sign",
+            "label": "The toll-gate",
+            "text": "The man at the gate says the river is rising fast, and he fears it will be a bad night."
+          },
+          {
+            "object": "log",
+            "label": "The fallen oak",
+            "text": "An oak tree crashes across the road. They must go the long way round, and now it is nearly dark."
+          },
+          {
+            "object": "barrel",
+            "label": "The bridge",
+            "text": "The water is over the middle of the low wooden bridge. In the dark nobody can see what is underneath."
+          }
+        ],
+        "solve": {
+          "object": "door",
+          "label": "The bridge",
+          "type": "choice",
+          "prompt": "Why won’t Beauty step onto the bridge?",
+          "options": [
+            "He senses the bridge is broken under the water",
+            "He is tired and lazy",
+            "He is frightened of the toll-keeper"
+          ],
+          "answer": 0,
+          "hint": "What did the man at the far side shout?"
+        }
+      }
+    },
+    {
+      "id": "fire",
+      "name": "The Fire",
+      "chapters": [
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "template": "CHASE",
+      "game": "Out of the smoke",
+      "blurb": "At an inn, someone leaves a pipe in the hayloft. James Howard keeps calm and leads the horses out.",
+      "how": "The stable is full of smoke! Follow James’s calm voice and get out into the yard.",
+      "params": {
+        "mode": "race",
+        "length": 80,
+        "obstacles": [
+          "hurdle",
+          "block"
+        ],
+        "density": 0.35,
+        "time": 60,
+        "floor": "floor",
+        "palette": {
+          "sky": "#6a5a5a",
+          "fog": "#8a7a78",
+          "accent": "#e8702a"
+        },
+        "objective": "Follow James out to the yard",
+        "finishText": "SAFE IN THE YARD"
+      }
+    },
+    {
+      "id": "night-gallop",
+      "name": "The Night Gallop",
+      "chapters": [
+        18,
+        19,
+        20,
+        21
+      ],
+      "template": "CHASE",
+      "game": "Go for the doctor",
+      "blurb": "In the middle of the night the mistress is very ill. John and Beauty must ride for the doctor.",
+      "how": "Gallop through the night to fetch the doctor. Keep going over the hills and through the dark wood!",
+      "params": {
+        "mode": "race",
+        "length": 130,
+        "obstacles": [
+          "hurdle",
+          "log",
+          "gap"
+        ],
+        "density": 0.45,
+        "time": 90,
+        "palette": {
+          "sky": "#1e2440",
+          "fog": "#2e3450"
+        },
+        "objective": "Ride for the doctor!",
+        "finishText": "THE DOCTOR’S DOOR"
+      }
+    },
+    {
+      "id": "earlshall",
+      "name": "Earlshall",
+      "chapters": [
+        22,
+        23,
+        24
+      ],
+      "template": "PUZZLE",
+      "game": "The bearing rein",
+      "blurb": "Beauty and Ginger are sold to an earl. His lady wants her horses’ heads held high — with a tight bearing rein.",
+      "how": "Look at the clues in the Earlshall stable, then work out what the bearing rein does to a horse.",
+      "params": {
+        "room": {
+          "w": 14,
+          "d": 12
+        },
+        "objective": "Understand the bearing rein",
+        "clues": [
+          {
+            "object": "chair",
+            "label": "The coachman",
+            "text": "York the coachman prefers a loose rein, but the lady wants style."
+          },
+          {
+            "object": "box",
+            "label": "The harness",
+            "text": "Day by day, hole by hole, the bearing reins are shortened."
+          },
+          {
+            "object": "picture",
+            "label": "Ginger",
+            "text": "Ginger jerks her head up and down against the bit. If they strain her up tight, she says, let them look out!"
+          }
+        ],
+        "solve": {
+          "object": "door",
+          "label": "The carriage",
+          "type": "choice",
+          "prompt": "What does the tight bearing rein do to Beauty?",
+          "options": [
+            "He cannot put his head down to pull, and it takes the spirit out of him",
+            "It helps him pull harder",
+            "It keeps the flies off"
+          ],
+          "answer": 0,
+          "hint": "How does Beauty feel when he has to pull with his head up?"
+        }
+      }
+    },
+    {
+      "id": "reuben",
+      "name": "Reuben Smith",
+      "chapters": [
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "template": "PUZZLE",
+      "game": "The loose shoe",
+      "blurb": "Reuben Smith is a skilled groom with one great fault. One night a loose nail is ignored — and it changes Beauty’s life.",
+      "how": "Look at the clues from the inn yard and the stony road, then put what happened in order.",
+      "params": {
+        "outdoors": true,
+        "room": {
+          "w": 18,
+          "d": 14,
+          "floor": "sand"
+        },
+        "objective": "Work out what went wrong",
+        "palette": {
+          "sky": "#2a2e48",
+          "fog": "#3a3e58"
+        },
+        "clues": [
+          {
+            "object": "sign",
+            "label": "The inn yard",
+            "text": "The hostler finds a nail starting in one of Beauty’s front shoes, and asks if it should be seen to."
+          },
+          {
+            "object": "barrel",
+            "label": "The stony road",
+            "text": "The road has just been mended with sharp new stones. Going fast, the shoe gets looser."
+          },
+          {
+            "object": "chest",
+            "label": "The blemish",
+            "text": "Beauty’s knees are cut, and the marks never fully go. A grand house will not keep a horse with knees like these."
+          }
+        ],
+        "solve": {
+          "object": "door",
+          "label": "What happened",
+          "type": "order",
+          "prompt": "Put what happened in order.",
+          "items": [
+            "A nail in Beauty’s shoe starts to come loose",
+            "Nobody has the shoe seen to",
+            "The shoe comes off on the stony road",
+            "Beauty stumbles and cuts his knees",
+            "Beauty is sold away from Earlshall"
+          ],
+          "hint": "Start at the inn and end with Beauty being sold."
+        }
+      }
+    },
+    {
+      "id": "london",
+      "name": "London Cab Horse",
+      "chapters": [
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43
+      ],
+      "template": "CHASE",
+      "game": "Through the London streets",
+      "blurb": "Beauty becomes a cab horse for Jerry Barker, a kind cabman with a happy family.",
+      "how": "Pull Jerry’s cab through the busy London streets. Pick up your passengers and keep clear of the carts!",
+      "params": {
+        "mode": "race",
+        "length": 120,
+        "obstacles": [
+          "block",
+          "hurdle",
+          "block"
+        ],
+        "density": 0.45,
+        "time": 85,
+        "floor": "stone",
+        "palette": {
+          "ground": "#8a8680",
+          "ground2": "#7a7670",
+          "sky": "#c8c4bc",
+          "fog": "#d8d4cc"
+        },
+        "collect": {
+          "item": {
+            "name": "A fare",
+            "icon": "🎩"
+          },
+          "count": 6,
+          "label": "fares"
+        },
+        "objective": "Get your fares across London",
+        "finishText": "THE CAB STAND"
+      }
+    },
+    {
+      "id": "hard-times",
+      "name": "Hard Times",
+      "chapters": [
+        44,
+        45,
+        46,
+        47
+      ],
+      "template": "COLLECT",
+      "game": "Look after Beauty",
+      "blurb": "Jerry falls ill and must give up cab work. Beauty is sold to hard masters and worked far too much.",
+      "how": "Beauty is worn out. Find six things that will help him get his strength back.",
+      "params": {
+        "area": [
+          32,
+          30
+        ],
+        "floor": "stone",
+        "label": "found",
+        "objective": "Help Beauty recover",
+        "palette": {
+          "ground": "#8a8680",
+          "ground2": "#7a7670",
+          "sky": "#c8c4bc",
+          "fog": "#d8d4cc"
+        },
+        "items": [
+          {
+            "name": "A warm cloth",
+            "icon": "🧣"
+          },
+          {
+            "name": "Good oats",
+            "icon": "🌾"
+          },
+          {
+            "name": "A bran mash",
+            "icon": "🥣"
+          },
+          {
+            "name": "Fresh water",
+            "icon": "🪣"
+          },
+          {
+            "name": "A loose rein",
+            "icon": "🪢"
+          },
+          {
+            "name": "Ten days’ rest",
+            "icon": "🛏️"
+          }
+        ],
+        "finale": {
+          "npc": {
+            "kind": "horse",
+            "name": "Black Beauty",
+            "look": {
+              "coat": "0x1b1b1b",
+              "mane": "0x0a0a0a"
+            }
+          },
+          "say": "Rest, good food and kind hands — I began to think it might be better to live after all."
+        }
+      }
+    },
+    {
+      "id": "last-home",
+      "name": "My Last Home",
+      "chapters": [
+        48
+      ],
+      "template": "COLLECT",
+      "game": "Farmer Thoroughgood’s meadow",
+      "blurb": "At a horse fair, a kind old farmer and his grandson Willie see that Beauty has known better days.",
+      "how": "Help Willie look after Beauty in the summer meadow. Find six things he needs.",
+      "params": {
+        "area": [
+          36,
+          34
+        ],
+        "floor": "grass",
+        "label": "found",
+        "objective": "Help Beauty in the meadow",
+        "items": [
+          {
+            "name": "Soft turf",
+            "icon": "🌿"
+          },
+          {
+            "name": "A shed for shade",
+            "icon": "🛖"
+          },
+          {
+            "name": "Hay and oats",
+            "icon": "🌾"
+          },
+          {
+            "name": "An apple from Willie",
+            "icon": "🍎"
+          },
+          {
+            "name": "A clear stream",
+            "icon": "💧"
+          },
+          {
+            "name": "A gentle ride",
+            "icon": "🐴"
+          }
+        ],
+        "finale": {
+          "npc": {
+            "kind": "child",
+            "name": "Willie",
+            "look": {
+              "shirt": "0x4a7ab0",
+              "pants": "0x3a3a3a",
+              "skin": "0xf4d0b0",
+              "hair": "0xc89a4a"
+            }
+          },
+          "say": "Grandpapa says I must take charge of you. I knew you would grow young in our meadows!"
+        }
+      }
+    }
+  ],
+  "skyRun": {
+    "id": "sky",
+    "name": "The Hayloft Rafters",
+    "template": "CLIMB",
+    "game": "Sky Run",
+    "blurb": "up through the hayloft rafters of the Birtwick stables.",
+    "how": "Jump from hay bale to beam, up to the very top of the Birtwick hayloft.",
+    "params": {
+      "height": 18,
+      "layout": "scatter",
+      "core": "none",
+      "moving": 2,
+      "collect": {
+        "item": {
+          "name": "A horseshoe",
+          "icon": "🧲"
+        },
+        "count": 6,
+        "label": "horseshoes"
+      },
+      "palette": {
+        "accent": "#c8a24a",
+        "wood": "#7a4e30",
+        "sky": "#e8d8b0",
+        "fog": "#f0e4c8"
+      },
+      "goalIcon": "🌾",
+      "objective": "Reach the top of the hayloft"
+    }
+  },
+  "npcs": [
+    {
+      "kind": "person",
+      "name": "John Manly",
+      "look": {
+        "shirt": "0x2f4a3a",
+        "pants": "0x3a2a1a",
+        "skin": "0xf0c8a0",
+        "hair": "0x5a3a1a"
+      },
+      "id": "john-manly",
+      "at": [
+        -8,
+        -6.5
+      ],
+      "idle": "There’s nothing like doing a kindness when it’s put in your way.",
+      "thanks": "Every horse in the stable fed and groomed. Thank you!"
+    }
+  ],
+  "sideQuest": {
+    "id": "ani-beauty-stable",
+    "title": "Morning at the Stable",
+    "giver": "john-manly",
+    "steps": [
+      {
+        "type": "talk",
+        "params": {
+          "npc": "john-manly"
+        },
+        "text": "Talk to John Manly outside the stables.",
+        "say": "Morning! The horses need grooming and feeding, and James has gone for the corn. Could you find six things for me?"
+      },
+      {
+        "type": "collect",
+        "params": {
+          "items": [
+            {
+              "id": "bb-st-1",
+              "name": "A curry-comb",
+              "shape": "gem",
+              "colour": "#8a6a4a",
+              "at": [
+                9,
+                -6
+              ]
+            },
+            {
+              "id": "bb-st-2",
+              "name": "A soft brush",
+              "shape": "gem",
+              "colour": "#c8a878",
+              "at": [
+                -9.5,
+                1
+              ]
+            },
+            {
+              "id": "bb-st-3",
+              "name": "A bucket of water",
+              "shape": "gem",
+              "colour": "#4a8ab8",
+              "at": [
+                9.5,
+                4
+              ]
+            },
+            {
+              "id": "bb-st-4",
+              "name": "Sweet hay",
+              "shape": "gem",
+              "colour": "#e8d070",
+              "at": [
+                -5,
+                7.5
+              ]
+            },
+            {
+              "id": "bb-st-5",
+              "name": "A measure of oats",
+              "shape": "gem",
+              "colour": "#d8b86a",
+              "at": [
+                5,
+                7.5
+              ]
+            },
+            {
+              "id": "bb-st-6",
+              "name": "A warm cloth",
+              "shape": "gem",
+              "colour": "#c0392b",
+              "at": [
+                0,
+                -9.5
+              ]
+            }
+          ]
+        },
+        "text": "Find six stable things around the yard."
+      },
+      {
+        "type": "talk",
+        "params": {
+          "npc": "john-manly"
+        },
+        "text": "Bring everything back to John.",
+        "say": "Well done! Groomed, fed and watered. Merrylegs says thank you too."
+      }
+    ],
+    "reward": {
+      "coins": 30
+    }
+  },
+  "vault": {
+    "name": "My Last Home",
+    "blurb": "an escape room in a quiet country stable: design a kind stable from everything Beauty learned.",
+    "intro": "Beauty has found his last home. Before the stable door opens, three locks must be solved. Use everything Beauty learned about kind and unkind owners.",
+    "room": {
+      "wall": "#c8a878",
+      "floor": "#7a4e30",
+      "rug": "#4f8a3a"
+    },
+    "stations": [
+      {
+        "id": "owners",
+        "object": "picture",
+        "label": "The owners’ portraits",
+        "lock": "Lock 1 · Kind and unkind",
+        "text": "Match each person to how they treated horses.",
+        "lesson": "A good stable is built on kindness, patience and good sense.",
+        "solve": {
+          "type": "match",
+          "prompt": "Match each person.",
+          "pairs": [
+            [
+              "Squire Gordon",
+              "Spoke up against cruel bearing reins"
+            ],
+            [
+              "Jerry Barker",
+              "Never drove his horse hard for an extra shilling"
+            ],
+            [
+              "Reuben Smith",
+              "Ignored a loose shoe on a stony road"
+            ],
+            [
+              "Nicholas Skinner",
+              "Was hard on the men, who were hard on the horses"
+            ]
+          ],
+          "hint": "Think about each of Beauty’s homes."
+        }
+      },
+      {
+        "id": "rules",
+        "object": "mirror",
+        "label": "The stable rules",
+        "lock": "Lock 2 · A kind stable",
+        "text": "Beauty’s ladies have promised he will never be sold. Now choose the rule that sums up the whole book.",
+        "lesson": "“My ladies have promised that I shall never be sold, and so I have nothing to fear.”",
+        "solve": {
+          "type": "choice",
+          "prompt": "Which rule belongs in a kind stable?",
+          "options": [
+            "No tight bearing reins, and a gentle hand instead of the whip",
+            "Keep every horse’s head held high for style",
+            "Drive fast whenever a passenger pays extra"
+          ],
+          "answer": 0,
+          "hint": "What did the lady on the hill say to Jakes?"
+        }
+      }
+    ],
+    "quiz": {
+      "object": "book",
+      "label": "Beauty’s story",
+      "lock": "Lock 3 · The whole story",
+      "lesson": "From the pleasant meadow to the last home."
+    },
+    "openText": "The stable door swings open onto a sunny paddock.",
+    "outro": "Black Beauty is home at last — and he will never be sold again."
+  },
+  "unlock": {
+    "badges": []
+  },
+  "chapterFiles": [
+    {
+      "n": 1,
+      "file": "01.md",
+      "title": "Chapter 1: My Early Home"
+    },
+    {
+      "n": 2,
+      "file": "02.md",
+      "title": "Chapter 2: The Hunt"
+    },
+    {
+      "n": 3,
+      "file": "03.md",
+      "title": "Chapter 3: My Breaking In"
+    },
+    {
+      "n": 4,
+      "file": "04.md",
+      "title": "Chapter 4: Birtwick Park"
+    },
+    {
+      "n": 5,
+      "file": "05.md",
+      "title": "Chapter 5: A Fair Start"
+    },
+    {
+      "n": 6,
+      "file": "06.md",
+      "title": "Chapter 6: Liberty"
+    },
+    {
+      "n": 7,
+      "file": "07.md",
+      "title": "Chapter 7: Ginger"
+    },
+    {
+      "n": 8,
+      "file": "08.md",
+      "title": "Chapter 8: Ginger’s Story Continued"
+    },
+    {
+      "n": 9,
+      "file": "09.md",
+      "title": "Chapter 9: Merrylegs"
+    },
+    {
+      "n": 10,
+      "file": "10.md",
+      "title": "Chapter 10: A Talk in the Orchard"
+    },
+    {
+      "n": 11,
+      "file": "11.md",
+      "title": "Chapter 11: Plain Speaking"
+    },
+    {
+      "n": 12,
+      "file": "12.md",
+      "title": "Chapter 12: A Stormy Day"
+    },
+    {
+      "n": 13,
+      "file": "13.md",
+      "title": "Chapter 13: The Devil’s Trade Mark"
+    },
+    {
+      "n": 14,
+      "file": "14.md",
+      "title": "Chapter 14: James Howard"
+    },
+    {
+      "n": 15,
+      "file": "15.md",
+      "title": "Chapter 15: The Old Hostler"
+    },
+    {
+      "n": 16,
+      "file": "16.md",
+      "title": "Chapter 16: The Fire"
+    },
+    {
+      "n": 17,
+      "file": "17.md",
+      "title": "Chapter 17: John Manly’s Talk"
+    },
+    {
+      "n": 18,
+      "file": "18.md",
+      "title": "Chapter 18: Going for the Doctor"
+    },
+    {
+      "n": 19,
+      "file": "19.md",
+      "title": "Chapter 19: Only Ignorance"
+    },
+    {
+      "n": 20,
+      "file": "20.md",
+      "title": "Chapter 20: Joe Green"
+    },
+    {
+      "n": 21,
+      "file": "21.md",
+      "title": "Chapter 21: The Parting"
+    },
+    {
+      "n": 22,
+      "file": "22.md",
+      "title": "Chapter 22: Earlshall"
+    },
+    {
+      "n": 23,
+      "file": "23.md",
+      "title": "Chapter 23: A Strike for Liberty"
+    },
+    {
+      "n": 24,
+      "file": "24.md",
+      "title": "Chapter 24: The Lady Anne, or a Runaway Horse"
+    },
+    {
+      "n": 25,
+      "file": "25.md",
+      "title": "Chapter 25: Reuben Smith"
+    },
+    {
+      "n": 26,
+      "file": "26.md",
+      "title": "Chapter 26: How It Ended"
+    },
+    {
+      "n": 27,
+      "file": "27.md",
+      "title": "Chapter 27: Ruined and Going Downhill"
+    },
+    {
+      "n": 28,
+      "file": "28.md",
+      "title": "Chapter 28: A Job Horse and His Drivers"
+    },
+    {
+      "n": 29,
+      "file": "29.md",
+      "title": "Chapter 29: Cockneys"
+    },
+    {
+      "n": 30,
+      "file": "30.md",
+      "title": "Chapter 30: A Thief"
+    },
+    {
+      "n": 31,
+      "file": "31.md",
+      "title": "Chapter 31: A Humbug"
+    },
+    {
+      "n": 32,
+      "file": "32.md",
+      "title": "Chapter 32: A Horse Fair"
+    },
+    {
+      "n": 33,
+      "file": "33.md",
+      "title": "Chapter 33: A London Cab Horse"
+    },
+    {
+      "n": 34,
+      "file": "34.md",
+      "title": "Chapter 34: An Old War Horse"
+    },
+    {
+      "n": 35,
+      "file": "35.md",
+      "title": "Chapter 35: Jerry Barker"
+    },
+    {
+      "n": 36,
+      "file": "36.md",
+      "title": "Chapter 36: The Sunday Cab"
+    },
+    {
+      "n": 37,
+      "file": "37.md",
+      "title": "Chapter 37: The Golden Rule"
+    },
+    {
+      "n": 38,
+      "file": "38.md",
+      "title": "Chapter 38: Dolly and a Real Gentleman"
+    },
+    {
+      "n": 39,
+      "file": "39.md",
+      "title": "Chapter 39: Seedy Sam"
+    },
+    {
+      "n": 40,
+      "file": "40.md",
+      "title": "Chapter 40: Poor Ginger"
+    },
+    {
+      "n": 41,
+      "file": "41.md",
+      "title": "Chapter 41: The Butcher"
+    },
+    {
+      "n": 42,
+      "file": "42.md",
+      "title": "Chapter 42: The Election"
+    },
+    {
+      "n": 43,
+      "file": "43.md",
+      "title": "Chapter 43: A Friend in Need"
+    },
+    {
+      "n": 44,
+      "file": "44.md",
+      "title": "Chapter 44: Old Captain and His Successor"
+    },
+    {
+      "n": 45,
+      "file": "45.md",
+      "title": "Chapter 45: Jerry’s New Year"
+    },
+    {
+      "n": 46,
+      "file": "46.md",
+      "title": "Chapter 46: Jakes and the Lady"
+    },
+    {
+      "n": 47,
+      "file": "47.md",
+      "title": "Chapter 47: Hard Times"
+    },
+    {
+      "n": 48,
+      "file": "48.md",
+      "title": "Chapter 48: Farmer Thoroughgood and His Grandson Willie"
+    },
+    {
+      "n": 49,
+      "file": "49.md",
+      "title": "Chapter 49: My Last Home"
+    }
+  ]
+}
