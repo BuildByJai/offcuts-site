@@ -1,0 +1,675 @@
+{
+  "id": "sci-lostworld",
+  "blurb": "A young reporter joins the fierce Professor Challenger on a journey to a plateau in South America where dinosaurs still live.",
+  "chapterWord": "Chapter",
+  "source": "The Lost World by Arthur Conan Doyle (1912). Read it in your own copy, or borrow it free from your library.",
+  "theme": {
+    "palette": {
+      "ground": "#4f7a3a",
+      "ground2": "#43702f",
+      "wall": "#a85a3a",
+      "trim": "#3a2a1a",
+      "roof": "#2f5a2a",
+      "accent": "#d8a23a",
+      "accent2": "#2f6a8a",
+      "wood": "#6a4a2a",
+      "leaf": "#2f6a2a",
+      "stone": "#a85a3a",
+      "sky": "#b8d8a8",
+      "fog": "#cfe0c0",
+      "water": "#3a7a8a",
+      "item": "#ffd23f"
+    },
+    "props": [
+      "tree",
+      "bush",
+      "rock",
+      "tree",
+      "reeds",
+      "tree"
+    ],
+    "vaultProps": [
+      "bookcase",
+      "table",
+      "chair",
+      "statue"
+    ],
+    "edge": "hedge",
+    "hide": "bush",
+    "building": {
+      "wall": "#a85a3a",
+      "trim": "#3a2a1a",
+      "roof": "#2f5a2a",
+      "style": "house",
+      "sign": "Maple White Land",
+      "h": 7
+    }
+  },
+  "streets": [
+    {
+      "id": "challenger",
+      "name": "Professor Challenger",
+      "chapters": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "template": "CHASE",
+      "game": "Run from the Professor",
+      "blurb": "Young Malone wants to do something heroic. His editor sends him to interview the famous — and furious — Professor Challenger.",
+      "how": "Professor Challenger does NOT like reporters! Run down the street before he catches you.",
+      "params": {
+        "mode": "flee",
+        "length": 90,
+        "obstacles": [
+          "hurdle",
+          "block"
+        ],
+        "chaser": {
+          "kind": "person",
+          "name": "Professor Challenger",
+          "look": {
+            "shirt": "0x2a2a2a",
+            "pants": "0x2a2a2a",
+            "skin": "0xe8b898",
+            "hair": "0x1b1b1b"
+          },
+          "scale": 0.95
+        },
+        "chaserSpeed": 6.0,
+        "floor": "stone",
+        "objective": "Escape the furious Professor!",
+        "finishText": "ENMORE PARK GATES"
+      }
+    },
+    {
+      "id": "meeting",
+      "name": "The Meeting",
+      "chapters": [
+        5,
+        6
+      ],
+      "template": "ARCADE",
+      "game": "Question!",
+      "blurb": "At a noisy scientific meeting, Challenger dares anyone to go and check his story. Malone stands up.",
+      "how": "The hall is full of shouts! Catch the volunteers’ hands going up — and dodge the flying heckles.",
+      "params": {
+        "mode": "catch",
+        "target": 12,
+        "player": "📝",
+        "bg": "hall",
+        "good": [
+          {
+            "icon": "✋",
+            "name": "a volunteer"
+          },
+          {
+            "icon": "❓",
+            "name": "a question"
+          }
+        ],
+        "bad": [
+          {
+            "icon": "💢",
+            "name": "a heckle"
+          }
+        ],
+        "objective": "Catch 12 questions and volunteers!",
+        "done": "“I will go!” — Malone joins the expedition."
+      }
+    },
+    {
+      "id": "amazon",
+      "name": "Up the Amazon",
+      "chapters": [
+        7,
+        8
+      ],
+      "template": "ARCADE",
+      "game": "Paddle the river",
+      "blurb": "Two canoes, two professors — one in each, to keep the peace — paddling up a dark, clear river.",
+      "how": "Paddle the canoe upriver. Pick up the supplies and steer clear of the logs and rocks.",
+      "params": {
+        "mode": "paddle",
+        "duration": 40,
+        "player": "🛶",
+        "good": [
+          {
+            "icon": "📦",
+            "name": "supplies"
+          },
+          {
+            "icon": "🗺️",
+            "name": "a map"
+          }
+        ],
+        "bad": [
+          {
+            "icon": "🪵",
+            "name": "log"
+          },
+          {
+            "icon": "🪨",
+            "name": "rock"
+          }
+        ],
+        "objective": "Paddle up the river!",
+        "done": "Through the bamboo, and the red cliffs are in sight."
+      }
+    },
+    {
+      "id": "plateau",
+      "name": "The Plateau",
+      "chapters": [
+        9
+      ],
+      "template": "CLIMB",
+      "game": "Climb the pinnacle",
+      "blurb": "Red cliffs too steep to climb — but beside them stands a tall pinnacle of rock with one tree on top.",
+      "how": "Climb the rock pinnacle to the tree at the top. Then work out how to cross to the plateau.",
+      "params": {
+        "height": 22,
+        "layout": "spiral",
+        "core": "rock",
+        "palette": {
+          "ground": "#4f7a3a",
+          "ground2": "#43702f",
+          "leaf": "#2f6a2a",
+          "sky": "#b8d8a8",
+          "fog": "#cfe0c0",
+          "stone": "#a85a3a"
+        },
+        "goalIcon": "🌳",
+        "objective": "Reach the top of the pinnacle",
+        "finale": {
+          "solve": {
+            "type": "choice",
+            "prompt": "How can the party cross the gap to the plateau?",
+            "options": [
+              "Chop down the tree on the pinnacle so it falls across as a bridge",
+              "Jump across",
+              "Wait for the pterodactyl to carry them"
+            ],
+            "answer": 0,
+            "hint": "What did Challenger carry up with him?"
+          }
+        },
+        "done": "The tree crashes across the gap — a bridge to the unknown!"
+      }
+    },
+    {
+      "id": "pterodactyls",
+      "name": "The Pterodactyls",
+      "chapters": [
+        10
+      ],
+      "template": "CHASE",
+      "game": "Out of the swamp",
+      "blurb": "The explorers stumble on a rookery full of pterodactyls — and the whole flock takes to the air.",
+      "how": "Run through the swamp and get back under the trees before the wings close in!",
+      "params": {
+        "mode": "race",
+        "length": 100,
+        "obstacles": [
+          "log",
+          "gap",
+          "hurdle"
+        ],
+        "density": 0.45,
+        "time": 75,
+        "palette": {
+          "sky": "#a8b8a0",
+          "fog": "#c0c8b8",
+          "ground": "#5a6a3a",
+          "ground2": "#4f5f34"
+        },
+        "objective": "Get back to the trees!",
+        "finishText": "THE TREES"
+      }
+    },
+    {
+      "id": "iguanodons",
+      "name": "The Iguanodons",
+      "chapters": [
+        11
+      ],
+      "template": "COLLECT",
+      "game": "Map the plateau",
+      "blurb": "Malone climbs the tallest tree on the plateau to see the whole of Maple White Land.",
+      "how": "Explore the glade and find six specimens and landmarks for the map.",
+      "params": {
+        "area": [
+          38,
+          36
+        ],
+        "floor": "grass",
+        "label": "found",
+        "objective": "Find the landmarks for the map",
+        "palette": {
+          "ground": "#4f7a3a",
+          "ground2": "#43702f",
+          "leaf": "#2f6a2a",
+          "sky": "#b8d8a8",
+          "fog": "#cfe0c0",
+          "stone": "#a85a3a"
+        },
+        "items": [
+          {
+            "name": "A giant footprint",
+            "icon": "🦶"
+          },
+          {
+            "name": "A primitive flower",
+            "icon": "🌼"
+          },
+          {
+            "name": "A strange fruit",
+            "icon": "🍈"
+          },
+          {
+            "name": "A fossil fern",
+            "icon": "🌿"
+          },
+          {
+            "name": "The central lake",
+            "icon": "🏞️"
+          },
+          {
+            "name": "The tallest tree",
+            "icon": "🌲"
+          }
+        ],
+        "finale": {
+          "npc": {
+            "kind": "person",
+            "name": "Professor Summerlee",
+            "look": {
+              "shirt": "0x8a8a7a",
+              "pants": "0x5a5a4a",
+              "skin": "0xf0d0b0",
+              "hair": "0xd8d8d8"
+            }
+          },
+          "say": "Remarkable. Iguanodons — harmless, and quite alive! Note everything down, young man."
+        }
+      }
+    },
+    {
+      "id": "captured",
+      "name": "Captured",
+      "chapters": [
+        12,
+        13,
+        14
+      ],
+      "template": "SNEAK",
+      "game": "The rescue",
+      "blurb": "Malone comes back from a night alone to find the camp empty. Lord John has escaped — and the two professors must be rescued.",
+      "how": "Creep with Lord John through the forest to the professors. Keep out of sight of the ape-men’s lookouts.",
+      "params": {
+        "area": [
+          38,
+          48
+        ],
+        "floor": "grass",
+        "watchers": 4,
+        "hides": 8,
+        "goal": {
+          "name": "the professors",
+          "icon": "🧑‍🔬"
+        },
+        "watcher": {
+          "kind": "person",
+          "name": "a lookout",
+          "look": {
+            "shirt": "0x8a4a2a",
+            "pants": "0x6a3a1a",
+            "skin": "0xa86a4a",
+            "hair": "0x8a3a1a"
+          }
+        },
+        "palette": {
+          "ground": "#4f7a3a",
+          "ground2": "#43702f",
+          "leaf": "#2f6a2a",
+          "sky": "#b8d8a8",
+          "fog": "#cfe0c0",
+          "stone": "#a85a3a"
+        },
+        "objective": "Reach the professors unseen"
+      }
+    },
+    {
+      "id": "way-down",
+      "name": "The Way Down",
+      "chapters": [
+        15
+      ],
+      "template": "PUZZLE",
+      "game": "The secret cave",
+      "blurb": "A young friend from the plateau gives Malone a roll of bark with a secret drawing on it.",
+      "how": "Look at the clues in the camp, then work out which cave leads down to the outside world.",
+      "params": {
+        "room": {
+          "w": 14,
+          "d": 12
+        },
+        "dark": true,
+        "objective": "Find the way down",
+        "clues": [
+          {
+            "object": "note",
+            "label": "The roll of bark",
+            "text": "A row of dots for the caves, with a cross by one of them. The young friend pointed up at the caves and put his finger to his lips."
+          },
+          {
+            "object": "box",
+            "label": "Challenger’s balloon",
+            "text": "Challenger’s homemade balloon shot up and nearly carried two of them off. Not a safe way down!"
+          },
+          {
+            "object": "chest",
+            "label": "The wrong cave",
+            "text": "The first cave they tried ended in a wall of rock. Were they counting from the wrong end?"
+          }
+        ],
+        "solve": {
+          "object": "door",
+          "label": "The cave",
+          "type": "choice",
+          "prompt": "Why did they reach a dead end the first time?",
+          "options": [
+            "They counted the caves from the wrong side of the drawing",
+            "The drawing was a trick",
+            "The cave had been blocked by the Professor"
+          ],
+          "answer": 0,
+          "hint": "Seventeen from one end is second from the other."
+        }
+      }
+    }
+  ],
+  "skyRun": {
+    "id": "sky",
+    "name": "The Rookery Cliffs",
+    "template": "CLIMB",
+    "game": "Sky Run",
+    "blurb": "up the red cliffs above the pterodactyl rookery.",
+    "how": "Climb the ledges of the red cliffs to the very top. Some ledges move — wait for them!",
+    "params": {
+      "height": 22,
+      "layout": "scatter",
+      "core": "none",
+      "moving": 3,
+      "collect": {
+        "item": {
+          "name": "A pterodactyl feather",
+          "icon": "🪶"
+        },
+        "count": 6,
+        "label": "feathers"
+      },
+      "palette": {
+        "accent": "#a85a3a",
+        "wood": "#7a3a2a",
+        "sky": "#c8d8b8",
+        "fog": "#d8e4c8"
+      },
+      "goalIcon": "🦅",
+      "objective": "Reach the top of the cliffs"
+    }
+  },
+  "npcs": [
+    {
+      "kind": "person",
+      "name": "Professor Summerlee",
+      "look": {
+        "shirt": "0x8a8a7a",
+        "pants": "0x5a5a4a",
+        "skin": "0xf0d0b0",
+        "hair": "0xd8d8d8"
+      },
+      "id": "summerlee",
+      "at": [
+        -8,
+        -6.5
+      ],
+      "idle": "I shall believe in Maple White Land when I see it with my own eyes.",
+      "thanks": "Splendid notes! Even Challenger will be impressed."
+    }
+  ],
+  "sideQuest": {
+    "id": "sci-lostworld-notes",
+    "title": "Summerlee’s Specimen Notes",
+    "giver": "summerlee",
+    "steps": [
+      {
+        "type": "talk",
+        "params": {
+          "npc": "summerlee"
+        },
+        "text": "Talk to Professor Summerlee by the plateau gate.",
+        "say": "My specimen notes have blown out of my case! Six pages — beetles, ferns, flowers. Science cannot do without them."
+      },
+      {
+        "type": "collect",
+        "params": {
+          "items": [
+            {
+              "id": "lw-nt-1",
+              "name": "Notes on beetles",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                9,
+                -6
+              ]
+            },
+            {
+              "id": "lw-nt-2",
+              "name": "Notes on ferns",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                -9.5,
+                1
+              ]
+            },
+            {
+              "id": "lw-nt-3",
+              "name": "Notes on flowers",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                9.5,
+                4
+              ]
+            },
+            {
+              "id": "lw-nt-4",
+              "name": "Notes on footprints",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                -5,
+                7.5
+              ]
+            },
+            {
+              "id": "lw-nt-5",
+              "name": "Notes on eggs",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                5,
+                7.5
+              ]
+            },
+            {
+              "id": "lw-nt-6",
+              "name": "Notes on the lake",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                0,
+                -9.5
+              ]
+            }
+          ]
+        },
+        "text": "Find six pages of Summerlee’s notes."
+      },
+      {
+        "type": "talk",
+        "params": {
+          "npc": "summerlee"
+        },
+        "text": "Bring the notes back to Summerlee.",
+        "say": "All six! Now we shall have proof that nobody can argue with."
+      }
+    ],
+    "reward": {
+      "coins": 30
+    }
+  },
+  "vault": {
+    "name": "The Queen’s Hall",
+    "blurb": "an escape room in the packed Queen’s Hall: prove the Lost World is real to a hall full of doubters.",
+    "intro": "The Queen’s Hall is packed and the doubters are shouting. Open three locks to prove that Maple White Land is real.",
+    "room": {
+      "wall": "#d8cfbf",
+      "floor": "#5a3a24",
+      "rug": "#8a2a2a"
+    },
+    "stations": [
+      {
+        "id": "proof",
+        "object": "picture",
+        "label": "The evidence table",
+        "lock": "Lock 1 · Weigh the proof",
+        "text": "The doubters say photographs can be faked. Which kind of proof can nobody argue with?",
+        "lesson": "Good scientists ask for evidence — and the best evidence is something everyone can see for themselves.",
+        "solve": {
+          "type": "choice",
+          "prompt": "What will convince the whole hall?",
+          "options": [
+            "A living creature from the plateau, there in the hall",
+            "More photographs",
+            "Shouting louder than the doubters"
+          ],
+          "answer": 0,
+          "hint": "What did Challenger bring in a big box?"
+        }
+      },
+      {
+        "id": "team",
+        "object": "mirror",
+        "label": "The four explorers",
+        "lock": "Lock 2 · The expedition",
+        "text": "Match each explorer to what they did.",
+        "lesson": "Four very different people — and each one mattered.",
+        "solve": {
+          "type": "match",
+          "prompt": "Match each explorer.",
+          "pairs": [
+            [
+              "Professor Challenger",
+              "Claimed the plateau was real"
+            ],
+            [
+              "Professor Summerlee",
+              "Doubted him and came to check"
+            ],
+            [
+              "Lord John Roxton",
+              "Led the rescue of the professors"
+            ],
+            [
+              "Edward Malone",
+              "Climbed the great tree and wrote it all down"
+            ]
+          ],
+          "hint": "Think about the whole journey."
+        }
+      }
+    ],
+    "quiz": {
+      "object": "book",
+      "label": "Malone’s notebook",
+      "lock": "Lock 3 · The whole story",
+      "lesson": "From a newspaper office in London to the top of Maple White Land and back."
+    },
+    "openText": "The lid of the box lifts — and something with leathery wings looks out.",
+    "outro": "The pterodactyl escapes through an open window and flies off over London. But the hall has seen it with its own eyes."
+  },
+  "unlock": {
+    "badges": []
+  },
+  "chapterFiles": [
+    {
+      "n": 1,
+      "title": "There Are Heroisms All Round Us"
+    },
+    {
+      "n": 2,
+      "title": "Try Your Luck with Professor Challenger"
+    },
+    {
+      "n": 3,
+      "title": "He Is a Perfectly Impossible Person"
+    },
+    {
+      "n": 4,
+      "title": "It’s Just the Very Biggest Thing in the World"
+    },
+    {
+      "n": 5,
+      "title": "Question!"
+    },
+    {
+      "n": 6,
+      "title": "I Was the Flail of the Lord"
+    },
+    {
+      "n": 7,
+      "title": "Tomorrow We Disappear Into the Unknown"
+    },
+    {
+      "n": 8,
+      "title": "The Outlying Pickets of the New World"
+    },
+    {
+      "n": 9,
+      "title": "Who Could Have Foreseen It?"
+    },
+    {
+      "n": 10,
+      "title": "The Most Wonderful Things Have Happened"
+    },
+    {
+      "n": 11,
+      "title": "For Once I Was the Hero"
+    },
+    {
+      "n": 12,
+      "title": "It Was Dreadful in the Forest"
+    },
+    {
+      "n": 13,
+      "title": "A Sight Which I Shall Never Forget"
+    },
+    {
+      "n": 14,
+      "title": "Those Were the Real Conquests"
+    },
+    {
+      "n": 15,
+      "title": "Our Eyes Have Seen Great Wonders"
+    },
+    {
+      "n": 16,
+      "title": "A Procession! A Procession!"
+    }
+  ]
+}

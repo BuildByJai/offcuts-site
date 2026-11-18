@@ -592,10 +592,11 @@
       "chapters": 16,
       "rights": "pd",
       "readable": false,
-      "status": "planned",
+      "status": "live",
       "requiresKey": null,
       "contentPath": "content/scifi/sci-lostworld/",
-      "place": "Maple White Land"
+      "place": "Maple White Land",
+      "keyName": "Lost World"
     },
     {
       "id": "sci-time",
