@@ -3,8 +3,7 @@
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path');
 const ROOT = '/home/user/offcuts-site/tools/chapterlands/';
-// three.js r160 is loaded from unpkg in the pages; point THREE_DIR at a local copy (npm i three@0.160.0) when unpkg is unreachable.
-const THREE_DIR = process.env.THREE_DIR || path.join(__dirname, 'three/node_modules/three');
+const THREE_DIR = path.join(__dirname, 'three/node_modules/three');
 const id = process.argv[2];
 const cat = JSON.parse(fs.readFileSync(ROOT + 'catalogue/books.json'));
 const meta = cat.books.find((b) => b.id === id);
@@ -13,7 +12,7 @@ const qs = JSON.parse(fs.readFileSync(ROOT + meta.contentPath + 'questions.json'
 const only = process.argv[3];
 const save = (extra = {}) => JSON.stringify(Object.assign({ v: 4, wallet: 100, earned: 100, profile: { name: 'Test Reader' },
   streets: { [id]: kit.streets.map((s) => s.id) }, streetGames: { [id]: kit.streets.map((s) => s.id) }, reading: { [id]: 99 },
-  libraryCard: { stamps: [], keys: meta.requiresKey ? [meta.requiresKey] : [] } }, extra));
+  libraryCard: { stamps: [], keys: (meta.requiresKey ? [meta.requiresKey] : []).concat((process.env.KEYS || '').split(',').filter(Boolean)) } }, extra));
 (async () => {
   const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
   const results = [];

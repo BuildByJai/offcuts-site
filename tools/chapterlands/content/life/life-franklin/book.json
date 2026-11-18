@@ -1,0 +1,467 @@
+{
+  "id": "life-franklin",
+  "blurb": "A young printer in Philadelphia makes a bold plan: to practise thirteen virtues, one week at a time, and track every slip in a little book.",
+  "chapterWord": "Part",
+  "source": "Text: from The Autobiography of Benjamin Franklin, chapter IX “Plan for Attaining Moral Perfection”, Standard Ebooks edition, split into three parts. Public domain.",
+  "theme": {
+    "palette": {
+      "ground": "#b8a88a",
+      "ground2": "#a8987a",
+      "wall": "#a8543a",
+      "trim": "#f0e8d8",
+      "roof": "#4a3a3a",
+      "accent": "#2f4a7a",
+      "accent2": "#c9a24a",
+      "wood": "#6a4a2a",
+      "leaf": "#5a8a3a",
+      "stone": "#c8b8a0",
+      "sky": "#c8d8e8",
+      "fog": "#e8ecf0",
+      "water": "#4a7aa8",
+      "item": "#ffd23f"
+    },
+    "props": [
+      "lamp",
+      "cart",
+      "tree",
+      "barrel",
+      "bench",
+      "tree"
+    ],
+    "vaultProps": [
+      "bookcase",
+      "table",
+      "chair",
+      "clock"
+    ],
+    "edge": "fence",
+    "hide": "cart",
+    "building": {
+      "wall": "#a8543a",
+      "trim": "#f0e8d8",
+      "roof": "#4a3a3a",
+      "style": "shop",
+      "sign": "B. Franklin, Printer",
+      "h": 6
+    }
+  },
+  "streets": [
+    {
+      "id": "printing-shop",
+      "name": "The Printing Shop",
+      "chapters": [
+        1
+      ],
+      "template": "ARCADE",
+      "game": "Set the virtues in type",
+      "blurb": "In his printing shop, Franklin plans a bold project: to live without any fault at all. First he writes his list of virtues.",
+      "how": "Set each virtue in type, letter by letter, before the ink dries.",
+      "params": {
+        "mode": "typeset",
+        "words": [
+          "ORDER",
+          "SILENCE",
+          "JUSTICE",
+          "INDUSTRY",
+          "HUMILITY"
+        ],
+        "duration": 60,
+        "bg": "paper",
+        "objective": "Typeset Franklin’s virtues",
+        "done": "Thirteen virtues, each with a short rule. Now for the plan."
+      }
+    },
+    {
+      "id": "virtues",
+      "name": "The 13 Virtues",
+      "chapters": [
+        2
+      ],
+      "template": "BUILD",
+      "game": "Fill in the chart",
+      "blurb": "Franklin will practise one virtue a week, in order — Temperance first, because a clear head makes the rest easier.",
+      "how": "Pick up each virtue and put it on the chart in Franklin’s order, one per week.",
+      "params": {
+        "area": [
+          32,
+          30
+        ],
+        "floor": "floor",
+        "order": true,
+        "objective": "Put the first six virtues on the chart in order",
+        "hint": "Temperance comes first. Look again at Franklin’s list.",
+        "items": [
+          {
+            "id": "temperance",
+            "name": "Temperance",
+            "icon": "🍽️"
+          },
+          {
+            "id": "silence",
+            "name": "Silence",
+            "icon": "🤫"
+          },
+          {
+            "id": "order",
+            "name": "Order",
+            "icon": "📂"
+          },
+          {
+            "id": "resolution",
+            "name": "Resolution",
+            "icon": "💪"
+          },
+          {
+            "id": "frugality",
+            "name": "Frugality",
+            "icon": "🪙"
+          },
+          {
+            "id": "industry",
+            "name": "Industry",
+            "icon": "⚒️"
+          }
+        ],
+        "slots": [
+          {
+            "id": "week1",
+            "name": "Week 1",
+            "accepts": [
+              "temperance"
+            ]
+          },
+          {
+            "id": "week2",
+            "name": "Week 2",
+            "accepts": [
+              "silence"
+            ]
+          },
+          {
+            "id": "week3",
+            "name": "Week 3",
+            "accepts": [
+              "order"
+            ]
+          },
+          {
+            "id": "week4",
+            "name": "Week 4",
+            "accepts": [
+              "resolution"
+            ]
+          },
+          {
+            "id": "week5",
+            "name": "Week 5",
+            "accepts": [
+              "frugality"
+            ]
+          },
+          {
+            "id": "week6",
+            "name": "Week 6",
+            "accepts": [
+              "industry"
+            ]
+          }
+        ],
+        "done": "One virtue a week — thirteen weeks for a whole course, four courses in a year."
+      }
+    },
+    {
+      "id": "little-book",
+      "name": "The Little Book",
+      "chapters": [
+        3
+      ],
+      "template": "PUZZLE",
+      "game": "Which was hardest?",
+      "blurb": "Years later, Franklin looks back at his little book of black spots. Did the plan work?",
+      "how": "Read the pages of Franklin’s little book, then work out which virtue gave him the most trouble.",
+      "params": {
+        "room": {
+          "w": 14,
+          "d": 12
+        },
+        "objective": "Find Franklin’s hardest virtue",
+        "clues": [
+          {
+            "object": "book",
+            "label": "The little book",
+            "text": "Red lines for the virtues, a column for each day — and a black spot for every fault. He was surprised how many there were."
+          },
+          {
+            "object": "table",
+            "label": "The messy desk",
+            "text": "Papers everywhere. As a busy master printer, people came to see him at their own hours, not his."
+          },
+          {
+            "object": "chest",
+            "label": "The speckled ax",
+            "text": "A man wanted his whole ax ground bright — then gave up and said he liked a speckled ax best."
+          }
+        ],
+        "solve": {
+          "object": "door",
+          "label": "The answer",
+          "type": "choice",
+          "prompt": "Which virtue gave Franklin the most trouble?",
+          "options": [
+            "Order",
+            "Silence",
+            "Temperance"
+          ],
+          "answer": 0,
+          "hint": "Think about the messy desk and the busy shop."
+        }
+      }
+    }
+  ],
+  "skyRun": {
+    "id": "sky",
+    "name": "Franklin’s Kite",
+    "template": "CLIMB",
+    "game": "Sky Run",
+    "blurb": "up past Franklin’s kite to the storm clouds above Philadelphia.",
+    "how": "Climb the rooftops and chimneys up to the storm clouds where Franklin’s kite is flying. Some ledges move — wait for them!",
+    "params": {
+      "height": 22,
+      "layout": "scatter",
+      "core": "none",
+      "moving": 3,
+      "collect": {
+        "item": {
+          "name": "A brass key",
+          "icon": "🗝️"
+        },
+        "count": 6,
+        "label": "keys"
+      },
+      "palette": {
+        "sky": "#7a8aa0",
+        "fog": "#9aa8b8",
+        "accent": "#2f4a7a"
+      },
+      "goalIcon": "🪁",
+      "objective": "Reach the kite in the clouds"
+    }
+  },
+  "npcs": [
+    {
+      "kind": "person",
+      "name": "Benjamin Franklin",
+      "look": {
+        "shirt": "0x6a4a2a",
+        "pants": "0x4a3a2a",
+        "skin": "0xf0d0b0",
+        "hair": "0xb8b0a0"
+      },
+      "id": "franklin",
+      "at": [
+        -8,
+        -6.5
+      ],
+      "idle": "Lose no time; be always employed in something useful.",
+      "thanks": "Every paper delivered on time. That is Industry!"
+    }
+  ],
+  "sideQuest": {
+    "id": "life-franklin-papers",
+    "title": "The Morning Papers",
+    "giver": "franklin",
+    "steps": [
+      {
+        "type": "talk",
+        "params": {
+          "npc": "franklin"
+        },
+        "text": "Talk to Benjamin Franklin outside his printing shop.",
+        "say": "The newspapers are printed, but my apprentice is late! Three bundles have blown off the cart. Could you find them and deliver them?"
+      },
+      {
+        "type": "collect",
+        "params": {
+          "items": [
+            {
+              "id": "bf-np-1",
+              "name": "A newspaper for the coffee house",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                0,
+                -9.5
+              ]
+            },
+            {
+              "id": "bf-np-2",
+              "name": "A newspaper for the library",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                -9.5,
+                -1
+              ]
+            },
+            {
+              "id": "bf-np-3",
+              "name": "A newspaper for the post office",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                0,
+                7.5
+              ]
+            }
+          ]
+        },
+        "text": "Find the three bundles of newspapers."
+      },
+      {
+        "type": "deliver",
+        "params": {
+          "pairs": [
+            {
+              "item": "bf-np-1",
+              "target": [
+                8,
+                -5
+              ],
+              "label": "Deliver to the coffee house"
+            },
+            {
+              "item": "bf-np-2",
+              "target": [
+                -8.5,
+                5
+              ],
+              "label": "Deliver to the library"
+            },
+            {
+              "item": "bf-np-3",
+              "target": [
+                8.5,
+                5
+              ],
+              "label": "Deliver to the post office"
+            }
+          ]
+        },
+        "text": "Deliver the papers: coffee house, library and post office."
+      },
+      {
+        "type": "talk",
+        "params": {
+          "npc": "franklin"
+        },
+        "text": "Report back to Franklin.",
+        "say": "Splendid. Early to bed and early to rise — and early with the papers!"
+      }
+    ],
+    "reward": {
+      "coins": 30
+    }
+  },
+  "vault": {
+    "name": "The Virtue Chart",
+    "blurb": "an escape room in Franklin’s study: build your own 13-week chart and compare it with Atomic Habits.",
+    "intro": "Franklin’s study. His little book lies open on the desk. Open three locks to build your own plan — and see what Franklin and Atomic Habits agree on.",
+    "room": {
+      "wall": "#a8543a",
+      "floor": "#5a3a24",
+      "rug": "#2f4a7a"
+    },
+    "stations": [
+      {
+        "id": "chart",
+        "object": "book",
+        "label": "Your chart",
+        "lock": "Lock 1 · Build your chart",
+        "text": "Put the steps of a 13-week virtue chart in order.",
+        "lesson": "One thing at a time, checked every day — that is how Franklin built habits.",
+        "solve": {
+          "type": "order",
+          "prompt": "Put the steps in order.",
+          "items": [
+            "Choose your virtues and write a short rule for each",
+            "Rule a page: a column for each day, a line for each virtue",
+            "Focus on just one virtue this week",
+            "Each evening, mark a spot for any slip",
+            "Next week, add the next virtue"
+          ],
+          "hint": "Start by choosing, end by moving on."
+        }
+      },
+      {
+        "id": "compare",
+        "object": "picture",
+        "label": "Franklin and Atomic Habits",
+        "lock": "Lock 2 · Two plans",
+        "text": "Match each part of Franklin’s plan to the Atomic Habits idea that is most like it (in our own words).",
+        "lesson": "Two hundred years apart, both say: make it small, make it visible, and keep going.",
+        "solve": {
+          "type": "match",
+          "prompt": "Match each pair.",
+          "pairs": [
+            [
+              "One virtue a week",
+              "Start small: one habit at a time"
+            ],
+            [
+              "Black spots in the little book",
+              "Track your habit so you can see it"
+            ],
+            [
+              "Morning: what good shall I do today?",
+              "Decide when and where you will do it"
+            ],
+            [
+              "A better and a happier man, though not perfect",
+              "Small improvements add up over time"
+            ]
+          ],
+          "hint": "Think about what each one is for."
+        }
+      }
+    ],
+    "quiz": {
+      "object": "clock",
+      "label": "Franklin’s clock",
+      "lock": "Lock 3 · The whole plan",
+      "lesson": "Franklin never became perfect — but the plan made him better and happier."
+    },
+    "openText": "The study door opens onto a bright Philadelphia morning.",
+    "outro": "Franklin carried his little book all his life. Now you have a chart of your own."
+  },
+  "unlock": {
+    "badges": [
+      {
+        "id": "habit-historian",
+        "name": "Habit Historian",
+        "icon": "📜",
+        "desc": "Finish Franklin’s 13 virtues and Atomic Habits.",
+        "requires": [
+          "life-franklin",
+          "life-atomic"
+        ]
+      }
+    ]
+  },
+  "chapterFiles": [
+    {
+      "n": 1,
+      "file": "01.md",
+      "title": "Part 1: The Bold Project"
+    },
+    {
+      "n": 2,
+      "file": "02.md",
+      "title": "Part 2: The Little Book"
+    },
+    {
+      "n": 3,
+      "file": "03.md",
+      "title": "Part 3: How the Plan Went"
+    }
+  ]
+}

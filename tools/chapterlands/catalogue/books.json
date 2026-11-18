@@ -708,14 +708,15 @@
       "series": null,
       "seriesOrder": null,
       "size": "district",
-      "chapters": null,
+      "chapters": 3,
       "rights": "pd",
       "readable": true,
-      "status": "planned",
+      "status": "live",
       "requiresKey": null,
       "contentPath": "content/life/life-franklin/",
       "place": "Franklin's Print Shop",
-      "note": "Virtues chapters only, in the game and in the Reading Room."
+      "note": "Virtues chapters only, in the game and in the Reading Room.",
+      "keyName": "Franklin"
     },
     {
       "id": "life-thinketh",

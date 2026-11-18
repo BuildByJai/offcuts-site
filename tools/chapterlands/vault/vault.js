@@ -163,7 +163,7 @@ const doorLabel = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 0.24), new THREE.M
 doorLabel.position.set(0, 3.28, HZ - 0.03); doorLabel.rotation.y = Math.PI; scene.add(doorLabel);
 
 /* =============== stations round the walls =============== */
-const ICON = { desk: '🗄️', shelf: '📚', clock: '🕰️', chair: '🪑', box: '📦', picture: '🖼️', window: '🪟', table: '🍽️', bed: '🛏️', chest: '🧰', plant: '🪴', statue: '🗿', sign: '🪧', mirror: '🪞', book: '📖', map: '🗺️', note: '📝', lamp: '🪔', safe: '🔐', toy: '🧸', board: '♟️', scales: '⚖️', telescope: '🔭', trunk: '🧳' };
+const ICON = { desk: '🗄️', shelf: '📚', clock: '🕰️', chair: '🪑', box: '📦', picture: '🖼️', window: '🪟', table: '🍽️', bed: '🛏️', chest: '🧰', plant: '🪴', statue: '🗿', sign: '🪧', mirror: '🪞', book: '📖', map: '🗺️', note: '📝', lamp: '🪔', safe: '🔐', toy: '🧸', board: '♟️', scales: '⚖️', telescope: '🔭', trunk: '🧳', rock: '🪨' };
 const stations = (V.stations || []).slice();
 if (QUIZ) stations.push(QUIZ);
 const interactables = [];

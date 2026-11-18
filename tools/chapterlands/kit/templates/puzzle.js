@@ -16,7 +16,7 @@ import { renderSolve } from '../solve.js';
 import { toast } from '../../js/hud.js';
 import { Sfx } from '../../js/audio.js';
 
-const OBJ_ICON = { desk: '🗄️', shelf: '📚', clock: '🕰️', chair: '🪑', box: '📦', picture: '🖼️', window: '🪟', table: '🍽️', bed: '🛏️', barrel: '🛢️', chest: '🧰', plant: '🪴', statue: '🗿', sign: '🪧', door: '🚪', mirror: '🪞', book: '📖', map: '🗺️', note: '📝', tree: '🌳', well: '🪣', lamp: '🪔', safe: '🔐' };
+const OBJ_ICON = { desk: '🗄️', shelf: '📚', clock: '🕰️', chair: '🪑', box: '📦', picture: '🖼️', window: '🪟', table: '🍽️', bed: '🛏️', barrel: '🛢️', chest: '🧰', plant: '🪴', statue: '🗿', sign: '🪧', door: '🚪', mirror: '🪞', book: '📖', map: '🗺️', note: '📝', tree: '🌳', well: '🪣', lamp: '🪔', safe: '🔐', board: '♟️', rock: '🪨', log: '🪵' };
 
 export function build(A) {
   const p = A.params, r = A.rng, P = A.P;
