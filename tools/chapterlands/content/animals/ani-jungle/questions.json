@@ -1,0 +1,285 @@
+{
+  "book": "ani-jungle",
+  "_about": "answer = index of the right option (shuffled on screen); evidence = supporting sentence, review only; hint = gentle \"look again\" line.",
+  "streets": {
+    "council-rock": [
+      {
+        "kind": "what",
+        "q": "Who was the first to speak up for Mowgli at the Pack Council?",
+        "options": [
+          "Baloo, the brown bear",
+          "Shere Khan",
+          "Akela"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "Then the only other creature who is allowed at the Pack Council—Baloo, the sleepy brown bear who teaches the wolf cubs the Law of the Jungle",
+        "hint": "Look again at the Council at full moon."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Bagheera offer a bull?",
+        "options": [
+          "To buy the man-cub’s place in the Pack, as the Law allows",
+          "Because he was full",
+          "To make Shere Khan go away"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "Now to Baloo’s word I will add one bull, and a fat one, newly killed, not half a mile from here, if ye will accept the man’s cub according to the Law.",
+        "hint": "Look again at what Bagheera says."
+      },
+      {
+        "kind": "think",
+        "q": "The Law says wolves must bring their cubs to the Pack Council. Why?",
+        "options": [
+          "So the other wolves can know them",
+          "So they can be given names",
+          "So the cubs can learn to hunt"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "he must bring them to the Pack Council, which is generally held once a month at full moon, in order that the other wolves may identify them",
+        "hint": "Look again at what the Law lays down."
+      }
+    ],
+    "red-flower": [
+      {
+        "kind": "what",
+        "q": "What did Bagheera mean by “the Red Flower”?",
+        "options": [
+          "Fire",
+          "A real flower",
+          "A wild berry"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "By Red Flower Bagheera meant fire, only no creature in the jungle will call fire by its proper name.",
+        "hint": "Look again at what Bagheera tells Mowgli to fetch."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Bagheera want Mowgli to have the Red Flower?",
+        "options": [
+          "So he would have a stronger friend when the young wolves turned on him",
+          "To keep warm",
+          "To cook his food"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "so that when the time comes thou mayest have even a stronger friend than I or Baloo or those of the Pack that love thee",
+        "hint": "Look again at Bagheera’s warning."
+      },
+      {
+        "kind": "think",
+        "q": "Mowgli cries, and Bagheera says these are “only tears such as men use”. What does this show?",
+        "options": [
+          "Mowgli is a man, not a wolf",
+          "Mowgli is ill",
+          "Wolves cry all the time"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "Those are only tears such as men use,” said Bagheera.",
+        "hint": "Look again at the end of the Council."
+      }
+    ],
+    "bandar-log": [
+      {
+        "kind": "what",
+        "q": "What did Baloo teach Mowgli to keep him safe?",
+        "options": [
+          "The Master Words of the Jungle",
+          "How to climb trees",
+          "How to make fire"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "“I am now teaching him the Master Words of the Jungle that shall protect him with the Birds and the Snake People, and all that hunt on four feet, except his own pack.",
+        "hint": "Look again at Baloo’s lessons."
+      },
+      {
+        "kind": "why",
+        "q": "Why were the Master Words so important?",
+        "options": [
+          "No snake, bird or beast would hurt him",
+          "They made him invisible",
+          "They let him talk to men"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "and how Mowgli was now reasonably safe against all accidents in the jungle, because neither snake, bird, nor beast would hurt him",
+        "hint": "Look again at what Mowgli learned from Hathi."
+      },
+      {
+        "kind": "think",
+        "q": "The monkeys said Mowgli should be their leader some day. Why shouldn’t he believe them?",
+        "options": [
+          "The Bandar-log say things they never mean",
+          "Monkeys always tell the truth",
+          "He already had a tail"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "they carried me in their arms up to the top of the trees and said I was their blood-brother, except that I had no tail, and should be their leader some day",
+        "hint": "Think about what Baloo says about the Monkey People."
+      }
+    ],
+    "cold-lairs": [
+      {
+        "kind": "what",
+        "q": "Where did the monkeys take Mowgli?",
+        "options": [
+          "To the Cold Lairs, a ruined city",
+          "To the man-village",
+          "To the river"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "They had brought the boy to the Lost City, and were very pleased with themselves for the time.",
+        "hint": "Look again at the start of the part."
+      },
+      {
+        "kind": "why",
+        "q": "Why were the monkeys so afraid of Kaa?",
+        "options": [
+          "Kaa was everything they feared in the jungle",
+          "Kaa was very loud",
+          "Kaa could fly"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "Kaa was everything that the monkeys feared in the jungle",
+        "hint": "Look again at what the monkeys’ elders told them."
+      },
+      {
+        "kind": "think",
+        "q": "Mowgli tells Kaa, “We be of one blood, thou and I.” What does that show?",
+        "options": [
+          "He is thanking Kaa and calling him family",
+          "He thinks he is a snake",
+          "He is being rude"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "“We be of one blood, thou and I,” Mowgli answered.",
+        "hint": "Look again at what Mowgli says after the rescue."
+      }
+    ],
+    "village": [
+      {
+        "kind": "what",
+        "q": "Who took Mowgli into her hut in the village?",
+        "options": [
+          "Messua",
+          "The priest’s wife",
+          "Mother Wolf"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "By my honor, Messua, he is not unlike thy boy that was taken by the tiger.”",
+        "hint": "Look again at Mowgli’s arrival at the village gate."
+      },
+      {
+        "kind": "why",
+        "q": "Why didn’t Mowgli stay in the first plowed lands he came to?",
+        "options": [
+          "They were too close to the jungle, where he had an enemy",
+          "There was no food",
+          "The people chased him away"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "he went down to the plowed lands where the villagers lived, but he would not stop there because it was too near to the jungle, and he knew that he had made at least one bad enemy at the Council",
+        "hint": "Look again at the start of the part."
+      },
+      {
+        "kind": "think",
+        "q": "How did Mowgli learn the words of the village so quickly?",
+        "options": [
+          "He copied Messua almost perfectly",
+          "The priest taught him to read",
+          "The wolves taught him"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "So as soon as Messua pronounced a word Mowgli would imitate it almost perfectly, and before dark he had learned the names of many things in the hut.",
+        "hint": "Look again at Mowgli’s first evening in the hut."
+      }
+    ]
+  },
+  "vault": [
+    {
+      "q": "What was Mowgli’s plan against Shere Khan?",
+      "options": [
+        "To trap him in the ravine between the bulls and the cows",
+        "To fight him alone",
+        "To hide in the village"
+      ],
+      "answer": 0,
+      "chapter": 6,
+      "evidence": "and then take the bulls down it and catch Shere Khan between the bulls and the cows",
+      "hint": "Think about the big ravine of the Waingunga."
+    },
+    {
+      "q": "Who brought Mowgli word that Shere Khan was close?",
+      "options": [
+        "Gray Brother",
+        "Baloo",
+        "Kaa"
+      ],
+      "answer": 0,
+      "chapter": 6,
+      "evidence": "At last a day came when he did not see Gray Brother at the signal place",
+      "hint": "Think about the signal place by the dhâk-tree."
+    },
+    {
+      "q": "What did the villagers shout when Mowgli brought the herd home?",
+      "options": [
+        "“More sorcery!”",
+        "“Welcome home!”",
+        "“Well done!”"
+      ],
+      "answer": 0,
+      "chapter": 6,
+      "evidence": "“More sorcery!” shouted the villagers.",
+      "hint": "Think about the end of the last story."
+    },
+    {
+      "q": "What did Mowgli tell Mother Wolf at the end?",
+      "options": [
+        "That he had been cast out of the Man Pack",
+        "That he was going to live in the village",
+        "That Kaa was his brother"
+      ],
+      "answer": 0,
+      "chapter": 6,
+      "evidence": "“They have cast me out from the Man Pack, Mother,” shouted Mowgli",
+      "hint": "Think about the very end."
+    },
+    {
+      "q": "Why must Mowgli never kill cattle?",
+      "options": [
+        "A bull was the price that bought his life",
+        "Cattle are too big",
+        "Baloo forbade it"
+      ],
+      "answer": 0,
+      "chapter": 2,
+      "evidence": "but for the sake of the bull that bought thee thou must never kill or eat any cattle young or old",
+      "hint": "Think back to Bagheera’s bull."
+    },
+    {
+      "q": "What are the Master Words Mowgli says to Kaa?",
+      "options": [
+        "“We be of one blood, thou and I”",
+        "“Good hunting”",
+        "“The Law is the Law”"
+      ],
+      "answer": 0,
+      "chapter": 4,
+      "evidence": "“We be of one blood, thou and I,” Mowgli answered.",
+      "hint": "Think about the rescue."
+    }
+  ]
+}

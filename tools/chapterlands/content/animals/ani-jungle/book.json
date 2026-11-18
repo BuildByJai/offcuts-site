@@ -1,0 +1,499 @@
+{
+  "id": "ani-jungle",
+  "blurb": "Mowgli, the man-cub raised by wolves, learns the Law of the Jungle from Baloo and Bagheera.",
+  "chapterWord": "Part",
+  "source": "Text: the three Mowgli stories from The Jungle Book by Rudyard Kipling (1894), from the Standard Ebooks edition, each split into two parts. Public domain.",
+  "theme": {
+    "palette": {
+      "ground": "#5a8a3a",
+      "ground2": "#4f7a34",
+      "wall": "#c8b890",
+      "trim": "#5a3a24",
+      "roof": "#3a6a2a",
+      "accent": "#e9a23b",
+      "accent2": "#c0583f",
+      "wood": "#6a4a2a",
+      "leaf": "#2f7a3a",
+      "stone": "#b0a890",
+      "sky": "#a8d8c8",
+      "fog": "#c8e4d4",
+      "water": "#4a9a9a",
+      "item": "#ffd23f"
+    },
+    "props": [
+      "tree",
+      "bush",
+      "rock",
+      "reeds",
+      "tree",
+      "bush"
+    ],
+    "vaultProps": [
+      "rock",
+      "tree",
+      "statue",
+      "rock"
+    ],
+    "edge": "hedge",
+    "hide": "bush",
+    "building": {
+      "wall": "#c8b890",
+      "trim": "#5a3a24",
+      "roof": "#3a6a2a",
+      "style": "house",
+      "sign": "The Seeonee Hills",
+      "h": 6
+    }
+  },
+  "streets": [
+    {
+      "id": "council-rock",
+      "name": "The Council Rock",
+      "chapters": [
+        1
+      ],
+      "template": "PUZZLE",
+      "game": "The Law of the Jungle",
+      "blurb": "Father and Mother Wolf must bring the man-cub to the Pack Council — and the Pack must decide.",
+      "how": "Look at the clues around the Council Rock, then work out how Mowgli joins the Pack.",
+      "params": {
+        "outdoors": true,
+        "room": {
+          "w": 18,
+          "d": 16
+        },
+        "objective": "Work out how Mowgli joins the Pack",
+        "palette": {
+          "ground": "#5a8a3a",
+          "ground2": "#4f7a34",
+          "leaf": "#2f7a3a",
+          "sky": "#a8d8c8",
+          "fog": "#c8e4d4"
+        },
+        "clues": [
+          {
+            "object": "statue",
+            "label": "The Council Rock",
+            "text": "By the Law, cubs are brought to the Pack Council so the other wolves will know them. If there is a dispute, two who are not his parents must speak for him."
+          },
+          {
+            "object": "tree",
+            "label": "Baloo",
+            "text": "Baloo, the sleepy brown bear who teaches the cubs the Law, grunts: “I speak for the man’s cub.”"
+          },
+          {
+            "object": "rock",
+            "label": "Bagheera",
+            "text": "Bagheera, the Black Panther, offers a fat bull, newly killed, as the price of the man-cub’s life."
+          }
+        ],
+        "solve": {
+          "object": "sign",
+          "label": "The Pack’s answer",
+          "type": "choice",
+          "prompt": "How is Mowgli accepted into the Pack?",
+          "options": [
+            "Baloo speaks for him and Bagheera pays a bull, as the Law allows",
+            "Shere Khan agrees to let him stay",
+            "Mowgli fights the leader of the Pack"
+          ],
+          "answer": 0,
+          "hint": "The Law says two must speak for a cub."
+        }
+      }
+    },
+    {
+      "id": "red-flower",
+      "name": "The Red Flower",
+      "chapters": [
+        2
+      ],
+      "template": "COLLECT",
+      "game": "Bring the fire-pot",
+      "blurb": "The young wolves are turning against Mowgli, and Bagheera says he needs the Red Flower.",
+      "how": "Find the fire-pot and the dry branches, carefully, and bring them back to Bagheera.",
+      "params": {
+        "area": [
+          38,
+          38
+        ],
+        "label": "found",
+        "objective": "Find the fire-pot and dry branches",
+        "palette": {
+          "ground": "#5a8a3a",
+          "ground2": "#4f7a34",
+          "leaf": "#2f7a3a",
+          "sky": "#a8d8c8",
+          "fog": "#c8e4d4"
+        },
+        "items": [
+          {
+            "name": "The fire-pot",
+            "icon": "🏺"
+          },
+          {
+            "name": "A dry branch",
+            "icon": "🌿"
+          },
+          {
+            "name": "Another dry branch",
+            "icon": "🌿"
+          },
+          {
+            "name": "A third dry branch",
+            "icon": "🌿"
+          }
+        ],
+        "finale": {
+          "npc": {
+            "kind": "person",
+            "name": "Bagheera",
+            "look": {
+              "shirt": "0x1b1b1b",
+              "pants": "0x1b1b1b",
+              "skin": "0x2a2a2a",
+              "hair": "0x1b1b1b"
+            }
+          },
+          "say": "Good. Keep the fire-pot safe, Little Brother. Now even the Pack will think twice."
+        }
+      }
+    },
+    {
+      "id": "bandar-log",
+      "name": "The Bandar-log",
+      "chapters": [
+        3
+      ],
+      "template": "CLIMB",
+      "game": "Through the treetops",
+      "blurb": "The Monkey People snatch Mowgli and swing off with him through the treetops.",
+      "how": "Climb up through the treetops, branch to branch, the way the Bandar-log travel.",
+      "params": {
+        "height": 20,
+        "core": "tree",
+        "layout": "scatter",
+        "collect": {
+          "item": {
+            "name": "A monkey nut",
+            "icon": "🥜"
+          },
+          "count": 6,
+          "label": "nuts"
+        },
+        "palette": {
+          "ground": "#5a8a3a",
+          "ground2": "#4f7a34",
+          "leaf": "#2f7a3a",
+          "sky": "#a8d8c8",
+          "fog": "#c8e4d4"
+        },
+        "goalIcon": "🐒",
+        "objective": "Climb to the top of the treetops"
+      }
+    },
+    {
+      "id": "cold-lairs",
+      "name": "The Cold Lairs",
+      "chapters": [
+        4
+      ],
+      "template": "CHASE",
+      "game": "The rescue",
+      "blurb": "Baloo, Bagheera and Kaa the python race to the ruined city where the monkeys hold Mowgli.",
+      "how": "Race through the ruins of the Cold Lairs. Jump the broken walls and reach the summer-house where Mowgli is trapped.",
+      "params": {
+        "mode": "race",
+        "length": 110,
+        "obstacles": [
+          "hurdle",
+          "block",
+          "gap",
+          "low"
+        ],
+        "density": 0.5,
+        "time": 85,
+        "floor": "stone",
+        "palette": {
+          "ground": "#a8a090",
+          "ground2": "#989080"
+        },
+        "objective": "Reach the summer-house",
+        "finishText": "THE SUMMER-HOUSE"
+      }
+    },
+    {
+      "id": "village",
+      "name": "The Village",
+      "chapters": [
+        5
+      ],
+      "template": "SNEAK",
+      "game": "Life in the man-village",
+      "blurb": "Mowgli goes to live in the man-village, and becomes a herd-boy.",
+      "how": "Slip through the village to the grazing grounds without the villagers stopping you to stare.",
+      "params": {
+        "area": [
+          38,
+          46
+        ],
+        "floor": "sand",
+        "watchers": 4,
+        "hides": 7,
+        "goal": {
+          "name": "the grazing grounds",
+          "icon": "🐃"
+        },
+        "watcher": {
+          "kind": "person",
+          "name": "a villager",
+          "look": {
+            "shirt": "0xf2efe6",
+            "pants": "0xf2efe6"
+          }
+        },
+        "objective": "Reach the grazing grounds"
+      }
+    }
+  ],
+  "skyRun": {
+    "id": "sky",
+    "name": "The Monkey Highways",
+    "template": "CLIMB",
+    "game": "Sky Run",
+    "blurb": "the Bandar-log’s highways, high in the treetops.",
+    "how": "Leap along the high branches. Some sway — wait for them!",
+    "params": {
+      "height": 22,
+      "core": "tree",
+      "layout": "scatter",
+      "moving": 3,
+      "collect": {
+        "item": {
+          "name": "A mango",
+          "icon": "🥭"
+        },
+        "count": 6,
+        "label": "mangoes"
+      },
+      "palette": {
+        "ground": "#5a8a3a",
+        "ground2": "#4f7a34",
+        "leaf": "#2f7a3a",
+        "sky": "#a8d8c8",
+        "fog": "#c8e4d4"
+      },
+      "goalIcon": "🌴",
+      "objective": "Reach the highest branch"
+    }
+  },
+  "npcs": [
+    {
+      "kind": "person",
+      "name": "Baloo",
+      "look": {
+        "shirt": "0x6a4a2a",
+        "pants": "0x6a4a2a",
+        "skin": "0x8a6a4a",
+        "hair": "0x5a3a1a"
+      },
+      "scale": 1.05,
+      "id": "baloo",
+      "at": [
+        -8,
+        -6.5
+      ],
+      "idle": "The Law of the Jungle never orders anything without a reason.",
+      "thanks": "Good! Now no snake, bird or beast will hurt thee."
+    }
+  ],
+  "sideQuest": {
+    "id": "ani-jungle-words",
+    "title": "Baloo's Lessons",
+    "giver": "baloo",
+    "steps": [
+      {
+        "type": "talk",
+        "params": {
+          "npc": "baloo"
+        },
+        "text": "Talk to Baloo outside the Seeonee Hills.",
+        "say": "A man-cub must learn the Master Words for every kind of jungle people. I have hidden them round about — the word for the Birds, for the Snake People, and for the Hunting People. Find them!"
+      },
+      {
+        "type": "collect",
+        "params": {
+          "items": [
+            {
+              "id": "jb-bird",
+              "name": "The Master Word for the Birds",
+              "shape": "gem",
+              "colour": "#7fd6f2",
+              "at": [
+                9,
+                -6
+              ]
+            },
+            {
+              "id": "jb-snake",
+              "name": "The Master Word for the Snake People",
+              "shape": "gem",
+              "colour": "#7fd6b0",
+              "at": [
+                -9.5,
+                2
+              ]
+            },
+            {
+              "id": "jb-hunt",
+              "name": "The Master Word for the Hunting People",
+              "shape": "gem",
+              "colour": "#e9a23b",
+              "at": [
+                0,
+                7.5
+              ]
+            }
+          ]
+        },
+        "text": "Find the three Master Words."
+      },
+      {
+        "type": "talk",
+        "params": {
+          "npc": "baloo"
+        },
+        "text": "Say the Master Words to Baloo.",
+        "say": "“We be of one blood, ye and I.” Well said, Little Brother!"
+      }
+    ],
+    "reward": {
+      "coins": 25
+    }
+  },
+  "vault": {
+    "name": "Tiger! Tiger!",
+    "blurb": "an escape room about Mowgli’s last stand against Shere Khan — and why he belongs to neither world.",
+    "intro": "Shere Khan is waiting for Mowgli at the village gate. Plan the buffalo stampede, then answer the hardest question: where does Mowgli belong?",
+    "room": {
+      "wall": "#c8b890",
+      "floor": "#6a4a2a",
+      "rug": "#e9a23b"
+    },
+    "stations": [
+      {
+        "id": "plan",
+        "object": "map",
+        "label": "The ravine",
+        "lock": "Lock 1 · The plan",
+        "text": "Put Mowgli’s plan in order.",
+        "lesson": "A clever plan, with the herd and his wolf friends working together.",
+        "solve": {
+          "type": "order",
+          "prompt": "First at the top.",
+          "items": [
+            "Gray Brother brings word that Shere Khan is in the ravine",
+            "Split the herd: bulls one way, cows the other",
+            "Take the bulls round in a big circle to the head of the ravine",
+            "Send the herd down the ravine",
+            "Take the buffaloes home"
+          ],
+          "hint": "It starts with Gray Brother’s news."
+        }
+      },
+      {
+        "id": "friends",
+        "object": "board",
+        "label": "The Pack",
+        "lock": "Lock 2 · Friends",
+        "text": "Match each friend to how they helped Mowgli.",
+        "lesson": "Mowgli’s friends came from both worlds.",
+        "solve": {
+          "type": "match",
+          "prompt": "Match each friend.",
+          "pairs": [
+            [
+              "Baloo",
+              "Taught him the Law and the Master Words"
+            ],
+            [
+              "Bagheera",
+              "Paid a bull for his life"
+            ],
+            [
+              "Kaa",
+              "Rescued him from the Cold Lairs"
+            ],
+            [
+              "Messua",
+              "Took him into her hut in the village"
+            ]
+          ],
+          "hint": "Think back over all three stories."
+        }
+      },
+      {
+        "id": "neither",
+        "object": "mirror",
+        "label": "The water’s edge",
+        "lock": "Lock 3 · Two worlds",
+        "text": "The young wolves said a man-cub had no place in the Pack. The villagers called him a sorcerer and drove him away. He goes off alone to hunt with his four brothers.",
+        "lesson": "Mowgli is part of both the jungle and the village — and fully at home in neither.",
+        "solve": {
+          "type": "choice",
+          "prompt": "Why does Mowgli belong to neither world?",
+          "options": [
+            "The Pack sees a man, and the village sees a wolf",
+            "He wants to live in the Cold Lairs",
+            "He doesn’t like either of them"
+          ],
+          "answer": 0,
+          "hint": "What did each side call him?"
+        }
+      }
+    ],
+    "quiz": {
+      "object": "rock",
+      "label": "The Council Rock",
+      "lock": "Lock 4 · The whole story",
+      "lesson": "Good hunting, Little Brother."
+    },
+    "openText": "The way out opens onto the jungle.",
+    "outro": "Mowgli goes back to the Council Rock — and then away, to hunt alone with his four brothers."
+  },
+  "unlock": {
+    "badges": []
+  },
+  "chapterFiles": [
+    {
+      "n": 1,
+      "file": "01.md",
+      "title": "Mowgli’s Brothers (part 1)"
+    },
+    {
+      "n": 2,
+      "file": "02.md",
+      "title": "Mowgli’s Brothers (part 2)"
+    },
+    {
+      "n": 3,
+      "file": "03.md",
+      "title": "Kaa’s Hunting (part 1)"
+    },
+    {
+      "n": 4,
+      "file": "04.md",
+      "title": "Kaa’s Hunting (part 2)"
+    },
+    {
+      "n": 5,
+      "file": "05.md",
+      "title": "“Tiger! Tiger!” (part 1)"
+    },
+    {
+      "n": 6,
+      "file": "06.md",
+      "title": "“Tiger! Tiger!” (part 2)"
+    }
+  ]
+}
