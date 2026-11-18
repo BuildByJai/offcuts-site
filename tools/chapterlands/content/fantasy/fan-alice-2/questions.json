@@ -1,0 +1,449 @@
+{
+  "book": "fan-alice-2",
+  "_about": "answer = index of the right option (shuffled on screen); evidence = supporting sentence, review only; hint = gentle \"look again\" line.",
+  "streets": {
+    "glass-house": [
+      {
+        "kind": "what",
+        "q": "How did Alice get into the Looking-glass room?",
+        "options": [
+          "She went through the glass over the mantelpiece",
+          "She opened a secret door",
+          "She fell down a rabbit-hole"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "In another moment Alice was through the glass, and had jumped lightly down into the Looking-glass room.",
+        "hint": "Look again at the part where the glass begins to melt away."
+      },
+      {
+        "kind": "why",
+        "q": "Why could Alice only read the poem by holding it up to a glass?",
+        "options": [
+          "It was a Looking-glass book, so the words went the wrong way",
+          "The writing was too small",
+          "It was written in a secret code"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "And if I hold it up to a glass, the words will all go the right way again.”",
+        "hint": "Look again at the part where Alice finds the book on the table."
+      },
+      {
+        "kind": "think",
+        "q": "What is different about the room behind the glass?",
+        "options": [
+          "It looks the same, but things go the other way",
+          "Everything is much bigger",
+          "It is always night there"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "First, there’s the room you can see through the glass—that’s just the same as our drawing-room, only the things go the other way.",
+        "hint": "Look again at what Alice tells Kitty about Looking-glass House."
+      }
+    ],
+    "live-flowers": [
+      {
+        "kind": "what",
+        "q": "When Alice wanted to reach the Red Queen, what did the Rose advise?",
+        "options": [
+          "To walk the other way",
+          "To run as fast as she could",
+          "To wait for the Queen to come to her"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "“You can’t possibly do that,” said the Rose: “I should advise you to walk the other way.”",
+        "hint": "Look again at what the flowers tell Alice."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Alice and the Red Queen run so fast but stay in the same place?",
+        "options": [
+          "In Looking-glass land it takes all the running you can do to stay where you are",
+          "They were running on a moving road",
+          "They were running in circles on purpose"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "“Now, here, you see, it takes all the running you can do, to keep in the same place.",
+        "hint": "Look again at what the Red Queen says when they stop running."
+      },
+      {
+        "kind": "think",
+        "q": "Why is Alice’s journey across the country like a game of chess?",
+        "options": [
+          "She moves square by square like a pawn, to become a Queen",
+          "She has to beat the Red Queen at chess",
+          "The flowers are all chess pieces"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "You can be the White Queen’s Pawn, if you like, as Lily’s too young to play; and you’re in the Second Square to begin with: when you get to the Eighth Square you’ll be a Queen—”",
+        "hint": "Look again at what the Red Queen offers Alice."
+      }
+    ],
+    "insects": [
+      {
+        "kind": "what",
+        "q": "What did the guard on the train ask everyone for?",
+        "options": [
+          "Their tickets",
+          "Their names",
+          "Their luggage"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "“Tickets, please!” said the guard, putting his head in at the window.",
+        "hint": "Look again at the start of the train ride."
+      },
+      {
+        "kind": "why",
+        "q": "Why did the Fawn walk happily with Alice through the wood?",
+        "options": [
+          "In that wood, nobody could remember names — so it didn’t know she was a human child",
+          "Alice gave it something to eat",
+          "It was lost and needed help"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "“I’m a Fawn!” it cried out in a voice of delight, “and, dear me! you’re a human child!”",
+        "hint": "Look again at what happens when they come out of the wood."
+      },
+      {
+        "kind": "think",
+        "q": "What is strange about the wood Alice walks into?",
+        "options": [
+          "Things have no names there",
+          "The trees can talk",
+          "It is upside-down"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "“This must be the wood,” she said thoughtfully to herself, “where things have no names.",
+        "hint": "Look again at what the Gnat tells Alice about the wood."
+      }
+    ],
+    "tweedles": [
+      {
+        "kind": "what",
+        "q": "In the rhyme, what did Tweedledum and Tweedledee agree to have?",
+        "options": [
+          "A battle",
+          "A tea-party",
+          "A race"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "Agreed to have a battle;",
+        "hint": "Look again at the rhyme Alice remembers about them."
+      },
+      {
+        "kind": "why",
+        "q": "In the rhyme, why did Tweedledum want to fight?",
+        "options": [
+          "He said Tweedledee had spoiled his nice new rattle",
+          "Tweedledee had eaten his cake",
+          "They both wanted the same hat"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "For Tweedledum said Tweedledee",
+        "hint": "Look again at the rhyme."
+      },
+      {
+        "kind": "think",
+        "q": "Tweedledee tells Alice she is only a thing in the Red King’s dream. What does Alice ask back?",
+        "options": [
+          "If she’s only in his dream, then what are they?",
+          "Can she wake the King up?",
+          "What is the King dreaming about?"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "“Besides, if I’m only a sort of thing in his dream, what are you, I should like to know?”",
+        "hint": "Look again at the part where they find the Red King snoring."
+      }
+    ],
+    "wool-water": [
+      {
+        "kind": "what",
+        "q": "What is the White Queen’s rule about jam?",
+        "options": [
+          "Jam tomorrow and jam yesterday — but never jam today",
+          "Jam every single day",
+          "No jam at all, ever"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "“The rule is, jam tomorrow and jam yesterday—but never jam today.”",
+        "hint": "Look again at what the White Queen offers Alice as wages."
+      },
+      {
+        "kind": "why",
+        "q": "Why does Alice suddenly find herself rowing a boat?",
+        "options": [
+          "The knitting-needles turned into oars",
+          "The Sheep pushed her into the stream",
+          "She wanted to pick rushes"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "Alice was beginning to say, when suddenly the needles turned into oars in her hands, and she found they were in a little boat, gliding along between banks",
+        "hint": "Look again at the part in the Sheep’s shop."
+      },
+      {
+        "kind": "think",
+        "q": "Why can Alice never have “jam today”?",
+        "options": [
+          "It’s jam every OTHER day, and today is never “another” day",
+          "The jam has all been eaten",
+          "Queens aren’t allowed jam"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "“It’s jam every other day: today isn’t any other day, you know.”",
+        "hint": "Look again at how the White Queen explains her rule."
+      }
+    ],
+    "humpty": [
+      {
+        "kind": "what",
+        "q": "Where was Humpty Dumpty sitting?",
+        "options": [
+          "On top of a high, narrow wall",
+          "On a mushroom",
+          "On a throne"
+        ],
+        "answer": 0,
+        "chapter": 6,
+        "evidence": "on the top of a high wall—such a narrow one that Alice quite wondered how he could keep his balance",
+        "hint": "Look again at how Alice first sees him."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Humpty Dumpty get a present when it wasn’t his birthday?",
+        "options": [
+          "It was an un-birthday present",
+          "He found it on the wall",
+          "Alice gave it to him"
+        ],
+        "answer": 0,
+        "chapter": 6,
+        "evidence": "Humpty Dumpty continued thoughtfully, as he crossed one knee over the other and clasped his hands round it, “they gave it me—for an un-birthday present.”",
+        "hint": "Look again at what Humpty says about his cravat."
+      },
+      {
+        "kind": "think",
+        "q": "Humpty says the question is “which is to be master”. What does he mean?",
+        "options": [
+          "Whether he controls what words mean, or the words control him",
+          "Who is the master of the wall",
+          "Whether Alice or he is cleverer"
+        ],
+        "answer": 0,
+        "chapter": 6,
+        "evidence": "“The question is,” said Humpty Dumpty, “which is to be master—that’s all.”",
+        "hint": "Look again at the argument about the word “glory”."
+      }
+    ],
+    "lion-unicorn": [
+      {
+        "kind": "what",
+        "q": "What were the Lion and the Unicorn fighting for?",
+        "options": [
+          "The crown",
+          "A plum-cake",
+          "The White King’s horses"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "“Fighting for the crown?”",
+        "hint": "Look again at what the White King tells Alice."
+      },
+      {
+        "kind": "why",
+        "q": "Why does the King call it “the best of the joke”?",
+        "options": [
+          "It’s his own crown they’re fighting for",
+          "Neither of them can win",
+          "The fight is only pretend"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "“Yes, to be sure,” said the King: “and the best of the joke is, that it’s my crown all the while!",
+        "hint": "Look again at what the King says about the crown."
+      },
+      {
+        "kind": "think",
+        "q": "How do you serve Looking-glass cake?",
+        "options": [
+          "Hand it round first, and cut it afterwards",
+          "Cut it first, then hand it round",
+          "Eat it all yourself"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "“Hand it round first, and cut it afterwards.”",
+        "hint": "Look again at the part where Alice tries to cut the cake."
+      }
+    ],
+    "white-knight": [
+      {
+        "kind": "what",
+        "q": "Who rescued Alice from the Red Knight?",
+        "options": [
+          "The White Knight",
+          "The White King",
+          "Humpty Dumpty"
+        ],
+        "answer": 0,
+        "chapter": 8,
+        "evidence": "“Yes, but then I came and rescued her!” the White Knight replied.",
+        "hint": "Look again at the start of the chapter."
+      },
+      {
+        "kind": "why",
+        "q": "Why does the White Knight carry his little box upside-down?",
+        "options": [
+          "So the rain can’t get in",
+          "So it doesn’t fall off",
+          "So nobody can see inside"
+        ],
+        "answer": 0,
+        "chapter": 8,
+        "evidence": "You see I carry it upside-down, so that the rain can’t get in.”",
+        "hint": "Look again at the part about the deal box on his shoulder."
+      },
+      {
+        "kind": "think",
+        "q": "Alice says he hasn’t had much practice in riding. Why does she think so?",
+        "options": [
+          "He keeps tumbling off his horse",
+          "His horse is too small",
+          "He rides facing backwards"
+        ],
+        "answer": 0,
+        "chapter": 8,
+        "evidence": "“I’m afraid you’ve not had much practice in riding,” she ventured to say, as she was helping him up from his fifth tumble.",
+        "hint": "Look again at how many times he falls off."
+      }
+    ],
+    "queen-alice": [
+      {
+        "kind": "what",
+        "q": "What words were over the doorway Alice came to?",
+        "options": [
+          "Queen Alice",
+          "Looking-Glass House",
+          "Visitors Only"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "She was standing before an arched doorway over which were the words Queen Alice in large letters",
+        "hint": "Look again at the arched doorway."
+      },
+      {
+        "kind": "why",
+        "q": "Why did the leg of mutton bow to Alice?",
+        "options": [
+          "The Red Queen introduced them",
+          "It wanted to be eaten",
+          "Alice was now a Queen"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "“You look a little shy; let me introduce you to that leg of mutton,” said the Red Queen.",
+        "hint": "Look again at the feast."
+      },
+      {
+        "kind": "think",
+        "q": "Alice is afraid her crown might come off, but says she’ll manage it “in time”. What does that show?",
+        "options": [
+          "She is getting used to being a Queen",
+          "She doesn’t want to be a Queen",
+          "The crown is much too big"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "“and if I really am a Queen,” she said as she sat down again, “I shall be able to manage it quite well in time.”",
+        "hint": "Look again at the part when Alice first finds the crown."
+      }
+    ]
+  },
+  "vault": [
+    {
+      "q": "How did Alice become a Queen?",
+      "options": [
+        "She moved across the board like a pawn, to the Eighth Square",
+        "The White King gave her a crown",
+        "She won a race"
+      ],
+      "answer": 0,
+      "chapter": 2,
+      "evidence": "when you get to the Eighth Square you’ll be a Queen—”",
+      "hint": "Think about what the Red Queen told her at the start."
+    },
+    {
+      "q": "In Looking-glass land, what do you have to do to stay in the same place?",
+      "options": [
+        "Run as fast as you can",
+        "Stand very still",
+        "Walk backwards"
+      ],
+      "answer": 0,
+      "chapter": 2,
+      "evidence": "“Now, here, you see, it takes all the running you can do, to keep in the same place.",
+      "hint": "Think about the run with the Red Queen."
+    },
+    {
+      "q": "Which rule about jam does the White Queen have?",
+      "options": [
+        "Jam tomorrow and jam yesterday, but never jam today",
+        "Jam only on Sundays",
+        "No jam for Pawns"
+      ],
+      "answer": 0,
+      "chapter": 5,
+      "evidence": "“The rule is, jam tomorrow and jam yesterday—but never jam today.”",
+      "hint": "Think about the White Queen."
+    },
+    {
+      "q": "What did the Red Queen turn out to be when Alice shook her?",
+      "options": [
+        "A kitten",
+        "A chess piece made of wood",
+        "The White Queen"
+      ],
+      "answer": 0,
+      "chapter": 11,
+      "evidence": "—and it really was a kitten, after all.",
+      "hint": "Think about the very end."
+    },
+    {
+      "q": "What does Alice say about the Red King at the end?",
+      "options": [
+        "He was part of her dream — but she was part of his dream too",
+        "He was the one who woke her up",
+        "He was never in the story"
+      ],
+      "answer": 0,
+      "chapter": 12,
+      "evidence": "He was part of my dream, of course—but then I was part of his dream, too!",
+      "hint": "Think about the last chapter, “Which Dreamed It?”"
+    },
+    {
+      "q": "Who did Alice talk to about her adventure when she woke up?",
+      "options": [
+        "Kitty, her kitten",
+        "Her sister",
+        "The White Knight"
+      ],
+      "answer": 0,
+      "chapter": 12,
+      "evidence": "And you’ve been along with me, Kitty—all through the Looking-Glass world.",
+      "hint": "Think about the very last pages."
+    }
+  ]
+}

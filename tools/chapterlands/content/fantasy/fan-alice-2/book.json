@@ -1,0 +1,759 @@
+{
+  "id": "fan-alice-2",
+  "blurb": "Alice climbs through the mirror into a land laid out like a giant chessboard.",
+  "chapterWord": "Chapter",
+  "source": "Text: Through the Looking-Glass, and What Alice Found There by Lewis Carroll (1871), from the Standard Ebooks edition. Public domain.",
+  "theme": {
+    "palette": {
+      "ground": "#86c27a",
+      "ground2": "#f2efe6",
+      "wall": "#eef0fa",
+      "trim": "#2a2420",
+      "roof": "#c0392b",
+      "accent": "#c0392b",
+      "accent2": "#f4f4f4",
+      "wood": "#7a4e30",
+      "leaf": "#5aa24f",
+      "stone": "#d8d8d8",
+      "sky": "#b8d8f0",
+      "fog": "#eef2f8",
+      "water": "#5ab8e6",
+      "item": "#ffd23f"
+    },
+    "props": [
+      "hedge",
+      "flower",
+      "tree",
+      "statue",
+      "column",
+      "flower"
+    ],
+    "vaultProps": [
+      "column",
+      "statue",
+      "table",
+      "column"
+    ],
+    "edge": "hedge",
+    "hide": "bush",
+    "building": {
+      "wall": "#eef0fa",
+      "trim": "#2a2420",
+      "roof": "#c0392b",
+      "style": "house",
+      "sign": "Looking-Glass Land",
+      "h": 6
+    }
+  },
+  "streets": [
+    {
+      "id": "glass-house",
+      "name": "Looking-Glass House",
+      "chapters": [
+        1
+      ],
+      "template": "PUZZLE",
+      "game": "Mirror room",
+      "blurb": "Alice climbs through the glass over the mantelpiece into a room where everything goes the other way.",
+      "how": "Everything is back to front in here — even your feet (left is right!). Look round the room, then work out how to read the strange poem.",
+      "params": {
+        "invert": "x",
+        "room": {
+          "w": 14,
+          "d": 12
+        },
+        "objective": "Read the Looking-glass poem",
+        "clues": [
+          {
+            "object": "mirror",
+            "label": "The looking-glass",
+            "text": "Through the glass you can see your own drawing-room — the same, only the things go the other way."
+          },
+          {
+            "object": "book",
+            "label": "A book on the table",
+            "text": "YKCOWREBBAJ. ’sevot yhtils eht dna ,gillirb sawT’ — the words all go the wrong way!"
+          },
+          {
+            "object": "clock",
+            "label": "The clock",
+            "text": "The back of the clock has the face of a little old man, and it grins at you."
+          }
+        ],
+        "solve": {
+          "object": "book",
+          "label": "The Looking-glass book",
+          "type": "choice",
+          "prompt": "How can Alice read the poem?",
+          "options": [
+            "Hold it up to a looking-glass",
+            "Read it upside-down",
+            "Ask the White King to read it"
+          ],
+          "answer": 0,
+          "hint": "If the words go the wrong way, what would turn them round again?"
+        },
+        "done": "’Twas brillig, and the slithy toves did gyre and gimble in the wabe…"
+      }
+    },
+    {
+      "id": "live-flowers",
+      "name": "The Garden of Live Flowers",
+      "chapters": [
+        2
+      ],
+      "template": "CHASE",
+      "game": "Walk the other way",
+      "blurb": "Every path Alice takes towards the hill brings her straight back to the house.",
+      "how": "In this garden you get somewhere by walking AWAY from it: push backwards to go forwards! Get to the hill at the end.",
+      "params": {
+        "mode": "race",
+        "invert": "z",
+        "length": 80,
+        "width": 10,
+        "obstacles": [
+          "hurdle",
+          "block"
+        ],
+        "density": 0.35,
+        "time": 70,
+        "palette": {
+          "leaf": "#5aa24f",
+          "accent": "#e94f6a",
+          "accent2": "#f2d47a"
+        },
+        "objective": "Reach the hill (walk the other way!)",
+        "finishText": "THE HILL",
+        "done": "You reached the hill — by walking away from it!"
+      }
+    },
+    {
+      "id": "insects",
+      "name": "Looking-Glass Insects",
+      "chapters": [
+        3
+      ],
+      "template": "ARCADE",
+      "game": "The train ride",
+      "blurb": "Alice finds herself on a train full of very odd passengers, and a Gnat tells her about Looking-glass insects.",
+      "how": "Catch the Looking-glass insects as they drift past the window. Don’t catch the puffs of smoke!",
+      "params": {
+        "mode": "catch",
+        "target": 12,
+        "player": "🧺",
+        "bg": "sky",
+        "good": [
+          {
+            "icon": "🦋",
+            "name": "Bread-and-butter-fly"
+          },
+          {
+            "icon": "🐞",
+            "name": "Rocking-horse-fly"
+          },
+          {
+            "icon": "🐉",
+            "name": "Snap-dragon-fly"
+          }
+        ],
+        "bad": [
+          {
+            "icon": "💨",
+            "name": "smoke"
+          }
+        ],
+        "objective": "Catch 12 Looking-glass insects!",
+        "done": "The train jumps the brook — and you’re in the Fourth Square."
+      }
+    },
+    {
+      "id": "tweedles",
+      "name": "Tweedledum and Tweedledee",
+      "chapters": [
+        4
+      ],
+      "template": "PUZZLE",
+      "game": "Tell them apart",
+      "blurb": "Two fat little men stand under a tree, each with an arm round the other’s neck.",
+      "how": "They look exactly the same! Find the clues, then work out how to tell them apart.",
+      "params": {
+        "outdoors": true,
+        "room": {
+          "w": 16,
+          "d": 14
+        },
+        "objective": "Work out how to tell the twins apart",
+        "clues": [
+          {
+            "object": "statue",
+            "label": "The first twin",
+            "text": "Round and round, with a collar. Embroidered on it: DUM."
+          },
+          {
+            "object": "statue",
+            "label": "The second twin",
+            "text": "Exactly the same — except the collar says DEE. “Contrariwise!” he says."
+          },
+          {
+            "object": "tree",
+            "label": "The Red King",
+            "text": "The Red King is asleep under a tree, snoring. “He’s dreaming now,” says Tweedledee."
+          }
+        ],
+        "solve": {
+          "object": "sign",
+          "label": "Name the twins",
+          "type": "choice",
+          "prompt": "How can Alice tell Tweedledum and Tweedledee apart?",
+          "options": [
+            "By the names embroidered on their collars",
+            "Tweedledee is much taller",
+            "Only Tweedledum can talk"
+          ],
+          "answer": 0,
+          "hint": "Look closely at their collars."
+        },
+        "done": "“Contrariwise,” said Tweedledee. Of course."
+      }
+    },
+    {
+      "id": "wool-water",
+      "name": "Wool and Water",
+      "chapters": [
+        5
+      ],
+      "template": "ARCADE",
+      "game": "Row with the Sheep",
+      "blurb": "The knitting-needles turn into oars, and Alice is rowing a little boat while the Sheep keeps knitting.",
+      "how": "Steer the boat up the stream. Pick up the scented rushes and keep clear of the crabs!",
+      "params": {
+        "mode": "paddle",
+        "duration": 40,
+        "player": "🚣",
+        "good": [
+          {
+            "icon": "🌾",
+            "name": "rushes"
+          }
+        ],
+        "bad": [
+          {
+            "icon": "🦀",
+            "name": "crab"
+          },
+          {
+            "icon": "🪨",
+            "name": "rock"
+          }
+        ],
+        "objective": "“Feather! Feather!” — row up the stream",
+        "done": "The scented rushes melt away, but what fun it was."
+      }
+    },
+    {
+      "id": "humpty",
+      "name": "Humpty Dumpty",
+      "chapters": [
+        6
+      ],
+      "template": "CLIMB",
+      "game": "Up the wall",
+      "blurb": "Humpty Dumpty sits on top of a high, narrow wall, and he has a lot to say about words.",
+      "how": "Climb the ledges up Humpty Dumpty’s wall. At the top he has a question about words.",
+      "params": {
+        "height": 16,
+        "core": "wall",
+        "collect": {
+          "item": {
+            "name": "A word",
+            "icon": "💬"
+          },
+          "count": 5,
+          "label": "words"
+        },
+        "finale": {
+          "npc": {
+            "kind": "person",
+            "name": "Humpty Dumpty",
+            "look": {
+              "skin": "0xf6f0e0",
+              "shirt": "0xe9a23b",
+              "pants": "0x2f3a6a",
+              "hair": "0xf6f0e0"
+            }
+          },
+          "say": "“When I use a word, it means just what I choose it to mean — neither more nor less.” Now, a question for you.",
+          "solve": {
+            "type": "choice",
+            "prompt": "Humpty Dumpty says “glory” means “a nice knock-down argument”. What is wrong with that?",
+            "options": [
+              "Words have meanings everyone shares — you can’t just choose",
+              "Nothing — he is quite right",
+              "“Glory” really means a kind of cake"
+            ],
+            "answer": 0,
+            "hint": "If everyone chose their own meanings, could anyone understand anyone?"
+          }
+        },
+        "objective": "Climb up to Humpty Dumpty",
+        "done": "There’s glory for you!"
+      }
+    },
+    {
+      "id": "lion-unicorn",
+      "name": "The Lion and the Unicorn",
+      "chapters": [
+        7
+      ],
+      "template": "ARCADE",
+      "game": "Plum-cake",
+      "blurb": "The Lion and the Unicorn are fighting for the crown, and the crowd is drumming them out of town.",
+      "how": "Catch the slices of plum-cake for the crowd — but not the drums!",
+      "params": {
+        "mode": "catch",
+        "target": 12,
+        "player": "🍽️",
+        "good": [
+          {
+            "icon": "🍰",
+            "name": "plum-cake"
+          },
+          {
+            "icon": "🍞",
+            "name": "white bread"
+          }
+        ],
+        "bad": [
+          {
+            "icon": "🥁",
+            "name": "drum"
+          }
+        ],
+        "objective": "Catch 12 slices for the crowd",
+        "done": "Hand it round first, and cut it afterwards!"
+      }
+    },
+    {
+      "id": "white-knight",
+      "name": "The White Knight",
+      "chapters": [
+        8
+      ],
+      "template": "CHASE",
+      "game": "Ride with the Knight",
+      "blurb": "The White Knight rescues Alice, then keeps tumbling off his horse — and he has invented a great many things.",
+      "how": "Follow the White Knight through the forest and catch his inventions as they fall off his saddle.",
+      "params": {
+        "mode": "follow",
+        "length": 100,
+        "obstacles": [
+          "hurdle",
+          "block"
+        ],
+        "density": 0.4,
+        "target": {
+          "kind": "person",
+          "name": "the White Knight",
+          "look": {
+            "shirt": "0xd8d8d8",
+            "pants": "0xb8b8b8",
+            "skin": "0xf0c08a",
+            "hair": "0xe8e8e8"
+          }
+        },
+        "collect": {
+          "item": {
+            "name": "One of the Knight’s inventions",
+            "icon": "🪤"
+          },
+          "count": 6,
+          "label": "inventions"
+        },
+        "objective": "Follow the White Knight to the edge of the wood",
+        "finishText": "THE BROOK",
+        "done": "“You’ve only a few yards to go — down the hill and over that little brook, and then you’ll be a Queen.”"
+      }
+    },
+    {
+      "id": "queen-alice",
+      "name": "Queen Alice",
+      "chapters": [
+        9
+      ],
+      "template": "BUILD",
+      "game": "Set the feast",
+      "blurb": "Alice is a Queen at last, and there’s a feast — in Looking-glass style.",
+      "how": "Carry each thing to its place on the feast table. Read the labels — and remember, everything here goes the other way!",
+      "params": {
+        "area": [
+          30,
+          30
+        ],
+        "floor": "stone",
+        "objective": "Set Queen Alice’s feast table",
+        "items": [
+          {
+            "id": "mutton",
+            "name": "the leg of mutton",
+            "icon": "🍖"
+          },
+          {
+            "id": "pudding",
+            "name": "the pudding",
+            "icon": "🍮"
+          },
+          {
+            "id": "crown",
+            "name": "the crown",
+            "icon": "👑"
+          },
+          {
+            "id": "glasses",
+            "name": "the glasses",
+            "icon": "🍷"
+          },
+          {
+            "id": "candles",
+            "name": "the candles",
+            "icon": "🕯️"
+          }
+        ],
+        "slots": [
+          {
+            "id": "s1",
+            "name": "Mutton dish",
+            "accepts": [
+              "mutton"
+            ]
+          },
+          {
+            "id": "s2",
+            "name": "Pudding plate",
+            "accepts": [
+              "pudding"
+            ]
+          },
+          {
+            "id": "s3",
+            "name": "Queen’s chair",
+            "accepts": [
+              "crown"
+            ]
+          },
+          {
+            "id": "s4",
+            "name": "For drinking",
+            "accepts": [
+              "glasses"
+            ]
+          },
+          {
+            "id": "s5",
+            "name": "For light",
+            "accepts": [
+              "candles"
+            ]
+          }
+        ],
+        "hint": "Read the label on each spot.",
+        "done": "“Alice — Mutton; Mutton — Alice.” The feast is ready!"
+      }
+    }
+  ],
+  "skyRun": {
+    "id": "sky",
+    "name": "Humpty Dumpty's High Wall",
+    "template": "CLIMB",
+    "game": "Sky Run",
+    "blurb": "Humpty Dumpty’s wall, built up and up high above the chessboard countryside.",
+    "how": "Climb the ledges up the great wall. Some of them slide — don’t have a great fall!",
+    "params": {
+      "height": 24,
+      "core": "wall",
+      "moving": 2,
+      "collect": {
+        "item": {
+          "name": "A chess piece",
+          "icon": "♟️"
+        },
+        "count": 6,
+        "label": "pieces"
+      },
+      "palette": {
+        "ground": "#86c27a",
+        "ground2": "#f2efe6"
+      },
+      "goalIcon": "👑",
+      "objective": "Climb to the top of the high wall",
+      "done": "You can see the whole chessboard from up here!"
+    }
+  },
+  "npcs": [
+    {
+      "id": "white-knight",
+      "name": "the White Knight",
+      "kind": "person",
+      "look": {
+        "shirt": "0xd8d8d8",
+        "pants": "0xb8b8b8",
+        "hair": "0xe8e8e8"
+      },
+      "at": [
+        -8,
+        -6.5
+      ],
+      "idle": "It’s my own invention.",
+      "thanks": "All six! I shall invent something to carry them in."
+    }
+  ],
+  "sideQuest": {
+    "id": "fan-alice-2-inventions",
+    "title": "The White Knight's Inventions",
+    "giver": "white-knight",
+    "steps": [
+      {
+        "type": "talk",
+        "params": {
+          "npc": "white-knight"
+        },
+        "text": "Talk to the White Knight outside Looking-Glass Land.",
+        "say": "I keep falling off my horse, and every time I do, one of my inventions drops out of the saddle. There are six of them about. Would you find them for me?"
+      },
+      {
+        "type": "collect",
+        "params": {
+          "items": [
+            {
+              "id": "lg-box",
+              "name": "The upside-down box",
+              "shape": "gem",
+              "colour": "#c9a27a",
+              "at": [
+                8.5,
+                -6
+              ]
+            },
+            {
+              "id": "lg-hive",
+              "name": "The beehive",
+              "shape": "gem",
+              "colour": "#f2b705",
+              "at": [
+                -9,
+                3
+              ]
+            },
+            {
+              "id": "lg-trap",
+              "name": "The mouse-trap",
+              "shape": "gem",
+              "colour": "#7a4e30",
+              "at": [
+                9,
+                4
+              ]
+            },
+            {
+              "id": "lg-anklets",
+              "name": "An anklet against sharks",
+              "shape": "gem",
+              "colour": "#9aa3ad",
+              "at": [
+                0,
+                7
+              ]
+            },
+            {
+              "id": "lg-pudding",
+              "name": "A pudding recipe",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                -4,
+                -9
+              ]
+            },
+            {
+              "id": "lg-helmet",
+              "name": "The sugar-loaf helmet",
+              "shape": "gem",
+              "colour": "#e8e8e8",
+              "at": [
+                4,
+                -9
+              ]
+            }
+          ]
+        },
+        "text": "Find the White Knight’s six inventions around Looking-Glass Land."
+      },
+      {
+        "type": "talk",
+        "params": {
+          "npc": "white-knight"
+        },
+        "text": "Give the inventions back to the White Knight.",
+        "say": "Splendid! You see, it’s my own invention — every one of them."
+      }
+    ],
+    "reward": {
+      "coins": 30
+    }
+  },
+  "vault": {
+    "name": "The Great Chessboard",
+    "blurb": "an escape room about the whole Looking-glass game, from Pawn to Queen.",
+    "intro": "A huge chessboard fills the room. To win the game you must move from Pawn to Queen — by showing you know the whole story.",
+    "room": {
+      "wall": "#eef0fa",
+      "floor": "#2a2420",
+      "rug": "#c0392b"
+    },
+    "stations": [
+      {
+        "id": "squares",
+        "object": "board",
+        "label": "The eight squares",
+        "lock": "Lock 1 · Pawn to Queen",
+        "text": "Alice crossed the board square by square. Put her adventures back in order.",
+        "lesson": "Like a pawn in chess, Alice moved forward square by square until she reached the Eighth Square — and became a Queen.",
+        "solve": {
+          "type": "order",
+          "prompt": "First at the top.",
+          "items": [
+            "Through the looking-glass",
+            "The garden of live flowers",
+            "The railway carriage",
+            "Tweedledum and Tweedledee",
+            "Rowing with the Sheep",
+            "Humpty Dumpty on his wall",
+            "The White Knight",
+            "Queen Alice"
+          ],
+          "hint": "She starts through the glass and ends as Queen Alice."
+        }
+      },
+      {
+        "id": "pieces",
+        "object": "box",
+        "label": "The box of pieces",
+        "lock": "Lock 2 · Who’s who",
+        "text": "The chess pieces have fallen out of their box. Match each one to what they did.",
+        "lesson": "Every piece on the board had its own part to play in the game.",
+        "solve": {
+          "type": "match",
+          "prompt": "Match each one.",
+          "pairs": [
+            [
+              "The Red Queen",
+              "Ran faster and faster to stay in the same place"
+            ],
+            [
+              "The White Queen",
+              "Jam tomorrow and jam yesterday"
+            ],
+            [
+              "The White Knight",
+              "Kept falling off his horse"
+            ],
+            [
+              "Humpty Dumpty",
+              "Made words mean what he chose"
+            ]
+          ],
+          "hint": "Think about where Alice met each one."
+        }
+      },
+      {
+        "id": "dream",
+        "object": "mirror",
+        "label": "The looking-glass",
+        "text": "Written in mirror-writing on the glass: “Which do you think it was — Alice, or the Red King, who dreamed it?” It isn’t a lock. The book never tells. What do you think?"
+      }
+    ],
+    "quiz": {
+      "object": "book",
+      "label": "The White King’s memorandum-book",
+      "lock": "Lock 3 · Checkmate",
+      "lesson": "Checkmate! You know the whole Looking-glass story."
+    },
+    "openText": "Checkmate! The board shakes, the Red Queen shrinks — and turns into a kitten.",
+    "outro": "It really was a kitten, after all. But which dreamed it?"
+  },
+  "unlock": {
+    "badges": [
+      {
+        "id": "through-the-glass",
+        "name": "Through the Glass",
+        "icon": "🪞",
+        "desc": "Finish both Alice books.",
+        "requires": [
+          "fan-alice-1",
+          "fan-alice-2"
+        ]
+      }
+    ]
+  },
+  "chapterFiles": [
+    {
+      "n": 1,
+      "file": "01.md",
+      "title": "Chapter 1: Looking-Glass House"
+    },
+    {
+      "n": 2,
+      "file": "02.md",
+      "title": "Chapter 2: The Garden of Live Flowers"
+    },
+    {
+      "n": 3,
+      "file": "03.md",
+      "title": "Chapter 3: Looking-Glass Insects"
+    },
+    {
+      "n": 4,
+      "file": "04.md",
+      "title": "Chapter 4: Tweedledum and Tweedledee"
+    },
+    {
+      "n": 5,
+      "file": "05.md",
+      "title": "Chapter 5: Wool and Water"
+    },
+    {
+      "n": 6,
+      "file": "06.md",
+      "title": "Chapter 6: Humpty Dumpty"
+    },
+    {
+      "n": 7,
+      "file": "07.md",
+      "title": "Chapter 7: The Lion and the Unicorn"
+    },
+    {
+      "n": 8,
+      "file": "08.md",
+      "title": "Chapter 8: “It’s My Own Invention”"
+    },
+    {
+      "n": 9,
+      "file": "09.md",
+      "title": "Chapter 9: Queen Alice"
+    },
+    {
+      "n": 10,
+      "file": "10.md",
+      "title": "Chapter 10: Shaking"
+    },
+    {
+      "n": 11,
+      "file": "11.md",
+      "title": "Chapter 11: Waking"
+    },
+    {
+      "n": 12,
+      "file": "12.md",
+      "title": "Chapter 12: Which Dreamed It?"
+    }
+  ]
+}

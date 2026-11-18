@@ -20,6 +20,7 @@ TERMS = [  # whole-word, case-insensitive. Hits are listed for a human to judge.
     r'wops?', r'spics?', r'wogs?', r'golliwogs?', r'hottentots?', r'kaffirs?', r'barbarians?', r'heathens?', r'natives?',
     r'cripples?', r'crippled', r'idiots?', r'imbeciles?', r'morons?', r'retard\w*', r'lunatics?', r'dwarf\w*', r'midgets?',
     r'deformed', r'disabled', r'dumb', r'lame', r'queer', r'fag\w*', r'spinsters?', r'wench\w*', r'harlots?',
+    r'turks?', r'orientals?', r'eskimos?', r'red indians?', r'blacks', r'coloured', r'darkies', r'cannibals?', r'slaves?', r'oriental',
 ]
 PG = re.compile(r'gutenberg|this ebook|\be-?texts?\b|\blicen[cs]e\b|www\.', re.I)
 
