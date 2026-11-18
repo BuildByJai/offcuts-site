@@ -1,0 +1,531 @@
+{
+  "book": "fan-oz-1",
+  "_about": "answer = index of the right option (shuffled on screen); evidence = supporting sentence, review only; hint = gentle \"look again\" line.",
+  "streets": {
+    "cyclone": [
+      {
+        "kind": "what",
+        "q": "What happened to Dorothy’s house in the cyclone?",
+        "options": [
+          "It whirled round and rose slowly into the air",
+          "It sank into the ground",
+          "It blew into a river"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "The house whirled around two or three times and rose slowly through the air.",
+        "hint": "Look again at the part where the cyclone arrives."
+      },
+      {
+        "kind": "why",
+        "q": "Why were the Munchkins so grateful to Dorothy?",
+        "options": [
+          "Her house had landed on the Wicked Witch of the East and set them free",
+          "She brought them food",
+          "She found their lost dog"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "We are so grateful to you for having killed the Wicked Witch of the East, and for setting our people free from bondage.”",
+        "hint": "Look again at what the little woman says to Dorothy."
+      },
+      {
+        "kind": "think",
+        "q": "Dorothy is puzzled when the Munchkins call her a sorceress. Why?",
+        "options": [
+          "She hadn’t meant to do anything — the house fell by itself",
+          "She knew lots of magic",
+          "She didn’t like the word"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "What could the little woman possibly mean by calling her a sorceress, and saying she had killed the Wicked Witch of the East?",
+        "hint": "Look again at how Dorothy feels about what happened."
+      }
+    ],
+    "scarecrow": [
+      {
+        "kind": "what",
+        "q": "Where did Dorothy find the Scarecrow?",
+        "options": [
+          "High on a pole in a cornfield",
+          "In a barn",
+          "On the yellow brick road"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "There was a great cornfield beyond the fence, and not far away she saw a Scarecrow, placed high on a pole to keep the birds from the ripe corn.",
+        "hint": "Look again at the field beyond the fence."
+      },
+      {
+        "kind": "why",
+        "q": "Why did the Scarecrow want to go to the Emerald City?",
+        "options": [
+          "To ask Oz for some brains",
+          "To find a new pole",
+          "To scare the birds there"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "“Do you think,” he asked, “if I go to the Emerald City with you, that Oz would give me some brains?”",
+        "hint": "Look again at what the Scarecrow asks Dorothy."
+      },
+      {
+        "kind": "think",
+        "q": "Why does the Scarecrow believe he has no brains?",
+        "options": [
+          "Because he is only stuffed with straw",
+          "Because someone told him so",
+          "Because he can’t read"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "You see, I am stuffed, so I have no brains at all,” he answered sadly.",
+        "hint": "Look again at what he says about being stuffed."
+      }
+    ],
+    "tin-woodman": [
+      {
+        "kind": "what",
+        "q": "What did the Tin Woodman ask Dorothy to fetch?",
+        "options": [
+          "An oilcan from his cottage",
+          "His axe",
+          "A blanket"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "“Get an oilcan and oil my joints,” he answered.",
+        "hint": "Look again at what he asks for first."
+      },
+      {
+        "kind": "why",
+        "q": "Why couldn’t the Tin Woodman move?",
+        "options": [
+          "His joints had rusted",
+          "He was asleep",
+          "His feet were stuck in mud"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "“They are rusted so badly that I cannot move them at all; if I am well oiled I shall soon be all right again.",
+        "hint": "Look again at what he says about his joints."
+      },
+      {
+        "kind": "think",
+        "q": "The Tin Woodman would rather have a heart than brains. Why?",
+        "options": [
+          "He had had both, and the heart mattered more to him",
+          "Hearts are easier to find",
+          "Oz only had hearts left"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "“But once I had brains, and a heart also; so, having tried them both, I should much rather have a heart.”",
+        "hint": "Look again at his talk with the Scarecrow."
+      }
+    ],
+    "lion": [
+      {
+        "kind": "what",
+        "q": "What did Dorothy call the Lion when he tried to bite Toto?",
+        "options": [
+          "A big coward",
+          "A brave king",
+          "A silly cat"
+        ],
+        "answer": 0,
+        "chapter": 6,
+        "evidence": "“You are nothing but a big coward.”",
+        "hint": "Look again at what Dorothy says when she slaps the Lion."
+      },
+      {
+        "kind": "why",
+        "q": "Why did the Lion think he was a coward?",
+        "options": [
+          "He roared to scare others, but would run away if they fought back",
+          "He had lost his roar",
+          "He was afraid of Dorothy"
+        ],
+        "answer": 0,
+        "chapter": 6,
+        "evidence": "If the elephants and the tigers and the bears had ever tried to fight me, I should have run myself—I’m such a coward; but just as soon as they hear me roar they all try to get away from me, and of course I let them go.”",
+        "hint": "Look again at the Lion’s explanation."
+      },
+      {
+        "kind": "think",
+        "q": "When the friends reach a wide, deep ditch, what do they realise?",
+        "options": [
+          "They must find a way to jump it or stop where they are",
+          "They can walk round it easily",
+          "The ditch is full of water to swim in"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "Therefore, if we cannot jump over it, we must stop where we are.”",
+        "hint": "Look again at the Scarecrow thinking about the ditch."
+      }
+    ],
+    "poppies": [
+      {
+        "kind": "what",
+        "q": "What happened to Dorothy in the poppy field?",
+        "options": [
+          "She fell fast asleep",
+          "She picked a bouquet",
+          "She got lost"
+        ],
+        "answer": 0,
+        "chapter": 8,
+        "evidence": "Her eyes closed in spite of herself and she forgot where she was and fell among the poppies, fast asleep.",
+        "hint": "Look again at the middle of the meadow."
+      },
+      {
+        "kind": "why",
+        "q": "Why do the poppies make people fall asleep?",
+        "options": [
+          "Their scent is so powerful that anyone who breathes it falls asleep",
+          "They sing lullabies",
+          "They are very soft to lie on"
+        ],
+        "answer": 0,
+        "chapter": 8,
+        "evidence": "Now it is well known that when there are many of these flowers together their odor is so powerful that anyone who breathes it falls asleep",
+        "hint": "Look again at what the story says about many poppies together."
+      },
+      {
+        "kind": "think",
+        "q": "The Tin Woodman saved the Queen of the Field Mice — and then the mice saved the Lion. What does this show?",
+        "options": [
+          "Kindness can come back to help you",
+          "Mice are stronger than lions",
+          "You should never help strangers"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "“Therefore you have done a great deed, as well as a brave one, in saving my life,” added the Queen.",
+        "hint": "Look again at what the Queen says to the Tin Woodman."
+      }
+    ],
+    "emerald-city": [
+      {
+        "kind": "what",
+        "q": "What must everyone in the Emerald City wear?",
+        "options": [
+          "Spectacles",
+          "Green hats",
+          "Silver shoes"
+        ],
+        "answer": 0,
+        "chapter": 10,
+        "evidence": "Even those who live in the City must wear spectacles night and day.",
+        "hint": "Look again at what the Guardian of the Gate gives them."
+      },
+      {
+        "kind": "why",
+        "q": "Why does the Guardian say they must wear spectacles?",
+        "options": [
+          "Otherwise the brightness of the Emerald City would blind them",
+          "To see in the dark",
+          "To look smart for the Wizard"
+        ],
+        "answer": 0,
+        "chapter": 10,
+        "evidence": "“Because if you did not wear spectacles the brightness and glory of the Emerald City would blind you.",
+        "hint": "Look again at the Guardian’s reason."
+      },
+      {
+        "kind": "think",
+        "q": "Dorothy saw Oz as a Head, but the Scarecrow saw a lovely Lady. What does that suggest?",
+        "options": [
+          "Oz might not be what he seems",
+          "Dorothy had bad eyesight",
+          "There were two wizards"
+        ],
+        "answer": 0,
+        "chapter": 11,
+        "evidence": "Dorothy was surprised to find that the Great Wizard was not a Head, as she had seen him, but a lovely Lady.",
+        "hint": "Look again at what the Scarecrow tells the others."
+      }
+    ],
+    "witch": [
+      {
+        "kind": "what",
+        "q": "What did Dorothy throw over the Wicked Witch?",
+        "options": [
+          "A bucket of water",
+          "A bag of flour",
+          "Her sunbonnet"
+        ],
+        "answer": 0,
+        "chapter": 12,
+        "evidence": "This made Dorothy so very angry that she picked up the bucket of water that stood near and dashed it over the Witch, wetting her from head to foot.",
+        "hint": "Look again at what made Dorothy so angry."
+      },
+      {
+        "kind": "why",
+        "q": "Why did the Witch never come near Dorothy when she was bathing?",
+        "options": [
+          "She was afraid of water",
+          "She didn’t like soap",
+          "She was busy with her wolves"
+        ],
+        "answer": 0,
+        "chapter": 12,
+        "evidence": "Indeed, the old Witch never touched water, nor ever let water touch her in any way.",
+        "hint": "Look again at what the Witch feared."
+      },
+      {
+        "kind": "think",
+        "q": "The Witch was too afraid of the dark to take Dorothy’s shoes at night. What does that show?",
+        "options": [
+          "Even the Wicked Witch had fears",
+          "The Witch didn’t want the shoes",
+          "Dorothy’s room had no door"
+        ],
+        "answer": 0,
+        "chapter": 12,
+        "evidence": "The Witch was too much afraid of the dark to dare go in Dorothy’s room at night to take the shoes",
+        "hint": "Look again at what kept the Witch away."
+      }
+    ],
+    "monkeys": [
+      {
+        "kind": "what",
+        "q": "What did Dorothy find in the Witch’s cupboard?",
+        "options": [
+          "The Golden Cap",
+          "A broomstick",
+          "A map of Oz"
+        ],
+        "answer": 0,
+        "chapter": 13,
+        "evidence": "Dorothy went to the Witch’s cupboard to fill her basket with food for the journey, and there she saw the Golden Cap.",
+        "hint": "Look again at Dorothy packing for the journey."
+      },
+      {
+        "kind": "why",
+        "q": "Why did the Winkies go to a tall tree?",
+        "options": [
+          "The Winged Monkeys had tossed the Scarecrow’s clothes into it",
+          "To pick fruit",
+          "To build a house"
+        ],
+        "answer": 0,
+        "chapter": 13,
+        "evidence": "So she called the Winkies to help her, and they walked all that day and part of the next until they came to the tall tree in the branches of which the Winged Monkeys had tossed the Scarecrow’s clothes.",
+        "hint": "Look again at the rescue of the Scarecrow."
+      },
+      {
+        "kind": "think",
+        "q": "When the friends were lost, why was using the Golden Cap a clever idea?",
+        "options": [
+          "The Winged Monkeys could carry them to the Emerald City",
+          "It would make them invisible",
+          "It would bring the Witch back"
+        ],
+        "answer": 0,
+        "chapter": 14,
+        "evidence": "Then she noticed Dorothy’s Golden Cap, and said, “Why don’t you use the charm of the Cap, and call the Winged Monkeys to you?",
+        "hint": "Look again at what the Queen of the Mice suggests."
+      }
+    ],
+    "wizard": [
+      {
+        "kind": "what",
+        "q": "Who was standing behind the screen?",
+        "options": [
+          "A little old man with a bald head",
+          "The Wicked Witch",
+          "A giant"
+        ],
+        "answer": 0,
+        "chapter": 15,
+        "evidence": "For they saw, standing in just the spot the screen had hidden, a little old man, with a bald head and a wrinkled face, who seemed to be as much surprised as they were.",
+        "hint": "Look again at what Toto knocks over."
+      },
+      {
+        "kind": "why",
+        "q": "What did Oz mix together to make the Scarecrow’s “brains”?",
+        "options": [
+          "Bran, with pins and needles",
+          "Straw and glue",
+          "Emeralds and gold"
+        ],
+        "answer": 0,
+        "chapter": 16,
+        "evidence": "Then he entered the back room and took up a measure of bran, which he mixed with a great many pins and needles.",
+        "hint": "Look again at the Scarecrow’s turn with the Wizard."
+      },
+      {
+        "kind": "think",
+        "q": "Oz tells the Lion that all he needs is confidence in himself. What does he mean?",
+        "options": [
+          "The Lion already had courage — he just had to believe it",
+          "The Lion needed a magic drink",
+          "Nobody can ever be brave"
+        ],
+        "answer": 0,
+        "chapter": 15,
+        "evidence": "“All you need is confidence in yourself.",
+        "hint": "Look again at what Oz says when the Lion asks for courage."
+      }
+    ],
+    "balloon": [
+      {
+        "kind": "what",
+        "q": "What is the balloon made of?",
+        "options": [
+          "Silk coated with glue",
+          "Paper",
+          "Leather"
+        ],
+        "answer": 0,
+        "chapter": 17,
+        "evidence": "“A balloon,” said Oz, “is made of silk, which is coated with glue to keep the gas in it.",
+        "hint": "Look again at how Oz explains the balloon."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Dorothy miss the balloon?",
+        "options": [
+          "She went to find Toto, who had run off to bark at a kitten",
+          "She was asleep",
+          "She didn’t want to leave"
+        ],
+        "answer": 0,
+        "chapter": 17,
+        "evidence": "Toto had run into the crowd to bark at a kitten, and Dorothy at last found him.",
+        "hint": "Look again at the moment the balloon is ready."
+      },
+      {
+        "kind": "think",
+        "q": "How did Oz first arrive in the Land of Oz?",
+        "options": [
+          "In a balloon",
+          "In a cyclone",
+          "On a Winged Monkey"
+        ],
+        "answer": 0,
+        "chapter": 17,
+        "evidence": "“You see, when I came to this country it was in a balloon.",
+        "hint": "Look again at Oz explaining his plan."
+      }
+    ],
+    "south": [
+      {
+        "kind": "what",
+        "q": "What were the people of the China Country made of?",
+        "options": [
+          "China, even their clothes",
+          "Wood",
+          "Straw"
+        ],
+        "answer": 0,
+        "chapter": 20,
+        "evidence": "And, strangest of all, these people were all made of china, even to their clothes, and were so small that the tallest of them was no higher than Dorothy’s knee.",
+        "hint": "Look again at the dainty country behind the wall."
+      },
+      {
+        "kind": "why",
+        "q": "Why couldn’t the travellers fight their way past the Hammer-Heads?",
+        "options": [
+          "The Hammer-Heads could shoot out their heads",
+          "They were too tall",
+          "They were invisible"
+        ],
+        "answer": 0,
+        "chapter": 22,
+        "evidence": "Dorothy ran down and helped the Scarecrow to his feet, and the Lion came up to her, feeling rather bruised and sore, and said, “It is useless to fight people with shooting heads; no one can withstand them.”",
+        "hint": "Look again at the hill of the Hammer-Heads."
+      },
+      {
+        "kind": "think",
+        "q": "Only the first row of trees fought them. What did the travellers decide those trees were like?",
+        "options": [
+          "Policemen guarding the forest",
+          "Angry giants",
+          "Soldiers of the Witch"
+        ],
+        "answer": 0,
+        "chapter": 19,
+        "evidence": "The other trees of the forest did nothing to keep them back, so they made up their minds that only the first row of trees could bend down their branches, and that probably these were the policemen of the forest",
+        "hint": "Look again at what happens after the Woodman chops the branch."
+      }
+    ]
+  },
+  "vault": [
+    {
+      "q": "How do the Silver Shoes work?",
+      "options": [
+        "Knock the heels together three times and say where to go",
+        "Click your fingers",
+        "Say “Oz” backwards"
+      ],
+      "answer": 0,
+      "chapter": 23,
+      "evidence": "All you have to do is to knock the heels together three times and command the shoes to carry you wherever you wish to go.”",
+      "hint": "Think about what Glinda tells Dorothy."
+    },
+    {
+      "q": "Glinda says Dorothy could have gone home sooner. When?",
+      "options": [
+        "On her very first day in Oz",
+        "Only after meeting the Wizard",
+        "Never — the shoes only worked at the end"
+      ],
+      "answer": 0,
+      "chapter": 23,
+      "evidence": "“If you had known their power you could have gone back to your Aunt Em the very first day you came to this country.”",
+      "hint": "Think about when Dorothy got the shoes."
+    },
+    {
+      "q": "Why was the Scarecrow glad Dorothy hadn’t gone home on the first day?",
+      "options": [
+        "He would never have got his wonderful brains",
+        "He didn’t like Kansas",
+        "He wanted the shoes"
+      ],
+      "answer": 0,
+      "chapter": 23,
+      "evidence": "“But then I should not have had my wonderful brains!” cried the Scarecrow.",
+      "hint": "Think about what the journey gave each friend."
+    },
+    {
+      "q": "What does Oz say is the only thing that brings knowledge?",
+      "options": [
+        "Experience",
+        "Magic",
+        "Bran and pins"
+      ],
+      "answer": 0,
+      "chapter": 15,
+      "evidence": "Experience is the only thing that brings knowledge, and the longer you are on earth the more experience you are sure to get.”",
+      "hint": "Think about what Oz tells the Scarecrow."
+    },
+    {
+      "q": "What did Dorothy do with the Golden Cap at the end?",
+      "options": [
+        "Gave it to Glinda",
+        "Threw it away",
+        "Took it home to Kansas"
+      ],
+      "answer": 0,
+      "chapter": 23,
+      "evidence": "“Willingly!” exclaimed Dorothy; “indeed, it is of no use to me now, and when you have it you can command the Winged Monkeys three times.”",
+      "hint": "Think about what Glinda asks for."
+    },
+    {
+      "q": "What did Dorothy say when she got home?",
+      "options": [
+        "“I’m so glad to be at home again!”",
+        "“I want to go back to Oz!”",
+        "“Where is the Wizard?”"
+      ],
+      "answer": 0,
+      "chapter": 24,
+      "evidence": "I’m so glad to be at home again!”",
+      "hint": "Think about the very last chapter."
+    }
+  ]
+}

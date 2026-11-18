@@ -1,0 +1,573 @@
+{
+  "id": "mys-39steps",
+  "blurb": "Richard Hannay is on the run across Scotland with a dead man’s notebook full of secrets.",
+  "chapterWord": "Chapter",
+  "source": "The Thirty-Nine Steps by John Buchan (1915). Read it in your own copy, or borrow it free from your library.",
+  "theme": {
+    "palette": {
+      "ground": "#8a7a5a",
+      "ground2": "#7a6e4e",
+      "wall": "#d8cfbf",
+      "trim": "#3a3a3a",
+      "roof": "#5a4a6a",
+      "accent": "#c9a24a",
+      "accent2": "#2f4a7a",
+      "wood": "#5a3a24",
+      "leaf": "#6a5a7a",
+      "stone": "#9a948a",
+      "sky": "#9aaabb",
+      "fog": "#b8c0c8",
+      "water": "#4a6a8a",
+      "item": "#ffd23f"
+    },
+    "props": [
+      "rock",
+      "bush",
+      "fence",
+      "rock",
+      "cart",
+      "tree"
+    ],
+    "vaultProps": [
+      "bookcase",
+      "table",
+      "chair",
+      "statue"
+    ],
+    "edge": "fence",
+    "hide": "bush",
+    "building": {
+      "wall": "#d8cfbf",
+      "trim": "#3a3a3a",
+      "roof": "#5a4a6a",
+      "style": "house",
+      "sign": "The Thirty-Nine Steps",
+      "h": 6
+    }
+  },
+  "streets": [
+    {
+      "id": "man-who-died",
+      "name": "The Man Who Died",
+      "chapters": [
+        1
+      ],
+      "template": "PUZZLE",
+      "game": "Scudder’s cipher",
+      "blurb": "A frightened neighbour, Scudder, hides in Hannay’s flat — and leaves behind a little notebook in code.",
+      "how": "Look round the flat for clues, then crack the code on Scudder’s notebook lock.",
+      "params": {
+        "room": {
+          "w": 14,
+          "d": 12
+        },
+        "objective": "Crack Scudder’s notebook code",
+        "clues": [
+          {
+            "object": "board",
+            "label": "The chessboard",
+            "text": "Every night Scudder and Hannay played chess. Scudder liked puzzles: the first number is the number of pieces left on the board — 7."
+          },
+          {
+            "object": "clock",
+            "label": "The clock",
+            "text": "The clock has stopped. Its hands point to 3."
+          },
+          {
+            "object": "window",
+            "label": "The window",
+            "text": "Scudder kept watching the street from here. On the glass he has drawn a little figure 9."
+          }
+        ],
+        "solve": {
+          "object": "book",
+          "label": "The notebook lock",
+          "type": "code",
+          "prompt": "Chessboard, clock, window — in that order.",
+          "answer": "739",
+          "hint": "Each clue gives one number."
+        }
+      }
+    },
+    {
+      "id": "milkman",
+      "name": "The Milkman",
+      "chapters": [
+        2
+      ],
+      "template": "SNEAK",
+      "game": "Leave in disguise",
+      "blurb": "Hannay must slip out of his flat past the men watching it.",
+      "how": "Dressed as the milkman, get past the watchers to the street corner. Hide behind the walls and in the doorways.",
+      "params": {
+        "area": [
+          34,
+          44
+        ],
+        "floor": "stone",
+        "watchers": 3,
+        "hides": 6,
+        "goal": {
+          "name": "the street corner",
+          "icon": "🥛"
+        },
+        "watcher": {
+          "kind": "person",
+          "name": "a watcher",
+          "look": {
+            "shirt": "0x3a3a46"
+          }
+        },
+        "palette": {
+          "ground": "#9a9a92",
+          "ground2": "#8a8a84"
+        },
+        "objective": "Get past the watchers to the corner"
+      }
+    },
+    {
+      "id": "innkeeper",
+      "name": "The Literary Innkeeper",
+      "chapters": [
+        3
+      ],
+      "template": "CHASE",
+      "game": "Across the moor",
+      "blurb": "Off the train and onto the Galloway moors, with a monoplane searching the sky.",
+      "how": "Run across the moor — leap the burns and dodge the rocks before the aeroplane spots you.",
+      "params": {
+        "mode": "race",
+        "length": 110,
+        "obstacles": [
+          "hurdle",
+          "block",
+          "gap"
+        ],
+        "density": 0.45,
+        "time": 80,
+        "palette": {
+          "ground": "#8a7a5a",
+          "ground2": "#7a6e4e",
+          "leaf": "#6a5a7a",
+          "sky": "#9aaabb",
+          "fog": "#b8c0c8",
+          "stone": "#9a948a"
+        },
+        "objective": "Cross the moor before you’re spotted",
+        "finishText": "THE INN"
+      }
+    },
+    {
+      "id": "candidate",
+      "name": "The Radical Candidate",
+      "chapters": [
+        4
+      ],
+      "template": "ARCADE",
+      "game": "The surprise speech",
+      "blurb": "Hannay is pushed onto a platform to make a speech at a meeting — with no warning at all.",
+      "how": "Keep to the rhythm of the speech: hit each word as it reaches the line.",
+      "params": {
+        "mode": "rhythm",
+        "duration": 35,
+        "bpm": 90,
+        "icons": [
+          "🗣️",
+          "📢",
+          "👏"
+        ],
+        "bg": "hall",
+        "objective": "Get through the speech!",
+        "done": "Loud cheers! Nobody guessed you were on the run."
+      }
+    },
+    {
+      "id": "roadman",
+      "name": "The Spectacled Roadman",
+      "chapters": [
+        5
+      ],
+      "template": "SNEAK",
+      "game": "Pass the searchers",
+      "blurb": "Hannay swaps places with a roadman — spectacles, hat, pipe and all.",
+      "how": "In your roadman’s disguise, walk past the searchers to the end of the road. Duck behind the stone heaps if they look your way.",
+      "params": {
+        "area": [
+          34,
+          48
+        ],
+        "watchers": 4,
+        "hides": 7,
+        "goal": {
+          "name": "the end of the road",
+          "icon": "🪨"
+        },
+        "watcher": {
+          "kind": "person",
+          "name": "a searcher",
+          "look": {
+            "shirt": "0x2f3b3a"
+          }
+        },
+        "palette": {
+          "ground": "#8a7a5a",
+          "ground2": "#7a6e4e",
+          "leaf": "#6a5a7a",
+          "sky": "#9aaabb",
+          "fog": "#b8c0c8",
+          "stone": "#9a948a"
+        },
+        "objective": "Pass the searchers unnoticed"
+      }
+    },
+    {
+      "id": "archaeologist",
+      "name": "The Bald Archaeologist",
+      "chapters": [
+        6
+      ],
+      "template": "PUZZLE",
+      "game": "Find a way out",
+      "blurb": "Captured and locked in a dark storeroom. There must be a way out.",
+      "how": "Feel your way round the storeroom for clues, then work out how to get out.",
+      "params": {
+        "room": {
+          "w": 12,
+          "d": 10
+        },
+        "dark": true,
+        "objective": "Find a way out of the storeroom",
+        "clues": [
+          {
+            "object": "window",
+            "label": "The shutters",
+            "text": "The windows are heavily shuttered. A thin line of light shows round one of them."
+          },
+          {
+            "object": "box",
+            "label": "The boxes",
+            "text": "Old boxes and tins, smelling of chemicals. Best left well alone."
+          },
+          {
+            "object": "chest",
+            "label": "A tool box",
+            "text": "Rusty tools — and an old screwdriver."
+          }
+        ],
+        "solve": {
+          "object": "window",
+          "label": "The way out",
+          "type": "choice",
+          "prompt": "How can Hannay get out safely?",
+          "options": [
+            "Use the screwdriver on the shutter by the line of light",
+            "Shout for help",
+            "Wait for the bald man to come back"
+          ],
+          "answer": 0,
+          "hint": "Where is the light getting in?"
+        },
+        "done": "Out through the shutter and away up the hillside!"
+      }
+    },
+    {
+      "id": "fisherman",
+      "name": "The Dry-Fly Fisherman",
+      "chapters": [
+        7,
+        8
+      ],
+      "template": "CHASE",
+      "game": "Get to London",
+      "blurb": "Hannay must reach Sir Walter Bullivant in London — and make him believe the story.",
+      "how": "Run for it! Get to the end of the road before the Black Stone catches up.",
+      "params": {
+        "mode": "flee",
+        "length": 100,
+        "obstacles": [
+          "hurdle",
+          "block",
+          "low"
+        ],
+        "chaser": {
+          "kind": "person",
+          "name": "a Black Stone agent",
+          "look": {
+            "shirt": "0x1b1b1b"
+          }
+        },
+        "chaserSpeed": 6.3,
+        "objective": "Get to London!",
+        "finishText": "LONDON"
+      }
+    }
+  ],
+  "skyRun": {
+    "id": "sky",
+    "name": "Out of Sight of the Aeroplane",
+    "template": "CLIMB",
+    "game": "Sky Run",
+    "blurb": "the rocky high points of the moor, with an aeroplane searching overhead.",
+    "how": "Leap between the high rocks to the top. Some rocks wobble — wait for them!",
+    "params": {
+      "height": 20,
+      "layout": "scatter",
+      "core": "none",
+      "moving": 2,
+      "collect": {
+        "item": {
+          "name": "A map fragment",
+          "icon": "🗺️"
+        },
+        "count": 6,
+        "label": "fragments"
+      },
+      "palette": {
+        "ground": "#8a7a5a",
+        "ground2": "#7a6e4e",
+        "leaf": "#6a5a7a",
+        "sky": "#9aaabb",
+        "fog": "#b8c0c8",
+        "stone": "#9a948a"
+      },
+      "goalIcon": "✈️",
+      "objective": "Reach the highest rock"
+    }
+  },
+  "npcs": [
+    {
+      "id": "hannay",
+      "name": "Richard Hannay",
+      "kind": "person",
+      "look": {
+        "shirt": "0x6a5a3a",
+        "pants": "0x4a4a3a",
+        "hair": "0x5a3a24"
+      },
+      "at": [
+        -8,
+        -6.5
+      ],
+      "idle": "I’ve been on the run for weeks. Never a dull moment.",
+      "thanks": "Every page! Now I can read the whole notebook."
+    }
+  ],
+  "sideQuest": {
+    "id": "mys-39steps-pages",
+    "title": "Scudder’s Notebook",
+    "giver": "hannay",
+    "steps": [
+      {
+        "type": "talk",
+        "params": {
+          "npc": "hannay"
+        },
+        "text": "Talk to Richard Hannay outside the district.",
+        "say": "Scudder’s little notebook came apart in the rain, and five pages have blown away. They’re in code — I need every one."
+      },
+      {
+        "type": "collect",
+        "params": {
+          "items": [
+            {
+              "id": "ts-1",
+              "name": "A notebook page",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                9,
+                -6
+              ]
+            },
+            {
+              "id": "ts-2",
+              "name": "A notebook page",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                -9.5,
+                2
+              ]
+            },
+            {
+              "id": "ts-3",
+              "name": "A notebook page",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                9.5,
+                4
+              ]
+            },
+            {
+              "id": "ts-4",
+              "name": "A notebook page",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                0,
+                7.5
+              ]
+            },
+            {
+              "id": "ts-5",
+              "name": "A notebook page",
+              "shape": "page",
+              "colour": "#f6eedb",
+              "at": [
+                -3,
+                -9.5
+              ]
+            }
+          ]
+        },
+        "text": "Find the five pages of Scudder’s notebook."
+      },
+      {
+        "type": "talk",
+        "params": {
+          "npc": "hannay"
+        },
+        "text": "Give the pages back to Hannay.",
+        "say": "Thirty-nine steps… high tide… It’s all here. Thank you!"
+      }
+    ],
+    "reward": {
+      "coins": 25
+    }
+  },
+  "vault": {
+    "name": "The House with the Steps",
+    "blurb": "an escape room about the whole chase: find the house with the thirty-nine steps and name the spies.",
+    "intro": "Sir Walter’s map room. The answer to Scudder’s riddle is somewhere on the coast tonight, at high tide. Open three locks to find the house and the spies.",
+    "room": {
+      "wall": "#d8cfbf",
+      "floor": "#5a3a24",
+      "rug": "#2f4a7a"
+    },
+    "stations": [
+      {
+        "id": "disguises",
+        "object": "trunk",
+        "label": "Hannay’s disguises",
+        "lock": "Lock 1 · The long chase",
+        "text": "Match each of Hannay’s disguises or tricks to where he used it.",
+        "lesson": "Hannay kept one step ahead by becoming whoever the moment needed.",
+        "solve": {
+          "type": "match",
+          "prompt": "Match each one.",
+          "pairs": [
+            [
+              "The milkman’s cap and overall",
+              "Leaving his flat"
+            ],
+            [
+              "The roadman’s spectacles",
+              "The road on the moor"
+            ],
+            [
+              "A speech on Free Trade",
+              "The meeting at Brattleburn"
+            ],
+            [
+              "An old plaid and hat",
+              "The way to London"
+            ]
+          ],
+          "hint": "Think about the order of the chase."
+        }
+      },
+      {
+        "id": "map",
+        "object": "map",
+        "label": "The coast map",
+        "lock": "Lock 2 · The thirty-nine steps",
+        "text": "High tide at 10.17 p.m. A villa on the cliff top, with a private staircase down to the beach. Hannay counts the steps: thirty-nine.",
+        "lesson": "Scudder’s riddle pointed to one house on the cliffs: the one with thirty-nine steps down to the sea.",
+        "solve": {
+          "type": "choice",
+          "prompt": "Which house has the thirty-nine steps?",
+          "options": [
+            "Trafalgar Lodge, the villa on the cliff above the beach",
+            "A warehouse by the docks",
+            "A farmhouse on the moor"
+          ],
+          "answer": 0,
+          "hint": "Steps down to a private beach, where high tide matters."
+        }
+      },
+      {
+        "id": "tennis",
+        "object": "window",
+        "label": "The window on the lawn",
+        "lock": "Lock 3 · The spies",
+        "text": "Three ordinary-looking gentlemen are playing tennis. But the old one has a way of hooding his eyes, just like the bald archaeologist on the moor.",
+        "lesson": "The Black Stone looked like ordinary English gentlemen — that was their disguise.",
+        "solve": {
+          "type": "choice",
+          "prompt": "Are these men really harmless neighbours?",
+          "options": [
+            "No — the old man’s hooded eyes give him away: they are the Black Stone",
+            "Yes — nobody playing tennis could be a spy",
+            "Nobody can ever tell"
+          ],
+          "answer": 0,
+          "hint": "Who else had a way of hooding his eyes?"
+        }
+      }
+    ],
+    "quiz": {
+      "object": "desk",
+      "label": "Sir Walter’s desk",
+      "lock": "Lock 4 · The whole story",
+      "lesson": "You followed Hannay from his flat in London all the way to the steps by the sea."
+    },
+    "openText": "The tide turns at 10.17 — and the door swings open.",
+    "outro": "The spies are caught at the top of the thirty-nine steps."
+  },
+  "unlock": {
+    "badges": []
+  },
+  "chapterFiles": [
+    {
+      "n": 1,
+      "title": "The Man Who Died"
+    },
+    {
+      "n": 2,
+      "title": "The Milkman Sets Out on His Travels"
+    },
+    {
+      "n": 3,
+      "title": "The Adventure of the Literary Innkeeper"
+    },
+    {
+      "n": 4,
+      "title": "The Adventure of the Radical Candidate"
+    },
+    {
+      "n": 5,
+      "title": "The Adventure of the Spectacled Roadman"
+    },
+    {
+      "n": 6,
+      "title": "The Adventure of the Bald Archaeologist"
+    },
+    {
+      "n": 7,
+      "title": "The Dry-Fly Fisherman"
+    },
+    {
+      "n": 8,
+      "title": "The Coming of the Black Stone"
+    },
+    {
+      "n": 9,
+      "title": "The Thirty-Nine Steps"
+    },
+    {
+      "n": 10,
+      "title": "Various Parties Converging on the Sea"
+    }
+  ]
+}

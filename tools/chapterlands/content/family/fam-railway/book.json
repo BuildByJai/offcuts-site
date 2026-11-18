@@ -1,0 +1,707 @@
+{
+  "id": "fam-railway",
+  "blurb": "when Father is taken away, Bobbie, Peter and Phyllis move to a cottage by the railway — and the trains become their friends.",
+  "chapterWord": "Chapter",
+  "source": "Text: The Railway Children by E. Nesbit (1906), from the Standard Ebooks edition. Public domain.",
+  "theme": {
+    "palette": {
+      "ground": "#8cc47a",
+      "ground2": "#7db86b",
+      "wall": "#f2e6d0",
+      "trim": "#5a3a24",
+      "roof": "#8a4a3a",
+      "accent": "#d8452f",
+      "accent2": "#2f6a3a",
+      "wood": "#7a4e30",
+      "leaf": "#4f9a4a",
+      "stone": "#b8b0a0",
+      "sky": "#a8d0f0",
+      "fog": "#e8eef0",
+      "water": "#5ab8e6",
+      "item": "#ffd23f"
+    },
+    "props": [
+      "fence",
+      "tree",
+      "flower",
+      "bush",
+      "lamp",
+      "cart"
+    ],
+    "vaultProps": [
+      "bookcase",
+      "table",
+      "chair",
+      "bed"
+    ],
+    "edge": "fence",
+    "hide": "bush",
+    "building": {
+      "wall": "#f2e6d0",
+      "trim": "#5a3a24",
+      "roof": "#8a4a3a",
+      "style": "house",
+      "sign": "Three Chimneys",
+      "h": 6
+    }
+  },
+  "streets": [
+    {
+      "id": "three-chimneys",
+      "name": "Three Chimneys",
+      "chapters": [
+        1
+      ],
+      "template": "COLLECT",
+      "game": "Settle in",
+      "blurb": "Father has gone away, and Mother takes the children to a little white house in the country called Three Chimneys.",
+      "how": "Help unpack: find six things around the new house.",
+      "params": {
+        "area": [
+          36,
+          34
+        ],
+        "label": "unpacked",
+        "objective": "Settle into Three Chimneys",
+        "items": [
+          {
+            "name": "The candles",
+            "icon": "🕯️"
+          },
+          {
+            "name": "Peter’s toy engine",
+            "icon": "🚂"
+          },
+          {
+            "name": "Mother’s pen",
+            "icon": "🖋️"
+          },
+          {
+            "name": "The teapot",
+            "icon": "🫖"
+          },
+          {
+            "name": "A box of books",
+            "icon": "📦"
+          },
+          {
+            "name": "Phyllis’s doll",
+            "icon": "🪆"
+          }
+        ]
+      }
+    },
+    {
+      "id": "coal-mine",
+      "name": "Peter’s Coal-Mine",
+      "chapters": [
+        2
+      ],
+      "template": "PUZZLE",
+      "game": "Is it right?",
+      "blurb": "The house is cold and money is short. Peter has a secret plan for getting coal.",
+      "how": "Look at the clues, then decide what is right.",
+      "params": {
+        "outdoors": true,
+        "room": {
+          "w": 16,
+          "d": 14
+        },
+        "objective": "Decide whether it is right to take the coal",
+        "palette": {
+          "ground": "#5a5a5a",
+          "ground2": "#4a4a4a"
+        },
+        "clues": [
+          {
+            "object": "box",
+            "label": "The coal heap",
+            "text": "A huge heap of the railway’s coal, with a whitewashed line round the top."
+          },
+          {
+            "object": "note",
+            "label": "Peter’s bag",
+            "text": "An old carpenter’s bag. Peter says he is mining coal from the “middle” of the heap, so it doesn’t count."
+          },
+          {
+            "object": "lamp",
+            "label": "The Station Master",
+            "text": "The Station Master has noticed the heap getting smaller…"
+          }
+        ],
+        "solve": {
+          "object": "sign",
+          "label": "The answer",
+          "type": "choice",
+          "prompt": "Was it right for Peter to take the coal?",
+          "options": [
+            "No — it was the railway’s coal, so it was stealing, even from the middle",
+            "Yes — the heap was huge",
+            "Yes — he only took a little"
+          ],
+          "answer": 0,
+          "hint": "Whose coal was it?"
+        }
+      }
+    },
+    {
+      "id": "old-gentleman",
+      "name": "The Old Gentleman",
+      "chapters": [
+        3
+      ],
+      "template": "ARCADE",
+      "game": "Wave at the 9.15",
+      "blurb": "Every morning the children wave to the 9.15 — and a kind old gentleman waves back.",
+      "how": "Catch the parcels and letters thrown from the train — but not the puffs of smoke!",
+      "params": {
+        "mode": "catch",
+        "target": 12,
+        "player": "👋",
+        "bg": "grass",
+        "good": [
+          {
+            "icon": "📦",
+            "name": "a parcel"
+          },
+          {
+            "icon": "✉️",
+            "name": "a letter"
+          },
+          {
+            "icon": "🧺",
+            "name": "a hamper"
+          }
+        ],
+        "bad": [
+          {
+            "icon": "💨",
+            "name": "smoke"
+          }
+        ],
+        "objective": "Catch 12 things from the 9.15",
+        "done": "The old gentleman waves from his carriage window."
+      }
+    },
+    {
+      "id": "russian",
+      "name": "The Russian",
+      "chapters": [
+        4,
+        5
+      ],
+      "template": "COLLECT",
+      "game": "Help Mr. Szczepansky",
+      "blurb": "A stranger who speaks no English arrives at the station on a stormy night.",
+      "how": "Gather the things that will help the Russian gentleman find his wife and children.",
+      "params": {
+        "area": [
+          34,
+          32
+        ],
+        "floor": "stone",
+        "label": "found",
+        "objective": "Help the Russian gentleman",
+        "items": [
+          {
+            "name": "His Russian stamp",
+            "icon": "📮"
+          },
+          {
+            "name": "A warm coat",
+            "icon": "🧥"
+          },
+          {
+            "name": "A cup of tea",
+            "icon": "☕"
+          },
+          {
+            "name": "His book",
+            "icon": "📕"
+          },
+          {
+            "name": "A letter to the old gentleman",
+            "icon": "✉️"
+          },
+          {
+            "name": "A railway timetable",
+            "icon": "🗓️"
+          }
+        ],
+        "finale": {
+          "npc": {
+            "kind": "person",
+            "name": "Mr. Szczepansky",
+            "look": {
+              "shirt": "0x3a3a46",
+              "hair": "0x5a5a5a"
+            }
+          },
+          "say": "Thank you, little friends. Now I can look for my wife and my children."
+        }
+      }
+    },
+    {
+      "id": "landslide",
+      "name": "The Landslide",
+      "chapters": [
+        6
+      ],
+      "template": "CHASE",
+      "game": "Warn the train",
+      "blurb": "A landslide blocks the line — and the 11.29 is coming!",
+      "how": "Race along the line to warn the train. Wave the red flags!",
+      "params": {
+        "mode": "race",
+        "length": 100,
+        "obstacles": [
+          "hurdle",
+          "block",
+          "log"
+        ],
+        "density": 0.45,
+        "time": 60,
+        "collect": {
+          "item": {
+            "name": "A red flag",
+            "icon": "🚩"
+          },
+          "count": 6,
+          "need": 3,
+          "label": "flags"
+        },
+        "objective": "Warn the train in time!",
+        "finishText": "STOP!"
+      }
+    },
+    {
+      "id": "birthday",
+      "name": "Bobbie’s Birthday",
+      "chapters": [
+        7,
+        8,
+        9
+      ],
+      "template": "BUILD",
+      "game": "Perks’s surprise",
+      "blurb": "It’s Perks the porter’s birthday, and the children plan a surprise from all his neighbours.",
+      "how": "Carry each present to its place on Perks’s table.",
+      "params": {
+        "area": [
+          30,
+          30
+        ],
+        "objective": "Set out Perks’s birthday surprise",
+        "items": [
+          {
+            "id": "flowers",
+            "name": "the wildflowers",
+            "icon": "💐"
+          },
+          {
+            "id": "cake",
+            "name": "the cake",
+            "icon": "🍰"
+          },
+          {
+            "id": "pipe",
+            "name": "the new pipe",
+            "icon": "🎁"
+          },
+          {
+            "id": "sweets",
+            "name": "the sweets",
+            "icon": "🍬"
+          },
+          {
+            "id": "toy",
+            "name": "a toy for the baby",
+            "icon": "🧸"
+          }
+        ],
+        "slots": [
+          {
+            "id": "s1",
+            "name": "Flower vase",
+            "accepts": [
+              "flowers"
+            ]
+          },
+          {
+            "id": "s2",
+            "name": "Cake plate",
+            "accepts": [
+              "cake"
+            ]
+          },
+          {
+            "id": "s3",
+            "name": "For Perks",
+            "accepts": [
+              "pipe"
+            ]
+          },
+          {
+            "id": "s4",
+            "name": "Sweet jar",
+            "accepts": [
+              "sweets"
+            ]
+          },
+          {
+            "id": "s5",
+            "name": "For the baby",
+            "accepts": [
+              "toy"
+            ]
+          }
+        ],
+        "hint": "Read the label on each spot.",
+        "done": "Happy birthday, Mr. Perks — from all your neighbours!"
+      }
+    },
+    {
+      "id": "paper-chase",
+      "name": "The Paper Chase",
+      "chapters": [
+        10,
+        11,
+        12
+      ],
+      "template": "CLIMB",
+      "game": "Into the tunnel",
+      "blurb": "A paper chase runs into the railway tunnel — and the last runner, in a red jersey, doesn’t come out.",
+      "how": "Climb down into the dark tunnel cutting to find the boy in the red jersey.",
+      "params": {
+        "height": 14,
+        "core": "shaft",
+        "direction": "down",
+        "dark": true,
+        "collect": {
+          "item": {
+            "name": "A paper scent",
+            "icon": "📄"
+          },
+          "count": 5,
+          "label": "scraps"
+        },
+        "finale": {
+          "npc": {
+            "kind": "child",
+            "name": "Jim",
+            "look": {
+              "shirt": "0xd8452f"
+            }
+          },
+          "say": "I’ve hurt my leg. Thank goodness you came!"
+        },
+        "objective": "Find the boy in the tunnel",
+        "palette": {
+          "wall": "#5a4a3a"
+        }
+      }
+    }
+  ],
+  "skyRun": {
+    "id": "sky",
+    "name": "The Railway Cutting",
+    "template": "CLIMB",
+    "game": "Sky Run",
+    "blurb": "high along the steep railway cutting and up over the bridge.",
+    "how": "Climb the ledges up the wall of the cutting to the bridge at the top.",
+    "params": {
+      "height": 20,
+      "core": "wall",
+      "moving": 2,
+      "collect": {
+        "item": {
+          "name": "A wildflower",
+          "icon": "🌼"
+        },
+        "count": 6,
+        "label": "wildflowers"
+      },
+      "goalIcon": "🌉",
+      "objective": "Reach the bridge"
+    }
+  },
+  "npcs": [
+    {
+      "id": "bobbie",
+      "name": "Bobbie",
+      "kind": "child",
+      "look": {
+        "shirt": "0xd8452f",
+        "pants": "0x2f3b4a",
+        "hair": "0x6a3a1a"
+      },
+      "at": [
+        -8,
+        -6.5
+      ],
+      "idle": "Take our love to Father!",
+      "thanks": "Mother will love them. Thank you!"
+    }
+  ],
+  "sideQuest": {
+    "id": "fam-railway-flowers",
+    "title": "Wildflowers for Mother",
+    "giver": "bobbie",
+    "steps": [
+      {
+        "type": "talk",
+        "params": {
+          "npc": "bobbie"
+        },
+        "text": "Talk to Bobbie outside Three Chimneys.",
+        "say": "Mother is working so hard, and she’s sad because Father is away. Could you help me pick six wildflowers to cheer her up?"
+      },
+      {
+        "type": "collect",
+        "params": {
+          "items": [
+            {
+              "id": "rc-fl-1",
+              "name": "A wildflower",
+              "shape": "flower",
+              "colour": "#e94f6a",
+              "at": [
+                9,
+                -6
+              ]
+            },
+            {
+              "id": "rc-fl-2",
+              "name": "A wildflower",
+              "shape": "flower",
+              "colour": "#f2d47a",
+              "at": [
+                -9.5,
+                1
+              ]
+            },
+            {
+              "id": "rc-fl-3",
+              "name": "A wildflower",
+              "shape": "flower",
+              "colour": "#b8a0e0",
+              "at": [
+                9.5,
+                4
+              ]
+            },
+            {
+              "id": "rc-fl-4",
+              "name": "A wildflower",
+              "shape": "flower",
+              "colour": "#ffffff",
+              "at": [
+                -5,
+                7.5
+              ]
+            },
+            {
+              "id": "rc-fl-5",
+              "name": "A wildflower",
+              "shape": "flower",
+              "colour": "#e94f6a",
+              "at": [
+                5,
+                7.5
+              ]
+            },
+            {
+              "id": "rc-fl-6",
+              "name": "A wildflower",
+              "shape": "flower",
+              "colour": "#f2d47a",
+              "at": [
+                0,
+                -9.5
+              ]
+            }
+          ]
+        },
+        "text": "Pick six wildflowers around Three Chimneys."
+      },
+      {
+        "type": "talk",
+        "params": {
+          "npc": "bobbie"
+        },
+        "text": "Give the flowers to Bobbie.",
+        "say": "They’re lovely. Mother will be so pleased."
+      }
+    ],
+    "reward": {
+      "coins": 25
+    }
+  },
+  "vault": {
+    "name": "What Happened to Father",
+    "blurb": "an escape room in Mother’s study: piece together what happened to Father, and how he comes home.",
+    "intro": "Mother’s study at Three Chimneys. Bobbie has found out the secret. Open three locks to piece together what happened to Father — and how he came home.",
+    "room": {
+      "wall": "#f2e6d0",
+      "floor": "#7a4e30",
+      "rug": "#2f6a3a"
+    },
+    "stations": [
+      {
+        "id": "newspaper",
+        "object": "note",
+        "label": "The old newspaper",
+        "lock": "Lock 1 · The secret",
+        "text": "Bobbie found it wrapped round a parcel: “End of the Trial. Verdict: Guilty.”",
+        "lesson": "Father had been sent to prison — for something he didn’t do.",
+        "solve": {
+          "type": "choice",
+          "prompt": "Why had Father really gone away?",
+          "options": [
+            "He was in prison, wrongly found guilty",
+            "He was working abroad",
+            "He had joined the railway"
+          ],
+          "answer": 0,
+          "hint": "What did the newspaper say?"
+        }
+      },
+      {
+        "id": "story",
+        "object": "book",
+        "label": "Bobbie’s diary",
+        "lock": "Lock 2 · The whole year",
+        "text": "Put the year at Three Chimneys back in order.",
+        "lesson": "A year of kindness — and every kindness came back to them.",
+        "solve": {
+          "type": "order",
+          "prompt": "First at the top.",
+          "items": [
+            "Moving to Three Chimneys",
+            "Peter caught with the coal",
+            "Waving to the old gentleman on the 9.15",
+            "Helping the Russian gentleman",
+            "Saving the train from the landslide",
+            "Finding Jim in the tunnel",
+            "Father comes home"
+          ],
+          "hint": "It starts with the move and ends with Father."
+        }
+      },
+      {
+        "id": "friends",
+        "object": "board",
+        "label": "The station noticeboard",
+        "lock": "Lock 3 · Friends",
+        "text": "Match each friend to how they helped.",
+        "lesson": "The old gentleman helped prove Father was innocent — because the children had been kind to so many people.",
+        "solve": {
+          "type": "match",
+          "prompt": "Match each friend.",
+          "pairs": [
+            [
+              "The old gentleman",
+              "Helped prove Father innocent"
+            ],
+            [
+              "Perks the porter",
+              "Taught them about the railway"
+            ],
+            [
+              "The Russian gentleman",
+              "Found his family again"
+            ],
+            [
+              "Jim",
+              "Was the old gentleman’s grandson"
+            ]
+          ],
+          "hint": "Think about who was Jim’s grandfather."
+        }
+      }
+    ],
+    "quiz": {
+      "object": "desk",
+      "label": "Mother’s desk",
+      "lock": "Lock 4 · The whole story",
+      "lesson": "Oh! my Daddy, my Daddy!"
+    },
+    "openText": "The door opens — and there is someone on the station platform.",
+    "outro": "Father comes home on the 11.54, and Bobbie runs to meet him."
+  },
+  "unlock": {
+    "badges": []
+  },
+  "chapterFiles": [
+    {
+      "n": 1,
+      "file": "01.md",
+      "title": "Chapter 1: The Beginning of Things"
+    },
+    {
+      "n": 2,
+      "file": "02.md",
+      "title": "Chapter 2: Peter’s Coal-Mine"
+    },
+    {
+      "n": 3,
+      "file": "03.md",
+      "title": "Chapter 3: The Old Gentleman"
+    },
+    {
+      "n": 4,
+      "file": "04.md",
+      "title": "Chapter 4: The Engine-Burglar"
+    },
+    {
+      "n": 5,
+      "file": "05.md",
+      "title": "Chapter 5: Prisoners and Captives"
+    },
+    {
+      "n": 6,
+      "file": "06.md",
+      "title": "Chapter 6: Saviours of the Train"
+    },
+    {
+      "n": 7,
+      "file": "07.md",
+      "title": "Chapter 7: For Valour"
+    },
+    {
+      "n": 8,
+      "file": "08.md",
+      "title": "Chapter 8: The Amateur Firemen"
+    },
+    {
+      "n": 9,
+      "file": "09.md",
+      "title": "Chapter 9: The Pride of Perks"
+    },
+    {
+      "n": 10,
+      "file": "10.md",
+      "title": "Chapter 10: The Terrible Secret"
+    },
+    {
+      "n": 11,
+      "file": "11.md",
+      "title": "Chapter 11: The Hound in the Red Jersey"
+    },
+    {
+      "n": 12,
+      "file": "12.md",
+      "title": "Chapter 12: What Bobbie Brought Home"
+    },
+    {
+      "n": 13,
+      "file": "13.md",
+      "title": "Chapter 13: The Hound’s Grandfather"
+    },
+    {
+      "n": 14,
+      "file": "14.md",
+      "title": "Chapter 14: The End"
+    }
+  ]
+}

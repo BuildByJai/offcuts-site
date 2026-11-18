@@ -163,7 +163,7 @@ const doorLabel = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 0.24), new THREE.M
 doorLabel.position.set(0, 3.28, HZ - 0.03); doorLabel.rotation.y = Math.PI; scene.add(doorLabel);
 
 /* =============== stations round the walls =============== */
-const ICON = { desk: '🗄️', shelf: '📚', clock: '🕰️', chair: '🪑', box: '📦', picture: '🖼️', window: '🪟', table: '🍽️', bed: '🛏️', chest: '🧰', plant: '🪴', statue: '🗿', sign: '🪧', mirror: '🪞', book: '📖', map: '🗺️', note: '📝', lamp: '🪔', safe: '🔐', toy: '🧸', board: '♟️', scales: '⚖️', telescope: '🔭', trunk: '🧳' };
+const ICON = { desk: '🗄️', shelf: '📚', clock: '🕰️', chair: '🪑', box: '📦', picture: '🖼️', window: '🪟', table: '🍽️', bed: '🛏️', chest: '🧰', plant: '🪴', statue: '🗿', sign: '🪧', mirror: '🪞', book: '📖', map: '🗺️', note: '📝', lamp: '🪔', safe: '🔐', toy: '🧸', board: '♟️', scales: '⚖️', telescope: '🔭', trunk: '🧳', rock: '🪨' };
 const stations = (V.stations || []).slice();
 if (QUIZ) stations.push(QUIZ);
 const interactables = [];
@@ -400,6 +400,7 @@ $('start-screen').hidden = false;
 setState('start');
 fadeIn();
 addEventListener('pageshow', (e) => { if (e.persisted) fadeIn(); });
-window.__vault = { player, solve, solved, LOCKS, interact: (i) => interact(interactables[i]), win: () => { solved.fill(true); openExit(); winGame(); } };
+window.__vault = { player, solve, solved, LOCKS, interact: (i) => interact(interactables[i]),
+  stationIndex: (S) => stations.indexOf(S), stationSolve: (i) => stations[i].solve, win: () => { solved.fill(true); openExit(); winGame(); } };
 tick();
 }

@@ -2,6 +2,7 @@
 """Chapterlands book checks. Run from the repo root:
 
     python3 docs/chapterlands/tools/check_book.py tools/chapterlands/content/fantasy/fan-velveteen
+    python3 docs/chapterlands/tools/check_book.py <held-back book dir> <local text dir, NN.md files, not committed>
 
 1. questions.json: 3 questions per street, 3 options each, 5-8 Vault questions,
    every question has evidence + hint, and (for readable books) the evidence
@@ -19,36 +20,47 @@ TERMS = [  # whole-word, case-insensitive. Hits are listed for a human to judge.
     r'wops?', r'spics?', r'wogs?', r'golliwogs?', r'hottentots?', r'kaffirs?', r'barbarians?', r'heathens?', r'natives?',
     r'cripples?', r'crippled', r'idiots?', r'imbeciles?', r'morons?', r'retard\w*', r'lunatics?', r'dwarf\w*', r'midgets?',
     r'deformed', r'disabled', r'dumb', r'lame', r'queer', r'fag\w*', r'spinsters?', r'wench\w*', r'harlots?',
+    r'turks?', r'orientals?', r'eskimos?', r'red indians?', r'blacks', r'coloured', r'darkies', r'cannibals?', r'slaves?', r'oriental',
 ]
-PG = re.compile(r'gutenberg|project gutenberg|this ebook|e-?text|license|licence|www\.', re.I)
+# "licence" alone is ordinary story text (e.g. a cabman's six-days' licence), so only flag it in ebook-boilerplate phrases.
+PG = re.compile(r'gutenberg|this ebook|\be-?texts?\b|\blicen[cs]e (?:agreement|terms)|full licen[cs]e|www\.', re.I)
 
 def norm(s):
-    return re.sub(r'\s+', ' ', s.replace('“', '"').replace('”', '"').replace('‘', "'").replace('’', "'")).strip()
+    s = re.sub(r'(^|\n)>\s?', ' ', s)
+    s = re.sub(r'\*\*|(?<![A-Za-z])_|_(?![A-Za-z])', '', s).replace('\u2060', '')
+    return re.sub(r'\s+', ' ', s.replace('\u201c', '"').replace('\u201d', '"').replace('\u2018', "'").replace('\u2019', "'")).strip()
 
-def main(d):
+def main(d, textdir=None):
     book = json.load(open(os.path.join(d, 'book.json')))
     q = json.load(open(os.path.join(d, 'questions.json')))
     cat = json.load(open(os.path.join(d, '../../../catalogue/books.json')))
     meta = next(b for b in cat['books'] if b['id'] == book['id'])
     chapters = {}
     for c in book.get('chapterFiles', []):
+        if 'file' not in c: continue
         p = os.path.join(d, 'chapters', c['file'])
         if os.path.exists(p):
             chapters[c['n']] = open(p, encoding='utf-8').read()
+    # held-back books: verify evidence against a local, uncommitted copy of the text
+    if textdir and not chapters:
+        for c in book.get('chapterFiles', []):
+            p = os.path.join(textdir, c.get('file') or f"{c['n']:02d}.md")
+            if os.path.exists(p): chapters[c['n']] = open(p, encoding='utf-8').read()
     problems = []
     for s in book['streets']:
         lst = q['streets'].get(s['id'], [])
         if len(lst) != 3: problems.append(f"street {s['id']}: {len(lst)} questions (need 3)")
+        for x in lst:
+            if x['chapter'] not in s['chapters']: problems.append(f"street {s['id']}: question '{x['q'][:40]}' cites chapter {x['chapter']}, not one of this street's chapters {s['chapters']}")
     if not 5 <= len(q.get('vault', [])) <= 8: problems.append(f"vault: {len(q.get('vault', []))} questions (need 5-8)")
     allq = [(sid, x) for sid, lst in q['streets'].items() for x in lst] + [('vault', x) for x in q.get('vault', [])]
     for sid, x in allq:
         if len(x['options']) != 3: problems.append(f"{sid}: '{x['q'][:40]}' has {len(x['options'])} options")
         if not x.get('evidence'): problems.append(f"{sid}: '{x['q'][:40]}' has no evidence")
         if not x.get('hint'): problems.append(f"{sid}: '{x['q'][:40]}' has no hint")
-        if meta['readable'] and chapters:
-            if norm(x['evidence']) not in norm(chapters.get(x['chapter'], '')):
-                problems.append(f"{sid}: evidence not found in chapter {x['chapter']}: {x['evidence'][:60]}")
-        elif not meta['readable'] and len(re.findall(r'[.!?](\s|$)', x['evidence'])) > 1:
+        if chapters and norm(x['evidence']) not in norm(chapters.get(x['chapter'], '')):
+            problems.append(f"{sid}: evidence not found in chapter {x['chapter']}: {x['evidence'][:60]}")
+        if not meta['readable'] and (len(re.findall(r'[.!?][”"’]?(\s|$)', x['evidence'])) > 1 or len(x['evidence'].split()) > 40):
             problems.append(f"{sid}: held-back book evidence must be one short sentence")
     if not meta['readable'] and os.path.isdir(os.path.join(d, 'chapters')):
         problems.append('held-back book has a chapters/ folder: its text must not be committed')
@@ -77,6 +89,7 @@ def main(d):
     # scans
     hits = []
     for n, txt in sorted(chapters.items()):
+        if not meta['readable']: break   # held-back text is not committed, so no scan
         if PG.search(txt): problems.append(f'chapter {n}: Project Gutenberg / licence reference left in')
         for t in TERMS:
             for m in re.finditer(r'\b' + t + r'\b', txt, re.I):
@@ -90,4 +103,4 @@ def main(d):
     return 1 if problems else 0
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv[1]))
+    sys.exit(main(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else None))

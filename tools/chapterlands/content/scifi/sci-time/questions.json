@@ -1,0 +1,367 @@
+{
+  "book": "sci-time",
+  "_about": "answer = index of the right option (shuffled on screen); evidence = supporting sentence, review only; hint = gentle \"look again\" line.",
+  "streets": {
+    "demonstration": [
+      {
+        "kind": "what",
+        "q": "What did the Time Traveller say every real body has besides length, breadth and thickness?",
+        "options": [
+          "Duration",
+          "Weight",
+          "Colour"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "it must have Length, Breadth, Thickness, and—Duration.",
+        "hint": "Look again at his explanation."
+      },
+      {
+        "kind": "why",
+        "q": "Why did the model machine vanish?",
+        "options": [
+          "The lever sent it gliding off through time",
+          "Someone stole it",
+          "It was blown away"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "Now I want you clearly to understand that this lever, being pressed over, sends the machine gliding into the future, and this other reverses the motion.",
+        "hint": "Look again at the levers."
+      },
+      {
+        "kind": "think",
+        "q": "The Time Traveller came in dusty, limping and hungry. What did that suggest to his guests?",
+        "options": [
+          "He had been on a real and difficult journey",
+          "He had been gardening",
+          "He had fallen downstairs"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "His coat was dusty and dirty, and smeared with green down the sleeves; his hair disordered, and as it seemed to me greyer—either with dust and dirt or because its colour had actually faded.",
+        "hint": "Look again at how he arrives."
+      }
+    ],
+    "through-time": [
+      {
+        "kind": "what",
+        "q": "How did night and day look as he went faster?",
+        "options": [
+          "Night followed day like the flapping of a black wing",
+          "It stayed night all the time",
+          "Everything stopped"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "As I put on pace, night followed day like the flapping of a black wing.",
+        "hint": "Look again at the journey."
+      },
+      {
+        "kind": "why",
+        "q": "Why did the travelling feel like a switchback?",
+        "options": [
+          "It was a helpless headlong motion",
+          "The machine went up and down hills",
+          "He was on a train"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "There is a feeling exactly like that one has upon a switchback—of a helpless headlong motion!",
+        "hint": "Look again at how it felt."
+      },
+      {
+        "kind": "think",
+        "q": "Snow flashed across the world, then the green of spring. What was he seeing?",
+        "options": [
+          "Whole seasons passing in moments",
+          "A storm",
+          "A dream"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "minute by minute the white snow flashed across the world, and vanished, and was followed by the bright, brief green of spring.",
+        "hint": "Think about how fast he is going."
+      }
+    ],
+    "eloi": [
+      {
+        "kind": "what",
+        "q": "What did one of the little people put round his neck?",
+        "options": [
+          "A chain of beautiful flowers",
+          "A gold medal",
+          "A rope"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "Then came one laughing towards me, carrying a chain of beautiful flowers altogether new to me, and put it about my neck.",
+        "hint": "Look again at the welcome."
+      },
+      {
+        "kind": "why",
+        "q": "Why did he take the little levers off the machine?",
+        "options": [
+          "So nobody could set it in motion",
+          "They were broken",
+          "To give them as a present"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "Happily then, when it was not too late, I thought of a danger I had hitherto forgotten, and reaching over the bars of the machine I unscrewed the little levers that would set it in motion, and put these in my pocket.",
+        "hint": "Look again at the little pink hands."
+      },
+      {
+        "kind": "think",
+        "q": "He expected the people of the future to be far ahead of us. Why was he surprised?",
+        "options": [
+          "They seemed gentle and childlike, not wise",
+          "They were giants",
+          "They spoke English"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "You see I had always anticipated that the people of the year Eight Hundred and Two Thousand odd would be incredibly in front of us in knowledge, art, everything.",
+        "hint": "Look again at what he thought."
+      }
+    ],
+    "missing-machine": [
+      {
+        "kind": "what",
+        "q": "What did he find when he got back to the little lawn?",
+        "options": [
+          "The Time Machine was gone",
+          "A new machine",
+          "Weena waiting"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "The Time Machine was gone!",
+        "hint": "Look again at the moonlit lawn."
+      },
+      {
+        "kind": "why",
+        "q": "How did he meet Weena?",
+        "options": [
+          "He rescued her when she was drifting downstream",
+          "She found his machine",
+          "She was his guide"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "When I realized this, I hurriedly slipped off my clothes, and, wading in at a point lower down, I caught the poor mite and drew her safe to land.",
+        "hint": "Look again at the bathers in the river."
+      },
+      {
+        "kind": "think",
+        "q": "The pedestal of the sphinx was hollow. Why was that important?",
+        "options": [
+          "The machine could have been hidden inside it",
+          "It was a good place to sleep",
+          "It held water"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "The pedestal was hollow.",
+        "hint": "Think about the groove in the turf."
+      }
+    ],
+    "wells": [
+      {
+        "kind": "what",
+        "q": "What did he use to climb down the well?",
+        "options": [
+          "Climbing hooks on the side of the shaft",
+          "A rope ladder",
+          "A lift"
+        ],
+        "answer": 0,
+        "chapter": 6,
+        "evidence": "I said, kissing her; and then putting her down, I began to feel over the parapet for the climbing hooks.",
+        "hint": "Look again at the top of the well."
+      },
+      {
+        "kind": "why",
+        "q": "Why were the little Upper-world people afraid of the dark?",
+        "options": [
+          "The Morlocks came out in the dark nights",
+          "They could not see the flowers",
+          "They were cold"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "And I now understood to some slight degree at least the reason of the fear of the little Upper-world people for the dark.",
+        "hint": "Look again at the Dark Nights."
+      },
+      {
+        "kind": "think",
+        "q": "The creatures below retreated from his match. What does that show about them?",
+        "options": [
+          "They live in darkness and dislike light",
+          "They were very polite",
+          "They wanted the match"
+        ],
+        "answer": 0,
+        "chapter": 6,
+        "evidence": "Starting up in the darkness I snatched at my matches and, hastily striking one, I saw three stooping white creatures similar to the one I had seen above ground in the ruin, hastily retreating before the light.",
+        "hint": "Look again at the tunnel."
+      }
+    ],
+    "palace": [
+      {
+        "kind": "what",
+        "q": "What did he find in an airtight case?",
+        "options": [
+          "A box of matches",
+          "A map",
+          "A watch"
+        ],
+        "answer": 0,
+        "chapter": 8,
+        "evidence": "And at last, in one of the really airtight cases, I found a box of matches.",
+        "hint": "Look again at the galleries."
+      },
+      {
+        "kind": "why",
+        "q": "What had happened to the books in the library?",
+        "options": [
+          "They had rotted into brown and charred rags",
+          "They were all in perfect condition",
+          "Someone had taken them"
+        ],
+        "answer": 0,
+        "chapter": 8,
+        "evidence": "The brown and charred rags that hung from the sides of it, I presently recognized as the decaying vestiges of books.",
+        "hint": "Look again at the library."
+      },
+      {
+        "kind": "think",
+        "q": "The rotting library made him think of the “enormous waste of labour”. Why?",
+        "options": [
+          "All that knowledge had been lost forever",
+          "Books are heavy",
+          "The library was too big"
+        ],
+        "answer": 0,
+        "chapter": 8,
+        "evidence": "But as it was, the thing that struck me with keenest force was the enormous waste of labour to which this sombre wilderness of rotting paper testified.",
+        "hint": "Think about what books are for."
+      }
+    ],
+    "forest": [
+      {
+        "kind": "what",
+        "q": "What did he gather to make a fire?",
+        "options": [
+          "Sticks and dried grass",
+          "Coal",
+          "Old books"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "Accordingly, as we went along I gathered any sticks or dried grass I saw, and presently had my arms full of such litter.",
+        "hint": "Look again at the walk to the forest."
+      },
+      {
+        "kind": "why",
+        "q": "Why was fire so strange to Weena?",
+        "options": [
+          "The art of fire-making had been forgotten",
+          "She had never been cold",
+          "She was afraid of red"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "In this decadence, too, the art of fire-making had been forgotten on the earth.",
+        "hint": "Look again at the fire."
+      },
+      {
+        "kind": "think",
+        "q": "When he reached the sphinx, the bronze valves were open. Why does he call it a “meek surrender”?",
+        "options": [
+          "It looked too easy — it was a trap",
+          "The Morlocks had given up",
+          "He had won a battle"
+        ],
+        "answer": 0,
+        "chapter": 10,
+        "evidence": "So here, after all my elaborate preparations for the siege of the White Sphinx, was a meek surrender.",
+        "hint": "Look again at what happens next."
+      }
+    ]
+  },
+  "vault": [
+    {
+      "q": "What colour was the sun in the far future?",
+      "options": [
+        "Red, huge and motionless",
+        "Bright blue",
+        "Gone completely"
+      ],
+      "answer": 0,
+      "chapter": 11,
+      "evidence": "At last, some time before I stopped, the sun, red and very large, halted motionless upon the horizon, a vast dome glowing with a dull heat, and now and then suffering a momentary extinction.",
+      "hint": "Think about the far future."
+    },
+    {
+      "q": "What creatures did he see on the red beach?",
+      "options": [
+        "Monstrous crablike creatures",
+        "Dinosaurs",
+        "Seagulls"
+      ],
+      "answer": 0,
+      "chapter": 11,
+      "evidence": "Then I saw the thing was really a monstrous crablike creature.",
+      "hint": "Think about the beach."
+    },
+    {
+      "q": "What could the Medical Man not identify?",
+      "options": [
+        "The strange white flowers",
+        "The machine",
+        "The camera"
+      ],
+      "answer": 0,
+      "chapter": 12,
+      "evidence": "“It’s a curious thing,” said the Medical Man; “but I certainly don’t know the natural order of these flowers.",
+      "hint": "Think about the evidence on the table."
+    },
+    {
+      "q": "What did the Time Traveller take with him when he left again?",
+      "options": [
+        "A small camera and a knapsack",
+        "A box of matches",
+        "Weena"
+      ],
+      "answer": 0,
+      "chapter": 12,
+      "evidence": "He had a small camera under one arm and a knapsack under the other.",
+      "hint": "Think about the very end."
+    },
+    {
+      "q": "What did the two white flowers prove to the narrator?",
+      "options": [
+        "That gratitude and tenderness still lived on",
+        "That plants live forever",
+        "That the Time Traveller was lying"
+      ],
+      "answer": 0,
+      "chapter": 12,
+      "evidence": "And I have by me, for my comfort, two strange white flowers—shrivelled now, and brown and flat and brittle—to witness that even when mind and strength had gone, gratitude and a mutual tenderness still lived on in the heart of man.",
+      "hint": "Think about the epilogue."
+    },
+    {
+      "q": "Where had the Morlocks hidden the machine?",
+      "options": [
+        "Inside the pedestal of the White Sphinx",
+        "In a well",
+        "In the Palace of Green Porcelain"
+      ],
+      "answer": 0,
+      "chapter": 12,
+      "evidence": "That gives you the exact distance from my little lawn to the pedestal of the White Sphinx, into which the Morlocks had carried my machine.",
+      "hint": "Think about the bronze panels."
+    }
+  ]
+}

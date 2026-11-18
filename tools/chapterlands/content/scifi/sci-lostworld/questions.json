@@ -1,0 +1,408 @@
+{
+  "book": "sci-lostworld",
+  "_about": "answer = index of the right option (shuffled on screen); evidence = supporting sentence, review only; hint = gentle \"look again\" line.",
+  "streets": {
+    "challenger": [
+      {
+        "kind": "what",
+        "q": "What sort of man did Gladys say she could love?",
+        "options": [
+          "A man of great deeds and strange experiences",
+          "A rich man",
+          "A famous professor"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "But, above all, he must be a man who could do, who could act, who could look Death in the face and have no fear of him, a man of great deeds and strange experiences.",
+        "hint": "Look again at Malone’s talk with Gladys."
+      },
+      {
+        "kind": "why",
+        "q": "Why did the editor, McArdle, send Malone to Professor Challenger?",
+        "options": [
+          "To try his luck getting a story from him",
+          "To sell him a newspaper",
+          "To ask for a job"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "“So why should you not try your luck with Professor Challenger, of Enmore Park?”",
+        "hint": "Look again at the newspaper office."
+      },
+      {
+        "kind": "think",
+        "q": "Challenger showed Malone the sketchbook of Maple White. Why was it so important?",
+        "options": [
+          "It had a picture of a creature sketched from the life",
+          "It was very old",
+          "It had a map of London"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "That is actually sketched from the life.”",
+        "hint": "Look again at the sketchbook."
+      }
+    ],
+    "meeting": [
+      {
+        "kind": "what",
+        "q": "Who was the tall, thin professor who doubted Challenger?",
+        "options": [
+          "Professor Summerlee",
+          "Professor Wadley",
+          "Lord John Roxton"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "Summerlee, the veteran Professor of Comparative Anatomy, rose among the audience, a tall, thin, bitter man",
+        "hint": "Look again at the meeting."
+      },
+      {
+        "kind": "why",
+        "q": "How did Challenger say his claims could be checked?",
+        "options": [
+          "By a committee chosen from the audience",
+          "By reading his book",
+          "By looking at a photograph"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "would be prepared to give it with proper precautions to a committee chosen from the audience.",
+        "hint": "Look again at what Challenger says."
+      },
+      {
+        "kind": "think",
+        "q": "Summerlee says claims about the Thames can be tested, but claims about the Amazon cannot. What is his point?",
+        "options": [
+          "Nobody can check a story from somewhere so far away",
+          "The Thames is bigger",
+          "He has been to the Amazon"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "any assertion about the former could be tested, while about the latter it could not.",
+        "hint": "Look again at the argument."
+      }
+    ],
+    "amazon": [
+      {
+        "kind": "what",
+        "q": "What was inside Challenger’s sealed envelope?",
+        "options": [
+          "A blank sheet",
+          "A map",
+          "A cheque"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "It was a blank sheet.",
+        "hint": "Look again at the opening of the instructions."
+      },
+      {
+        "kind": "why",
+        "q": "Why did they put one professor in each canoe?",
+        "options": [
+          "To keep the peace between them",
+          "To balance the weight",
+          "So each could steer"
+        ],
+        "answer": 0,
+        "chapter": 8,
+        "evidence": "taking the obvious precaution in the interests of peace of putting one Professor into each canoe.",
+        "hint": "Look again at how they set off."
+      },
+      {
+        "kind": "think",
+        "q": "Summerlee thinks the trip is a wild-goose chase. Why come along at all?",
+        "options": [
+          "To test Challenger’s claims for himself",
+          "He loves canoeing",
+          "Challenger paid him"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "From the beginning he has never concealed his belief that Professor Challenger is an absolute fraud, that we are all embarked upon an absurd wild-goose chase",
+        "hint": "Think about the committee from the meeting."
+      }
+    ],
+    "plateau": [
+      {
+        "kind": "what",
+        "q": "What grew on top of the rock pinnacle?",
+        "options": [
+          "One high tree",
+          "A forest",
+          "Nothing at all"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "On the summit of it there grew one high tree.",
+        "hint": "Look again at the pinnacle."
+      },
+      {
+        "kind": "why",
+        "q": "Why did they need a bridge?",
+        "options": [
+          "A gap lay between the pinnacle and the plateau",
+          "The river was too deep",
+          "The cliff was too slippery"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "A drawbridge had to be found which could be dropped across the abyss.",
+        "hint": "Look again at the top of the pinnacle."
+      },
+      {
+        "kind": "think",
+        "q": "“The bridge was gone!” Why was that so serious?",
+        "options": [
+          "They were stuck on the plateau with no way back",
+          "They had to build another tree",
+          "The pterodactyl had stolen it"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "The bridge was gone!",
+        "hint": "Think about how they got across."
+      }
+    ],
+    "pterodactyls": [
+      {
+        "kind": "what",
+        "q": "What did the explorers find in the swamp?",
+        "options": [
+          "A rookery of pterodactyls",
+          "A lake of gold",
+          "A lost city"
+        ],
+        "answer": 0,
+        "chapter": 10,
+        "evidence": "The place was a rookery of pterodactyls.",
+        "hint": "Look again at the swamp."
+      },
+      {
+        "kind": "why",
+        "q": "What did the explorers see in a glade, the same day?",
+        "options": [
+          "Five live iguanodons",
+          "A herd of horses",
+          "A crashed aeroplane"
+        ],
+        "answer": 0,
+        "chapter": 10,
+        "evidence": "August the twenty-eighth—the day we saw five live iguanodons in a glade of Maple White Land.",
+        "hint": "Look again at the start of the chapter."
+      },
+      {
+        "kind": "think",
+        "q": "Why was it so hard to back away from the pterodactyls?",
+        "options": [
+          "They circled closer whenever the explorers tried to retreat",
+          "The swamp was too deep",
+          "They were asleep"
+        ],
+        "answer": 0,
+        "chapter": 10,
+        "evidence": "The moment we attempted to retreat the circle closed in upon us",
+        "hint": "Look again at the flock in the air."
+      }
+    ],
+    "iguanodons": [
+      {
+        "kind": "what",
+        "q": "What colour were most of the plateau’s flowers?",
+        "options": [
+          "White or yellow",
+          "Bright red",
+          "Blue"
+        ],
+        "answer": 0,
+        "chapter": 11,
+        "evidence": "all that morning we wandered among lovely flowers—mostly, as I observed, white or yellow in color",
+        "hint": "Look again at the morning walk."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Malone climb the great tree?",
+        "options": [
+          "To see the plateau and help make a chart of it",
+          "To escape a dinosaur",
+          "To pick fruit"
+        ],
+        "answer": 0,
+        "chapter": 11,
+        "evidence": "I absolutely refuse to leave, however, until we have made at least a superficial examination of this country, and are able to take back with us something in the nature of a chart.”",
+        "hint": "Look again at the evening discussion."
+      },
+      {
+        "kind": "think",
+        "q": "Malone says he was a skilled tree-climber as a lad. How did that help the team?",
+        "options": [
+          "He could do something useful that the others could not",
+          "He liked showing off",
+          "It made him a professor"
+        ],
+        "answer": 0,
+        "chapter": 11,
+        "evidence": "Now, ever since I ran wild as a lad in Ireland I have been a bold and skilled tree-climber.",
+        "hint": "Think about what the chart needed."
+      }
+    ],
+    "captured": [
+      {
+        "kind": "what",
+        "q": "Who woke Malone at daybreak?",
+        "options": [
+          "Lord John Roxton",
+          "Professor Challenger",
+          "Gladys"
+        ],
+        "answer": 0,
+        "chapter": 13,
+        "evidence": "I gave a cry of joy as in the cold gray light I saw Lord John Roxton kneeling beside me.",
+        "hint": "Look again at the morning after Malone’s night alone."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Malone go off alone in the night?",
+        "options": [
+          "He wanted to bring back a record of the central lake",
+          "He was lost",
+          "Challenger sent him"
+        ],
+        "answer": 0,
+        "chapter": 12,
+        "evidence": "suppose I made my way down to the central lake, suppose I was back at breakfast with some record of the place",
+        "hint": "Look again at the start of the chapter."
+      },
+      {
+        "kind": "think",
+        "q": "The chief of the ape-men looked like a red Challenger. Why did Summerlee laugh till he cried?",
+        "options": [
+          "The likeness to Challenger was very funny, even in danger",
+          "He was not afraid at all",
+          "He liked the ape-men"
+        ],
+        "answer": 0,
+        "chapter": 13,
+        "evidence": "This old ape-man—he was their chief—was a sort of red Challenger, with every one of our friend’s beauty points, only just a trifle more so.",
+        "hint": "Look again at Lord John’s story."
+      }
+    ],
+    "way-down": [
+      {
+        "kind": "what",
+        "q": "What did the young friend give Malone?",
+        "options": [
+          "A small roll of bark with a drawing",
+          "A rope",
+          "A diamond"
+        ],
+        "answer": 0,
+        "chapter": 15,
+        "evidence": "This is a chart of the caves.",
+        "hint": "Look again at the evening visit."
+      },
+      {
+        "kind": "why",
+        "q": "Why couldn’t they use the old tunnel up the cliff?",
+        "options": [
+          "An earthquake had made the top of it fall in",
+          "It was guarded",
+          "It was flooded"
+        ],
+        "answer": 0,
+        "chapter": 15,
+        "evidence": "there had been a terrific earthquake, and the upper end of the tunnel had fallen in and completely disappeared.",
+        "hint": "Look again at what the plateau people explained."
+      },
+      {
+        "kind": "think",
+        "q": "Malone says “Seventeen from the right and second from the left.” What had they got wrong?",
+        "options": [
+          "They had counted the caves from the wrong end",
+          "They had the wrong drawing",
+          "It was night"
+        ],
+        "answer": 0,
+        "chapter": 15,
+        "evidence": "“Seventeen from the right and second from the left.",
+        "hint": "Look again at the dead end."
+      }
+    ]
+  },
+  "vault": [
+    {
+      "q": "Where was the great meeting held when the explorers came home?",
+      "options": [
+        "The Queen’s Hall",
+        "Enmore Park",
+        "The Zoological Hall"
+      ],
+      "answer": 0,
+      "chapter": 16,
+      "evidence": "it was only in the Queen’s Hall in Regent Street that accommodation could be found.",
+      "hint": "Think about the very last chapter."
+    },
+    {
+      "q": "Why weren’t the photographs enough to convince the hall?",
+      "options": [
+        "People said photographs could be faked",
+        "They were too small",
+        "They were in colour"
+      ],
+      "answer": 0,
+      "chapter": 16,
+      "evidence": "Did they accuse them of having forged these photographs?",
+      "hint": "Think about the doubters."
+    },
+    {
+      "q": "What did Challenger say in a coaxing voice to the box?",
+      "options": [
+        "“Come, then, pretty, pretty!”",
+        "“Stay in there!”",
+        "“Fly away home!”"
+      ],
+      "answer": 0,
+      "chapter": 16,
+      "evidence": "Peering down into the box he snapped his fingers several times and was heard from the press seat to say",
+      "hint": "Think about the final proof."
+    },
+    {
+      "q": "Who was Gladys married to when Malone came home?",
+      "options": [
+        "A solicitor’s clerk, Mr. Potts",
+        "Lord John",
+        "McArdle"
+      ],
+      "answer": 0,
+      "chapter": 16,
+      "evidence": "“I am a solicitor’s clerk,” said he.",
+      "hint": "Think about the very end."
+    },
+    {
+      "q": "What was inside the sealed envelope at Manaus?",
+      "options": [
+        "A blank sheet",
+        "A map",
+        "A ticket home"
+      ],
+      "answer": 0,
+      "chapter": 7,
+      "evidence": "It was a blank sheet.",
+      "hint": "Think back to the Amazon."
+    },
+    {
+      "q": "How did the party first get onto the plateau?",
+      "options": [
+        "Over a tree felled across the gap",
+        "By balloon",
+        "Up a ladder"
+      ],
+      "answer": 0,
+      "chapter": 9,
+      "evidence": "In a little over an hour there was a loud crack, the tree swayed forward, and then crashed over",
+      "hint": "Think about the pinnacle."
+    }
+  ]
+}

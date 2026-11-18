@@ -1,0 +1,543 @@
+{
+  "book": "fan-alice-1",
+  "_about": "answer = index of the right option (shuffled on screen); evidence = supporting sentence, review only; hint = gentle \"look again\" line.",
+  "streets": {
+    "rabbit-hole": [
+      {
+        "kind": "what",
+        "q": "What did the White Rabbit take out of his waistcoat-pocket?",
+        "options": [
+          "A watch",
+          "A key",
+          "A pair of gloves"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "I shall be late!” (when she thought it over afterwards, it occurred to her that she ought to have wondered at this, but at the time it all seemed quite natural); but when the Rabbit actually took a watch out of its waistcoat-pocket, and looked at it, and then hurried on, Alice started to her feet",
+        "hint": "Look again at the very start, when Alice first sees the Rabbit."
+      },
+      {
+        "kind": "why",
+        "q": "Why didn’t Alice drop the empty marmalade jar as she fell?",
+        "options": [
+          "She was afraid of killing somebody below",
+          "She wanted to keep it for later",
+          "It was stuck to her hand"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "it was labelled “Orange Marmalade,” but to her great disappointment it was empty: she did not like to drop the jar for fear of killing somebody",
+        "hint": "Look again at the part where Alice takes a jar down from a shelf."
+      },
+      {
+        "kind": "think",
+        "q": "Before drinking from the “Drink Me” bottle, Alice checks if it says “poison”. What does this show?",
+        "options": [
+          "She was being sensible and careful",
+          "She didn’t like the taste of things",
+          "She wanted to save it for someone else"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "“No, I’ll look first,” she said, “and see whether it’s marked ‘poison’ or not”",
+        "hint": "Look again at the part where Alice finds the little bottle."
+      }
+    ],
+    "pool": [
+      {
+        "kind": "what",
+        "q": "What was the pool that Alice found herself swimming in?",
+        "options": [
+          "The tears she had cried when she was nine feet high",
+          "The sea, near a railway station",
+          "A pond in the garden"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "However, she soon made out that she was in the pool of tears which she had wept when she was nine feet high.",
+        "hint": "Look again at the part where Alice thinks she has fallen into the sea."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Alice cry so much in the hall?",
+        "options": [
+          "She was too big to get through the little door into the garden",
+          "She had hurt her foot",
+          "The White Rabbit was rude to her"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "It was as much as she could do, lying down on one side, to look through into the garden with one eye; but to get through was more hopeless than ever: she sat down and began to cry again.",
+        "hint": "Look again at the part where Alice grows very tall."
+      },
+      {
+        "kind": "think",
+        "q": "Alice asks herself, “Who in the world am I?” Why does she feel so mixed up?",
+        "options": [
+          "So many strange things have happened that she isn’t sure she’s the same girl",
+          "She has forgotten her own name for fun",
+          "Someone has told her she is a different girl"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "But if I’m not the same, the next question is, Who in the world am I?",
+        "hint": "Look again at the part where Alice wonders if she has been changed in the night."
+      }
+    ],
+    "caucus": [
+      {
+        "kind": "what",
+        "q": "What prize did Alice get at the end of the Caucus-race?",
+        "options": [
+          "Her own thimble",
+          "A box of comfits",
+          "A golden key"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "Then they all crowded round her once more, while the Dodo solemnly presented the thimble",
+        "hint": "Look again at the part where everyone asks who will give the prizes."
+      },
+      {
+        "kind": "why",
+        "q": "Why did the Dodo suggest a Caucus-race?",
+        "options": [
+          "To get everyone dry",
+          "To choose a new king",
+          "To get away from the Mouse"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "“What I was going to say,” said the Dodo in an offended tone, “was, that the best thing to get us dry would be a Caucus-race.”",
+        "hint": "Look again at what everyone wanted after climbing out of the pool."
+      },
+      {
+        "kind": "think",
+        "q": "The Dodo says “everybody has won”. What is funny about this race?",
+        "options": [
+          "A race where everyone wins isn’t really a race at all",
+          "Nobody ran in it",
+          "Only the Dodo won"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "At last the Dodo said, “everybody has won, and all must have prizes.”",
+        "hint": "Look again at what the Dodo says when everyone asks who has won."
+      }
+    ],
+    "rabbit-house": [
+      {
+        "kind": "what",
+        "q": "What did the White Rabbit call Alice when he mistook her for someone else?",
+        "options": [
+          "Mary Ann",
+          "Mabel",
+          "Dinah"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "Very soon the Rabbit noticed Alice, as she went hunting about, and called out to her in an angry tone, “Why, Mary Ann, what are you doing out here?",
+        "hint": "Look again at the start of the chapter, when the Rabbit is hunting for his fan and gloves."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Alice get stuck in the White Rabbit’s house?",
+        "options": [
+          "She drank from a bottle and grew too big",
+          "The door was locked",
+          "Bill the Lizard sat on her"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "She hastily put down the bottle, saying to herself “That’s quite enough—I hope I shan’t grow any more—As it is, I can’t get out at the door—I do wish I hadn’t drunk quite so much!”",
+        "hint": "Look again at the part where Alice finds a bottle in the Rabbit’s room."
+      },
+      {
+        "kind": "think",
+        "q": "The pebbles thrown at Alice turn into little cakes. Why does this give her a “bright idea”?",
+        "options": [
+          "Eating a cake might change her size and let her get out",
+          "She was hungry and wanted a snack",
+          "She could throw the cakes back"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "Alice noticed with some surprise that the pebbles were all turning into little cakes as they lay on the floor, and a bright idea came into her head.",
+        "hint": "Look again at what happens to the pebbles on the floor."
+      }
+    ],
+    "caterpillar": [
+      {
+        "kind": "what",
+        "q": "What did the Caterpillar say the two sides of the mushroom would do?",
+        "options": [
+          "One makes you grow taller, the other shorter",
+          "One makes you fly, the other swim",
+          "One sends you home, the other keeps you here"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "One side will make you grow taller, and the other side will make you grow shorter.",
+        "hint": "Look again at what the Caterpillar says as it crawls away."
+      },
+      {
+        "kind": "why",
+        "q": "Why couldn’t Alice answer when the Caterpillar asked, “Who are you?”",
+        "options": [
+          "She had changed so many times that day",
+          "She was too scared to speak",
+          "She didn’t understand the question"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "Alice replied, rather shyly, “I—I hardly know, sir, just at present—at least I know who I was when I got up this morning, but I think I must have been changed several times since then.”",
+        "hint": "Look again at Alice’s first answer to the Caterpillar."
+      },
+      {
+        "kind": "think",
+        "q": "Alice calls three inches “a wretched height”, and the Caterpillar is angry. Why?",
+        "options": [
+          "The Caterpillar is exactly three inches high",
+          "The Caterpillar wanted to be taller",
+          "Alice was rude about its mushroom"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "“It is a very good height indeed!” said the Caterpillar angrily, rearing itself upright as it spoke (it was exactly three inches high).",
+        "hint": "Look again at how tall the Caterpillar is."
+      }
+    ],
+    "pepper": [
+      {
+        "kind": "what",
+        "q": "What did the Duchess’s baby turn into?",
+        "options": [
+          "A pig",
+          "A cat",
+          "A frog"
+        ],
+        "answer": 0,
+        "chapter": 6,
+        "evidence": "“It turned into a pig,”",
+        "hint": "Look again at the part where Alice carries the baby outside."
+      },
+      {
+        "kind": "why",
+        "q": "Why was everyone in the Duchess’s kitchen sneezing?",
+        "options": [
+          "There was too much pepper in the soup",
+          "The kitchen was full of dust",
+          "They all had colds"
+        ],
+        "answer": 0,
+        "chapter": 6,
+        "evidence": "“There’s certainly too much pepper in that soup!”",
+        "hint": "Look again at what Alice says as she sneezes in the kitchen."
+      },
+      {
+        "kind": "think",
+        "q": "Alice asks why the cat grins. The Duchess says, “It’s a Cheshire cat, and that’s why.” Is that a real reason?",
+        "options": [
+          "No — it doesn’t really explain anything",
+          "Yes, it explains everything",
+          "Yes, because all cats grin"
+        ],
+        "answer": 0,
+        "chapter": 6,
+        "evidence": "“It’s a Cheshire cat,” said the Duchess, “and that’s why.",
+        "hint": "Look again at the Duchess’s answer about the cat."
+      }
+    ],
+    "tea-party": [
+      {
+        "kind": "what",
+        "q": "What time is it always at the Mad Tea-Party?",
+        "options": [
+          "Six o’clock",
+          "Twelve o’clock",
+          "Four o’clock"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "It’s always six o’clock now.",
+        "hint": "Look again at what the Hatter says about Time."
+      },
+      {
+        "kind": "why",
+        "q": "Why is it always the same time at the tea-party?",
+        "options": [
+          "The Hatter quarrelled with Time",
+          "The clocks are all broken",
+          "The Queen made a rule"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "“We quarrelled last March—just before he went mad, you know—”",
+        "hint": "Look again at the Hatter’s story about the Queen’s concert."
+      },
+      {
+        "kind": "think",
+        "q": "When the Hatter wants a clean cup, what does everyone do?",
+        "options": [
+          "They all move one place on round the table",
+          "They wash the cups",
+          "They go home"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "“I want a clean cup,” interrupted the Hatter: “let’s all move one place on.”",
+        "hint": "Look again at what the Hatter says when he wants a clean cup."
+      }
+    ],
+    "croquet": [
+      {
+        "kind": "what",
+        "q": "What were used as the croquet balls and mallets?",
+        "options": [
+          "Live hedgehogs and live flamingoes",
+          "Apples and walking sticks",
+          "Painted stones and umbrellas"
+        ],
+        "answer": 0,
+        "chapter": 8,
+        "evidence": "the balls were live hedgehogs, the mallets live flamingoes",
+        "hint": "Look again at Alice’s first look at the croquet-ground."
+      },
+      {
+        "kind": "why",
+        "q": "Why were the gardeners painting the roses red?",
+        "options": [
+          "They had planted a white rose-tree by mistake",
+          "Red was the King’s favourite colour",
+          "The roses were fading"
+        ],
+        "answer": 0,
+        "chapter": 8,
+        "evidence": "Two began in a low voice, “Why the fact is, you see, Miss, this here ought to have been a red rose-tree, and we put a white one in by mistake; and if the Queen was to find it out, we should all have our heads cut off, you know.",
+        "hint": "Look again at what the gardener tells Alice."
+      },
+      {
+        "kind": "think",
+        "q": "The Queen screams “Off with her head!” and Alice says “Nonsense!” — and the Queen goes quiet. What does this show?",
+        "options": [
+          "Standing up to someone who shouts can work",
+          "Alice wanted to be Queen",
+          "The Queen was tired"
+        ],
+        "answer": 0,
+        "chapter": 8,
+        "evidence": "“Nonsense!” said Alice, very loudly and decidedly, and the Queen was silent.",
+        "hint": "Look again at the part where the Queen first meets Alice."
+      }
+    ],
+    "mock-turtle": [
+      {
+        "kind": "what",
+        "q": "Who took Alice to see the Mock Turtle?",
+        "options": [
+          "The Gryphon",
+          "The Duchess",
+          "The White Rabbit"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "“Up, lazy thing!” said the Queen, “and take this young lady to see the Mock Turtle, and to hear his history.",
+        "hint": "Look again at the part where they find someone asleep in the sun."
+      },
+      {
+        "kind": "why",
+        "q": "Why did the Mock Turtle say they called their teacher “Tortoise”?",
+        "options": [
+          "“Because he taught us”",
+          "Because he was very slow",
+          "Because he lived in a shell"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "“We called him Tortoise because he taught us,” said the Mock Turtle angrily",
+        "hint": "Look again at the Mock Turtle’s school days."
+      },
+      {
+        "kind": "think",
+        "q": "The Gryphon says lessons are called lessons “because they lessen from day to day”. What kind of joke is this?",
+        "options": [
+          "A play on words",
+          "A true fact about school",
+          "A riddle with no answer"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "“That’s the reason they’re called lessons,” the Gryphon remarked: “because they lessen from day to day.”",
+        "hint": "Look again at what Alice asks about hours of lessons."
+      }
+    ],
+    "quadrille": [
+      {
+        "kind": "what",
+        "q": "In the Lobster Quadrille, who is each dancer’s partner?",
+        "options": [
+          "A lobster",
+          "A seal",
+          "A crab"
+        ],
+        "answer": 0,
+        "chapter": 10,
+        "evidence": "“Each with a lobster as a partner!” cried the Gryphon.",
+        "hint": "Look again at how the Gryphon explains the dance."
+      },
+      {
+        "kind": "why",
+        "q": "In the song, why does the whiting ask the snail to walk faster?",
+        "options": [
+          "A porpoise is close behind, treading on his tail",
+          "The dance is about to start",
+          "It is getting dark"
+        ],
+        "answer": 0,
+        "chapter": 10,
+        "evidence": "‘There’s a porpoise close behind us, and he’s treading on my tail.",
+        "hint": "Look again at the first lines of the song."
+      },
+      {
+        "kind": "think",
+        "q": "Alice says it was “a very interesting dance to watch” and is glad it’s over. What does this tell us?",
+        "options": [
+          "She was being polite",
+          "She wanted to see it again straight away",
+          "She thought it was too short"
+        ],
+        "answer": 0,
+        "chapter": 10,
+        "evidence": "“Thank you, it’s a very interesting dance to watch,” said Alice, feeling very glad that it was over at last",
+        "hint": "Look again at what Alice says when the dance ends."
+      }
+    ],
+    "tarts": [
+      {
+        "kind": "what",
+        "q": "What is the Knave of Hearts accused of?",
+        "options": [
+          "Stealing the Queen’s tarts",
+          "Painting the roses",
+          "Losing the White Rabbit’s fan"
+        ],
+        "answer": 0,
+        "chapter": 11,
+        "evidence": "The Knave of Hearts, he stole those tarts,",
+        "hint": "Look again at what the White Rabbit reads out from his scroll."
+      },
+      {
+        "kind": "why",
+        "q": "Why did the Dormouse complain about Alice in the court?",
+        "options": [
+          "She was growing larger and squashing him",
+          "She kept talking",
+          "She ate a tart"
+        ],
+        "answer": 0,
+        "chapter": 11,
+        "evidence": "“I can’t help it,” said Alice very meekly: “I’m growing.”",
+        "hint": "Look again at the curious feeling Alice has in the court."
+      },
+      {
+        "kind": "think",
+        "q": "There is a dish of tarts on the table in the middle of the court. What does that suggest?",
+        "options": [
+          "Maybe the tarts were never really stolen",
+          "The Knave brought them back",
+          "The cook made new ones"
+        ],
+        "answer": 0,
+        "chapter": 11,
+        "evidence": "In the very middle of the court was a table, with a large dish of tarts upon it",
+        "hint": "Look again at what Alice sees when she arrives at the court."
+      }
+    ]
+  },
+  "vault": [
+    {
+      "q": "How did Alice first get into Wonderland?",
+      "options": [
+        "She followed the White Rabbit down a rabbit-hole",
+        "She climbed through a mirror",
+        "She fell asleep on a train"
+      ],
+      "answer": 0,
+      "chapter": 1,
+      "evidence": "it flashed across her mind that she had never before seen a rabbit with either a waistcoat-pocket, or a watch to take out of it",
+      "hint": "Think back to the very first chapter."
+    },
+    {
+      "q": "What helped Alice get small enough to escape from the Rabbit’s house?",
+      "options": [
+        "Little cakes",
+        "A bottle of water",
+        "The Caterpillar’s mushroom"
+      ],
+      "answer": 0,
+      "chapter": 4,
+      "evidence": "Alice noticed with some surprise that the pebbles were all turning into little cakes as they lay on the floor",
+      "hint": "Think about what the pebbles turned into."
+    },
+    {
+      "q": "The Queen says “Sentence first—verdict afterwards.” What is wrong with that?",
+      "options": [
+        "You should decide if someone is guilty before you punish them",
+        "Sentences should be short",
+        "The jury should speak first"
+      ],
+      "answer": 0,
+      "chapter": 12,
+      "evidence": "“Sentence first—verdict afterwards.”",
+      "hint": "Think about what a trial is for."
+    },
+    {
+      "q": "When does Alice finally stand up to the whole court?",
+      "options": [
+        "When she has grown to her full size",
+        "When she is three inches tall",
+        "When the Cheshire Cat appears"
+      ],
+      "answer": 0,
+      "chapter": 12,
+      "evidence": "“Who cares for you?” said Alice, (she had grown to her full size by this time.)",
+      "hint": "Think about Alice’s size at the end of the trial."
+    },
+    {
+      "q": "What did Alice call the King, the Queen and their court?",
+      "options": [
+        "Nothing but a pack of cards",
+        "A lot of silly birds",
+        "Mad as hatters"
+      ],
+      "answer": 0,
+      "chapter": 12,
+      "evidence": "“You’re nothing but a pack of cards!”",
+      "hint": "Think about how the trial ends."
+    },
+    {
+      "q": "Where was Alice when she woke up?",
+      "options": [
+        "On the bank, with her head in her sister’s lap",
+        "At the bottom of the rabbit-hole",
+        "In her bed at home"
+      ],
+      "answer": 0,
+      "chapter": 12,
+      "evidence": "she gave a little scream, half of fright and half of anger, and tried to beat them off, and found herself lying on the bank, with her head in the lap of her sister",
+      "hint": "Think about the very last chapter."
+    },
+    {
+      "q": "What did all of Alice’s adventures turn out to be?",
+      "options": [
+        "A curious dream",
+        "A story her sister told her",
+        "A game of croquet"
+      ],
+      "answer": 0,
+      "chapter": 12,
+      "evidence": "“Oh, I’ve had such a curious dream!” said Alice",
+      "hint": "Think about what Alice tells her sister."
+    }
+  ]
+}

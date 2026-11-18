@@ -1,0 +1,978 @@
+{
+  "id": "adv-treasure",
+  "blurb": "young Jim Hawkins finds a treasure map in an old sea-chest — and sails with a crew that can’t be trusted.",
+  "chapterWord": "Chapter",
+  "source": "Text: Treasure Island by Robert Louis Stevenson (1883), from the Standard Ebooks edition. Public domain.",
+  "theme": {
+    "palette": {
+      "ground": "#e8d3a0",
+      "ground2": "#d8c08a",
+      "wall": "#e8dcc4",
+      "trim": "#5a3a24",
+      "roof": "#8a2a2a",
+      "accent": "#c9a24a",
+      "accent2": "#2f4a7a",
+      "wood": "#7a4e30",
+      "leaf": "#3f8a3a",
+      "stone": "#b8b0a0",
+      "sky": "#9fd6f2",
+      "fog": "#d8eef4",
+      "water": "#2f8ab8",
+      "item": "#ffd23f"
+    },
+    "props": [
+      "barrel",
+      "crate",
+      "tree",
+      "rock",
+      "tent",
+      "barrel"
+    ],
+    "vaultProps": [
+      "barrel",
+      "crate",
+      "table",
+      "barrel"
+    ],
+    "edge": "fence",
+    "hide": "crate",
+    "rafts": [
+      "crate",
+      "barrel",
+      "chest"
+    ],
+    "building": {
+      "wall": "#e8dcc4",
+      "trim": "#5a3a24",
+      "roof": "#8a2a2a",
+      "style": "house",
+      "sign": "The Admiral Benbow",
+      "h": 6
+    }
+  },
+  "streets": [
+    {
+      "id": "benbow",
+      "name": "The Admiral Benbow",
+      "chapters": [
+        1,
+        2,
+        3
+      ],
+      "template": "PUZZLE",
+      "game": "The captain’s sea-chest",
+      "blurb": "An old sea captain lodges at Jim’s inn, watching the road — and guarding his sea-chest.",
+      "how": "Look round the inn parlour, then work out what the captain’s enemies are really after.",
+      "params": {
+        "room": {
+          "w": 14,
+          "d": 12
+        },
+        "objective": "Find out what the captain’s enemies want",
+        "clues": [
+          {
+            "object": "window",
+            "label": "The window",
+            "text": "The captain pays Jim a silver fourpenny each month to watch for a seafaring man with one leg."
+          },
+          {
+            "object": "note",
+            "label": "A scrap of paper",
+            "text": "A round of paper, blackened on one side. The black spot!"
+          },
+          {
+            "object": "chest",
+            "label": "The sea-chest",
+            "text": "An old sea-chest with the letter B burned on the lid. The captain never lets it out of his room."
+          }
+        ],
+        "solve": {
+          "object": "chest",
+          "label": "The chest",
+          "type": "choice",
+          "prompt": "What are the captain’s old shipmates really after?",
+          "options": [
+            "His old sea-chest",
+            "His room at the inn",
+            "Jim’s fourpenny piece"
+          ],
+          "answer": 0,
+          "hint": "What does the captain tell Jim to guard?"
+        },
+        "palette": {
+          "ground": "#8a6440",
+          "ground2": "#7a5636"
+        }
+      }
+    },
+    {
+      "id": "blind-pew",
+      "name": "Blind Pew",
+      "chapters": [
+        4,
+        5,
+        6
+      ],
+      "template": "SNEAK",
+      "game": "Escape with the map",
+      "blurb": "The pirates are coming to the inn. Jim and his mother must get away — with the captain’s packet.",
+      "how": "Slip out of the inn and along the road to the village without the pirates seeing you.",
+      "params": {
+        "area": [
+          34,
+          46
+        ],
+        "dark": true,
+        "watchers": 3,
+        "hides": 6,
+        "goal": {
+          "name": "the village",
+          "icon": "🗺️"
+        },
+        "watcher": {
+          "kind": "person",
+          "name": "a pirate",
+          "look": {
+            "shirt": "0x8a2a2a",
+            "pants": "0x3a3a46",
+            "hair": "0x1b1b1b"
+          }
+        },
+        "objective": "Get the map to safety",
+        "palette": {
+          "sky": "#1d2540",
+          "fog": "#2a3456"
+        }
+      }
+    },
+    {
+      "id": "bristol",
+      "name": "Bristol",
+      "chapters": [
+        7,
+        8,
+        9
+      ],
+      "template": "COLLECT",
+      "game": "Crew the Hispaniola",
+      "blurb": "In Bristol the squire buys a ship, the Hispaniola, and gathers a crew.",
+      "how": "Find everyone and everything the Hispaniola needs before she sails.",
+      "params": {
+        "area": [
+          36,
+          34
+        ],
+        "floor": "stone",
+        "label": "found",
+        "objective": "Crew the Hispaniola",
+        "items": [
+          {
+            "name": "Captain Smollett",
+            "icon": "🧭"
+          },
+          {
+            "name": "Doctor Livesey",
+            "icon": "🩺"
+          },
+          {
+            "name": "Squire Trelawney",
+            "icon": "🎩"
+          },
+          {
+            "name": "The ship’s cook",
+            "icon": "🍳"
+          },
+          {
+            "name": "Cap’n Flint, the parrot",
+            "icon": "🦜"
+          },
+          {
+            "name": "An anchor",
+            "icon": "⚓"
+          }
+        ]
+      }
+    },
+    {
+      "id": "apple-barrel",
+      "name": "The Apple Barrel",
+      "chapters": [
+        10,
+        11,
+        12
+      ],
+      "template": "SNEAK",
+      "game": "Overhear the plan",
+      "blurb": "Jim climbs into the apple barrel for an apple — and hears something he shouldn’t.",
+      "how": "Creep across the deck to the apple barrel without the crew noticing you.",
+      "params": {
+        "area": [
+          24,
+          44
+        ],
+        "floor": "floor",
+        "watchers": 3,
+        "hides": 5,
+        "goal": {
+          "name": "the apple barrel",
+          "icon": "🍎"
+        },
+        "watcher": {
+          "kind": "person",
+          "name": "a pirate",
+          "look": {
+            "shirt": "0x8a2a2a",
+            "pants": "0x3a3a46",
+            "hair": "0x1b1b1b"
+          }
+        },
+        "objective": "Reach the apple barrel unseen"
+      }
+    },
+    {
+      "id": "ben-gunn",
+      "name": "Ben Gunn",
+      "chapters": [
+        13,
+        14,
+        15
+      ],
+      "template": "COLLECT",
+      "game": "Explore the island",
+      "blurb": "Jim slips ashore and explores the island alone — and meets a strange, wild man.",
+      "how": "Explore the island, find six things, then talk to the man who lives here.",
+      "params": {
+        "area": [
+          44,
+          44
+        ],
+        "floor": "sand",
+        "platforms": 6,
+        "label": "found",
+        "objective": "Explore the island",
+        "palette": {
+          "ground": "#e8d3a0",
+          "ground2": "#d8c08a",
+          "leaf": "#3f8a3a",
+          "sky": "#9fd6f2",
+          "fog": "#d8eef4"
+        },
+        "items": [
+          {
+            "name": "A coconut",
+            "icon": "🥥"
+          },
+          {
+            "name": "A shell",
+            "icon": "🐚"
+          },
+          {
+            "name": "A goat’s footprint",
+            "icon": "🐐"
+          },
+          {
+            "name": "A wild flower",
+            "icon": "🌺"
+          },
+          {
+            "name": "A crab",
+            "icon": "🦀"
+          },
+          {
+            "name": "An old boat",
+            "icon": "🛶"
+          }
+        ],
+        "finale": {
+          "npc": {
+            "kind": "person",
+            "name": "Ben Gunn",
+            "look": {
+              "shirt": "0x8a7a5a",
+              "pants": "0x6a5a4a",
+              "hair": "0xd8c08a",
+              "skin": "0xc68a5a"
+            }
+          },
+          "say": "I’m poor Ben Gunn, I am. Marooned three years! You mightn’t happen to have a piece of cheese about you, now?"
+        }
+      }
+    },
+    {
+      "id": "stockade",
+      "name": "The Stockade",
+      "chapters": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "template": "BUILD",
+      "game": "Hold the stockade",
+      "blurb": "The captain’s party leave the ship for an old log stockade on the island.",
+      "how": "Carry logs to block the four gaps in the stockade fence.",
+      "params": {
+        "area": [
+          30,
+          30
+        ],
+        "anyItem": true,
+        "floor": "sand",
+        "palette": {
+          "ground": "#e8d3a0",
+          "ground2": "#d8c08a",
+          "leaf": "#3f8a3a",
+          "sky": "#9fd6f2",
+          "fog": "#d8eef4"
+        },
+        "objective": "Block the gaps in the stockade",
+        "items": [
+          {
+            "id": "log0",
+            "name": "a log",
+            "icon": "🪵"
+          },
+          {
+            "id": "log1",
+            "name": "a log",
+            "icon": "🪵"
+          },
+          {
+            "id": "log2",
+            "name": "a log",
+            "icon": "🪵"
+          },
+          {
+            "id": "log3",
+            "name": "a log",
+            "icon": "🪵"
+          }
+        ],
+        "slots": [
+          {
+            "id": "n",
+            "name": "North gap"
+          },
+          {
+            "id": "e",
+            "name": "East gap"
+          },
+          {
+            "id": "s",
+            "name": "South gap"
+          },
+          {
+            "id": "w",
+            "name": "West gap"
+          }
+        ],
+        "done": "The stockade is secure."
+      }
+    },
+    {
+      "id": "coracle",
+      "name": "The Coracle",
+      "chapters": [
+        22,
+        23,
+        24
+      ],
+      "template": "ARCADE",
+      "game": "Paddle to the ship",
+      "blurb": "Jim finds Ben Gunn’s little coracle and paddles out to the Hispaniola in the dark.",
+      "how": "Steer the coracle out to the ship. Collect the oars and avoid the rocks.",
+      "params": {
+        "mode": "paddle",
+        "duration": 40,
+        "player": "🛶",
+        "good": [
+          {
+            "icon": "🪝",
+            "name": "rope"
+          },
+          {
+            "icon": "🌊",
+            "name": "a good wave"
+          }
+        ],
+        "bad": [
+          {
+            "icon": "🪨",
+            "name": "rock"
+          }
+        ],
+        "objective": "Paddle out to the Hispaniola",
+        "done": "Alongside the Hispaniola!"
+      }
+    },
+    {
+      "id": "hispaniola",
+      "name": "The Hispaniola",
+      "chapters": [
+        25,
+        26,
+        27
+      ],
+      "template": "CLIMB",
+      "game": "Up the rigging",
+      "blurb": "Jim takes back the ship, and climbs the rigging high above the deck.",
+      "how": "Climb the rigging up the mainmast to the cross-trees.",
+      "params": {
+        "height": 18,
+        "core": "mast",
+        "layout": "spiral",
+        "collect": {
+          "item": {
+            "name": "A piece of eight",
+            "icon": "🪙"
+          },
+          "count": 5,
+          "label": "coins"
+        },
+        "palette": {
+          "ground": "#2f8ab8",
+          "ground2": "#3a9ac8"
+        },
+        "goalIcon": "🏴",
+        "objective": "Climb to the cross-trees"
+      }
+    },
+    {
+      "id": "black-spot",
+      "name": "The Black Spot",
+      "chapters": [
+        28,
+        29,
+        30
+      ],
+      "template": "PUZZLE",
+      "game": "Among the pirates",
+      "blurb": "Jim walks into the pirates’ camp — and the pirates turn against Silver.",
+      "how": "Look round the pirates’ log-house, then work out how Jim can stay safe.",
+      "params": {
+        "room": {
+          "w": 14,
+          "d": 12
+        },
+        "dark": true,
+        "objective": "Work out how Jim stays safe",
+        "clues": [
+          {
+            "object": "note",
+            "label": "The black spot",
+            "text": "Cut from a Bible, of all things. On the back: “Deposed.”"
+          },
+          {
+            "object": "map",
+            "label": "The chart",
+            "text": "Silver has the treasure map — the doctor gave it to him. Why?"
+          },
+          {
+            "object": "chair",
+            "label": "Silver",
+            "text": "Silver says: “You stand by Hawkins, John, and Hawkins’ll stand by you.”"
+          }
+        ],
+        "solve": {
+          "object": "sign",
+          "label": "Staying safe",
+          "type": "choice",
+          "prompt": "How does Jim stay safe among the pirates?",
+          "options": [
+            "Silver agrees to stand by him — each needs the other",
+            "He hides in the apple barrel",
+            "He promises to join the pirates for ever"
+          ],
+          "answer": 0,
+          "hint": "Listen to what Silver says to himself."
+        }
+      }
+    },
+    {
+      "id": "treasure-hunt",
+      "name": "The Treasure Hunt",
+      "chapters": [
+        31,
+        32,
+        33
+      ],
+      "template": "COLLECT",
+      "game": "Follow the map",
+      "blurb": "Silver and the pirates set out with Flint’s map to find the treasure.",
+      "how": "Follow Flint’s clues across the island.",
+      "params": {
+        "area": [
+          44,
+          44
+        ],
+        "floor": "sand",
+        "label": "clues",
+        "objective": "Follow the map clues",
+        "palette": {
+          "ground": "#e8d3a0",
+          "ground2": "#d8c08a",
+          "leaf": "#3f8a3a",
+          "sky": "#9fd6f2",
+          "fog": "#d8eef4"
+        },
+        "platforms": 5,
+        "items": [
+          {
+            "name": "The tall tree",
+            "icon": "🌲"
+          },
+          {
+            "name": "The compass bearing",
+            "icon": "🧭"
+          },
+          {
+            "name": "Spy-glass shoulder",
+            "icon": "⛰️"
+          },
+          {
+            "name": "The two-pointed hill",
+            "icon": "🏔️"
+          },
+          {
+            "name": "A broken pickaxe",
+            "icon": "⛏️"
+          },
+          {
+            "name": "A trail of footprints",
+            "icon": "👣"
+          }
+        ]
+      }
+    }
+  ],
+  "skyRun": {
+    "id": "sky",
+    "name": "The Hispaniola’s Masts",
+    "template": "CLIMB",
+    "game": "Sky Run",
+    "blurb": "across the masts and rigging of the Hispaniola.",
+    "how": "Climb the rigging from yard to yard. Some swing with the ship — hold on!",
+    "params": {
+      "height": 22,
+      "core": "mast",
+      "layout": "zigzag",
+      "moving": 2,
+      "collect": {
+        "item": {
+          "name": "A gold doubloon",
+          "icon": "🪙"
+        },
+        "count": 6,
+        "label": "doubloons"
+      },
+      "palette": {
+        "ground": "#2f8ab8",
+        "ground2": "#3a9ac8"
+      },
+      "goalIcon": "🔭",
+      "objective": "Reach the crow’s nest"
+    }
+  },
+  "npcs": [
+    {
+      "id": "jim",
+      "name": "Jim Hawkins",
+      "kind": "child",
+      "look": {
+        "shirt": "0x2f4a7a",
+        "pants": "0x5a3a24",
+        "hair": "0x6a3a1a"
+      },
+      "at": [
+        -8,
+        -6.5
+      ],
+      "idle": "I’ll never forget the sound of that parrot.",
+      "thanks": "All eight! That bird is a terror."
+    }
+  ],
+  "sideQuest": {
+    "id": "adv-treasure-eight",
+    "title": "Pieces of Eight",
+    "giver": "jim",
+    "steps": [
+      {
+        "type": "talk",
+        "params": {
+          "npc": "jim"
+        },
+        "text": "Talk to Jim Hawkins outside the Admiral Benbow.",
+        "say": "Cap’n Flint — Silver’s parrot — has got loose and hidden eight pieces of eight around the place. Pieces of eight! Pieces of eight! Can you find them?"
+      },
+      {
+        "type": "collect",
+        "params": {
+          "items": [
+            {
+              "id": "ti-p8-1",
+              "name": "A piece of eight",
+              "shape": "gem",
+              "colour": "#ffd23f",
+              "at": [
+                9,
+                -6
+              ]
+            },
+            {
+              "id": "ti-p8-2",
+              "name": "A piece of eight",
+              "shape": "gem",
+              "colour": "#ffd23f",
+              "at": [
+                -9.5,
+                -2
+              ]
+            },
+            {
+              "id": "ti-p8-3",
+              "name": "A piece of eight",
+              "shape": "gem",
+              "colour": "#ffd23f",
+              "at": [
+                9.5,
+                2
+              ]
+            },
+            {
+              "id": "ti-p8-4",
+              "name": "A piece of eight",
+              "shape": "gem",
+              "colour": "#ffd23f",
+              "at": [
+                -9.5,
+                5
+              ]
+            },
+            {
+              "id": "ti-p8-5",
+              "name": "A piece of eight",
+              "shape": "gem",
+              "colour": "#ffd23f",
+              "at": [
+                -5,
+                7.5
+              ]
+            },
+            {
+              "id": "ti-p8-6",
+              "name": "A piece of eight",
+              "shape": "gem",
+              "colour": "#ffd23f",
+              "at": [
+                5,
+                7.5
+              ]
+            },
+            {
+              "id": "ti-p8-7",
+              "name": "A piece of eight",
+              "shape": "gem",
+              "colour": "#ffd23f",
+              "at": [
+                -3,
+                -9.5
+              ]
+            },
+            {
+              "id": "ti-p8-8",
+              "name": "A piece of eight",
+              "shape": "gem",
+              "colour": "#ffd23f",
+              "at": [
+                3,
+                -9.5
+              ]
+            }
+          ]
+        },
+        "text": "Find the eight pieces of eight Cap’n Flint hid."
+      },
+      {
+        "type": "talk",
+        "params": {
+          "npc": "jim"
+        },
+        "text": "Give the coins back to Jim.",
+        "say": "That parrot! Thank you, shipmate."
+      }
+    ],
+    "reward": {
+      "coins": 35
+    }
+  },
+  "vault": {
+    "name": "Ben Gunn’s Cave",
+    "blurb": "an escape room in the treasure cave: who can be trusted, and who knew what?",
+    "intro": "Ben Gunn’s cave is piled with Flint’s treasure. Three locks guard the way out. Rebuild the story of who knew what.",
+    "room": {
+      "wall": "#b8a888",
+      "floor": "#8a7a5a",
+      "rug": "#c9a24a",
+      "dark": true
+    },
+    "stations": [
+      {
+        "id": "who-knew",
+        "object": "trunk",
+        "label": "The sea-chests",
+        "lock": "Lock 1 · Who knew what",
+        "text": "Match each person to what they knew or did.",
+        "lesson": "The treasure moved long before anyone with a map arrived.",
+        "solve": {
+          "type": "match",
+          "prompt": "Match each one.",
+          "pairs": [
+            [
+              "Ben Gunn",
+              "Had already dug up the treasure"
+            ],
+            [
+              "Jim Hawkins",
+              "Heard the mutiny plot from the apple barrel"
+            ],
+            [
+              "Doctor Livesey",
+              "Gave Silver the map, knowing it was useless"
+            ],
+            [
+              "Long John Silver",
+              "Changed sides whenever it suited him"
+            ]
+          ],
+          "hint": "Think about the apple barrel, the cave and the map."
+        }
+      },
+      {
+        "id": "story",
+        "object": "map",
+        "label": "Flint’s map",
+        "lock": "Lock 2 · The voyage",
+        "text": "Put the adventure back in order.",
+        "lesson": "From the Admiral Benbow to Ben Gunn’s cave.",
+        "solve": {
+          "type": "order",
+          "prompt": "First at the top.",
+          "items": [
+            "The captain arrives at the Admiral Benbow",
+            "Jim finds the map in the sea-chest",
+            "The Hispaniola sails from Bristol",
+            "Jim hears the plot in the apple barrel",
+            "Jim meets Ben Gunn",
+            "Jim takes the Hispaniola back",
+            "The treasure hole is empty"
+          ],
+          "hint": "It starts at the inn and ends at the empty hole."
+        }
+      },
+      {
+        "id": "trust",
+        "object": "board",
+        "label": "The ship’s log",
+        "lock": "Lock 3 · Who can be trusted?",
+        "text": "Silver was friendly, clever and brave — and he led the mutiny.",
+        "lesson": "Someone can be charming and still not be trustworthy. Watch what people do, not just what they say.",
+        "solve": {
+          "type": "choice",
+          "prompt": "Could Long John Silver be trusted?",
+          "options": [
+            "Not really — he was loyal only to himself",
+            "Yes, always",
+            "Only by the parrot"
+          ],
+          "answer": 0,
+          "hint": "Whose side was he on at each part of the story?"
+        }
+      }
+    ],
+    "quiz": {
+      "object": "chest",
+      "label": "The treasure chest",
+      "lock": "Lock 4 · The whole voyage",
+      "lesson": "Pieces of eight! Pieces of eight!"
+    },
+    "openText": "The last lock clicks — daylight at the cave mouth.",
+    "outro": "The treasure is loaded, the Hispaniola sails for home — and Silver is gone."
+  },
+  "unlock": {
+    "badges": []
+  },
+  "chapterFiles": [
+    {
+      "n": 1,
+      "file": "01.md",
+      "title": "Chapter 1: At the Admiral Benbow"
+    },
+    {
+      "n": 2,
+      "file": "02.md",
+      "title": "Chapter 2: Black Dog Appears and Disappears"
+    },
+    {
+      "n": 3,
+      "file": "03.md",
+      "title": "Chapter 3: The Black Spot"
+    },
+    {
+      "n": 4,
+      "file": "04.md",
+      "title": "Chapter 4: The Sea-Chest"
+    },
+    {
+      "n": 5,
+      "file": "05.md",
+      "title": "Chapter 5: The Last of the Blind Man"
+    },
+    {
+      "n": 6,
+      "file": "06.md",
+      "title": "Chapter 6: The Captain’s Papers"
+    },
+    {
+      "n": 7,
+      "file": "07.md",
+      "title": "Chapter 7: I Go to Bristol"
+    },
+    {
+      "n": 8,
+      "file": "08.md",
+      "title": "Chapter 8: At the Sign of the Spy-Glass"
+    },
+    {
+      "n": 9,
+      "file": "09.md",
+      "title": "Chapter 9: Powder and Arms"
+    },
+    {
+      "n": 10,
+      "file": "10.md",
+      "title": "Chapter 10: The Voyage"
+    },
+    {
+      "n": 11,
+      "file": "11.md",
+      "title": "Chapter 11: What I Heard in the Apple Barrel"
+    },
+    {
+      "n": 12,
+      "file": "12.md",
+      "title": "Chapter 12: Council of War"
+    },
+    {
+      "n": 13,
+      "file": "13.md",
+      "title": "Chapter 13: How My Shore Adventure Began"
+    },
+    {
+      "n": 14,
+      "file": "14.md",
+      "title": "Chapter 14: The First Blow"
+    },
+    {
+      "n": 15,
+      "file": "15.md",
+      "title": "Chapter 15: The Man of the Island"
+    },
+    {
+      "n": 16,
+      "file": "16.md",
+      "title": "Chapter 16: Narrative Continued by the Doctor⁠—How the Ship Was Abandoned"
+    },
+    {
+      "n": 17,
+      "file": "17.md",
+      "title": "Chapter 17: Narrative Continued by the Doctor⁠—The Jolly-Boat’s Last Trip"
+    },
+    {
+      "n": 18,
+      "file": "18.md",
+      "title": "Chapter 18: Narrative Continued by the Doctor⁠—End of the First Day’s Fighting"
+    },
+    {
+      "n": 19,
+      "file": "19.md",
+      "title": "Chapter 19: Narrative Resumed by Jim Hawkins⁠—The Garrison in the Stockade"
+    },
+    {
+      "n": 20,
+      "file": "20.md",
+      "title": "Chapter 20: Silver’s Embassy"
+    },
+    {
+      "n": 21,
+      "file": "21.md",
+      "title": "Chapter 21: The Attack"
+    },
+    {
+      "n": 22,
+      "file": "22.md",
+      "title": "Chapter 22: How My Sea Adventure Began"
+    },
+    {
+      "n": 23,
+      "file": "23.md",
+      "title": "Chapter 23: The Ebb-Tide Runs"
+    },
+    {
+      "n": 24,
+      "file": "24.md",
+      "title": "Chapter 24: The Cruise of the Coracle"
+    },
+    {
+      "n": 25,
+      "file": "25.md",
+      "title": "Chapter 25: I Strike the Jolly Roger"
+    },
+    {
+      "n": 26,
+      "file": "26.md",
+      "title": "Chapter 26: Israel Hands"
+    },
+    {
+      "n": 27,
+      "file": "27.md",
+      "title": "Chapter 27: “Pieces of Eight”"
+    },
+    {
+      "n": 28,
+      "file": "28.md",
+      "title": "Chapter 28: In the Enemy’s Camp"
+    },
+    {
+      "n": 29,
+      "file": "29.md",
+      "title": "Chapter 29: The Black Spot Again"
+    },
+    {
+      "n": 30,
+      "file": "30.md",
+      "title": "Chapter 30: On Parole"
+    },
+    {
+      "n": 31,
+      "file": "31.md",
+      "title": "Chapter 31: The Treasure-Hunt⁠—Flint’s Pointer"
+    },
+    {
+      "n": 32,
+      "file": "32.md",
+      "title": "Chapter 32: The Treasure-Hunt⁠—The Voice Among the Trees"
+    },
+    {
+      "n": 33,
+      "file": "33.md",
+      "title": "Chapter 33: The Fall of a Chieftain"
+    },
+    {
+      "n": 34,
+      "file": "34.md",
+      "title": "Chapter 34: And Last"
+    }
+  ]
+}

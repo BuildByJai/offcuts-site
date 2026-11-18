@@ -1,0 +1,490 @@
+{
+  "book": "adv-treasure",
+  "_about": "answer = index of the right option (shuffled on screen); evidence = supporting sentence, review only; hint = gentle \"look again\" line.",
+  "streets": {
+    "benbow": [
+      {
+        "kind": "what",
+        "q": "What did the captain pay Jim to look out for?",
+        "options": [
+          "A seafaring man with one leg",
+          "A ship with black sails",
+          "A blind beggar"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "He had taken me aside one day and promised me a silver fourpenny on the first of every month if I would only keep my “weather eye open for a seafaring man with one leg,” and let him know the moment he appeared.",
+        "hint": "Look again at the captain’s deal with Jim."
+      },
+      {
+        "kind": "why",
+        "q": "What did the captain say his old shipmates were really after?",
+        "options": [
+          "His old sea-chest",
+          "His money belt",
+          "The inn"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "Now, if I can’t get away nohow, and they tip me the black spot, mind you, it’s my old sea-chest they’re after",
+        "hint": "Look again at what the captain tells Jim when he is ill."
+      },
+      {
+        "kind": "think",
+        "q": "The blind man asks gently for help, then grips Jim hard. What does that show?",
+        "options": [
+          "He is not as helpless as he pretends",
+          "He is frightened of Jim",
+          "He has lost his way"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "I was so much startled that I struggled to withdraw, but the blind man pulled me close up to him with a single action of his arm.",
+        "hint": "Look again at the blind man on the road."
+      }
+    ],
+    "blind-pew": [
+      {
+        "kind": "what",
+        "q": "What did Jim take from the captain’s sea-chest?",
+        "options": [
+          "An oilskin packet",
+          "A pistol",
+          "A parrot"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "“And I’ll take this to square the count,” said I, picking up the oilskin packet.",
+        "hint": "Look again at what Jim picks up as they leave."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Jim and his mother have to hurry?",
+        "options": [
+          "The black spot said, “You have till ten tonight”",
+          "The inn was on fire",
+          "The squire was waiting"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "I could not doubt that this was the black spot; and, taking it up, I found written on the other side, in a very good, clear hand, this short message, “You have till ten tonight.”",
+        "hint": "Look again at the message on the black spot."
+      },
+      {
+        "kind": "think",
+        "q": "Why was the map in the packet so important?",
+        "options": [
+          "It showed where Flint’s treasure was buried",
+          "It showed the way to Bristol",
+          "It was very old and valuable to collectors"
+        ],
+        "answer": 0,
+        "chapter": 6,
+        "evidence": "There were several additions of a later date; but, above all, three crosses of red ink—two on the north part of the island, one in the southwest, and, beside this last, in the same red ink, and in a small, neat hand, very different from the captain’s tottery characters, these words: “Bulk of treasure here.”",
+        "hint": "Look again at what the doctor finds when he opens the seals."
+      }
+    ],
+    "bristol": [
+      {
+        "kind": "what",
+        "q": "What was the ship’s cook called?",
+        "options": [
+          "Long John Silver",
+          "Billy Bones",
+          "Black Dog"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "Long John Silver he is called, and has lost a leg; but that I regarded as a recommendation, since he lost it in his country’s service, under the immortal Hawke.",
+        "hint": "Look again at the squire’s letter."
+      },
+      {
+        "kind": "why",
+        "q": "Why did the squire think Silver’s lost leg was a good sign?",
+        "options": [
+          "He believed Silver lost it serving his country",
+          "It meant Silver couldn’t run away",
+          "Silver cooked better sitting down"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "Long John Silver he is called, and has lost a leg; but that I regarded as a recommendation, since he lost it in his country’s service",
+        "hint": "Look again at what the squire writes about Silver."
+      },
+      {
+        "kind": "think",
+        "q": "Jim says Silver was “too clever for me”. What does that suggest?",
+        "options": [
+          "Silver was very good at fooling people",
+          "Silver was a great teacher",
+          "Jim was not very clever"
+        ],
+        "answer": 0,
+        "chapter": 8,
+        "evidence": "But he was too deep, and too ready, and too clever for me",
+        "hint": "Look again at Jim’s visit to the Spy-glass inn."
+      }
+    ],
+    "apple-barrel": [
+      {
+        "kind": "what",
+        "q": "What was Silver’s parrot called?",
+        "options": [
+          "Cap’n Flint",
+          "Polly",
+          "Billy Bones"
+        ],
+        "answer": 0,
+        "chapter": 10,
+        "evidence": "Here’s Cap’n Flint—I calls my parrot Cap’n Flint, after the famous buccaneer—here’s Cap’n Flint predicting success to our v’yage.",
+        "hint": "Look again at Silver’s galley."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Jim climb into the apple barrel?",
+        "options": [
+          "He fancied an apple",
+          "He was hiding on purpose",
+          "He was told to clean it"
+        ],
+        "answer": 0,
+        "chapter": 10,
+        "evidence": "Now, just after sundown, when all my work was over and I was on my way to my berth, it occurred to me that I should like an apple.",
+        "hint": "Look again at the end of the chapter."
+      },
+      {
+        "kind": "think",
+        "q": "The apple barrel turned out to be lucky. Why?",
+        "options": [
+          "From inside it, Jim overheard the mutiny plot and could warn the others",
+          "It was full of gold",
+          "It floated when the ship sank"
+        ],
+        "answer": 0,
+        "chapter": 10,
+        "evidence": "But good did come of the apple barrel, as you shall hear, for if it had not been for that we should have had no note of warning and might all have perished by the hand of treachery.",
+        "hint": "Look again at what Jim says about the barrel."
+      }
+    ],
+    "ben-gunn": [
+      {
+        "kind": "what",
+        "q": "Who did Jim meet alone on the island?",
+        "options": [
+          "Ben Gunn",
+          "Captain Flint",
+          "Israel Hands"
+        ],
+        "answer": 0,
+        "chapter": 15,
+        "evidence": "“Ben Gunn,” he answered, and his voice sounded hoarse and awkward, like a rusty lock.",
+        "hint": "Look again at the wild figure among the trees."
+      },
+      {
+        "kind": "why",
+        "q": "Why was Ben Gunn living alone on the island?",
+        "options": [
+          "He had been marooned",
+          "He was shipwrecked on purpose",
+          "He liked being alone"
+        ],
+        "answer": 0,
+        "chapter": 15,
+        "evidence": "“Nay, mate,” said he, “marooned.”",
+        "hint": "Look again at how Ben Gunn came to be there."
+      },
+      {
+        "kind": "think",
+        "q": "Ben Gunn has dreamed of cheese for three years. What does that tell you?",
+        "options": [
+          "How long and lonely his time on the island has been",
+          "That he is a cook",
+          "That cheese grows on the island"
+        ],
+        "answer": 0,
+        "chapter": 15,
+        "evidence": "Well, many’s the long night I’ve dreamed of cheese—toasted, mostly—and woke up again, and here I were.”",
+        "hint": "Look again at what Ben Gunn asks Jim for."
+      }
+    ],
+    "stockade": [
+      {
+        "kind": "what",
+        "q": "Where did the doctor’s party head for on the island?",
+        "options": [
+          "The stockade",
+          "Skeleton Island",
+          "The two-pointed hill"
+        ],
+        "answer": 0,
+        "chapter": 16,
+        "evidence": "I had not gone a hundred yards when I came on the stockade.",
+        "hint": "Look again at the doctor’s part of the story."
+      },
+      {
+        "kind": "why",
+        "q": "How did Jim know the pirates now held the ship?",
+        "options": [
+          "The Jolly Roger was flying from her peak",
+          "He heard them singing",
+          "Ben Gunn told him"
+        ],
+        "answer": 0,
+        "chapter": 19,
+        "evidence": "The Hispaniola still lay where she had anchored; but, sure enough, there was the Jolly Roger—the black flag of piracy—flying from her peak.",
+        "hint": "Look again at what Jim sees from the shore."
+      },
+      {
+        "kind": "think",
+        "q": "The loyal party left the ship for a stockade on land. Why might that be wise?",
+        "options": [
+          "They were outnumbered on the ship, and a fort is easier to hold",
+          "The stockade had the treasure in it",
+          "The ship was sinking"
+        ],
+        "answer": 0,
+        "chapter": 16,
+        "evidence": "We were clear out of the ship, but not yet ashore in our stockade.",
+        "hint": "Think about how many mutineers there were."
+      }
+    ],
+    "coracle": [
+      {
+        "kind": "what",
+        "q": "What was Jim hoping to find by the white rock?",
+        "options": [
+          "Ben Gunn’s hidden boat",
+          "The treasure",
+          "A spring of water"
+        ],
+        "answer": 0,
+        "chapter": 22,
+        "evidence": "find the white rock I had observed last evening, and ascertain whether it was there or not that Ben Gunn had hidden his boat",
+        "hint": "Look again at Jim’s plan."
+      },
+      {
+        "kind": "why",
+        "q": "Why was the ship’s hawser pulled so tight?",
+        "options": [
+          "The current was pulling the ship against her anchor",
+          "The pirates had tied it too tight",
+          "It was frozen"
+        ],
+        "answer": 0,
+        "chapter": 23,
+        "evidence": "The hawser was as taut as a bowstring and the current so strong she pulled upon her anchor.",
+        "hint": "Look again at what Jim finds when he reaches the ship."
+      },
+      {
+        "kind": "think",
+        "q": "Why did Jim go down the sea side of the spit?",
+        "options": [
+          "To avoid being seen from the anchorage",
+          "Because it was shorter",
+          "To look for shells"
+        ],
+        "answer": 0,
+        "chapter": 22,
+        "evidence": "I took my way straight for the east coast of the island, for I was determined to go down the seaside of the spit to avoid all chance of observation from the anchorage.",
+        "hint": "Look again at the route Jim takes."
+      }
+    ],
+    "hispaniola": [
+      {
+        "kind": "what",
+        "q": "Where did Jim mean to beach the ship?",
+        "options": [
+          "In North Inlet",
+          "On Skeleton Island",
+          "In Bristol"
+        ],
+        "answer": 0,
+        "chapter": 25,
+        "evidence": "I mean to get into North Inlet, and beach her quietly there.”",
+        "hint": "Look again at Jim’s plan on board."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Jim haul down the black flag?",
+        "options": [
+          "It was the pirates’ flag, and the ship was no longer theirs",
+          "It was torn",
+          "To use it as a sail"
+        ],
+        "answer": 0,
+        "chapter": 25,
+        "evidence": "And, again dodging the boom, I ran to the color lines, hauled down their cursed black flag, and chucked it overboard.",
+        "hint": "Look again at the start of the chapter."
+      },
+      {
+        "kind": "think",
+        "q": "With nobody steering, the ship bucked like a vicious horse. Why was that dangerous?",
+        "options": [
+          "A ship nobody steers can drift anywhere, even onto rocks",
+          "Horses don’t like ships",
+          "It made the parrot seasick"
+        ],
+        "answer": 0,
+        "chapter": 25,
+        "evidence": "For a while the ship kept bucking and sidling like a vicious horse, the sails filling, now on one tack, now on another, and the boom swinging to and fro till the mast groaned aloud under the strain.",
+        "hint": "Look again at how the ship moves."
+      }
+    ],
+    "black-spot": [
+      {
+        "kind": "what",
+        "q": "What did the pirates give Silver in their council?",
+        "options": [
+          "The black spot",
+          "A treasure map",
+          "A medal"
+        ],
+        "answer": 0,
+        "chapter": 29,
+        "evidence": "“This crew has tipped you the black spot in full council, as in dooty bound; just you turn it over, as in dooty bound, and see what’s wrote there.",
+        "hint": "Look again at the pirates’ council."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Silver decide to protect Jim?",
+        "options": [
+          "He hoped that if he stood by Jim, Jim would stand by him",
+          "He wanted Jim to be his cook",
+          "The doctor paid him"
+        ],
+        "answer": 0,
+        "chapter": 28,
+        "evidence": "I says to myself: You stand by Hawkins, John, and Hawkins’ll stand by you.",
+        "hint": "Look again at what Silver says to Jim in the log-house."
+      },
+      {
+        "kind": "think",
+        "q": "The doctor says he would tell Silver more, but it is not his secret. What does that show about the doctor?",
+        "options": [
+          "He keeps other people’s secrets",
+          "He has forgotten the secret",
+          "He wants to trick Jim"
+        ],
+        "answer": 0,
+        "chapter": 30,
+        "evidence": "“No,” said the doctor, musingly, “I’ve no right to say more; it’s not my secret, you see, Silver, or, I give you my word, I’d tell it you.",
+        "hint": "Look again at the doctor’s visit."
+      }
+    ],
+    "treasure-hunt": [
+      {
+        "kind": "what",
+        "q": "How did they decide which tall tree was Captain Flint’s?",
+        "options": [
+          "By the readings of the compass",
+          "By climbing every tree",
+          "By asking the parrot"
+        ],
+        "answer": 0,
+        "chapter": 31,
+        "evidence": "which of these was the particular “tall tree” of Captain Flint could only be decided on the spot, and by the readings of the compass",
+        "hint": "Look again at the start of the treasure hunt."
+      },
+      {
+        "kind": "why",
+        "q": "Why was the treasure hole empty?",
+        "options": [
+          "Ben Gunn had already dug it up and carried it to his cave",
+          "There had never been any treasure",
+          "The pirates dug it up the night before"
+        ],
+        "answer": 0,
+        "chapter": 33,
+        "evidence": "It was he that had rifled it; he had found the treasure; he had dug it up",
+        "hint": "Look again at what the doctor explains."
+      },
+      {
+        "kind": "think",
+        "q": "Everyone ignored Ben Gunn, but he had the treasure all along. What does that show?",
+        "options": [
+          "The person nobody notices can turn out to matter most",
+          "Treasure is never where the map says",
+          "Ben Gunn wanted to be a pirate"
+        ],
+        "answer": 0,
+        "chapter": 33,
+        "evidence": "“I’m Ben Gunn, I am,” replied the maroon, wriggling like an eel in his embarrassment.",
+        "hint": "Think about who really found the treasure."
+      }
+    ]
+  },
+  "vault": [
+    {
+      "q": "What did Jim take from the captain’s sea-chest that started the whole adventure?",
+      "options": [
+        "An oilskin packet with the map",
+        "A bag of gold",
+        "A pistol"
+      ],
+      "answer": 0,
+      "chapter": 4,
+      "evidence": "“And I’ll take this to square the count,” said I, picking up the oilskin packet.",
+      "hint": "Think about the night at the inn."
+    },
+    {
+      "q": "How did Jim learn about the mutiny?",
+      "options": [
+        "He overheard Silver from inside the apple barrel",
+        "The parrot told him",
+        "He read Silver’s diary"
+      ],
+      "answer": 0,
+      "chapter": 10,
+      "evidence": "But good did come of the apple barrel, as you shall hear",
+      "hint": "Think about the voyage."
+    },
+    {
+      "q": "Why was Ben Gunn on the island?",
+      "options": [
+        "He had been marooned",
+        "He was the island’s king",
+        "He was looking for the Hispaniola"
+      ],
+      "answer": 0,
+      "chapter": 15,
+      "evidence": "“Nay, mate,” said he, “marooned.”",
+      "hint": "Think about the wild man Jim met."
+    },
+    {
+      "q": "Where was the treasure really, by the time the Hispaniola arrived?",
+      "options": [
+        "In Ben Gunn’s cave on the two-pointed hill",
+        "Under the tall tree",
+        "On Skeleton Island"
+      ],
+      "answer": 0,
+      "chapter": 33,
+      "evidence": "he had carried it on his back, in many weary journeys, from the foot of the tall pine to a cave he had on the two-pointed hill",
+      "hint": "Think about the empty hole."
+    },
+    {
+      "q": "What happened to Long John Silver at the end?",
+      "options": [
+        "He slipped away",
+        "He became captain",
+        "He stayed on the island"
+      ],
+      "answer": 0,
+      "chapter": 34,
+      "evidence": "Silver was gone.",
+      "hint": "Think about the voyage home."
+    },
+    {
+      "q": "What does Jim still hear in his worst dreams?",
+      "options": [
+        "The parrot crying “Pieces of eight!”",
+        "The black spot",
+        "The tapping of a stick"
+      ],
+      "answer": 0,
+      "chapter": 34,
+      "evidence": "Oxen and wain-ropes would not bring me back again to that accursed island",
+      "hint": "Think about the very last lines."
+    }
+  ]
+}

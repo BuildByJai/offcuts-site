@@ -97,3 +97,13 @@ Coins buy help on skill games (`costs.extraLife`, `costs.speedBoost` in config.j
 ## Held-back books (not readable in-game)
 
 `readable: false` in the catalogue. **No `chapters/` folder, no full text in the repo** (the site is publicly served). Download the text temporarily to write the questions, then leave it out of the commit. The district panel automatically shows "Read chapter N in your own copy, or borrow it free from your library" with the library links behind the grown-up check, then the 3 questions.
+
+## Browser tests (per book)
+
+Serve the repo (`python3 -m http.server 8765` from the repo root), then:
+
+```bash
+node docs/chapterlands/tools/test_book.js <bookId>   # every street + Sky Run loads; Sky Run and Vault played to the end; Key + stamp checked
+node docs/chapterlands/tools/test_town.js <bookId>   # district side quest end to end in the town; series bridge with and without the Key
+```
+Needs Playwright (`require('playwright')`). Set `THREE_DIR` to a local three@0.160.0 if unpkg is blocked.

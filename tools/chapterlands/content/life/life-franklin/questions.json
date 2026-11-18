@@ -1,0 +1,203 @@
+{
+  "book": "life-franklin",
+  "_about": "answer = index of the right option (shuffled on screen); evidence = supporting sentence, review only; hint = gentle \"look again\" line.",
+  "streets": {
+    "printing-shop": [
+      {
+        "kind": "what",
+        "q": "What bold project did Franklin begin?",
+        "options": [
+          "Arriving at moral perfection",
+          "Building a printing press",
+          "Sailing to London"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "It was about this time I conceived the bold and arduous project of arriving at moral perfection.",
+        "hint": "Look again at the very first line."
+      },
+      {
+        "kind": "why",
+        "q": "Why was it harder than he expected?",
+        "options": [
+          "While he guarded against one fault, another surprised him",
+          "He had no time at all",
+          "Nobody would help him"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "While my care was employed in guarding against one fault, I was often surprised by another; habit took the advantage of inattention; inclination was sometimes too strong for reason.",
+        "hint": "Look again at what went wrong."
+      },
+      {
+        "kind": "think",
+        "q": "Franklin says good habits must be “acquired and established”. What does he mean?",
+        "options": [
+          "Knowing what is right is not enough — you have to practise it",
+          "You can buy good habits",
+          "Habits never change"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "and that the contrary habits must be broken, and good ones acquired and established, before we can have any dependence on a steady, uniform rectitude of conduct.",
+        "hint": "Look again at what he concluded."
+      }
+    ],
+    "virtues": [
+      {
+        "kind": "what",
+        "q": "How long did Franklin give to each virtue?",
+        "options": [
+          "A week’s strict attention",
+          "One day",
+          "A whole year"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "I determined to give a week’s strict attention to each of the virtues successively.",
+        "hint": "Look again at the plan."
+      },
+      {
+        "kind": "why",
+        "q": "Why did he put Temperance first?",
+        "options": [
+          "It gives a cool, clear head for the rest",
+          "It was the easiest to spell",
+          "His friend told him to"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "Temperance first, as it tends to procure that coolness and clearness of head, which is so necessary where constant vigilance was to be kept up",
+        "hint": "Look again at his reasons for the order."
+      },
+      {
+        "kind": "think",
+        "q": "Franklin compares his plan to weeding a garden one bed at a time. Why?",
+        "options": [
+          "Trying to fix everything at once is too much",
+          "He loved gardening",
+          "Weeds are like virtues"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "And like him who, having a garden to weed, does not attempt to eradicate all the bad herbs at once, which would exceed his reach and his strength, but works on one of the beds at a time",
+        "hint": "Think about the one-at-a-time plan."
+      }
+    ],
+    "little-book": [
+      {
+        "kind": "what",
+        "q": "Which virtue gave Franklin the most trouble?",
+        "options": [
+          "Order",
+          "Temperance",
+          "Silence"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "My scheme of _Order_ gave me the most trouble",
+        "hint": "Look again at what he found hardest."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Franklin add Humility to his list?",
+        "options": [
+          "A Quaker friend told him he was thought proud",
+          "It was on every list",
+          "He had run out of ideas"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "My list of virtues contained at first but twelve; but a Quaker friend having kindly informed me that I was generally thought proud",
+        "hint": "Look again at the thirteenth virtue."
+      },
+      {
+        "kind": "think",
+        "q": "The man said, “I think I like a speckled ax best.” What is Franklin warning about?",
+        "options": [
+          "Giving up and pretending your faults don’t matter",
+          "Buying cheap tools",
+          "Working too hard"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "have given up the struggle, and concluded that “a speckled ax was best”",
+        "hint": "Look again at the story of the smith."
+      }
+    ]
+  },
+  "vault": [
+    {
+      "q": "What did Franklin mark in his little book for every fault?",
+      "options": [
+        "A little black spot",
+        "A gold star",
+        "A tick"
+      ],
+      "answer": 0,
+      "chapter": 2,
+      "evidence": "I might mark, by a little black spot, every fault I found upon examination to have been committed respecting that virtue upon that day.",
+      "hint": "Think about the pages of the little book."
+    },
+    {
+      "q": "What question did Franklin ask himself each morning?",
+      "options": [
+        "What good shall I do this day?",
+        "What shall I eat today?",
+        "Who shall I meet today?"
+      ],
+      "answer": 0,
+      "chapter": 2,
+      "evidence": "What good shall I do this day?",
+      "hint": "Think about his daily timetable."
+    },
+    {
+      "q": "How long was one complete course through all the virtues?",
+      "options": [
+        "Thirteen weeks",
+        "Thirteen days",
+        "Thirteen years"
+      ],
+      "answer": 0,
+      "chapter": 2,
+      "evidence": "Proceeding thus to the last, I could go through a course complete in thirteen weeks, and four courses in a year.",
+      "hint": "Think about one virtue a week."
+    },
+    {
+      "q": "Did Franklin become perfect?",
+      "options": [
+        "No — but he became a better and a happier man",
+        "Yes, completely",
+        "He gave up after a week"
+      ],
+      "answer": 0,
+      "chapter": 3,
+      "evidence": "But, on the whole, though I never arrived at the perfection I had been so ambitious of obtaining, but fell far short of it, yet I was, by the endeavour, a better and a happier man than I otherwise should have been if I had not attempted it",
+      "hint": "Think about how it ended."
+    },
+    {
+      "q": "Why does Franklin say he might be “proud of my humility”?",
+      "options": [
+        "Pride is so hard to beat it sneaks back in",
+        "He was very humble",
+        "Humility was easy"
+      ],
+      "answer": 0,
+      "chapter": 3,
+      "evidence": "In reality, there is, perhaps, no one of our natural passions so hard to subdue as _pride_.",
+      "hint": "Think about the last virtue."
+    },
+    {
+      "q": "What did Franklin always carry with him, even abroad?",
+      "options": [
+        "His little book",
+        "His printing press",
+        "His kite"
+      ],
+      "answer": 0,
+      "chapter": 3,
+      "evidence": "but I always carried my little book with me.",
+      "hint": "Think about his travels."
+    }
+  ]
+}

@@ -1,0 +1,367 @@
+{
+  "book": "fam-railway",
+  "_about": "answer = index of the right option (shuffled on screen); evidence = supporting sentence, review only; hint = gentle \"look again\" line.",
+  "streets": {
+    "three-chimneys": [
+      {
+        "kind": "what",
+        "q": "What got broken on Peter’s birthday?",
+        "options": [
+          "His toy engine",
+          "His bicycle",
+          "The front window"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "All the Noah’s Ark people who were in the tender were broken to bits, but nothing else was hurt except the poor little engine and the feelings of Peter.",
+        "hint": "Look again at the start of the story."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Peter hope Father would mend the engine?",
+        "options": [
+          "Father was wonderfully clever with his fingers",
+          "Father had made it",
+          "Father worked on the railway"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "All Peter’s hopes for the curing of his afflicted engine were now fixed on his father, for Father was most wonderfully clever with his fingers.",
+        "hint": "Look again at what Peter thinks about Father."
+      },
+      {
+        "kind": "think",
+        "q": "What kind of father did the children have?",
+        "options": [
+          "Never cross, never unfair, always ready for a game",
+          "Very strict",
+          "Always too busy"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "They also had a father who was just perfect—never cross, never unjust, and always ready for a game",
+        "hint": "Look again at how the story describes him."
+      }
+    ],
+    "coal-mine": [
+      {
+        "kind": "what",
+        "q": "Who caught Peter with a bag of coal?",
+        "options": [
+          "The Station Master",
+          "Perks the porter",
+          "Mother"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "Then the arm of the Station Master was raised, the hand of the Station Master fell on a collar, and there was Peter firmly held by the jacket, with an old carpenter’s bag full of coal in his trembling clutch.",
+        "hint": "Look again at the night in the coal yard."
+      },
+      {
+        "kind": "why",
+        "q": "Why wouldn’t Peter tell the girls his plan?",
+        "options": [
+          "It might be wrong, and he didn’t want to drag them into it",
+          "He wanted all the coal for himself",
+          "It was a birthday surprise"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "“The only reason why I won’t tell you my idea that I’m going to do is because it may be wrong, and I don’t want to drag you into it.”",
+        "hint": "Look again at what Peter says to his sisters."
+      },
+      {
+        "kind": "think",
+        "q": "Bobbie says, “Don’t you do it if it’s wrong.” What does she understand?",
+        "options": [
+          "Something can be wrong even if you have a good reason",
+          "Peter is always wrong",
+          "Coal is bad for you"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "“Don’t you do it if it’s wrong, Peter,” said Bobbie; “let me do it.”",
+        "hint": "Look again at Bobbie’s answer."
+      }
+    ],
+    "old-gentleman": [
+      {
+        "kind": "what",
+        "q": "What did the children call the train the old gentleman travelled on?",
+        "options": [
+          "The Green Dragon",
+          "The Red Rocket",
+          "The Flying Scotsman"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "It was by the Green Dragon that the old gentleman travelled.",
+        "hint": "Look again at the names the children gave the trains."
+      },
+      {
+        "kind": "why",
+        "q": "Why did the children wave at the Green Dragon?",
+        "options": [
+          "To send their love to Father",
+          "To stop the train",
+          "To win a prize"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "“The Green Dragon’s going where Father is,” said Phyllis",
+        "hint": "Look again at Phyllis’s idea."
+      },
+      {
+        "kind": "think",
+        "q": "The old gentleman “looked as if he were nice, too, which is not at all the same thing”. What does that mean?",
+        "options": [
+          "Looking nice and being nice are different things",
+          "He only looked nice",
+          "He wasn’t nice at all"
+        ],
+        "answer": 0,
+        "chapter": 3,
+        "evidence": "He was a very nice-looking old gentleman, and he looked as if he were nice, too, which is not at all the same thing.",
+        "hint": "Look again at how the children describe him."
+      }
+    ],
+    "russian": [
+      {
+        "kind": "what",
+        "q": "How did Peter guess the stranger was Russian?",
+        "options": [
+          "He showed them a Russian stamp",
+          "He wore a fur hat",
+          "The Station Master told them"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "The hand that he reached out at last, with a gesture as of one answering a question, contained a Russian stamp.",
+        "hint": "Look again at the stranger in the waiting room."
+      },
+      {
+        "kind": "why",
+        "q": "Why had the Russian gentleman been sent to prison?",
+        "options": [
+          "For writing about how poor people should be made better and happier",
+          "For stealing",
+          "For losing his ticket"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "In Russia at the time of the Czar one dared not say anything about the rich people doing wrong, or about the things that ought to be done to make poor people better and happier.",
+        "hint": "Look again at what Mother explains."
+      },
+      {
+        "kind": "think",
+        "q": "Peter says people only go to prison when they’ve done wrong. What does this story show?",
+        "options": [
+          "Sometimes good people are punished unfairly",
+          "Peter is always right",
+          "Prison is a nice place"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "“But they can’t,” said Peter; “people only go to prison when they’ve done wrong.”",
+        "hint": "Think about the Russian gentleman."
+      }
+    ],
+    "landslide": [
+      {
+        "kind": "what",
+        "q": "What did the girls use to make danger flags?",
+        "options": [
+          "Their red flannel petticoats",
+          "Their hair ribbons",
+          "A tablecloth"
+        ],
+        "answer": 0,
+        "chapter": 6,
+        "evidence": "She took the red flannel petticoat from him and tore it off an inch from the band.",
+        "hint": "Look again at what Bobbie wished they hadn’t worn."
+      },
+      {
+        "kind": "why",
+        "q": "Why did the children need to stop the train?",
+        "options": [
+          "A landslide had covered the line with stones and trees",
+          "They wanted a ride",
+          "Perks asked them to"
+        ],
+        "answer": 0,
+        "chapter": 6,
+        "evidence": "They did, and with the petticoats rolled up under their arms, ran along the railway, skirting the newly fallen mound of stones and rock and earth, and bent, crushed, twisted trees.",
+        "hint": "Look again at what fell onto the line."
+      },
+      {
+        "kind": "think",
+        "q": "The train stopped not twenty yards from Bobbie’s flags. What does this show?",
+        "options": [
+          "Their quick thinking saved the train",
+          "The driver was going to stop anyway",
+          "Flags always stop trains"
+        ],
+        "answer": 0,
+        "chapter": 6,
+        "evidence": "It seemed almost as though it had—for it slackened swiftly, slackened and stopped, not twenty yards from the place where Bobbie’s two flags waved over the line.",
+        "hint": "Look again at the very end of the chapter."
+      }
+    ],
+    "birthday": [
+      {
+        "kind": "what",
+        "q": "What did Perks say Bobbie’s brooch looked like?",
+        "options": [
+          "A buttercup",
+          "A daisy",
+          "A railway engine"
+        ],
+        "answer": 0,
+        "chapter": 8,
+        "evidence": "“That’s a likely little brooch you’ve got on, Miss,” said Perks the Porter; “I don’t know as ever I see a thing more like a buttercup without it was a buttercup.”",
+        "hint": "Look again at what Perks notices."
+      },
+      {
+        "kind": "why",
+        "q": "Why was Perks upset about the birthday presents at first?",
+        "options": [
+          "He thought it was charity",
+          "He didn’t like cake",
+          "He had forgotten his birthday"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "I’m not going to begin these sort of charity goings-on at my time of life, so don’t you think it, Nell.”",
+        "hint": "Look again at what Perks says to his wife."
+      },
+      {
+        "kind": "think",
+        "q": "Why did the children worry how Perks would feel about the presents?",
+        "options": [
+          "They didn’t want him to feel they pitied him",
+          "They thought he wouldn’t like the colours",
+          "They wanted him to give them presents too"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "I only hope he won’t be offended and think it’s charity.",
+        "hint": "Look again at what the children say before the party."
+      }
+    ],
+    "paper-chase": [
+      {
+        "kind": "what",
+        "q": "What was the last runner in the paper chase wearing?",
+        "options": [
+          "A red jersey",
+          "A blue cap",
+          "A white coat"
+        ],
+        "answer": 0,
+        "chapter": 11,
+        "evidence": "The last one, in a red jersey, seemed to be extinguished by the darkness like a candle that is blown out.",
+        "hint": "Look again at the runners going into the tunnel."
+      },
+      {
+        "kind": "why",
+        "q": "Why did the children go looking in the tunnel?",
+        "options": [
+          "The runner in the red jersey never came out",
+          "They wanted to explore it",
+          "Perks sent them"
+        ],
+        "answer": 0,
+        "chapter": 11,
+        "evidence": "For when they had got down to a level with the top of the tunnel’s mouth—they were a couple of hundred yards out of their reckoning and had to creep along the face of the hill—there was no sign of the hare or the hounds.",
+        "hint": "Look again at what they notice outside the tunnel."
+      },
+      {
+        "kind": "think",
+        "q": "The children brought the hurt boy home. Why were they sure Mother would want that?",
+        "options": [
+          "Mother always helped people in trouble",
+          "Mother was a doctor",
+          "The boy lived at Three Chimneys"
+        ],
+        "answer": 0,
+        "chapter": 12,
+        "evidence": "I told him I was sure you’d want us to bring him home.",
+        "hint": "Think about the kind of person Mother is."
+      }
+    ]
+  },
+  "vault": [
+    {
+      "q": "What did Bobbie read on the old newspaper?",
+      "options": [
+        "That Father had been found guilty at a trial",
+        "That the railway was closing",
+        "That the Russian had found his family"
+      ],
+      "answer": 0,
+      "chapter": 10,
+      "evidence": "The verdict was “Guilty.”",
+      "hint": "Think about the newspaper round the parcel."
+    },
+    {
+      "q": "What did the children call out to the 9.15?",
+      "options": [
+        "“Take our love to Father!”",
+        "“Stop the train!”",
+        "“Happy birthday, Perks!”"
+      ],
+      "answer": 0,
+      "chapter": 14,
+      "evidence": "“Take our love to Father!” cried Bobbie.",
+      "hint": "Think about what they did every morning."
+    },
+    {
+      "q": "Who turned out to be Jim’s grandfather?",
+      "options": [
+        "Their own old gentleman",
+        "Perks",
+        "The Station Master"
+      ],
+      "answer": 0,
+      "chapter": 13,
+      "evidence": "“This is Jim’s grandfather, Mr. ⸻” said Mother, naming the old gentleman’s name.",
+      "hint": "Think about who came to see Jim."
+    },
+    {
+      "q": "What did the girls use to warn the train about the landslide?",
+      "options": [
+        "Red flannel petticoats as flags",
+        "A lantern",
+        "A whistle"
+      ],
+      "answer": 0,
+      "chapter": 6,
+      "evidence": "She took the red flannel petticoat from him and tore it off an inch from the band.",
+      "hint": "Think about the landslide."
+    },
+    {
+      "q": "Why had the Russian gentleman been sent to prison?",
+      "options": [
+        "For writing that poor people should be made better and happier",
+        "For stealing coal",
+        "For travelling without a ticket"
+      ],
+      "answer": 0,
+      "chapter": 5,
+      "evidence": "In Russia at the time of the Czar one dared not say anything about the rich people doing wrong",
+      "hint": "Think about Mr. Szczepansky."
+    },
+    {
+      "q": "What does Bobbie cry when Father comes home?",
+      "options": [
+        "“Oh! my Daddy, my Daddy!”",
+        "“Where have you been?”",
+        "“Take our love!”"
+      ],
+      "answer": 0,
+      "chapter": 14,
+      "evidence": "“Oh! my Daddy, my Daddy!”",
+      "hint": "Think about the very end."
+    }
+  ]
+}

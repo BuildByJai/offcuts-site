@@ -1,0 +1,750 @@
+{
+  "id": "fan-alice-1",
+  "blurb": "Alice follows a White Rabbit down a rabbit-hole into a world where nothing makes sense.",
+  "chapterWord": "Chapter",
+  "source": "Text: Alice's Adventures in Wonderland by Lewis Carroll (1865), from the Standard Ebooks edition. Public domain.",
+  "theme": {
+    "palette": {
+      "ground": "#7fbf6a",
+      "ground2": "#6fb35b",
+      "wall": "#f4e4f0",
+      "trim": "#2f3a6a",
+      "roof": "#d8452f",
+      "accent": "#e94f6a",
+      "accent2": "#3a7bd5",
+      "wood": "#8a5a3a",
+      "leaf": "#4f9a4a",
+      "stone": "#d8cfbf",
+      "sky": "#a8d8f0",
+      "fog": "#efe6f4",
+      "water": "#5ab8e6",
+      "item": "#ffd23f"
+    },
+    "props": [
+      "mushroom",
+      "tree",
+      "flower",
+      "hedge",
+      "table",
+      "statue",
+      "mushroom"
+    ],
+    "vaultProps": [
+      "column",
+      "table",
+      "chair",
+      "column"
+    ],
+    "edge": "hedge",
+    "hide": "bush",
+    "rafts": [
+      "crate",
+      "book",
+      "chest",
+      "hat",
+      "barrel"
+    ],
+    "building": {
+      "wall": "#f4e4f0",
+      "trim": "#2f3a6a",
+      "roof": "#d8452f",
+      "style": "house",
+      "sign": "Wonderland",
+      "h": 6
+    }
+  },
+  "streets": [
+    {
+      "id": "rabbit-hole",
+      "name": "Down the Rabbit-Hole",
+      "chapters": [
+        1
+      ],
+      "template": "CLIMB",
+      "game": "Fall down the hole",
+      "blurb": "The rabbit-hole dips suddenly down, and Alice falls past cupboards and book-shelves.",
+      "how": "Drift gently down the hole from shelf to shelf. Grab at least three jars of marmalade on the way to the bottom.",
+      "params": {
+        "height": 20,
+        "core": "shaft",
+        "direction": "down",
+        "floaty": true,
+        "collect": {
+          "item": {
+            "name": "A jar of Orange Marmalade",
+            "icon": "🍯"
+          },
+          "count": 6,
+          "need": 3,
+          "label": "jars"
+        },
+        "objective": "Fall all the way to the bottom",
+        "palette": {
+          "wall": "#c9a27a",
+          "ground": "#8a6440",
+          "ground2": "#7a5636"
+        },
+        "done": "Thump! Down on a heap of sticks and dry leaves, and the fall is over."
+      }
+    },
+    {
+      "id": "pool",
+      "name": "The Pool of Tears",
+      "chapters": [
+        2
+      ],
+      "template": "COLLECT",
+      "game": "Cross the flood",
+      "blurb": "Alice cried so much when she was nine feet high that the hall is now a pool of tears.",
+      "how": "Hop across the floating things to the far shore, picking up the key, the bottle and the little cake on the way. Falling in only sends you back to the shore.",
+      "params": {
+        "floor": "water",
+        "area": [
+          30,
+          60
+        ],
+        "rafts": 16,
+        "label": "found",
+        "objective": "Cross the pool of tears",
+        "items": [
+          {
+            "name": "The little golden key",
+            "icon": "🔑"
+          },
+          {
+            "name": "The “Drink Me” bottle",
+            "icon": "🧴"
+          },
+          {
+            "name": "An “Eat Me” cake",
+            "icon": "🧁"
+          }
+        ],
+        "done": "Out of the pool and dripping wet. Now to get dry…"
+      }
+    },
+    {
+      "id": "caucus",
+      "name": "The Caucus-Race",
+      "chapters": [
+        3
+      ],
+      "template": "CHASE",
+      "game": "A race in circles",
+      "blurb": "The best thing to get dry, says the Dodo, is a Caucus-race.",
+      "how": "Run round the course with everyone else. Two laps and the race is over — and everybody wins.",
+      "params": {
+        "mode": "loop",
+        "laps": 2,
+        "radius": 15,
+        "hurdles": 6,
+        "objective": "Run two laps of the Caucus-race",
+        "racers": [
+          {
+            "kind": "person",
+            "name": "the Dodo",
+            "look": {
+              "shirt": "0x6a5acd",
+              "pants": "0x3a3a46",
+              "hair": "0x3a2618"
+            }
+          },
+          {
+            "kind": "rabbit",
+            "name": "the Mouse",
+            "look": {
+              "coat": "0x9a9a9a",
+              "waistcoat": null,
+              "watch": false,
+              "eyes": "0x1b1b1b"
+            }
+          },
+          {
+            "kind": "person",
+            "name": "the Lory",
+            "look": {
+              "shirt": "0xe94f6a"
+            }
+          },
+          {
+            "kind": "person",
+            "name": "the Duck",
+            "look": {
+              "shirt": "0xf2d47a"
+            }
+          }
+        ],
+        "done": "Everybody has won, and all must have prizes!"
+      }
+    },
+    {
+      "id": "rabbit-house",
+      "name": "The Rabbit's House",
+      "chapters": [
+        4
+      ],
+      "template": "PUZZLE",
+      "game": "Too big for the house",
+      "blurb": "Alice drank from a little bottle in the White Rabbit’s house — and now she fills the whole room.",
+      "how": "Look round the room for clues, then work out how to get out.",
+      "params": {
+        "room": {
+          "w": 12,
+          "d": 10,
+          "h": 3.2
+        },
+        "objective": "Work out how to get out of the house",
+        "clues": [
+          {
+            "object": "table",
+            "label": "The little bottle",
+            "text": "A little bottle stood near the looking-glass. There was no label this time — and Alice drank from it anyway. Now she can’t get out at the door."
+          },
+          {
+            "object": "window",
+            "label": "The window",
+            "text": "Someone outside shouts “a barrowful will do, to begin with!” — and a shower of little pebbles comes rattling in."
+          },
+          {
+            "object": "box",
+            "label": "The pebbles",
+            "text": "The pebbles on the floor are all turning into little cakes."
+          }
+        ],
+        "solve": {
+          "object": "door",
+          "label": "The door",
+          "type": "choice",
+          "prompt": "How can Alice get small enough to get out?",
+          "options": [
+            "Eat one of the little cakes",
+            "Drink the rest of the bottle",
+            "Wait for Bill the Lizard to pull her out"
+          ],
+          "answer": 0,
+          "hint": "Things to eat and drink keep changing Alice’s size. Which one is new?"
+        },
+        "done": "Alice shrinks, runs out of the house and off into a thick wood."
+      }
+    },
+    {
+      "id": "caterpillar",
+      "name": "The Caterpillar",
+      "chapters": [
+        5
+      ],
+      "template": "CLIMB",
+      "game": "Up the mushroom",
+      "blurb": "A large blue caterpillar sits on top of a mushroom, quietly smoking a long hookah and taking no notice of anybody.",
+      "how": "Climb the giant mushroom from cap to cap to reach the Caterpillar at the top.",
+      "params": {
+        "height": 16,
+        "layout": "spiral",
+        "core": "tree",
+        "collect": {
+          "item": {
+            "name": "A piece of mushroom",
+            "icon": "🍄"
+          },
+          "count": 5,
+          "label": "pieces"
+        },
+        "palette": {
+          "leaf": "#d8452f",
+          "wood": "#f3ead6",
+          "accent": "#e94f6a"
+        },
+        "finale": {
+          "npc": {
+            "kind": "person",
+            "name": "the Caterpillar",
+            "look": {
+              "shirt": "0x3a7bd5",
+              "pants": "0x3a7bd5",
+              "skin": "0x7fb0e0",
+              "hair": "0x2f3a6a"
+            }
+          },
+          "say": "Who are YOU? … One side will make you grow taller, and the other side will make you grow shorter."
+        },
+        "objective": "Climb up to the Caterpillar",
+        "done": "Alice nibbles a bit of each side, and gets herself back to her right size."
+      }
+    },
+    {
+      "id": "pepper",
+      "name": "Pig and Pepper",
+      "chapters": [
+        6
+      ],
+      "template": "ARCADE",
+      "game": "Dodge the kitchen",
+      "blurb": "The Duchess’s kitchen is full of smoke and pepper, and the cook is throwing everything within reach.",
+      "how": "Dodge the pepper, the frying-pans and the plates for 30 seconds.",
+      "params": {
+        "mode": "dodge",
+        "duration": 30,
+        "bg": "kitchen",
+        "player": "🧒",
+        "bad": [
+          {
+            "icon": "🌶️",
+            "name": "pepper"
+          },
+          {
+            "icon": "🍳",
+            "name": "frying-pan"
+          },
+          {
+            "icon": "🍽️",
+            "name": "plate"
+          }
+        ],
+        "objective": "Dodge the pepper and the pans!",
+        "done": "Out of the kitchen — and the baby turns out to be a pig."
+      }
+    },
+    {
+      "id": "tea-party",
+      "name": "The Mad Tea-Party",
+      "chapters": [
+        7
+      ],
+      "template": "PUZZLE",
+      "game": "Always tea-time",
+      "blurb": "A table set out under a tree, with the March Hare, the Hatter and a sleepy Dormouse squeezed at one corner.",
+      "how": "Look at the clock, the cups and the guests, then work out the seat-moving pattern.",
+      "params": {
+        "outdoors": true,
+        "room": {
+          "w": 18,
+          "d": 16
+        },
+        "objective": "Work out why they keep moving round the table",
+        "clues": [
+          {
+            "object": "clock",
+            "label": "The Hatter’s watch",
+            "text": "The watch tells the day of the month, but doesn’t tell what o’clock it is. The Hatter says that ever since he quarrelled with Time, it’s always six o’clock."
+          },
+          {
+            "object": "table",
+            "label": "The tea things",
+            "text": "A very long table, laid for lots of people — with dirty cups all along one side."
+          },
+          {
+            "object": "chair",
+            "label": "The Dormouse",
+            "text": "The Dormouse is fast asleep, being used as a cushion by the other two."
+          }
+        ],
+        "solve": {
+          "object": "table",
+          "label": "The empty seats",
+          "type": "choice",
+          "prompt": "It’s always tea-time, and there’s no time to wash up. So what do they do?",
+          "options": [
+            "Move one place on round the table, to a clean cup",
+            "Wash the cups in the teapot",
+            "Stop having tea altogether"
+          ],
+          "answer": 0,
+          "hint": "Listen to what the Hatter says when he wants a clean cup."
+        },
+        "done": "“Let’s all move one place on!” And round they go."
+      }
+    },
+    {
+      "id": "croquet",
+      "name": "The Croquet-Ground",
+      "chapters": [
+        8
+      ],
+      "template": "ARCADE",
+      "game": "Royal croquet",
+      "blurb": "The balls are live hedgehogs, the mallets live flamingoes, and the soldiers stand on their hands to make the arches.",
+      "how": "Drag back from the hedgehog to hit it through the soldier-hoop, then into the flag. The hoop keeps walking off!",
+      "params": {
+        "mode": "golf",
+        "holes": 3,
+        "ball": "🦔",
+        "club": "🦩",
+        "hoop": "🃏",
+        "objective": "Through the soldier, then to the flag",
+        "done": "You played the Queen’s croquet — and kept your head!"
+      }
+    },
+    {
+      "id": "mock-turtle",
+      "name": "The Mock Turtle's Story",
+      "chapters": [
+        9
+      ],
+      "template": "COLLECT",
+      "game": "School under the sea",
+      "blurb": "The Mock Turtle remembers his school days in the sea, and all the odd things he learned there.",
+      "how": "Find all six of the Mock Turtle’s school subjects scattered along the shore.",
+      "params": {
+        "area": [
+          40,
+          36
+        ],
+        "floor": "sand",
+        "label": "subjects",
+        "objective": "Find the Mock Turtle’s six subjects",
+        "items": [
+          {
+            "name": "Reeling",
+            "icon": "🎣"
+          },
+          {
+            "name": "Writhing",
+            "icon": "🌀"
+          },
+          {
+            "name": "Ambition",
+            "icon": "➕"
+          },
+          {
+            "name": "Distraction",
+            "icon": "➖"
+          },
+          {
+            "name": "Uglification",
+            "icon": "✖️"
+          },
+          {
+            "name": "Derision",
+            "icon": "➗"
+          }
+        ],
+        "palette": {
+          "ground": "#e8d3a0",
+          "ground2": "#d8c08a",
+          "sky": "#9fd6f2"
+        },
+        "finale": {
+          "npc": {
+            "kind": "person",
+            "name": "the Mock Turtle",
+            "look": {
+              "shirt": "0x5a8a5a",
+              "pants": "0x5a8a5a",
+              "skin": "0xa8c8a0"
+            }
+          },
+          "say": "That’s the reason they’re called lessons — because they lessen from day to day!"
+        },
+        "done": "Ten hours the first day, nine the next, and so on…"
+      }
+    },
+    {
+      "id": "quadrille",
+      "name": "The Lobster Quadrille",
+      "chapters": [
+        10
+      ],
+      "template": "ARCADE",
+      "game": "The dance",
+      "blurb": "The Gryphon and the Mock Turtle show Alice the Lobster Quadrille.",
+      "how": "Keep to the beat: hit each lobster, turtle and whiting as it reaches the line.",
+      "params": {
+        "mode": "rhythm",
+        "duration": 35,
+        "bpm": 92,
+        "icons": [
+          "🦞",
+          "🐢",
+          "🐟"
+        ],
+        "bg": "river",
+        "objective": "Dance the Lobster Quadrille!",
+        "done": "Will you, won’t you, will you, won’t you, will you join the dance?"
+      }
+    },
+    {
+      "id": "tarts",
+      "name": "Who Stole the Tarts?",
+      "chapters": [
+        11
+      ],
+      "template": "COLLECT",
+      "game": "Gather the evidence",
+      "blurb": "The Knave of Hearts is on trial for stealing the Queen’s tarts.",
+      "how": "Search the courtroom for the six things the court will want to see.",
+      "params": {
+        "area": [
+          36,
+          32
+        ],
+        "floor": "stone",
+        "label": "pieces of evidence",
+        "objective": "Gather the evidence around the court",
+        "items": [
+          {
+            "name": "The dish of tarts",
+            "icon": "🥧"
+          },
+          {
+            "name": "The Hatter’s teacup",
+            "icon": "☕"
+          },
+          {
+            "name": "A piece of bread-and-butter",
+            "icon": "🍞"
+          },
+          {
+            "name": "The cook’s pepper-box",
+            "icon": "🧂"
+          },
+          {
+            "name": "A juror’s slate",
+            "icon": "🪧"
+          },
+          {
+            "name": "The White Rabbit’s trumpet",
+            "icon": "🎺"
+          }
+        ],
+        "done": "“Call the next witness!” said the King."
+      }
+    }
+  ],
+  "skyRun": {
+    "id": "sky",
+    "name": "The Cheshire Cat's Treetops",
+    "template": "CLIMB",
+    "game": "Sky Run",
+    "blurb": "a treetop course where the branches fade in and out, just like the Cat.",
+    "how": "Climb the tree to the top. Blue branches vanish and come back — wait for them!",
+    "params": {
+      "height": 22,
+      "layout": "spiral",
+      "core": "tree",
+      "fade": true,
+      "collect": {
+        "item": {
+          "name": "A grin",
+          "icon": "😺"
+        },
+        "count": 6,
+        "label": "grins"
+      },
+      "goalIcon": "😸",
+      "objective": "Climb to the Cheshire Cat’s branch",
+      "done": "All that’s left is the grin…"
+    }
+  },
+  "npcs": [],
+  "sideQuest": {
+    "id": "fan-alice-1-gloves",
+    "title": "The White Rabbit's Gloves and Fan",
+    "giver": "rabbit",
+    "steps": [
+      {
+        "type": "talk",
+        "params": {
+          "npc": "rabbit"
+        },
+        "text": "Talk to the White Rabbit outside Wonderland.",
+        "say": "Oh my dear paws! Oh my fur and whiskers! I’ve dropped my white kid gloves and my fan somewhere in the garden, and the Duchess will be savage!"
+      },
+      {
+        "type": "collect",
+        "params": {
+          "items": [
+            {
+              "id": "al-gloves",
+              "name": "The white kid gloves",
+              "shape": "gem",
+              "colour": "#ffffff",
+              "at": [
+                8.5,
+                -6
+              ]
+            },
+            {
+              "id": "al-fan",
+              "name": "The fan",
+              "shape": "page",
+              "colour": "#e94f6a",
+              "at": [
+                -9,
+                5
+              ]
+            }
+          ]
+        },
+        "text": "Find the White Rabbit’s gloves and fan around Wonderland."
+      },
+      {
+        "type": "talk",
+        "params": {
+          "npc": "rabbit"
+        },
+        "text": "Give the gloves and fan back to the White Rabbit.",
+        "say": "My gloves! My fan! Now I shan’t be late — well, not very late. Thank you!"
+      }
+    ],
+    "reward": {
+      "coins": 25
+    }
+  },
+  "vault": {
+    "name": "The Trial of the Knave",
+    "blurb": "an escape room in the Queen's courtroom, about the whole of Wonderland.",
+    "intro": "The court is in session, and the Queen wants the sentence first. Four locks hold the courtroom door. Show you know what really happened in Wonderland — and whether the evidence is real.",
+    "room": {
+      "wall": "#f4e4f0",
+      "floor": "#7a4e30",
+      "rug": "#d8452f"
+    },
+    "stations": [
+      {
+        "id": "scroll",
+        "object": "book",
+        "label": "The White Rabbit’s scroll",
+        "lock": "Lock 1 · Alice’s journey",
+        "text": "The White Rabbit has mixed up the order of Alice’s adventures. Put them right.",
+        "lesson": "Down the rabbit-hole, through the pool of tears, and all the way to the trial.",
+        "solve": {
+          "type": "order",
+          "prompt": "First at the top.",
+          "items": [
+            "Falling down the rabbit-hole",
+            "Swimming in the pool of tears",
+            "The Caucus-race",
+            "Advice from the Caterpillar",
+            "The Mad Tea-Party",
+            "Croquet with the Queen",
+            "The trial of the Knave of Hearts"
+          ],
+          "hint": "The rabbit-hole is first and the trial is last."
+        }
+      },
+      {
+        "id": "jury",
+        "object": "board",
+        "label": "The jury-box",
+        "lock": "Lock 2 · Who said it?",
+        "text": "The jurors have written names on their slates. Match each character to what they did.",
+        "lesson": "Wonderland is full of characters who all think they make perfect sense.",
+        "solve": {
+          "type": "match",
+          "prompt": "Match each one.",
+          "pairs": [
+            [
+              "The Dodo",
+              "Ran the Caucus-race"
+            ],
+            [
+              "The Caterpillar",
+              "Sat on a mushroom"
+            ],
+            [
+              "The Hatter",
+              "Always at tea"
+            ],
+            [
+              "The Queen of Hearts",
+              "“Off with her head!”"
+            ]
+          ],
+          "hint": "Think about where Alice met each of them."
+        }
+      },
+      {
+        "id": "paper",
+        "object": "note",
+        "label": "The “evidence”",
+        "lock": "Lock 3 · Is the evidence real?",
+        "text": "The White Rabbit has just picked up a paper: a set of verses. It isn’t in the Knave’s handwriting, and there’s no name signed at the end.",
+        "lesson": "Proper evidence has to show something. These verses prove nothing at all.",
+        "solve": {
+          "type": "choice",
+          "prompt": "Does this paper prove the Knave stole the tarts?",
+          "options": [
+            "No — it isn’t his writing, it isn’t signed, and it doesn’t even make sense",
+            "Yes — not signing it proves he’s guilty",
+            "Yes — because the Queen says so"
+          ],
+          "answer": 0,
+          "hint": "Alice says she doesn’t believe there’s an atom of meaning in it."
+        }
+      }
+    ],
+    "quiz": {
+      "object": "book",
+      "label": "The King’s notebook",
+      "lock": "Lock 4 · The whole story",
+      "lesson": "You remembered all of Wonderland — and it was only a pack of cards."
+    },
+    "openText": "“You’re nothing but a pack of cards!” The whole pack rises up into the air — and the door flies open.",
+    "outro": "Alice grows to her full size, the cards come flying down, and she wakes on the bank with her head in her sister’s lap."
+  },
+  "unlock": {
+    "badges": []
+  },
+  "chapterFiles": [
+    {
+      "n": 1,
+      "file": "01.md",
+      "title": "Chapter 1: Down the Rabbit-Hole"
+    },
+    {
+      "n": 2,
+      "file": "02.md",
+      "title": "Chapter 2: The Pool of Tears"
+    },
+    {
+      "n": 3,
+      "file": "03.md",
+      "title": "Chapter 3: A Caucus-Race and a Long Tale"
+    },
+    {
+      "n": 4,
+      "file": "04.md",
+      "title": "Chapter 4: The Rabbit Sends in a Little Bill"
+    },
+    {
+      "n": 5,
+      "file": "05.md",
+      "title": "Chapter 5: Advice from a Caterpillar"
+    },
+    {
+      "n": 6,
+      "file": "06.md",
+      "title": "Chapter 6: Pig and Pepper"
+    },
+    {
+      "n": 7,
+      "file": "07.md",
+      "title": "Chapter 7: A Mad Tea-Party"
+    },
+    {
+      "n": 8,
+      "file": "08.md",
+      "title": "Chapter 8: The Queen’s Croquet-Ground"
+    },
+    {
+      "n": 9,
+      "file": "09.md",
+      "title": "Chapter 9: The Mock Turtle’s Story"
+    },
+    {
+      "n": 10,
+      "file": "10.md",
+      "title": "Chapter 10: The Lobster Quadrille"
+    },
+    {
+      "n": 11,
+      "file": "11.md",
+      "title": "Chapter 11: Who Stole the Tarts?"
+    },
+    {
+      "n": 12,
+      "file": "12.md",
+      "title": "Chapter 12: Alice’s Evidence"
+    }
+  ]
+}
