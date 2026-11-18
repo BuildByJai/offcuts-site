@@ -1,0 +1,367 @@
+{
+  "book": "mys-holmes-4",
+  "_about": "answer = index of the right option (shuffled on screen); evidence = supporting sentence, review only; hint = gentle \"look again\" line.",
+  "streets": {
+    "walking-stick": [
+      {
+        "kind": "what",
+        "q": "What was engraved on the visitor’s walking stick?",
+        "options": [
+          "“To James Mortimer, M.R.C.S., from his friends of the C.C.H.”",
+          "“Property of Sherlock Holmes”",
+          "“Baskerville Hall, 1884”"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "“To James Mortimer, M.R.C.S., from his friends of the C.C.H.,” was engraved upon it, with the date “1884.”",
+        "hint": "Look again at the start, when Watson picks up the stick."
+      },
+      {
+        "kind": "why",
+        "q": "How did Holmes know the stick’s owner had a dog?",
+        "options": [
+          "The dog’s teeth marks were on the stick",
+          "There were dog hairs on it",
+          "The dog was in the room"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "Being a heavy stick the dog has held it tightly by the middle, and the marks of his teeth are very plainly visible.",
+        "hint": "Look again at what Holmes sees in the middle of the stick."
+      },
+      {
+        "kind": "think",
+        "q": "Watson guessed an old, grave family doctor; Holmes saw a young man under thirty. What does this show?",
+        "options": [
+          "Follow the clues, not your first guess",
+          "Watson is always right",
+          "Sticks can’t tell you anything"
+        ],
+        "answer": 0,
+        "chapter": 1,
+        "evidence": "So your grave, middle-aged family practitioner vanishes into thin air, my dear Watson, and there emerges a young fellow under thirty, amiable, unambitious, absentminded, and the possessor of a favourite dog",
+        "hint": "Look again at how Holmes corrects Watson."
+      }
+    ],
+    "curse": [
+      {
+        "kind": "what",
+        "q": "What did Dr. Mortimer see on the ground near Sir Charles?",
+        "options": [
+          "The footprints of a gigantic hound",
+          "A broken walking stick",
+          "A lantern"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "Holmes, they were the footprints of a gigantic hound!”",
+        "hint": "Look again at the very end of the chapter."
+      },
+      {
+        "kind": "why",
+        "q": "Why would Sir Charles never go out on the moor at night?",
+        "options": [
+          "He had taken the old family legend to heart",
+          "He couldn’t see in the dark",
+          "The moor was closed at night"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "He had taken this legend which I have read you exceedingly to heart—so much so that, although he would walk in his own grounds, nothing would induce him to go out upon the moor at night.",
+        "hint": "Look again at what Dr. Mortimer says about Sir Charles."
+      },
+      {
+        "kind": "think",
+        "q": "Dr. Mortimer says Sir Charles’s constant worry was harming his health. What does this show?",
+        "options": [
+          "Fear itself can make someone ill",
+          "Legends are always true",
+          "Sir Charles was never worried"
+        ],
+        "answer": 0,
+        "chapter": 2,
+        "evidence": "His heart was, I knew, affected, and the constant anxiety in which he lived, however chimerical the cause of it might be, was evidently having a serious effect upon his health.",
+        "hint": "Look again at what the doctor says about Sir Charles’s heart."
+      }
+    ],
+    "missing-boot": [
+      {
+        "kind": "what",
+        "q": "What went missing from Sir Henry’s hotel room?",
+        "options": [
+          "One of his boots",
+          "His wallet",
+          "His walking stick"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "Among other things I bought these brown boots—gave six dollars for them—and had one stolen before ever I had them on my feet.”",
+        "hint": "Look again at what Sir Henry complains about."
+      },
+      {
+        "kind": "why",
+        "q": "Holmes knew the warning was cut from a newspaper — and even which part. What did he name?",
+        "options": [
+          "The leading article of The Times",
+          "An advertisement",
+          "A letter from a reader"
+        ],
+        "answer": 0,
+        "chapter": 4,
+        "evidence": "I could understand anyone saying that the words were from a newspaper; but that you should name which, and add that it came from the leading article, is really one of the most remarkable things which I have ever known.",
+        "hint": "Look again at how Holmes reads the cut-out words."
+      },
+      {
+        "kind": "think",
+        "q": "First a new brown boot went missing, then an old black one. Why is that strange?",
+        "options": [
+          "Why would a thief want an old, worn boot?",
+          "Boots are too big to steal",
+          "Black boots cost more"
+        ],
+        "answer": 0,
+        "chapter": 5,
+        "evidence": "And now it’s an old black one.”",
+        "hint": "Look again at what Sir Henry says the second time."
+      }
+    ],
+    "hall": [
+      {
+        "kind": "what",
+        "q": "What was Stapleton’s great interest?",
+        "options": [
+          "He was a naturalist",
+          "He was a painter",
+          "He was a soldier"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "Stapleton was a naturalist.",
+        "hint": "Look again at the part where Watson meets him on the moor."
+      },
+      {
+        "kind": "why",
+        "q": "Why does Stapleton warn Watson about the great Grimpen Mire?",
+        "options": [
+          "It is a dangerous bog",
+          "It belongs to the Hall",
+          "It is full of butterflies"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "It’s a bad place, the great Grimpen Mire.”",
+        "hint": "Look again at what happens to the pony."
+      },
+      {
+        "kind": "think",
+        "q": "Miss Stapleton urgently tells Watson, “Go back!” What does this suggest?",
+        "options": [
+          "She is trying to warn of danger",
+          "She doesn’t like visitors",
+          "She is joking"
+        ],
+        "answer": 0,
+        "chapter": 7,
+        "evidence": "“Go back!” she said.",
+        "hint": "Look again at the part when she runs after Watson."
+      }
+    ],
+    "light": [
+      {
+        "kind": "what",
+        "q": "Where did Watson find Barrymore at night?",
+        "options": [
+          "Crouching at a window with a candle",
+          "Asleep in the kitchen",
+          "Out on the moor"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "When at last we reached the door and peeped through we found him crouching at the window, candle in hand, his white, intent face pressed against the pane, exactly as I had seen him two nights before.",
+        "hint": "Look again at what Watson and Sir Henry see at night."
+      },
+      {
+        "kind": "why",
+        "q": "Why was the light being shown at the window?",
+        "options": [
+          "To signal that food was ready for someone on the moor",
+          "To scare off the hound",
+          "To call for help"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "The light is a signal to him that food is ready for him, and his light out yonder is to show the spot to which to bring it.”",
+        "hint": "Look again at what Mrs. Barrymore explains."
+      },
+      {
+        "kind": "think",
+        "q": "Mrs. Barrymore helped her brother even though he was an escaped convict. What does this show?",
+        "options": [
+          "She still loved her brother",
+          "She didn’t know who he was",
+          "She wanted a reward"
+        ],
+        "answer": 0,
+        "chapter": 9,
+        "evidence": "“My unhappy brother is starving on the moor.",
+        "hint": "Look again at Mrs. Barrymore’s words."
+      }
+    ],
+    "tor": [
+      {
+        "kind": "what",
+        "q": "Whose voice did Watson hear at the stone hut?",
+        "options": [
+          "Sherlock Holmes",
+          "Sir Henry",
+          "Stapleton"
+        ],
+        "answer": 0,
+        "chapter": 11,
+        "evidence": "“It is a lovely evening, my dear Watson,” said a well-known voice.",
+        "hint": "Look again at the end of the chapter."
+      },
+      {
+        "kind": "why",
+        "q": "Why did Watson search among the old stone huts?",
+        "options": [
+          "He had learned the hidden watcher lived in one of them",
+          "He was lost",
+          "He was looking for the hound"
+        ],
+        "answer": 0,
+        "chapter": 11,
+        "evidence": "the other that the lurking man upon the moor was to be found among the stone huts upon the hillside",
+        "hint": "Look again at the two facts Watson had learned."
+      },
+      {
+        "kind": "think",
+        "q": "Laura Lyons had made an appointment with Sir Charles at the very place he died. Why is this important?",
+        "options": [
+          "It explains why he was waiting at the gate that night",
+          "It proves the hound was imaginary",
+          "It shows she was his doctor"
+        ],
+        "answer": 0,
+        "chapter": 11,
+        "evidence": "Laura Lyons of Coombe Tracey had written to Sir Charles Baskerville and made an appointment with him at the very place and hour that he met his death",
+        "hint": "Look again at the start of the chapter."
+      }
+    ],
+    "death-moor": [
+      {
+        "kind": "what",
+        "q": "Whose clothes was the man on the moor wearing?",
+        "options": [
+          "Sir Henry’s old clothes",
+          "Holmes’s clothes",
+          "His own prison clothes"
+        ],
+        "answer": 0,
+        "chapter": 13,
+        "evidence": "This poor wretch was dressed in your clothes.",
+        "hint": "Look again at what Holmes tells Sir Henry."
+      },
+      {
+        "kind": "why",
+        "q": "What did Holmes look like, even after weeks hiding on the moor?",
+        "options": [
+          "As neat and clean as if he were in Baker Street",
+          "Ragged and muddy",
+          "Dressed as a shepherd"
+        ],
+        "answer": 0,
+        "chapter": 12,
+        "evidence": "In his tweed suit and cloth cap he looked like any other tourist upon the moor, and he had contrived, with that catlike love of personal cleanliness which was one of his characteristics, that his chin should be as smooth and his linen as perfect as if he were in Baker Street.",
+        "hint": "Look again at how Watson describes Holmes."
+      },
+      {
+        "kind": "think",
+        "q": "Why do you think the hound followed the man in Sir Henry’s clothes?",
+        "options": [
+          "It was following Sir Henry’s scent",
+          "It was hungry",
+          "It was lost in the fog"
+        ],
+        "answer": 0,
+        "chapter": 13,
+        "evidence": "This poor wretch was dressed in your clothes.",
+        "hint": "Think about the missing boots."
+      }
+    ]
+  },
+  "vault": [
+    {
+      "q": "What made the hound glow in the dark?",
+      "options": [
+        "A luminous paste painted on it",
+        "Moonlight",
+        "A lantern on its collar"
+      ],
+      "answer": 0,
+      "chapter": 14,
+      "evidence": "This paste in the tin is no doubt the luminous mixture with which the creature was daubed.",
+      "hint": "Think about what was found in the tin."
+    },
+    {
+      "q": "Why did the plotter need an old boot rather than a new one?",
+      "options": [
+        "An old boot carried Sir Henry’s scent for the hound",
+        "New boots were too expensive",
+        "The old one fitted the hound"
+      ],
+      "answer": 0,
+      "chapter": 15,
+      "evidence": "He then had it returned and obtained another—a most instructive incident, since it proved conclusively to my mind that we were dealing with a real hound",
+      "hint": "Think about how a hound tracks someone."
+    },
+    {
+      "q": "Who was Stapleton really?",
+      "options": [
+        "A son of Rodger Baskerville, Sir Charles’s younger brother",
+        "Dr. Mortimer’s brother",
+        "An escaped convict"
+      ],
+      "answer": 0,
+      "chapter": 15,
+      "evidence": "He was a son of that Rodger Baskerville, the younger brother of Sir Charles",
+      "hint": "Think about Holmes’s retrospection."
+    },
+    {
+      "q": "Who was the woman who called herself Miss Stapleton?",
+      "options": [
+        "Stapleton’s wife",
+        "Barrymore’s sister",
+        "Sir Henry’s cousin"
+      ],
+      "answer": 0,
+      "chapter": 15,
+      "evidence": "that he meant mischief from the first is evident from the way in which he took his wife with him in the character of his sister",
+      "hint": "Think about what Holmes reveals at the end."
+    },
+    {
+      "q": "Where was the hound hidden?",
+      "options": [
+        "At an old tin mine on an island in the mire",
+        "In the cellar of the Hall",
+        "In Coombe Tracey"
+      ],
+      "answer": 0,
+      "chapter": 14,
+      "evidence": "“There is an old tin mine on an island in the heart of the mire.",
+      "hint": "Think about the great Grimpen Mire."
+    },
+    {
+      "q": "Why would Sir Charles never go out on the moor at night?",
+      "options": [
+        "He believed the old legend of the hound",
+        "He had a bad leg",
+        "He was afraid of the convict"
+      ],
+      "answer": 0,
+      "chapter": 2,
+      "evidence": "He had taken this legend which I have read you exceedingly to heart",
+      "hint": "Think back to the beginning."
+    }
+  ]
+}

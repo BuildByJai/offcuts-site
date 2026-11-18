@@ -1,0 +1,677 @@
+{
+  "id": "mys-holmes-4",
+  "blurb": "a family legend, a lonely moor and a gigantic hound. Holmes and Watson go to Dartmoor.",
+  "chapterWord": "Chapter",
+  "source": "Text: The Hound of the Baskervilles by Arthur Conan Doyle (1902), from the Standard Ebooks edition. Public domain.",
+  "theme": {
+    "palette": {
+      "ground": "#7a8a5a",
+      "ground2": "#6a7a4e",
+      "wall": "#9a948a",
+      "trim": "#3a3a3a",
+      "roof": "#4a4f5a",
+      "accent": "#c9a24a",
+      "accent2": "#5a6a8a",
+      "wood": "#5a3a24",
+      "leaf": "#5a6a3e",
+      "stone": "#9a948a",
+      "sky": "#8a96a8",
+      "fog": "#a8b0b8",
+      "water": "#4a5a4a",
+      "item": "#ffd23f"
+    },
+    "props": [
+      "rock",
+      "bush",
+      "reeds",
+      "rock",
+      "statue",
+      "fence"
+    ],
+    "vaultProps": [
+      "bookcase",
+      "chair",
+      "table",
+      "statue"
+    ],
+    "edge": "fence",
+    "hide": "bush",
+    "building": {
+      "wall": "#9a948a",
+      "trim": "#3a3a3a",
+      "roof": "#4a4f5a",
+      "style": "house",
+      "sign": "Baskerville Hall",
+      "h": 7
+    }
+  },
+  "streets": [
+    {
+      "id": "walking-stick",
+      "name": "The Walking Stick",
+      "chapters": [
+        1
+      ],
+      "template": "PUZZLE",
+      "game": "Deduce the owner",
+      "blurb": "A visitor has left his walking stick behind at 221B. What can it tell Holmes?",
+      "how": "Look closely at the stick, then work out what kind of person owns it.",
+      "params": {
+        "room": {
+          "w": 14,
+          "d": 12
+        },
+        "objective": "Work out who owns the stick",
+        "clues": [
+          {
+            "object": "note",
+            "label": "The silver band",
+            "text": "“To James Mortimer, M.R.C.S., from his friends of the C.C.H.” — 1884."
+          },
+          {
+            "object": "box",
+            "label": "The tip",
+            "text": "The iron tip is worn right down: whoever owns this does a great deal of walking."
+          },
+          {
+            "object": "picture",
+            "label": "The middle",
+            "text": "Teeth marks, plainly visible, where a dog has carried it."
+          }
+        ],
+        "solve": {
+          "object": "sign",
+          "label": "The deduction",
+          "type": "choice",
+          "prompt": "What sort of person owns the stick?",
+          "options": [
+            "A young country doctor who walks a lot and has a dog",
+            "An old London lawyer who never walks",
+            "A sailor with a parrot"
+          ],
+          "answer": 0,
+          "hint": "M.R.C.S. is a doctor’s title. And what made those teeth marks?"
+        },
+        "palette": {
+          "ground": "#8a6440",
+          "ground2": "#7a5636"
+        }
+      }
+    },
+    {
+      "id": "curse",
+      "name": "The Curse",
+      "chapters": [
+        2,
+        3
+      ],
+      "template": "COLLECT",
+      "game": "The legend and the footprints",
+      "blurb": "Dr. Mortimer reads Holmes an old family legend — and then tells him what he saw near Sir Charles.",
+      "how": "Search the yew alley for the clues to the old legend and the strange footprints.",
+      "params": {
+        "area": [
+          36,
+          40
+        ],
+        "label": "clues",
+        "objective": "Find the six clues in the yew alley",
+        "palette": {
+          "ground": "#7a8a5a",
+          "ground2": "#6a7a4e",
+          "sky": "#8a96a8",
+          "fog": "#a8b0b8",
+          "stone": "#9a948a"
+        },
+        "items": [
+          {
+            "name": "The old manuscript",
+            "icon": "📜"
+          },
+          {
+            "name": "Hugo Baskerville’s portrait",
+            "icon": "🖼️"
+          },
+          {
+            "name": "The moor-gate",
+            "icon": "🚪"
+          },
+          {
+            "name": "A giant paw-print",
+            "icon": "🐾"
+          },
+          {
+            "name": "Another paw-print",
+            "icon": "🐾"
+          },
+          {
+            "name": "A third paw-print",
+            "icon": "🐾"
+          }
+        ]
+      }
+    },
+    {
+      "id": "missing-boot",
+      "name": "The Missing Boot",
+      "chapters": [
+        4,
+        5
+      ],
+      "template": "COLLECT",
+      "game": "Sir Henry’s hotel",
+      "blurb": "Sir Henry arrives in London, gets a strange warning — and loses a boot. Then another.",
+      "how": "Search the hotel for the clues: the warning, the newspaper and the missing boots.",
+      "params": {
+        "area": [
+          32,
+          30
+        ],
+        "floor": "floor",
+        "label": "clues",
+        "objective": "Find the six hotel clues",
+        "items": [
+          {
+            "name": "The new brown boot",
+            "icon": "🥾"
+          },
+          {
+            "name": "The old black boot",
+            "icon": "👞"
+          },
+          {
+            "name": "Yesterday’s Times",
+            "icon": "📰"
+          },
+          {
+            "name": "Short-bladed scissors",
+            "icon": "✂️"
+          },
+          {
+            "name": "The warning letter",
+            "icon": "✉️"
+          },
+          {
+            "name": "A cab number",
+            "icon": "🚖"
+          }
+        ]
+      }
+    },
+    {
+      "id": "hall",
+      "name": "Baskerville Hall",
+      "chapters": [
+        6,
+        7
+      ],
+      "template": "COLLECT",
+      "game": "Explore the moor",
+      "blurb": "Watson and Sir Henry arrive at the gloomy Hall on the edge of the moor.",
+      "how": "Explore the moor round the Hall and find the six things Watson reports to Holmes.",
+      "params": {
+        "area": [
+          44,
+          44
+        ],
+        "label": "discoveries",
+        "objective": "Explore the moor and the Hall",
+        "palette": {
+          "ground": "#7a8a5a",
+          "ground2": "#6a7a4e",
+          "sky": "#8a96a8",
+          "fog": "#a8b0b8",
+          "stone": "#9a948a"
+        },
+        "platforms": 6,
+        "items": [
+          {
+            "name": "The key to the Hall",
+            "icon": "🗝️"
+          },
+          {
+            "name": "A butterfly net",
+            "icon": "🦋"
+          },
+          {
+            "name": "A warning sign: Grimpen Mire",
+            "icon": "⚠️"
+          },
+          {
+            "name": "A poster about the escaped convict",
+            "icon": "📋"
+          },
+          {
+            "name": "A family portrait",
+            "icon": "🖼️"
+          },
+          {
+            "name": "A bittern’s feather",
+            "icon": "🪶"
+          }
+        ]
+      }
+    },
+    {
+      "id": "light",
+      "name": "The Light on the Moor",
+      "chapters": [
+        8,
+        9,
+        10
+      ],
+      "template": "SNEAK",
+      "game": "Follow the signal",
+      "blurb": "Someone in the Hall is signalling with a candle at night — and a light answers out on the moor.",
+      "how": "Creep across the dark moor towards the answering light without being spotted.",
+      "params": {
+        "area": [
+          38,
+          46
+        ],
+        "dark": true,
+        "watchers": 3,
+        "hides": 7,
+        "goal": {
+          "name": "the answering light",
+          "icon": "🕯️"
+        },
+        "watcher": {
+          "kind": "person",
+          "name": "Barrymore",
+          "look": {
+            "shirt": "0x2a2420",
+            "hair": "0x1b1b1b"
+          }
+        },
+        "objective": "Reach the light unseen",
+        "palette": {
+          "ground": "#4a5a3e",
+          "ground2": "#404e36",
+          "sky": "#1d2540",
+          "fog": "#2a3456"
+        }
+      }
+    },
+    {
+      "id": "tor",
+      "name": "The Man on the Tor",
+      "chapters": [
+        11
+      ],
+      "template": "CLIMB",
+      "game": "Find the hidden hut",
+      "blurb": "Someone is hiding on the moor, living in one of the old stone huts.",
+      "how": "Climb the rocky tor to find the hidden watcher’s hut at the top.",
+      "params": {
+        "height": 16,
+        "layout": "scatter",
+        "core": "none",
+        "collect": {
+          "item": {
+            "name": "A clue from the hut",
+            "icon": "🔍"
+          },
+          "count": 5,
+          "label": "clues"
+        },
+        "palette": {
+          "ground": "#7a8a5a",
+          "ground2": "#6a7a4e",
+          "sky": "#8a96a8",
+          "fog": "#a8b0b8",
+          "stone": "#9a948a"
+        },
+        "finale": {
+          "npc": {
+            "kind": "person",
+            "name": "the hidden watcher",
+            "look": {
+              "shirt": "0x6a5a4a",
+              "pants": "0x5a4a3a",
+              "hair": "0x1b1b1b"
+            }
+          },
+          "say": "“It is a lovely evening, my dear Watson.” It was Sherlock Holmes all along!"
+        },
+        "objective": "Climb to the hut on the tor"
+      }
+    },
+    {
+      "id": "death-moor",
+      "name": "Death on the Moor",
+      "chapters": [
+        12,
+        13
+      ],
+      "template": "CHASE",
+      "game": "Across the moor at night",
+      "blurb": "A terrible cry rings out over the moor in the dark.",
+      "how": "Race back across the moor through the night. Jump the ditches and get to the Hall before the fog rolls in.",
+      "params": {
+        "mode": "race",
+        "length": 110,
+        "obstacles": [
+          "hurdle",
+          "block",
+          "gap"
+        ],
+        "density": 0.45,
+        "time": 80,
+        "dark": true,
+        "palette": {
+          "ground": "#4a5a3e",
+          "ground2": "#404e36",
+          "sky": "#1d2540",
+          "fog": "#2a3456"
+        },
+        "objective": "Get back to the Hall",
+        "finishText": "THE HALL"
+      }
+    }
+  ],
+  "skyRun": {
+    "id": "sky",
+    "name": "The Granite Tors",
+    "template": "CLIMB",
+    "game": "Sky Run",
+    "blurb": "the great granite tors, high above the mist of the moor.",
+    "how": "Leap from rock to rock up the tallest tor. The mist is far below.",
+    "params": {
+      "height": 22,
+      "layout": "scatter",
+      "core": "none",
+      "moving": 2,
+      "collect": {
+        "item": {
+          "name": "A sprig of heather",
+          "icon": "🌸"
+        },
+        "count": 6,
+        "label": "sprigs"
+      },
+      "palette": {
+        "ground": "#7a8a5a",
+        "ground2": "#6a7a4e",
+        "sky": "#8a96a8",
+        "fog": "#a8b0b8",
+        "stone": "#9a948a"
+      },
+      "goalIcon": "⛰️",
+      "objective": "Reach the top of the highest tor"
+    }
+  },
+  "npcs": [
+    {
+      "id": "mortimer",
+      "name": "Dr. Mortimer",
+      "kind": "person",
+      "look": {
+        "shirt": "0x4a4a3a",
+        "hair": "0x6a5a4a"
+      },
+      "at": [
+        -8,
+        -6.5
+      ],
+      "idle": "Mind the mire. It has swallowed many a pony.",
+      "thanks": "Now anyone can cross safely. Thank you!"
+    }
+  ],
+  "sideQuest": {
+    "id": "mys-holmes-4-mire",
+    "title": "The Safe Path",
+    "giver": "mortimer",
+    "steps": [
+      {
+        "type": "talk",
+        "params": {
+          "npc": "mortimer"
+        },
+        "text": "Talk to Dr. Mortimer outside Baskerville Hall.",
+        "say": "The great Grimpen Mire is a bad place. There’s a safe path through it, marked with little wands — but the fog has scattered six of the markers. Will you find them?"
+      },
+      {
+        "type": "collect",
+        "params": {
+          "items": [
+            {
+              "id": "gm-1",
+              "name": "A path marker",
+              "shape": "strand",
+              "colour": "#c9a24a",
+              "at": [
+                9,
+                -6
+              ]
+            },
+            {
+              "id": "gm-2",
+              "name": "A path marker",
+              "shape": "strand",
+              "colour": "#c9a24a",
+              "at": [
+                -9.5,
+                -1
+              ]
+            },
+            {
+              "id": "gm-3",
+              "name": "A path marker",
+              "shape": "strand",
+              "colour": "#c9a24a",
+              "at": [
+                9.5,
+                3
+              ]
+            },
+            {
+              "id": "gm-4",
+              "name": "A path marker",
+              "shape": "strand",
+              "colour": "#c9a24a",
+              "at": [
+                -5,
+                7
+              ]
+            },
+            {
+              "id": "gm-5",
+              "name": "A path marker",
+              "shape": "strand",
+              "colour": "#c9a24a",
+              "at": [
+                5,
+                7
+              ]
+            },
+            {
+              "id": "gm-6",
+              "name": "A path marker",
+              "shape": "strand",
+              "colour": "#c9a24a",
+              "at": [
+                0,
+                -9.5
+              ]
+            }
+          ]
+        },
+        "text": "Find the six safe-path markers around the Hall."
+      },
+      {
+        "type": "talk",
+        "params": {
+          "npc": "mortimer"
+        },
+        "text": "Bring the markers back to Dr. Mortimer.",
+        "say": "All six! The path is marked again."
+      }
+    ],
+    "reward": {
+      "coins": 30
+    }
+  },
+  "vault": {
+    "name": "The Truth About the Hound",
+    "blurb": "an escape room about the whole mystery: who was behind the Hound, and how was it done?",
+    "intro": "Holmes’s notes are scattered round the room. Open three locks to show who was behind the Hound — and how it was done.",
+    "room": {
+      "wall": "#9a948a",
+      "floor": "#5a3a24",
+      "rug": "#5a6a8a",
+      "dark": true
+    },
+    "stations": [
+      {
+        "id": "notes",
+        "object": "note",
+        "label": "Holmes’s notes",
+        "lock": "Lock 1 · How it was done",
+        "text": "Match each clue to what it really meant.",
+        "lesson": "No curse — just a real hound, and a clever, wicked plan.",
+        "solve": {
+          "type": "match",
+          "prompt": "Match each clue.",
+          "pairs": [
+            [
+              "The stolen old boot",
+              "Gave the hound Sir Henry’s scent"
+            ],
+            [
+              "The paste in the tin",
+              "Made the hound glow"
+            ],
+            [
+              "“Miss” Stapleton",
+              "Was really his wife"
+            ],
+            [
+              "The tin mine in the mire",
+              "Where the hound was hidden"
+            ]
+          ],
+          "hint": "Think about what Holmes explains at the end."
+        }
+      },
+      {
+        "id": "culprit",
+        "object": "picture",
+        "label": "The portrait of Hugo",
+        "lock": "Lock 2 · Who was behind it",
+        "text": "Holmes covers part of the old portrait of Hugo Baskerville with his hand — and a face from the moor looks out.",
+        "lesson": "Stapleton was a Baskerville, hoping to inherit the Hall.",
+        "solve": {
+          "type": "choice",
+          "prompt": "Who was behind the Hound of the Baskervilles?",
+          "options": [
+            "Stapleton, the naturalist",
+            "Barrymore, the butler",
+            "Dr. Mortimer"
+          ],
+          "answer": 0,
+          "hint": "Whose face looks out of Hugo’s portrait?"
+        }
+      }
+    ],
+    "quiz": {
+      "object": "desk",
+      "label": "Watson’s reports",
+      "lock": "Lock 3 · The whole case",
+      "lesson": "You solved the case of the Hound of the Baskervilles."
+    },
+    "openText": "The fog lifts, and the door swings open.",
+    "outro": "The legend was only a story — the hound was real, and so was the man behind it."
+  },
+  "unlock": {
+    "badges": [
+      {
+        "id": "consulting-detective",
+        "name": "Consulting Detective",
+        "icon": "🔎",
+        "desc": "Finish The Adventures of Sherlock Holmes and The Hound of the Baskervilles.",
+        "requires": [
+          "mys-holmes-3",
+          "mys-holmes-4"
+        ]
+      }
+    ]
+  },
+  "chapterFiles": [
+    {
+      "n": 1,
+      "file": "01.md",
+      "title": "Chapter 1: Mr. Sherlock Holmes"
+    },
+    {
+      "n": 2,
+      "file": "02.md",
+      "title": "Chapter 2: The Curse of the Baskervilles"
+    },
+    {
+      "n": 3,
+      "file": "03.md",
+      "title": "Chapter 3: The Problem"
+    },
+    {
+      "n": 4,
+      "file": "04.md",
+      "title": "Chapter 4: Sir Henry Baskerville"
+    },
+    {
+      "n": 5,
+      "file": "05.md",
+      "title": "Chapter 5: Three Broken Threads"
+    },
+    {
+      "n": 6,
+      "file": "06.md",
+      "title": "Chapter 6: Baskerville Hall"
+    },
+    {
+      "n": 7,
+      "file": "07.md",
+      "title": "Chapter 7: The Stapletons of Merripit House"
+    },
+    {
+      "n": 8,
+      "file": "08.md",
+      "title": "Chapter 8: First Report of Dr. Watson"
+    },
+    {
+      "n": 9,
+      "file": "09.md",
+      "title": "Chapter 9: Second Report of Dr. Watson"
+    },
+    {
+      "n": 10,
+      "file": "10.md",
+      "title": "Chapter 10: Extract from the Diary of Dr. Watson"
+    },
+    {
+      "n": 11,
+      "file": "11.md",
+      "title": "Chapter 11: The Man on the Tor"
+    },
+    {
+      "n": 12,
+      "file": "12.md",
+      "title": "Chapter 12: Death on the Moor"
+    },
+    {
+      "n": 13,
+      "file": "13.md",
+      "title": "Chapter 13: Fixing the Nets"
+    },
+    {
+      "n": 14,
+      "file": "14.md",
+      "title": "Chapter 14: The Hound of the Baskervilles"
+    },
+    {
+      "n": 15,
+      "file": "15.md",
+      "title": "Chapter 15: A Retrospection"
+    }
+  ]
+}
