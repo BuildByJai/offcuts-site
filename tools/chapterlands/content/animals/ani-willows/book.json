@@ -1,0 +1,817 @@
+{
+  "id": "ani-willows",
+  "blurb": "Mole, Ratty, Badger and the very boastful Toad of Toad Hall, by the river and in the Wild Wood.",
+  "chapterWord": "Chapter",
+  "source": "Text: The Wind in the Willows by Kenneth Grahame (1908), from the Standard Ebooks edition. Public domain.",
+  "theme": {
+    "palette": {
+      "ground": "#7fbf6a",
+      "ground2": "#6fb35b",
+      "wall": "#e8dcc4",
+      "trim": "#4a6a3a",
+      "roof": "#7a4e30",
+      "accent": "#d8452f",
+      "accent2": "#3a7bd5",
+      "wood": "#7a4e30",
+      "leaf": "#4f8a3a",
+      "stone": "#c0b8a8",
+      "sky": "#a8d8f0",
+      "fog": "#e8f0e8",
+      "water": "#4a9ac8",
+      "item": "#ffd23f"
+    },
+    "props": [
+      "tree",
+      "reeds",
+      "bush",
+      "flower",
+      "tree",
+      "reeds"
+    ],
+    "vaultProps": [
+      "table",
+      "chair",
+      "bookcase",
+      "table"
+    ],
+    "edge": "hedge",
+    "hide": "bush",
+    "building": {
+      "wall": "#e8dcc4",
+      "trim": "#4a6a3a",
+      "roof": "#7a4e30",
+      "style": "house",
+      "sign": "Toad Hall",
+      "h": 7
+    }
+  },
+  "streets": [
+    {
+      "id": "river-bank",
+      "name": "The River Bank",
+      "chapters": [
+        1
+      ],
+      "template": "ARCADE",
+      "game": "Row with Ratty",
+      "blurb": "Mole throws down his brush, leaves his spring-cleaning, and discovers the river.",
+      "how": "Row up the river with Ratty. Pick up the picnic and keep clear of the snags.",
+      "params": {
+        "mode": "paddle",
+        "duration": 40,
+        "player": "🚣",
+        "good": [
+          {
+            "icon": "🧺",
+            "name": "picnic"
+          },
+          {
+            "icon": "🌼",
+            "name": "flowers"
+          }
+        ],
+        "bad": [
+          {
+            "icon": "🪵",
+            "name": "snag"
+          },
+          {
+            "icon": "🪨",
+            "name": "rock"
+          }
+        ],
+        "objective": "Messing about in boats!",
+        "done": "Nothing half so much worth doing as messing about in boats."
+      }
+    },
+    {
+      "id": "open-road",
+      "name": "The Open Road",
+      "chapters": [
+        2
+      ],
+      "template": "CHASE",
+      "game": "The caravan and the motor-car",
+      "blurb": "Toad’s new craze is a canary-yellow caravan — until a motor-car roars past.",
+      "how": "Race along the open road. Jump the ruts and dodge the stones — and watch out for the motor-car!",
+      "params": {
+        "mode": "race",
+        "length": 100,
+        "obstacles": [
+          "hurdle",
+          "block",
+          "log"
+        ],
+        "density": 0.4,
+        "time": 70,
+        "floor": "sand",
+        "objective": "Travel the open road",
+        "finishText": "POOP-POOP!"
+      }
+    },
+    {
+      "id": "wild-wood",
+      "name": "The Wild Wood",
+      "chapters": [
+        3
+      ],
+      "template": "SNEAK",
+      "game": "Through the snow",
+      "blurb": "Mole goes into the Wild Wood alone — and the snow begins to fall.",
+      "how": "Creep through the snowy Wild Wood to Badger’s door. Keep out of sight of the weasels, and hide in the bushes.",
+      "params": {
+        "area": [
+          36,
+          46
+        ],
+        "floor": "snow",
+        "watchers": 4,
+        "hides": 7,
+        "goal": {
+          "name": "Badger’s door",
+          "icon": "🚪"
+        },
+        "watcher": {
+          "kind": "person",
+          "name": "a weasel",
+          "look": {
+            "shirt": "0x8a7a6a",
+            "pants": "0x6a5a4a",
+            "skin": "0xb8a890"
+          }
+        },
+        "palette": {
+          "ground": "#f4f7fb",
+          "ground2": "#dfe7f0",
+          "sky": "#c8d4e0",
+          "fog": "#dfe7f0",
+          "leaf": "#4a6a4a"
+        },
+        "objective": "Reach Badger’s door unseen"
+      }
+    },
+    {
+      "id": "badger",
+      "name": "Mr. Badger",
+      "chapters": [
+        4
+      ],
+      "template": "COLLECT",
+      "game": "Badger’s home",
+      "blurb": "Badger takes them into his warm, safe house under the Wild Wood.",
+      "how": "Explore Badger’s big underground kitchen and find six cosy things.",
+      "params": {
+        "area": [
+          32,
+          30
+        ],
+        "floor": "floor",
+        "label": "found",
+        "objective": "Explore Badger’s home",
+        "items": [
+          {
+            "name": "A ham",
+            "icon": "🍖"
+          },
+          {
+            "name": "The fire",
+            "icon": "🔥"
+          },
+          {
+            "name": "Badger’s slippers",
+            "icon": "🥿"
+          },
+          {
+            "name": "A flat candlestick",
+            "icon": "🕯️"
+          },
+          {
+            "name": "A big armchair",
+            "icon": "🪑"
+          },
+          {
+            "name": "A jar of honey",
+            "icon": "🍯"
+          }
+        ],
+        "finale": {
+          "npc": {
+            "kind": "person",
+            "name": "Mr. Badger",
+            "look": {
+              "shirt": "0x5a5a5a",
+              "pants": "0x3a3a3a",
+              "skin": "0xd8d8d8",
+              "hair": "0x1b1b1b"
+            }
+          },
+          "say": "Make yourselves at home. Nobody comes to harm in my house."
+        }
+      }
+    },
+    {
+      "id": "dulce-domum",
+      "name": "Dulce Domum",
+      "chapters": [
+        5
+      ],
+      "template": "PUZZLE",
+      "game": "Find Mole’s home",
+      "blurb": "On a cold winter evening Mole suddenly smells his old home, somewhere very close.",
+      "how": "Look for the clues in the snowy village, then work out how Mole can find his way home.",
+      "params": {
+        "outdoors": true,
+        "room": {
+          "w": 18,
+          "d": 16,
+          "floor": "snow"
+        },
+        "objective": "Help Mole find his home",
+        "palette": {
+          "ground": "#f4f7fb",
+          "ground2": "#dfe7f0",
+          "sky": "#c8d4e0",
+          "fog": "#dfe7f0",
+          "leaf": "#4a6a4a"
+        },
+        "clues": [
+          {
+            "object": "window",
+            "label": "A lit window",
+            "text": "Warm windows glow in the village. Mole and Rat look in, far from home themselves."
+          },
+          {
+            "object": "sign",
+            "label": "A faint smell",
+            "text": "Something reaches Mole through the cold air, like an electric shock: his own home, calling him."
+          },
+          {
+            "object": "door",
+            "label": "A little door",
+            "text": "A little front door with “Mole End” painted over the bell-pull."
+          }
+        ],
+        "solve": {
+          "object": "door",
+          "label": "Mole End",
+          "type": "choice",
+          "prompt": "How does Mole find his old home?",
+          "options": [
+            "He follows the smell — his home is calling him",
+            "He reads a map",
+            "The field mice lead him there"
+          ],
+          "answer": 0,
+          "hint": "What reached Mole like an electric shock?"
+        }
+      }
+    },
+    {
+      "id": "mr-toad",
+      "name": "Mr. Toad",
+      "chapters": [
+        6
+      ],
+      "template": "CHASE",
+      "game": "Toad and the car",
+      "blurb": "Toad can’t resist motor-cars — and this time he drives off in one that isn’t his.",
+      "how": "Run! Get to the end of the lane before the policeman catches up with you.",
+      "params": {
+        "mode": "flee",
+        "length": 90,
+        "obstacles": [
+          "hurdle",
+          "block"
+        ],
+        "chaser": {
+          "kind": "person",
+          "name": "the policeman",
+          "look": {
+            "shirt": "0x23303d",
+            "pants": "0x23303d"
+          }
+        },
+        "chaserSpeed": 6.2,
+        "objective": "Get away down the lane!",
+        "finishText": "THE END OF THE LANE"
+      }
+    },
+    {
+      "id": "piper",
+      "name": "The Piper at the Gates of Dawn",
+      "chapters": [
+        7
+      ],
+      "template": "COLLECT",
+      "game": "Search the river",
+      "blurb": "Little Portly the otter is missing, and Mole and Rat row out at night to look for him.",
+      "how": "Hop along the river on the floating logs and lily pads, and search for Portly.",
+      "params": {
+        "floor": "water",
+        "area": [
+          30,
+          56
+        ],
+        "rafts": 16,
+        "label": "found",
+        "objective": "Search the river for Portly",
+        "palette": {
+          "sky": "#c8d8f0",
+          "fog": "#e0e8f4"
+        },
+        "items": [
+          {
+            "name": "A willow leaf",
+            "icon": "🍃"
+          },
+          {
+            "name": "A feather",
+            "icon": "🪶"
+          },
+          {
+            "name": "A little paw-print",
+            "icon": "🐾"
+          }
+        ],
+        "finale": {
+          "npc": {
+            "kind": "rabbit",
+            "name": "Portly",
+            "look": {
+              "coat": "0x7a5a3a",
+              "waistcoat": null,
+              "watch": false,
+              "eyes": "0x1b1b1b"
+            },
+            "scale": 0.7
+          },
+          "say": "Here I am! I fell asleep… and I heard the most beautiful music."
+        }
+      }
+    },
+    {
+      "id": "toad-escape",
+      "name": "Toad’s Adventures",
+      "chapters": [
+        8
+      ],
+      "template": "PUZZLE",
+      "game": "Escape as the washerwoman",
+      "blurb": "Toad is locked in the darkest dungeon of the castle — but the gaoler’s daughter has an idea.",
+      "how": "Look at the clues in Toad’s cell, then work out how he can escape.",
+      "params": {
+        "room": {
+          "w": 12,
+          "d": 10
+        },
+        "dark": true,
+        "objective": "Work out how Toad escapes",
+        "clues": [
+          {
+            "object": "chair",
+            "label": "The gaoler’s daughter",
+            "text": "She feels sorry for Toad, and brings him buttered toast and tea."
+          },
+          {
+            "object": "box",
+            "label": "The washing basket",
+            "text": "Her aunt is a washerwoman who does the washing for all the prisoners."
+          },
+          {
+            "object": "chest",
+            "label": "A bundle",
+            "text": "A cotton print gown, an apron, a shawl and a rusty black bonnet."
+          }
+        ],
+        "solve": {
+          "object": "door",
+          "label": "The castle gate",
+          "type": "choice",
+          "prompt": "How does Toad get out of the castle?",
+          "options": [
+            "Dressed in the washerwoman’s gown and bonnet",
+            "By digging a tunnel",
+            "By flying out of the window"
+          ],
+          "answer": 0,
+          "hint": "Who is allowed to walk in and out with the washing?"
+        }
+      }
+    },
+    {
+      "id": "wayfarers",
+      "name": "Wayfarers All",
+      "chapters": [
+        9
+      ],
+      "template": "COLLECT",
+      "game": "The call of the South",
+      "blurb": "The swallows are leaving, and a seafaring rat tells Ratty about the warm South.",
+      "how": "Find six things from the Sea Rat’s travels, then talk to him.",
+      "params": {
+        "area": [
+          36,
+          36
+        ],
+        "floor": "sand",
+        "label": "treasures",
+        "objective": "Find the Sea Rat’s treasures",
+        "items": [
+          {
+            "name": "A sea shell",
+            "icon": "🐚"
+          },
+          {
+            "name": "Grapes from the South",
+            "icon": "🍇"
+          },
+          {
+            "name": "A little ship",
+            "icon": "⛵"
+          },
+          {
+            "name": "A compass",
+            "icon": "🧭"
+          },
+          {
+            "name": "A map",
+            "icon": "🗺️"
+          },
+          {
+            "name": "An olive branch",
+            "icon": "🫒"
+          }
+        ],
+        "finale": {
+          "npc": {
+            "kind": "rabbit",
+            "name": "the Sea Rat",
+            "look": {
+              "coat": "0x8a7a6a",
+              "waistcoat": "0x2f4a7a",
+              "watch": false,
+              "eyes": "0x1b1b1b"
+            }
+          },
+          "say": "Ah, the call of the South! But your home is here, by your river, with your friends."
+        }
+      }
+    },
+    {
+      "id": "further",
+      "name": "The Further Adventures of Toad",
+      "chapters": [
+        10
+      ],
+      "template": "CHASE",
+      "game": "Train, barge and horse",
+      "blurb": "Toad is on the run in his washerwoman disguise — by train, by barge and on horseback.",
+      "how": "Race along the canal towpath. Collect the tickets and coins you need on the way.",
+      "params": {
+        "mode": "race",
+        "length": 120,
+        "obstacles": [
+          "hurdle",
+          "block",
+          "gap"
+        ],
+        "density": 0.45,
+        "time": 85,
+        "collect": {
+          "item": {
+            "name": "A coin for the journey",
+            "icon": "🪙"
+          },
+          "count": 6,
+          "label": "coins"
+        },
+        "objective": "Get back to the river!",
+        "finishText": "THE RIVER"
+      }
+    },
+    {
+      "id": "toads-tears",
+      "name": "Toad’s Tears",
+      "chapters": [
+        11
+      ],
+      "template": "PUZZLE",
+      "game": "Plan the secret passage",
+      "blurb": "The Stoats and Weasels have taken Toad Hall. But Badger knows a secret.",
+      "how": "Look at Badger’s clues, then put the plan in order.",
+      "params": {
+        "room": {
+          "w": 14,
+          "d": 12
+        },
+        "objective": "Plan the attack on Toad Hall",
+        "clues": [
+          {
+            "object": "map",
+            "label": "The old map",
+            "text": "An underground passage leads from the riverbank right up into the middle of Toad Hall."
+          },
+          {
+            "object": "note",
+            "label": "Otter’s news",
+            "text": "Tomorrow night the Chief Weasel is giving a birthday banquet in the dining hall."
+          },
+          {
+            "object": "box",
+            "label": "The butler’s pantry",
+            "text": "The passage comes up under the butler’s pantry, next to the dining hall."
+          }
+        ],
+        "solve": {
+          "object": "sign",
+          "label": "The plan",
+          "type": "order",
+          "prompt": "Put the plan in order.",
+          "items": [
+            "Go into the passage from the riverbank",
+            "Creep along underground to Toad Hall",
+            "Come up in the butler’s pantry",
+            "Surprise the weasels at their banquet"
+          ],
+          "hint": "Start at the riverbank and end at the banquet."
+        }
+      }
+    }
+  ],
+  "skyRun": {
+    "id": "sky",
+    "name": "The Roofs of Toad Hall",
+    "template": "CLIMB",
+    "game": "Sky Run",
+    "blurb": "across the rooftops and chimneys of Toad Hall.",
+    "how": "Leap from chimney to chimney up over the roofs of Toad Hall.",
+    "params": {
+      "height": 20,
+      "layout": "scatter",
+      "core": "none",
+      "moving": 2,
+      "collect": {
+        "item": {
+          "name": "A weather-vane",
+          "icon": "🐸"
+        },
+        "count": 6,
+        "label": "weather-vanes"
+      },
+      "palette": {
+        "accent": "#a8583f",
+        "wood": "#7a4e30"
+      },
+      "goalIcon": "🏰",
+      "objective": "Reach the highest chimney"
+    }
+  },
+  "npcs": [
+    {
+      "kind": "rabbit",
+      "name": "the Water Rat",
+      "look": {
+        "coat": "0x7a5a3a",
+        "waistcoat": "0x2f4a7a",
+        "watch": false,
+        "eyes": "0x1b1b1b"
+      },
+      "id": "ratty",
+      "at": [
+        -8,
+        -6.5
+      ],
+      "idle": "Believe me, there is nothing half so much worth doing as simply messing about in boats.",
+      "thanks": "A splendid picnic! Thank you."
+    }
+  ],
+  "sideQuest": {
+    "id": "ani-willows-picnic",
+    "title": "Ratty's Picnic",
+    "giver": "ratty",
+    "steps": [
+      {
+        "type": "talk",
+        "params": {
+          "npc": "ratty"
+        },
+        "text": "Talk to Ratty outside Toad Hall.",
+        "say": "I’m packing a picnic for Mole — but the wind has blown half of it along the bank! Could you find six things for the basket?"
+      },
+      {
+        "type": "collect",
+        "params": {
+          "items": [
+            {
+              "id": "ww-pic-1",
+              "name": "Cold chicken",
+              "shape": "gem",
+              "colour": "#f2d47a",
+              "at": [
+                9,
+                -6
+              ]
+            },
+            {
+              "id": "ww-pic-2",
+              "name": "Some pickles",
+              "shape": "gem",
+              "colour": "#4f8a3a",
+              "at": [
+                -9.5,
+                1
+              ]
+            },
+            {
+              "id": "ww-pic-3",
+              "name": "French bread",
+              "shape": "gem",
+              "colour": "#d8a86a",
+              "at": [
+                9.5,
+                4
+              ]
+            },
+            {
+              "id": "ww-pic-4",
+              "name": "Lemonade",
+              "shape": "gem",
+              "colour": "#ffee88",
+              "at": [
+                -5,
+                7.5
+              ]
+            },
+            {
+              "id": "ww-pic-5",
+              "name": "A bit of cheese",
+              "shape": "gem",
+              "colour": "#f2c81a",
+              "at": [
+                5,
+                7.5
+              ]
+            },
+            {
+              "id": "ww-pic-6",
+              "name": "Potted meat",
+              "shape": "gem",
+              "colour": "#c0583f",
+              "at": [
+                0,
+                -9.5
+              ]
+            }
+          ]
+        },
+        "text": "Find six picnic things along the bank."
+      },
+      {
+        "type": "talk",
+        "params": {
+          "npc": "ratty"
+        },
+        "text": "Bring the picnic back to Ratty.",
+        "say": "Coldchickencoldtonguecoldhampickles — perfect!"
+      }
+    ],
+    "reward": {
+      "coins": 30
+    }
+  },
+  "vault": {
+    "name": "The Return of Ulysses",
+    "blurb": "an escape room in the banqueting hall of Toad Hall: did Toad learn his lesson, or didn’t he?",
+    "intro": "Toad Hall is back! But before the banquet can start, three locks must open. Show what happened — and decide whether Toad really changed.",
+    "room": {
+      "wall": "#e8dcc4",
+      "floor": "#7a4e30",
+      "rug": "#d8452f"
+    },
+    "stations": [
+      {
+        "id": "friends",
+        "object": "picture",
+        "label": "The portraits",
+        "lock": "Lock 1 · Good friends",
+        "text": "Match each friend to how they helped Toad.",
+        "lesson": "Toad got his home back because his friends never gave up on him.",
+        "solve": {
+          "type": "match",
+          "prompt": "Match each friend.",
+          "pairs": [
+            [
+              "Badger",
+              "Knew the secret passage"
+            ],
+            [
+              "Ratty",
+              "Took Toad in when he came back"
+            ],
+            [
+              "Mole",
+              "Scouted the weasels in disguise"
+            ],
+            [
+              "The gaoler’s daughter",
+              "Helped Toad escape from prison"
+            ]
+          ],
+          "hint": "Think about chapters 8 and 11."
+        }
+      },
+      {
+        "id": "toad",
+        "object": "mirror",
+        "label": "Toad’s mirror",
+        "lock": "Lock 2 · Did Toad learn?",
+        "text": "At the banquet, Toad makes no speeches and sings no songs. He sends thanks and a gift to the gaoler’s daughter and pays the engine-driver back.",
+        "lesson": "“He was indeed an altered Toad!” — though his friends kept a very close eye on him.",
+        "solve": {
+          "type": "choice",
+          "prompt": "What does the ending show about Toad?",
+          "options": [
+            "He has learned to be modest and grateful — at least for now",
+            "He has learned nothing at all",
+            "He has decided to buy another motor-car"
+          ],
+          "answer": 0,
+          "hint": "Look at how Toad behaves at the banquet."
+        }
+      }
+    ],
+    "quiz": {
+      "object": "book",
+      "label": "The banquet menu",
+      "lock": "Lock 3 · The whole story",
+      "lesson": "Mole, Ratty, Badger and Toad, together again."
+    },
+    "openText": "The doors of the banqueting hall swing wide.",
+    "outro": "Toad Hall is Toad’s again — and the Wild Wood is friendly at last."
+  },
+  "unlock": {
+    "badges": []
+  },
+  "chapterFiles": [
+    {
+      "n": 1,
+      "file": "01.md",
+      "title": "Chapter 1: The River Bank"
+    },
+    {
+      "n": 2,
+      "file": "02.md",
+      "title": "Chapter 2: The Open Road"
+    },
+    {
+      "n": 3,
+      "file": "03.md",
+      "title": "Chapter 3: The Wild Wood"
+    },
+    {
+      "n": 4,
+      "file": "04.md",
+      "title": "Chapter 4: Mr. Badger"
+    },
+    {
+      "n": 5,
+      "file": "05.md",
+      "title": "Chapter 5: Dulce Domum"
+    },
+    {
+      "n": 6,
+      "file": "06.md",
+      "title": "Chapter 6: Mr. Toad"
+    },
+    {
+      "n": 7,
+      "file": "07.md",
+      "title": "Chapter 7: The Piper at the Gates of Dawn"
+    },
+    {
+      "n": 8,
+      "file": "08.md",
+      "title": "Chapter 8: Toad’s Adventures"
+    },
+    {
+      "n": 9,
+      "file": "09.md",
+      "title": "Chapter 9: Wayfarers All"
+    },
+    {
+      "n": 10,
+      "file": "10.md",
+      "title": "Chapter 10: The Further Adventures of Toad"
+    },
+    {
+      "n": 11,
+      "file": "11.md",
+      "title": "Chapter 11: “Like Summer Tempests Came His Tears”"
+    },
+    {
+      "n": 12,
+      "file": "12.md",
+      "title": "Chapter 12: The Return of Ulysses"
+    }
+  ]
+}
