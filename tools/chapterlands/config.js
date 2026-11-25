@@ -379,7 +379,15 @@ export const CONFIG = {
      its road past `out`, `side` is which side of the road (±1). Presets live in
      js/lookout.js. `requiresKey` (a book id) puts a gate round the base. */
   lookoutTowers: [
-    { id: 'fantasy', quarter: 'fantasy', at: 4, side: -1, height: 24, preset: 'spiral', requiresKey: null }
+    // One per road. `preset` is the level design (js/lookout.js); `offset` is
+    // how far the tower's centre sits from the middle of the road (default 13).
+    { id: 'fantasy',   quarter: 'fantasy',   at: 4, side: -1, height: 24, preset: 'spiral',    requiresKey: null },
+    { id: 'family',    quarter: 'family',    at: 4, side: 1,  height: 20, preset: 'treehouse', requiresKey: null },
+    { id: 'life',      quarter: 'life',      at: 4, side: -1, height: 22, preset: 'books',     requiresKey: null },
+    { id: 'animals',   quarter: 'animals',   at: 4, side: -1, height: 21, preset: 'stumps',    requiresKey: null, offset: 16 },
+    { id: 'adventure', quarter: 'adventure', at: 4, side: -1, height: 24, preset: 'mast',      requiresKey: null },
+    { id: 'scifi',     quarter: 'scifi',     at: 6, side: -1, height: 27, preset: 'pylon',     requiresKey: null },
+    { id: 'mystery',   quarter: 'mystery',   at: 4, side: -1, height: 26, preset: 'zigzag',    requiresKey: null }
   ],
   // Only built with ?debug=1: tests the requiresKey gate message.
   debugTowers: [
@@ -542,6 +550,7 @@ export const CONFIG = {
     { id: 'shelver',        name: 'Shelver',         desc: 'Return all seven lost books to their shelves.', icon: '📚' },
     { id: 'rabbit-chaser',  name: 'Rabbit Chaser',   desc: 'Catch the White Rabbit and help him home.',    icon: '🐇' },
     { id: 'lookout',        name: 'Lookout',         desc: 'Climb a Lookout Tower and lift the fog.',      icon: '🔭' },
+    { id: 'eagle-eye',      name: 'Eagle Eye',       desc: 'Climb all seven Lookout Towers.',              icon: '🦅' },
     { id: 'first-check',    name: 'Good Reader',     desc: 'Pass your first reading check.',               icon: '✅' },
     { id: 'sky-runner',     name: 'Sky Runner',      desc: 'Finish a Sky Run.',                            icon: '☁️' },
     { id: 'vault-cracker',  name: 'Vault Cracker',   desc: 'Crack a district Vault.',                      icon: '🗝️' }

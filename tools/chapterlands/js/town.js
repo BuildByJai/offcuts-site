@@ -1334,7 +1334,10 @@ function updateSweep(dt) {
   if (!S.lifted && S.t > 1.2) {
     S.lifted = true;
     ROADS.mist.set('q:' + road.Q.id, false);
-    if (S.first) { Save.climbTower(road.Q.id); track('tower-climbed', { quarter: road.Q.id }); track('fog-lifted', { quarter: road.Q.id }); }
+    if (S.first) {
+      Save.climbTower(road.Q.id); track('tower-climbed', { quarter: road.Q.id }); track('fog-lifted', { quarter: road.Q.id });
+      earnWithFlight(25, new THREE.Vector3(S.T.top.x, S.T.top.y + 1.6, S.T.top.z), null);
+    }
   }
   if (S.t >= S.dur) {
     sweep = null;
@@ -1357,6 +1360,7 @@ $('btn-banner-close').addEventListener('click', () => {
   $('banner').hidden = true;
   setState('playing');
   awardBadge('lookout');
+  if (CONFIG.lookoutTowers.every((t) => Save.towerClimbed(t.quarter))) awardBadge('eagle-eye');
 });
 
 /* =============== interaction markers (ring + floating icon) =============== */
