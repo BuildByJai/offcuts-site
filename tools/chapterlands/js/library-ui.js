@@ -163,8 +163,7 @@ export function streetState(book, kit, idx) {
   const open = Save.isStreetOpen(book.id, st.id);
   const played = Save.isStreetPlayed(book.id, st.id);
   const prevOpen = idx === 0 || Save.isStreetOpen(book.id, kit.streets[idx - 1].id);
-  const last = Math.max(...(st.chapters || [0]));
-  const read = book.readable ? Save.lastRead(book.id) >= last : Save.ownCopy(book.id).includes(st.id);
+  const read = book.readable ? (st.chapters || []).every((c) => Save.hasRead(book.id, c)) : Save.ownCopy(book.id).includes(st.id);
   return { st, open, played, prevOpen, read, done: open && played };
 }
 export function districtDone(book, kit) {
@@ -173,8 +172,16 @@ export function districtDone(book, kit) {
 
 /* =============== district panel =============== */
 // hooks: { play(book, kitStreetOrKind), read(book, chapter), refresh() }
+// Series sequels need the previous book's Key, however the player gets here.
+export function keyLocked(book) { return !!(book && book.requiresKey && !Save.hasKey(book.requiresKey)); }
+export function keyToast(book) {
+  const prev = Catalogue.getBook(book.requiresKey);
+  toast(`🔒 Finish ${prev ? prev.title : 'the book before'} first to get its Key.`, { ms: 3200 });
+}
+
 export async function openDistrict(bookId, hooks) {
   const book = Catalogue.getBook(bookId);
+  if (keyLocked(book)) { keyToast(book); if (hooks && hooks.close) hooks.close(); return null; }
   const el = overlay('district', 'district');
   el.innerHTML = '<div class="card"><p class="lede">Opening the district…</p></div>';
   el.hidden = false;
@@ -233,7 +240,7 @@ export async function openDistrict(bookId, hooks) {
     el.querySelectorAll('[data-play]').forEach((b) => b.onclick = () => hooks.play(book, kit.streets[Number(b.dataset.play)].id));
     el.querySelectorAll('[data-read]').forEach((b) => b.onclick = () => {
       const s = kit.streets[Number(b.dataset.read)];
-      const next = s.chapters.find((c) => c > Save.lastRead(book.id)) || s.chapters[0];
+      const next = s.chapters.find((c) => !Save.hasRead(book.id, c)) || s.chapters[0];
       openReader(book, kit, next, { onCheck: (street) => startCheck(street), onClose: () => { el.hidden = false; render(); } });
       el.hidden = true;
     });
@@ -253,7 +260,7 @@ export async function openDistrict(bookId, hooks) {
       onPass: () => {
         const fresh = Save.openStreet(book.id, s.id);
         if (fresh) {
-          track('street-unlocked', { book: book.id, street: s.id });
+          track('street-unlocked', { book: book.id, street: s.id, index: kit.streets.indexOf(s) });
           Sfx.unlockLock();
           confetti({ count: 120 });
           toast(`🎉 ${s.name} is open!`, { badge: true, ms: 3200 });
@@ -294,9 +301,10 @@ export async function openReadingRoom({ onOpenBook, onClose } = {}) {
     if (!books.length) html += '<span class="rr-empty">More books coming to this shelf.</span>';
     for (const b of books) {
       const ready = b.status === 'live';
+      const locked = ready && keyLocked(b);
       const read = Save.lastRead(b.id);
-      html += `<button type="button" class="rr-spine ${ready ? '' : 'soon'}" data-book="${esc(b.id)}" ${ready ? '' : 'disabled'} title="${esc(b.title)}">
-        <span class="rr-t">${esc(b.title)}</span><span class="rr-l">${Catalogue.levelIcons(b.level)}${ready ? (read ? ` · ch ${read}` : '') : ' · soon'}</span></button>`;
+      html += `<button type="button" class="rr-spine ${ready ? '' : 'soon'} ${locked ? 'locked' : ''}" data-book="${esc(b.id)}" ${ready ? '' : 'disabled'} title="${esc(b.title)}">
+        <span class="rr-t">${locked ? '🔒 ' : ''}${esc(b.title)}</span><span class="rr-l">${Catalogue.levelIcons(b.level)}${ready ? (locked ? ' · needs a Key' : (read ? ` · ch ${read}` : '')) : ' · soon'}</span></button>`;
     }
     html += '</div></div>';
   }
@@ -306,6 +314,7 @@ export async function openReadingRoom({ onOpenBook, onClose } = {}) {
   el.querySelectorAll('[data-book]').forEach((b) => b.onclick = async () => {
     el.hidden = true;
     const book = Catalogue.getBook(b.dataset.book);
+    if (keyLocked(book)) { el.hidden = false; keyToast(book); return; }
     const kit = await Catalogue.kit(book.id);
     if (!kit) { toast('That book is still being shelved.'); el.hidden = false; return; }
     openBookContents(book, kit, { back: () => { el.hidden = false; }, onOpenBook });
@@ -318,7 +327,7 @@ function openBookContents(book, kit, { back, onOpenBook }) {
   const read = Save.lastRead(book.id);
   el.innerHTML = `<div class="card scrollable"><span class="tag-inline">reading room · ${Catalogue.levelIcons(book.level)} level ${book.level}</span>
     <h2>${esc(book.title)}</h2><p class="lede">${esc(book.author)}</p>
-    <ol class="rr-chapters">${(kit.chapterFiles || []).map((c) => `<li><button type="button" class="btn ghost mini-btn" data-ch="${c.n}">${c.n <= read ? '✅ ' : ''}${esc(c.title)}</button></li>`).join('')}</ol>
+    <ol class="rr-chapters">${(kit.chapterFiles || []).map((c) => `<li><button type="button" class="btn ghost mini-btn" data-ch="${c.n}">${Save.hasRead(book.id, c.n) ? '✅ ' : ''}${esc(c.title)}</button></li>`).join('')}</ol>
     <button class="btn" type="button" data-go="1">${read ? 'Keep reading' : 'Start reading'}</button>
     ${onOpenBook ? '<button class="btn ghost" type="button" data-district="1">Go to the district</button>' : ''}
     <button class="btn ghost" type="button" data-back="1">Back to the shelves</button></div>`;
@@ -326,7 +335,10 @@ function openBookContents(book, kit, { back, onOpenBook }) {
   const files = kit.chapterFiles || [];
   const go = (n) => { el.hidden = true; openReader(book, kit, n, { onClose: () => { openBookContents(book, kit, { back, onOpenBook }); }, onCheck: (street) => { el.hidden = true; if (onOpenBook) onOpenBook(book, street); } }); };
   el.querySelectorAll('[data-ch]').forEach((b) => b.onclick = () => go(Number(b.dataset.ch)));
-  el.querySelector('[data-go]').onclick = () => go(Math.min(files.length || 1, read + 1));
+  el.querySelector('[data-go]').onclick = () => {
+    const unread = files.find((c) => c.n > read && !Save.hasRead(book.id, c.n)) || files.find((c) => !Save.hasRead(book.id, c.n));
+    go(unread ? unread.n : (files[0] ? files[0].n : 1));
+  };
   const d = el.querySelector('[data-district]');
   if (d) d.onclick = () => { el.hidden = true; onOpenBook(book, null); };
   el.querySelector('[data-back]').onclick = () => { el.hidden = true; back(); };
@@ -356,17 +368,30 @@ export async function openReader(book, kit, n, { onClose, onCheck } = {}) {
   el.querySelector('[data-close]').onclick = () => { el.hidden = true; onClose && onClose(); };
   const md = await Catalogue.chapter(book.id, ch.file);
   if (md == null) { art.innerHTML = '<p class="lede">This chapter isn\'t on the shelf yet.</p>'; return; }
-  const street = kit.streets.find((s) => Math.max(...s.chapters) === ch.n);
+  const street = kit.streets.find((s) => (s.chapters || []).includes(ch.n));
   const streetIdx = street ? kit.streets.indexOf(street) : -1;
   const prev = files.find((c) => c.n === ch.n - 1), next = files.find((c) => c.n === ch.n + 1);
   art.innerHTML = `<h1 class="reader-ch">${esc(ch.title)}</h1>${renderMarkdown(md)}
     <div class="reader-end">
-      <button class="btn" type="button" data-done="1">I've finished this ${esc((kit.chapterWord || 'chapter').toLowerCase())}</button>
+      <button class="btn" type="button" data-done="1" disabled>Keep reading…</button>
       <div class="reader-after" hidden></div>
       <div class="btn-row">${prev ? `<button class="btn ghost" type="button" data-n="${prev.n}">← ${esc(prev.title)}</button>` : ''}${next ? `<button class="btn ghost" type="button" data-n="${next.n}">${esc(next.title)} →</button>` : ''}</div>
       ${kit.source ? `<p class="fineprint reader-source">${esc(kit.source)}</p>` : ''}
     </div>`;
   el.querySelector('.reader-page').scrollTop = 0;
+  // "I've finished" unlocks after roughly a quick-reading time for this chapter
+  // (about 400 words a minute, 15–120 s). Already-read chapters unlock at once.
+  const doneBtn = art.querySelector('[data-done]');
+  const words = md.split(/\s+/).length;
+  const needMs = Save.hasRead(book.id, ch.n) ? 0 : Math.max(15, Math.min(120, words / 400 * 60)) * 1000;
+  const t0 = performance.now();
+  const doneLabel = `I've finished this ${(kit.chapterWord || 'chapter').toLowerCase()}`;
+  const tick = () => {
+    if (el.hidden || !doneBtn.isConnected) return;
+    if (performance.now() - t0 >= needMs) { doneBtn.disabled = false; doneBtn.textContent = doneLabel; return; }
+    setTimeout(tick, 500);
+  };
+  tick();
   art.querySelectorAll('[data-n]').forEach((b) => b.onclick = () => openReader(book, kit, Number(b.dataset.n), { onClose, onCheck }));
   art.querySelector('[data-done]').onclick = () => {
     if (Save.markRead(book.id, ch.n)) track('chapter-read', { book: book.id, chapter: ch.n });
@@ -374,7 +399,11 @@ export async function openReader(book, kit, n, { onClose, onCheck } = {}) {
     const after = art.querySelector('.reader-after');
     after.hidden = false;
     art.querySelector('[data-done]').hidden = true;
-    if (street) {
+    const missing = street ? street.chapters.filter((c) => !Save.hasRead(book.id, c)) : [];
+    if (street && missing.length) {
+      const word = kit.chapterWord || 'Chapter';
+      after.innerHTML = `<p class="lede">Well read! Now read ${esc(word.toLowerCase())} ${missing.join(' and ')} to open <b>${esc(street.name)}</b>.</p>`;
+    } else if (street) {
       const S = streetState(book, kit, streetIdx);
       if (S.open) after.innerHTML = `<p class="lede">✅ <b>${esc(street.name)}</b> is already open. ${next ? 'On to the next one!' : ''}</p>`;
       else if (!S.prevOpen) after.innerHTML = '<p class="lede">Well read! Open the street before this one first, then come back for this one\'s questions.</p>';
