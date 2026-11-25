@@ -107,3 +107,23 @@ node docs/chapterlands/tools/test_book.js <bookId>   # every street + Sky Run lo
 node docs/chapterlands/tools/test_town.js <bookId>   # district side quest end to end in the town; series bridge with and without the Key
 ```
 Needs Playwright (`require('playwright')`). Set `THREE_DIR` to a local three@0.160.0 if unpkg is blocked.
+
+
+## Scenery, furniture and art (Nov 2026)
+
+You don't build sets by hand. `A.ground(w, d, floor)` now also builds the visible set round the play area (`kit/scenery.js`):
+- **Outdoors:** sky dome in the book's colours (stars when `dark`), a visible edge where the invisible walls are (`theme.edge`: hedge · fence · rail · rock · reeds, or any outdoor prop), two rings of trees/props beyond it (`theme.props` that are outdoor props), grass tufts and flowers on grass floors, and hills on the horizon.
+- **Indoors (`floor: 'floor'`):** papered walls in `palette.wall`, skirting, windows, pictures and a rug, with a garden outside. The wall between the camera and the player fades out.
+- Templates that lay their own floor call `A.scenery({ w, d, cx, cz, floor: 'track', edge: false })` (CHASE does this). Set `A.set = false` before `A.ground` to skip it.
+- **Furniture:** PUZZLE and Vault station `object`s are drawn as real furniture by `kit/vaultobjects.js` (desk, book lectern, clock, chest, safe, window, door, easel picture/map/board, sign, note stand, statue, scales, telescope, well…). Unknown names fall back to a plinth.
+- **Arcade:** each `bg` (river · grass · kitchen · paper · night · sky · hall) is a painted scene; sprites get shadows, points throw sparks, mistakes shake the screen.
+
+## Reading rules
+
+- Each chapter is recorded separately (`save.chaptersRead`). A street's questions open only when **every** chapter in its `chapters` list is finished. Old saves are credited with chapters 1…N from the old bookmark.
+- "I've finished this chapter" unlocks after a quick-reading time for that chapter (about 400 words a minute, 15–120 s).
+- Sequels: the Reading Room shows them locked (🔒 needs a Key) and `openDistrict` refuses without the previous book's Key, however the player gets there.
+
+## Lights Out
+
+`CONFIG.lightsOut` (21:00–07:00, device clock only). The town goes dark, streets/Sky Runs/Vaults/the café and the telescopes sleep, and only the **Reading Room** is lit and open. Finishing a chapter during Lights Out gives the Rested bonus (+20 coins, Bedtime Reader badge) next morning. Test with `?lightsout=1` / `?lightsout=0`.
