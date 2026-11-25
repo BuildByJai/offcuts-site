@@ -35,7 +35,8 @@ function blank() {
     towers: {},                 // quarter id → true once its Lookout Tower is climbed
     sideQuests: {},             // quest id → { step, done, got: { itemId: 1 }, gave: { itemId: 1 } }
     streets: {},                // book id → [street ids whose reading check is passed]
-    reading: {},                // book id → last chapter number read in the Reading Room
+    reading: {},                // book id → last chapter number read in the Reading Room (bookmark)
+    chaptersRead: {},           // book id → [chapter numbers finished] (a street needs all of its chapters)
     streetGames: {},            // book id → [street ids whose game is finished]
     skyRuns: {},                // book id → best ms
     vaults: {},                 // book id → best ms
@@ -63,7 +64,7 @@ function migrate(old) {
       if (old[k] !== undefined && old[k] !== null) out[k] = old[k];
     }
     if (old.tower && typeof old.tower === 'object') out.tower = Object.assign(blankTower(), old.tower);
-    for (const k of ['towers', 'sideQuests', 'streets', 'reading', 'streetGames', 'skyRuns', 'vaults', 'ownCopy', 'hints']) {
+    for (const k of ['towers', 'sideQuests', 'streets', 'reading', 'chaptersRead', 'streetGames', 'skyRuns', 'vaults', 'ownCopy', 'hints']) {
       if (old[k] && typeof old[k] === 'object') out[k] = old[k];
     }
     if (old.profile && typeof old.profile === 'object') out.profile = Object.assign(out.profile, old.profile);
@@ -75,6 +76,14 @@ function migrate(old) {
       const e = CONFIG.economy;
       out.wallet = Object.keys(out.coins).length * e.coin + Object.keys(out.golden).length * e.golden;
       out.earned = out.wallet;
+    }
+  }
+  // Before per-chapter reading existed, `reading` was a high-water mark.
+  // Credit those players with every chapter up to it, so nobody loses progress.
+  if (!old || !old.chaptersRead) {
+    for (const [b, n] of Object.entries(out.reading || {})) {
+      const top = Math.min(Number(n) || 0, 200);
+      out.chaptersRead[b] = Array.from({ length: top }, (_, i) => i + 1);
     }
   }
   out.v = 4;
@@ -274,10 +283,16 @@ export const Save = {
     return true;
   },
   lastRead(book) { return read().reading[book] || 0; },
+  hasRead(book, chapter) { return (read().chaptersRead[book] || []).includes(chapter); },
+  chaptersRead(book) { return (read().chaptersRead[book] || []).slice(); },
+  // Returns true the first time this chapter is finished.
   markRead(book, chapter) {
     const s = read();
-    if ((s.reading[book] || 0) >= chapter) return false;
-    s.reading[book] = chapter; write(); changed('reading');
+    const list = s.chaptersRead[book] || (s.chaptersRead[book] = []);
+    s.reading[book] = chapter;                     // bookmark: where to pick up next time
+    if (list.includes(chapter)) { write(); return false; }
+    list.push(chapter); list.sort((a, b) => a - b);
+    write(); changed('reading');
     return true;
   },
   ownCopy(book) { return read().ownCopy[book] || []; },
