@@ -225,7 +225,8 @@ export class Player {
   // Speed pads: multiply top speed for a while.
   boost(mult, seconds) { this.boostMult = mult; this.boostTimer = seconds; }
   // Timed shop / orb boosts.
-  addBoost(id, secs) { this.boosts[id] = Math.max(this.boosts[id] || 0, secs); }
+  addBoost(id, secs, { reset = false } = {}) { this.boosts[id] = reset ? secs : Math.max(this.boosts[id] || 0, secs); }
+  get fizz() { return (this.boosts.matcha || 0) > 0; }   // Matcha Orange: free stamina
   // Springs: launch upwards to a given height regardless of jump input.
   launch(height, { keepSpeed = false } = {}) {
     this.vel.y = Math.sqrt(2 * this.cfg.gravity * height);
@@ -300,6 +301,8 @@ export class Player {
     if (this._turnCd > 0) this._turnCd -= dt;
     if (this.controlLock > 0) this.controlLock -= dt;
 
+    // Matcha Orange: stamina stays full for as long as the fizz lasts
+    if (this.fizz) { this.stamina = this.st.max; this.staminaDelay = 0; }
     // stamina refills on the ground
     if (this.grounded && !this.charging) {
       if (this.staminaDelay > 0) this.staminaDelay -= dt;
@@ -317,7 +320,7 @@ export class Player {
       return;
     }
 
-    const speedMult = this.boosts.speed > 0 ? CONFIG.shop.speedSprintMult : 1;
+    const speedMult = (this.boosts.speed > 0 ? CONFIG.shop.speedSprintMult : 1) * (this.fizz ? CONFIG.cafe.drink.sprintMult : 1);
     this.sprinting = input.sprint && mv.mag > 0.1;
     let top = (this.sprinting ? c.sprintSpeed * speedMult : c.walkSpeed) * mv.mag * this.boostMult;
 
@@ -346,7 +349,7 @@ export class Player {
         (this.grounded || !this.airDashUsed)) {
       if (this.stamina < this.st.dash) this.emit('tired');
       else {
-        this.stamina -= this.st.dash; this.staminaDelay = this.st.regenDelay;
+        if (!this.fizz) { this.stamina -= this.st.dash; this.staminaDelay = this.st.regenDelay; }
         let dx = wl > 1e-4 ? wx : Math.sin(this.facing), dz = wl > 1e-4 ? wz : Math.cos(this.facing);
         this.dashDir.set(dx, dz);
         this.dashT = m.dashTime;
@@ -440,7 +443,7 @@ export class Player {
     let k = Math.min(1, this.chargeT / m.superJumpChargeTime);
     const need = st.superJump * Math.max(0.25, k);
     if (this.stamina < need) k = Math.max(0, this.stamina / st.superJump);
-    this.stamina = Math.max(0, this.stamina - st.superJump * Math.max(0.25, k));
+    if (!this.fizz) this.stamina = Math.max(0, this.stamina - st.superJump * Math.max(0.25, k));
     this.staminaDelay = st.regenDelay;
     this.charging = false;
     const r = this.boosts.rocket > 0 ? CONFIG.shop.rocketJumpMult : 1;
@@ -613,7 +616,7 @@ export class Player {
       this.trick('glide');
     }
     if (this.gliding) {
-      this.stamina = Math.max(0, this.stamina - this.st.glidePerSec * h);
+      if (!this.fizz) this.stamina = Math.max(0, this.stamina - this.st.glidePerSec * h);
       this.staminaDelay = this.st.regenDelay;
       if (!held || this.stamina <= 0 || this.grounded) this._endGlide();
     }

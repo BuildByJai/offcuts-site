@@ -41,7 +41,8 @@ function blank() {
     skyRuns: {},                // book id → best ms
     vaults: {},                 // book id → best ms
     ownCopy: {},                // book id → [street ids] the player said they read in their own copy
-    hints: {}                   // "bookId:streetId:q" → 1 when a hint was bought
+    hints: {},                  // "bookId:streetId:q" → 1 when a hint was bought
+    cafe: {}                    // Chapter Café: { lastFreeDate, daysDrunk: [], ready, pickups: { id: 1 } }
   };
 }
 const ARR = ['stamps', 'keys'];
@@ -64,7 +65,7 @@ function migrate(old) {
       if (old[k] !== undefined && old[k] !== null) out[k] = old[k];
     }
     if (old.tower && typeof old.tower === 'object') out.tower = Object.assign(blankTower(), old.tower);
-    for (const k of ['towers', 'sideQuests', 'streets', 'reading', 'chaptersRead', 'streetGames', 'skyRuns', 'vaults', 'ownCopy', 'hints']) {
+    for (const k of ['towers', 'sideQuests', 'streets', 'reading', 'chaptersRead', 'streetGames', 'skyRuns', 'vaults', 'ownCopy', 'hints', 'cafe']) {
       if (old[k] && typeof old[k] === 'object') out[k] = old[k];
     }
     if (old.profile && typeof old.profile === 'object') out.profile = Object.assign(out.profile, old.profile);
@@ -301,6 +302,8 @@ export const Save = {
     const list = s.ownCopy[book] || (s.ownCopy[book] = []);
     if (!list.includes(street)) { list.push(street); write(); }
   },
+  cafe() { return read().cafe || {}; },
+  updateCafe(fn) { const s = read(); s.cafe = s.cafe || {}; fn(s.cafe); write(); changed('cafe'); },
   hasHint(key) { return !!read().hints[key]; },
   buyHint(key) { read().hints[key] = 1; write(); },
   skyRun(book) { return read().skyRuns[book] || null; },

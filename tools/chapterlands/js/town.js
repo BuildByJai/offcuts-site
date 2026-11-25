@@ -29,6 +29,7 @@ import { SideQuests } from './sidequests.js';
 import { posterTexture } from './posters.js';
 import { track } from './track.js';
 import { LightsOut } from './lightsout.js';
+import { Matcha, matchaCup } from './matcha.js';
 import { grownUps, guardLinks } from './grownups.js';
 import { renderLibraryCard, renderQuestLog, openDistrict, openReadingRoom, districtDone } from './library-ui.js';
 
@@ -1393,6 +1394,40 @@ function darkFrame() {
   rrGlow.material.opacity = 0.5;
 }
 
+/* ---------- Matcha Orange: drinks from the café, hidden cups in town ---------- */
+function drinkMatcha(where) {
+  Matcha.drink(player, awardBadge);
+  player.stretchTimer = 0.3;
+  juice.sparkle(player.pos.x, player.pos.y + 1.4, player.pos.z, 24, 0x7fdc6a, { speed: 3.5, life: 0.7 });
+  Sfx.boost();
+  toast(`🥤 Glug! <b>Focus Fizz</b>: free stamina for ${CONFIG.cafe.drink.secs}s`, { ms: 3200 });
+  track(where === 'pickup' ? 'matcha-pickup' : 'matcha-free-claimed');
+}
+function drinkWaiting() { if (Matcha.takeReady() > 0) setTimeout(() => drinkMatcha('cafe'), 700); }
+const matchaCups = [];
+for (const P of CONFIG.cafe.pickups) {
+  if (Matcha.pickupTaken(P.id)) continue;
+  const cup = matchaCup(0.55);
+  cup.position.set(P.x, P.y, P.z);
+  const halo = new THREE.Mesh(new THREE.SphereGeometry(0.55, 14, 10), new THREE.MeshBasicMaterial({ color: 0x9be86b, transparent: true, opacity: 0.22, depthWrite: false, blending: THREE.AdditiveBlending }));
+  halo.position.y = 0.4; cup.add(halo);
+  scene.add(cup);
+  matchaCups.push({ P, cup, y0: P.y });
+}
+function updateMatchaCups(t) {
+  for (let i = matchaCups.length - 1; i >= 0; i--) {
+    const m = matchaCups[i];
+    m.cup.position.y = m.y0 + Math.sin(t * 2 + i) * 0.15;
+    m.cup.rotation.y = t * 1.2;
+    if (Math.hypot(player.pos.x - m.P.x, player.pos.z - m.P.z) < 1.3 && Math.abs(player.pos.y + 0.9 - m.y0) < 1.6) {
+      Matcha.takePickup(m.P.id);
+      scene.remove(m.cup);
+      matchaCups.splice(i, 1);
+      drinkMatcha('pickup');
+    }
+  }
+}
+
 /* ---------- Lookout Tower telescope: camera sweep, fog lifts, banner ---------- */
 let sweep = null;
 function useTelescope(T) {
@@ -1572,6 +1607,7 @@ function startPlaying() {
   setState('playing');
   if (LightsOut.isOn()) { setLightsOut(true, { announce: false }); showLightsOutCard(); }
   else morningCheck();
+  drinkWaiting();
 }
 $('btn-play').addEventListener('click', startPlaying);
 
@@ -1781,6 +1817,7 @@ function tick() {
   quests.update(state === 'playing' ? dt : 0);
   ROADS.mist.update(dt, t, scene.fog.color);
   for (const T of lookouts) T.update(dt, t, player);
+  if (state === 'playing') updateMatchaCups(t);
   updateCoins(t, dt);
   updatePops(dt);
   updateDoors(dt);
@@ -1824,6 +1861,8 @@ const finishLoading = () => {
     toast(spawnKey.startsWith('plot:') ? 'Back on the road.' : 'Welcome back to Library Square!');
     Save.takeToasts().forEach((m, i) => setTimeout(() => toast(m, { badge: true, ms: 3600 }), 400 + i * 600));
     if (!lightsOn) morningCheck();
+    drinkWaiting();
+    if (params.get('open') === 'reading') setTimeout(() => openReading(), 600);
     checkBookBadges();
     if (spawnKey.startsWith('plot:') && params.get('panel') === '1') {
       const b = Catalogue.getBook(spawnKey.slice(5));

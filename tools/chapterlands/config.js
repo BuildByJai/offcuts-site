@@ -184,6 +184,27 @@ export const CONFIG = {
     speedSprintMult: 1.4,
     magnetRadius: 7
   },
+  /* ---------------- The Chapter Café + Matcha Orange ----------------
+     The drink was designed by a young guest artist. Her real name must never
+     appear anywhere: the credit comes ONLY from guestArt.matcha.credit. */
+  cafe: {
+    name: 'The Chapter Café',
+    drink: { id: 'matcha', name: 'Matcha Orange', icon: '🥤', price: 10, secs: 45, sprintMult: 1.15,
+             desc: 'Focus Fizz: 45 seconds of free stamina and a faster sprint.' },
+    // hidden cups in town, each found once (next to three golden coins)
+    pickups: [
+      { id: 'matcha-roof',     x: 40, y: 7.5, z: -20,  hint: 'arcade roof' },
+      { id: 'matcha-alley',    x: -42, y: 2.0, z: 0,   hint: 'back alley' },
+      { id: 'matcha-fountain', x: 0,  y: 2.0, z: -5.6, hint: 'behind the fountain' }
+    ]
+  },
+  guestArt: {
+    matcha: {
+      file: 'assets/guest-art/matcha-drawing.jpg',      // relative to tools/chapterlands/
+      credit: 'Guest artist: Captain M',
+      alt: "A child's marker drawing of a green matcha drink with a teal straw and an orange slice."
+    }
+  },
   economy: {
     coin: 1,                   // wallet value of a regular coin (collected once)
     golden: 25,                // wallet value of a golden coin
@@ -227,6 +248,7 @@ export const CONFIG = {
     default: { x: 0, y: 0, z: 34, facing: Math.PI },   // south entrance, facing the square
     study:   { plot: 'life-atomic' },                    // outside the Atomic Habits district (Life Skills road)
     reading: { x: -18, y: 0, z: -26.5, facing: 0 },     // outside the Reading Room door, facing the square
+    cafe:    { x: 27.8, y: 0, z: 11, facing: -Math.PI / 2 }, // outside the Chapter Café door, facing the square
     tower:   { x: -26.6, y: 0, z: -16, facing: Math.PI / 2 } // outside the Habit Tower door, facing the square
   },
 
@@ -340,8 +362,8 @@ export const CONFIG = {
 
     { id: 'e-house',  name: 'House',      status: 'filler',
       x0: 30,  x1: 44,  z0: -30, z1: -3,   h: 5.5, wall: P.grape, trim: P.gold, roof: P.navy, style: 'house' },
-    // The café is open: it's where the White Rabbit quest starts.
-    { id: 'cafe',     name: 'Café',       sign: 'Café', status: 'open',
+    // The Chapter Café: walk in to buy Matcha Orange (cafe/).
+    { id: 'cafe',     name: 'The Chapter Café', sign: 'Chapter Café', status: 'live', href: 'cafe/', icon: '☕',
       x0: 30,  x1: 44,  z0: 3,   z1: 16,  h: 4,   wall: P.peach, trim: P.darkWood, roof: P.wood, style: 'cafe',
       door: { face: 'west', at: 11 } },
     { id: 'se-house', name: 'House',      status: 'filler',
@@ -450,12 +472,12 @@ export const CONFIG = {
           say: 'Oh dear! Oh dear! I shall be too late!' },
         { type: 'talk', params: { npc: 'rabbit' },
           text: 'Talk to the White Rabbit.',
-          say: 'Oh my ears and whiskers, how late it\'s getting! I\'ve lost my way home — it\'s somewhere up the Fantasy road, past all that fog. Will you walk with me?' },
+          say: 'Oh my ears and whiskers, how late it\'s getting! My home is up the Fantasy road. Will you walk with me?' },
         { type: 'reach', params: { actor: 'rabbit', lead: true, radius: 4, points: [[-5, -29], [-5, -50], 'plot:fan-alice-1'] },
           text: 'Follow the White Rabbit up the Fantasy road.' },
         { type: 'talk', params: { npc: 'rabbit' },
           text: 'Talk to the White Rabbit at the edge of Wonderland.',
-          say: 'Here we are — Wonderland! But the way is still shut. Come back when the way opens! And thank you — you\'re much quicker than I am.' }
+          say: 'Here we are: Wonderland! Read chapter 1 in the Reading Room, answer 3 questions, and the first street opens. Thank you, you\'re much quicker than I am!' }
       ],
       reward: { coins: 30, badge: 'rabbit-chaser' } }
   ],
@@ -562,6 +584,8 @@ export const CONFIG = {
     { id: 'rabbit-chaser',  name: 'Rabbit Chaser',   desc: 'Catch the White Rabbit and help him home.',    icon: '🐇' },
     { id: 'lookout',        name: 'Lookout',         desc: 'Climb a Lookout Tower and lift the fog.',      icon: '🔭' },
     { id: 'night-owl',      name: 'Bedtime Reader',  desc: 'Read a chapter at Lights Out, then wake up rested.', icon: '🌙' },
+    { id: 'first-sip',      name: 'First Sip',       desc: 'Drink your first Matcha Orange.',             icon: '🥤' },
+    { id: 'regular',        name: 'Regular',         desc: 'Drink Matcha Orange on 5 different days.',     icon: '☕' },
     { id: 'eagle-eye',      name: 'Eagle Eye',       desc: 'Climb all seven Lookout Towers.',              icon: '🦅' },
     { id: 'first-check',    name: 'Good Reader',     desc: 'Pass your first reading check.',               icon: '✅' },
     { id: 'sky-runner',     name: 'Sky Runner',      desc: 'Finish a Sky Run.',                            icon: '☁️' },

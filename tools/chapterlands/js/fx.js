@@ -250,6 +250,10 @@ export function attachJuice({ scene, player, cam, camera, renderer }) {
       if (player.boosts.speed > 0 && player.grounded && player.speedH > 6 && Math.random() < dt * 30) {
         spark.emit(p.x, p.y + 0.3, p.z, { color: 0x7fd6ff, size: 0.35, size1: 0.05, life: 0.5, spread: 0.4 });
       }
+      // light green trail while sprinting on Matcha Orange
+      if (player.boosts.matcha > 0 && player.sprinting && player.speedH > 5 && Math.random() < dt * 30) {
+        spark.emit(p.x, p.y + 0.3, p.z, { color: 0x9be86b, size: 0.35, size1: 0.05, life: 0.5, spread: 0.4 });
+      }
       if (player.boosts.rocket > 0 && !player.grounded && Math.random() < dt * 25) {
         spark.emit(p.x, p.y + 0.1, p.z, { vy: -2, color: 0xff9a3c, size: 0.4, size1: 0.05, life: 0.4, spread: 0.6 });
       }

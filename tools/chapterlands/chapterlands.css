@@ -493,3 +493,7 @@ body.touch #help-btn { left: auto; transform: none; right: max(12px, env(safe-ar
 #lights-out .lede { color: #d8dcff; }
 #lights-out .moon { font-size: 64px; line-height: 1; }
 #lights-out .btn.ghost { color: #eef0ff; border-color: rgba(238,240,255,0.5); background: transparent; }
+
+/* Matcha Orange (Focus Fizz) */
+.stam.fizz .stam-fill { background: linear-gradient(90deg, #5fc46a, #a6e86b) !important; }
+.boost-pill.fizz { background: #2F6B35; color: #fff; }
