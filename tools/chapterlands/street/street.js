@@ -24,6 +24,7 @@ import { pal, rng, seedOf, groundTexture, hex, decorate } from '../kit/props.js'
 import { DEMO } from '../kit/demo.js';
 import { TEMPLATES } from '../kit/templates/index.js';
 import { runArcade } from '../kit/arcade.js';
+import { skyDome, buildSet } from '../kit/scenery.js';
 
 const $ = (id) => document.getElementById(id);
 const qs = new URLSearchParams(location.search);
@@ -194,6 +195,8 @@ function play3D(T) {
   scene.fog = new THREE.Fog(new THREE.Color(P.fog), 40, (def.params && def.params.fogFar) || 150);
   const camera = new THREE.PerspectiveCamera(CONFIG.camera.fov, innerWidth / innerHeight, 0.1, 400);
   const dark = def.params && def.params.dark;
+  const skyD = skyDome(scene, P, { dark: !!dark });
+  scene.fog.color.copy(skyD.uniforms.horizonColor.value);
   scene.add(new THREE.HemisphereLight(dark ? 0x8a9ad0 : 0xeaf4ff, 0x5a6a4a, dark ? 0.85 : 1.2));
   const sun = new THREE.DirectionalLight(dark ? 0xc8d4ff : 0xfff3dc, dark ? 1.1 : 2.0);
   sun.castShadow = true; sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.03;
@@ -221,6 +224,7 @@ function play3D(T) {
 
   const interactables = [];
   const updates = [];
+  const idles = [];
   let state = 'start';
   let lives = null, startT = 0, timeLeft = null, checkpoint = { x: 0, y: 0, z: 0, facing: Math.PI };
   const A = {
@@ -230,6 +234,7 @@ function play3D(T) {
     interactables,
     killY: -6,
     onUpdate(fn) { updates.push(fn); },
+    onIdle(fn) { idles.push(fn); },          // also runs on the start screen / when paused
     setObjective(text, sub = '') {
       $('objective').hidden = false;
       $('ob-name').textContent = def.name;
@@ -299,6 +304,7 @@ function play3D(T) {
         A.groundMesh = m;
       }
       if (floor !== 'water' && floor !== 'none') world.add(cx - w / 2 - 60, cx + w / 2 + 60, -1, 0, cz - d / 2 - 60, cz + d / 2 + 60);
+      if (walls && floor !== 'none' && A.set !== false) buildSet(A, { w, d, cx, cz, floor, dark: !!dark });
       if (walls) {
         world.add(cx - w / 2 - 1, cx - w / 2, -2, wallH, cz - d / 2 - 1, cz + d / 2 + 1, false);
         world.add(cx + w / 2, cx + w / 2 + 1, -2, wallH, cz - d / 2 - 1, cz + d / 2 + 1, false);
@@ -307,6 +313,9 @@ function play3D(T) {
       }
     },
     decorate(opts) { decorate(B, world, Object.assign({ P, props: theme.props, seed: seedOf(def.id || 'x') }, opts)); },
+    // the visible set round a play area (see kit/scenery.js); templates that
+    // build their own floor call this themselves
+    scenery(opts) { buildSet(A, Object.assign({ dark: !!dark }, opts)); },
     interact(o) { interactables.push(o); return o; },
     help(opts) { helpButton(opts); },
     hex
@@ -403,7 +412,9 @@ function play3D(T) {
       if (run.idle) run.idle(dt, t);
       cam.update(dt, player.pos, null);
     }
+    if (state !== 'playing') for (const f of idles) f(dt, t);
     followShadow(sun, player.pos, SUN_DIR, gfx.tierCfg.shadowRange || 0, 60);
+    skyD.update(dt, camera.position);
     juice.update(dt);
     moveHud.update(dt);
     gfx.monitor(dt, state === 'playing');

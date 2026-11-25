@@ -13,6 +13,7 @@ import * as THREE from 'three';
 import { hex, prop } from '../props.js';
 import { emojiSprite } from '../props.js';
 import { renderSolve } from '../solve.js';
+import { vaultObject } from '../vaultobjects.js';
 import { toast } from '../../js/hud.js';
 import { Sfx } from '../../js/audio.js';
 
@@ -26,20 +27,19 @@ export function build(A) {
   // a higher, further camera so you can see round the room
   Object.assign(A.cam.cfg, { distance: 6.5, maxDistance: 9, pitch: 0.62 });
   A.cam.wantDist = 6.5; A.cam.pitch = 0.62;
+  if (!out) A.set = false;              // the room below replaces the outdoor set
   A.ground(w, d, room.floor || (out ? 'grass' : 'floor'), { wallH: 8 });
   if (!out) {
-    const wall = hex(room.wall || P.wall), trim = hex(P.trim);
-    A.B.box(-w / 2 - 0.3, w / 2 + 0.3, 0, h, -d / 2 - 0.3, -d / 2, wall);
-    A.B.box(-w / 2 - 0.3, -w / 2, 0, h, -d / 2, d / 2, wall);
-    A.B.box(w / 2, w / 2 + 0.3, 0, h, -d / 2, d / 2, wall);
-    A.B.box(-w / 2 - 0.3, w / 2 + 0.3, 0, h * 0.35, d / 2, d / 2 + 0.3, wall);   // low front wall so the camera sees in
-    A.B.box(-w / 2, w / 2, 0, 0.18, -d / 2, -d / 2 + 0.05, trim);
+    // papered walls, skirting, windows, pictures and a rug (kit/scenery.js),
+    // low enough for the camera to see in; plus a garden beyond
+    const Pw = A.P.wall;
+    if (room.wall) A.P.wall = room.wall;
+    A.scenery({ w, d, floor: 'floor' });
+    A.P.wall = Pw;
     A.world.add(-w / 2 - 1, w / 2 + 1, 0, h, -d / 2 - 1, -d / 2);
     A.world.add(-w / 2 - 1, -w / 2, 0, h, -d / 2, d / 2);
     A.world.add(w / 2, w / 2 + 1, 0, h, -d / 2, d / 2);
     A.world.add(-w / 2 - 1, w / 2 + 1, 0, 2.5, d / 2, d / 2 + 1);
-    // rug
-    A.B.box(-w * 0.25, w * 0.25, 0, 0.02, -d * 0.2, d * 0.2, hex(P.accent), { cast: false });
   } else {
     A.decorate({ w, d, count: 20 });
   }
@@ -66,11 +66,11 @@ export function build(A) {
     const { x, z, face } = spots[i];
     // a plinth/prop for the object + its icon floating above
     const kind = S.object || 'box';
-    const propFor = { desk: 'table', table: 'table', shelf: 'bookcase', bed: 'bed', barrel: 'barrel', chest: 'crate', box: 'crate', plant: 'bush', statue: 'statue', tree: 'tree', chair: 'chair' }[kind];
+    const propFor = { tree: 'tree' }[kind];
     if (propFor) prop(propFor, A.B, A.world, x, z, 0.9, P, r);
-    else { A.B.box(x - 0.5, x + 0.5, 0, 1.0, z - 0.5, z + 0.5, hex(S._solve ? P.accent : P.trim)); A.world.add(x - 0.5, x + 0.5, 0, 1.0, z - 0.5, z + 0.5); }
-    const sp = emojiSprite(OBJ_ICON[kind] || '❓', S._solve ? 1.2 : 0.95);
-    sp.position.set(x, propFor === 'bookcase' || propFor === 'tree' ? 3.2 : 2.2, z); A.scene.add(sp);
+    else vaultObject(kind, A.B, A.world, x, z, face, P);
+    const sp = emojiSprite(OBJ_ICON[kind] || '❓', S._solve ? 1.0 : 0.75);
+    sp.position.set(x, kind === 'tree' || kind === 'clock' || kind === 'shelf' ? 3.4 : 2.7, z); A.scene.add(sp);
     const ox = x + Math.sin(face) * 1.4, oz = z + Math.cos(face) * 1.4;
     A.onUpdate((dt, t) => { sp.position.y += Math.sin(t * 2 + i) * 0.002; sp.material.opacity = S._solve && read.size < need ? 0.6 : 1; });
     A.interact({
