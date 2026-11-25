@@ -106,7 +106,7 @@ function rewardAndFinish({ ms = null, text = '' } = {}) {
     } else {
       const first = Save.playStreet(book.id, def.id);
       if (first) pay = CONFIG.rewards.streetGame;
-      track('street-played', { book: book.id, street: def.id });
+      track('street-played', { book: book.id, street: def.id, index: kit.streets.findIndex((x) => x.id === def.id) });
     }
     if (pay) Save.earn(pay);
   }

@@ -1474,7 +1474,9 @@ function renderControls() {
 input.onTouchModeChange = renderControls;
 renderControls();
 
+let sessionTracked = false;
 function startPlaying() {
+  if (!sessionTracked) { sessionTracked = true; track('session-start'); }
   Sfx.unlock();
   $('start-screen').hidden = true;
   cam.snapBehind(player.facing);

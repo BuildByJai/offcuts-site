@@ -30,6 +30,11 @@
       "binding": "POST_MATCH_CACHE",
       "id": "1c9df72099cb484190a70d2417a16481"
     }
+  ],
+  // Chapterlands anonymous event counts (Gate A). Analytics Engine creates the
+  // dataset on the first write: nothing to provision. See docs/chapterlands/tracking.md.
+  "analytics_engine_datasets": [
+    { "binding": "CHAPTERLANDS_EVENTS", "dataset": "chapterlands_events" }
   ]
   // The Study (tools/the-study/) wants a STUDY_LEADERBOARD KV namespace for
   // its global leaderboard. It's not provisioned yet — a placeholder id here

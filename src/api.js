@@ -1,5 +1,6 @@
 import { PLAYER_POOL, MAX_SQUAD, MAX_PER_TEAM, BUDGET_CAP } from "./lib/players.js";
 import { generateMomentsFromReport } from "./lib/post-match-moments/pipeline.js";
+import { handleChapterlandsEvents, handleChapterlandsStats } from "./lib/chapterlands-events.js";
 
 const ID_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -325,6 +326,12 @@ export default {
       const [, board, action] = bookTownMatch;
       if (action === "score" && request.method === "POST") return handleBookTownSubmitScore(board, request, env);
       if (action === "leaderboard" && request.method === "GET") return handleBookTownLeaderboard(board, env);
+    }
+    if (url.pathname === "/api/chapterlands/events" && request.method === "POST") {
+      return handleChapterlandsEvents(request, env);
+    }
+    if (url.pathname === "/api/chapterlands/stats" && request.method === "GET") {
+      return handleChapterlandsStats(request, env);
     }
     if (url.pathname === "/api/wave-runner/score" && request.method === "POST") {
       return handleWaveRunnerSubmitScore(request, env);
