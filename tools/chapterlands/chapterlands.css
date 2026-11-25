@@ -497,3 +497,15 @@ body.touch #help-btn { left: auto; transform: none; right: max(12px, env(safe-ar
 /* Matcha Orange (Focus Fizz) */
 .stam.fizz .stam-fill { background: linear-gradient(90deg, #5fc46a, #a6e86b) !important; }
 .boost-pill.fizz { background: #2F6B35; color: #fff; }
+
+/* short, kid-friendly start + noticeboard */
+.big-lede { font-size: 22px !important; font-weight: 800; color: var(--ink) !important; margin: 4px 0 12px !important; }
+.steps3 { list-style: none; display: flex; gap: 10px; padding: 0; margin: 0 0 16px; }
+.steps3 li { flex: 1; text-align: center; background: var(--accent-soft, #E9F3ED); border-radius: 12px; padding: 10px 4px; font-weight: 800; font-size: 15px; }
+.steps3 li span { display: block; font-size: 30px; line-height: 1.2; }
+.controls-short { font: 13px 'JetBrains Mono', monospace; color: var(--ink-soft); margin: 0 0 10px; }
+.notice-list { list-style: none; padding: 0; margin: 6px 0 18px; }
+.notice-list li { display: flex; align-items: center; gap: 12px; font-size: 18px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.notice-list li span:first-child { font-size: 28px; width: 36px; text-align: center; }
+
+.how-big { font-family: Inter, system-ui, sans-serif; display: block; font-size: 19px; font-weight: 800; color: var(--ink); line-height: 1.35; }

@@ -443,7 +443,7 @@ export const CONFIG = {
       steps: [
         { type: 'talk', params: { npc: 'librarian' },
           text: 'Talk to the Librarian on the Reading Room steps.',
-          say: 'Oh, what a muddle! Seven books have wandered off. Every road out of the square is one part of the library — Fantasy, Adventure, Mystery and the rest — and each road has a little shelf under its arch. Could you find the books and put each one back on its own shelf? Match the colour and the picture on the cover.' },
+          say: 'Oh, what a muddle! Seven books have run off. Find them, then put each one on the little shelf under its road\'s arch. Match the colours!' },
         { type: 'collect', params: { items: [
             { id: 'lb-fantasy',   quarter: 'fantasy',   at: [-16, 0.7, 10] },
             { id: 'lb-adventure', quarter: 'adventure', at: [18, 0.7, -7] },
@@ -462,7 +462,7 @@ export const CONFIG = {
           text: 'Put each book on the shelf under its own road\'s arch.' },
         { type: 'talk', params: { npc: 'librarian' },
           text: 'Tell the Librarian the shelves are tidy.',
-          say: 'Every book back where it belongs! Now you know how the library works: pick a road for the kind of story you like, and the easier books are nearest the square.' }
+          say: 'All back where they belong! Each road is a kind of story. Easier books are nearest the square.' }
       ],
       reward: { coins: 40, badge: 'shelver' } },
     { id: 'white-rabbit', title: 'The White Rabbit', giver: 'rabbit',

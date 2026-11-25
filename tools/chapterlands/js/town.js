@@ -1594,6 +1594,8 @@ const titleOrbit = { center: new THREE.Vector3(0, 5, -2), dist: 62, pitch: 0.36,
 
 function renderControls() {
   document.querySelectorAll('.controls-help').forEach((el) => { el.innerHTML = controlsHelpHTML(input.touchMode, Save.unlocks()); });
+  const k = document.getElementById('start-keys');
+  if (k) k.textContent = input.touchMode ? 'Left side: move · Big button: jump · ✋: use' : 'WASD: move · Space: jump · E: use';
 }
 input.onTouchModeChange = renderControls;
 renderControls();
@@ -1873,7 +1875,7 @@ const finishLoading = () => {
     setState('start');
     $('start-screen').hidden = false;
     const n = Save.coinCount() + Save.goldenCount();
-    if (n > 0 || Save.card().stamps.length) $('start-progress').textContent = `Your progress: ${Save.card().stamps.length} stamp${Save.card().stamps.length === 1 ? '' : 's'} · ${Save.coinCount()}/${coins.length} coins · ${Save.goldenCount()}/${goldens.length} golden · ${Object.keys(Save.get().badges).length}/${CONFIG.badges.length} badges · 🪙 ${Save.wallet()} to spend`;
+    if (n > 0 || Save.card().stamps.length) $('start-progress').textContent = `✅ ${Save.card().stamps.length} · 🪙 ${Save.wallet()} · 🏅 ${Object.keys(Save.get().badges).length}`;
     checkBookBadges();
   }
 };

@@ -66,7 +66,6 @@ document.title = `${V.name} — ${book.title} — ${CONFIG.gameName}`;
 $('crumb').textContent = `${CONFIG.gameName.toLowerCase()} / ${Catalogue.placeName(book).toLowerCase()} / vault`;
 $('start-tag').textContent = `${book.title} · the vault`;
 $('start-title').textContent = V.name;
-$('start-lede').textContent = V.intro || V.blurb || '';
 $('pause-title').textContent = V.name;
 
 /* =============== locks (data) =============== */
@@ -75,6 +74,7 @@ const QUIZ = V.quiz && questions && questions.vault && questions.vault.length
   ? Object.assign({ object: 'desk', label: 'The reading desk', _quiz: true }, V.quiz) : null;
 if (QUIZ) LOCKS.push({ kind: 'quiz', s: QUIZ, name: QUIZ.lock || 'The last lock', lesson: QUIZ.lesson });
 const NL = LOCKS.length;
+$('start-lede').textContent = `🔒 ${NL} locks. Solve the room to get out!`;
 
 /* =============== renderer / scene (from The Study) =============== */
 const canvas = $('game-canvas');

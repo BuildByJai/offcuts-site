@@ -120,7 +120,6 @@ export function openQuiz({ book, kit, street, questions, onPass, onClose, title 
         <button class="btn ghost quiz-hint" type="button" ${bought || !q.hint ? 'disabled' : ''}>💡 Hint (🪙${CONFIG.costs.hint})</button>
         <button class="btn ghost quiz-close" type="button">Later</button>
       </div>
-      <p class="fineprint" style="margin-top:10px">Coins can buy a hint, never an answer.</p>
     </div>`;
     el.querySelectorAll('.quiz-opt').forEach((b) => b.addEventListener('click', () => {
       const k = Number(b.dataset.k);
@@ -197,9 +196,9 @@ export async function openDistrict(bookId, hooks) {
     let html = `<div class="card scrollable district-card" style="--qc:${q.colour}">
       <span class="tag-inline">${quarterIcon(q)} ${esc(q.name)} · ${Catalogue.levelIcons(book.level)} Level ${book.level}</span>
       <h2>${esc(book.title)}</h2>
-      <p class="lede" style="margin-bottom:8px">${esc(book.author)}${kit.blurb ? ' — ' + esc(kit.blurb) : ''}</p>
+      <p class="lede" style="margin-bottom:8px">${esc(book.author)}</p>
       ${card.stamps.includes(book.id) ? '<p class="d-done">✅ Stamped on your library card · 🗝️ Key held</p>' : ''}
-      ${!book.readable ? `<p class="d-note">📕 This book isn't in our Reading Room. Read it in your own copy, or borrow it free from your library.</p>` : ''}
+      ${!book.readable ? `<p class="d-note">📕 Read this one in your own copy, or borrow it from the library.</p>` : ''}
       <h3>Streets</h3><ol class="streets">`;
     kit.streets.forEach((s, i) => {
       const S = streetState(book, kit, i);
@@ -210,15 +209,14 @@ export async function openDistrict(bookId, hooks) {
       } else if (S.open) {
         action = `<button class="btn mini-btn" data-play="${i}" type="button">${templateIcon(s.template)} ${S.played ? 'Play again' : 'Play'}</button>`;
       } else if (!S.prevOpen) {
-        action = '<span class="st-lock">🔒 Open the street before this one first</span>';
+        action = '<span class="st-lock">🔒</span>';
       } else {
         const readBtn = book.readable
           ? `<button class="btn ghost mini-btn" data-read="${i}" type="button">📖 Read ${esc(lab.toLowerCase())}</button>`
-          : `<span class="st-own">Read ${esc(lab.toLowerCase())} in your own copy, or borrow it free from your library.</span>
-             <button class="btn ghost mini-btn" data-lib="1" type="button">🏛️ Borrow it (grown-ups)</button>
+          : `<button class="btn ghost mini-btn" data-lib="1" type="button">🏛️ Borrow it (grown-ups)</button>
              <button class="btn ghost mini-btn" data-own="${i}" type="button">I've read it</button>`;
         action = readBtn + `<button class="btn mini-btn" data-quiz="${i}" type="button" ${S.read ? '' : 'disabled'}>✏️ Answer 3 questions</button>`
-          + (S.read ? '' : `<span class="st-hint">${book.readable ? 'Read it first — the questions open at the end of the chapter.' : ''}</span>`);
+          ;
       }
       html += `<li class="${S.done ? 'done' : S.open ? 'open' : ''}"><div class="st-head"><b>${esc(s.name)}</b><span>${esc(lab)} · ${templateIcon(s.template)} ${esc(s.game || s.template)}</span></div>
         <div class="st-act">${S.done ? '<span class="st-tick">✅ Done</span>' : ''}${action}</div></li>`;
@@ -227,15 +225,15 @@ export async function openDistrict(bookId, hooks) {
     const firstOpen = Save.isStreetOpen(book.id, kit.streets[0].id);
     if (kit.skyRun) {
       const best = Save.skyRun(book.id);
-      html += `<h3>Sky Run</h3><div class="d-extra"><span>☁️ <b>${esc(kit.skyRun.name)}</b> — ${esc(kit.skyRun.blurb || 'an optional climb high above the district, for coins and a badge.')}${best ? ` Best: ${fmtMs(best)}.` : ''}</span>
+      html += `<h3>Sky Run</h3><div class="d-extra"><span>☁️ <b>${esc(kit.skyRun.name)}</b>${best ? ` · Best: ${fmtMs(best)}` : ''}</span>
         ${LightsOut.isOn() ? '<span class="st-lock">🌙 Asleep</span>' : firstOpen ? '<button class="btn mini-btn" data-sky="1" type="button">Climb</button>' : '<span class="st-lock">🔒 Opens with the first street</span>'}</div>`;
     }
     if (kit.sideQuest) {
       const st = Save.quest(kit.sideQuest.id);
-      html += `<h3>Side quest</h3><div class="d-extra"><span>🧭 <b>${esc(kit.sideQuest.title)}</b> — ${st.done ? '✅ Done' : esc(kit.sideQuest.steps[Math.min(st.step, kit.sideQuest.steps.length - 1)].text)} <i>(No reading needed — it's out in the district's yard.)</i></span></div>`;
+      html += `<h3>Side quest</h3><div class="d-extra"><span>🧭 <b>${esc(kit.sideQuest.title)}</b> — ${st.done ? '✅ Done' : esc(kit.sideQuest.steps[Math.min(st.step, kit.sideQuest.steps.length - 1)].text)} <i hidden>(No reading needed — it's out in the district's yard.)</i></span></div>`;
     }
     if (kit.vault) {
-      html += `<h3>The Vault</h3><div class="d-extra"><span>🗝️ <b>${esc(kit.vault.name)}</b> — ${esc(kit.vault.blurb || 'an escape room about the whole book.')} Crack it to earn the <b>Key</b> and your library card stamp.</span>
+      html += `<h3>The Vault</h3><div class="d-extra"><span>🗝️ <b>${esc(kit.vault.name)}</b>: crack it to win the <b>Key</b>!</span>
         ${LightsOut.isOn() ? '<span class="st-lock">🌙 Asleep</span>' : allDone ? '<button class="btn mini-btn gold" data-vault="1" type="button">Enter the Vault</button>' : '<span class="st-lock">🔒 Finish every street first</span>'}</div>`;
     }
     html += `<button class="btn ghost" type="button" data-close="1" style="margin-top:14px">Back to the road</button></div>`;

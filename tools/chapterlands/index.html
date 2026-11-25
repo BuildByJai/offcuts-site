@@ -40,9 +40,11 @@
     <p class="crumb"><a href="../../" data-grownup>offcuts</a> / <a href="../../" data-grownup>games</a> / chapterlands</p>
     <span class="tag-inline">games &middot; reading &middot; explore</span>
     <h1 class="title-logo game-logo">📚 Chapter<b>lands</b></h1>
-    <p class="lede">A world that grows as you read. Every road out of Library Square is a kind of story, and every book is a district waiting under the fog. Read a chapter to open a street, climb the <b>Lookout Tower</b> to see what's coming, and help find the <b>lost books</b>. There are <span id="start-coins">63</span> coins and <span id="start-gold">8</span> golden ones to find on the way.</p>
+    <span hidden><span id="start-coins"></span><span id="start-gold"></span></span>
+    <p class="lede big-lede">Read books. Unlock the world.</p>
+    <ol class="steps3"><li><span>📖</span>Read</li><li><span>✏️</span>Answer</li><li><span>🗺️</span>Explore</li></ol>
     <div class="name-row"><span>Your library card: <b id="start-name">—</b></span><button class="btn ghost mini-btn" id="btn-start-reroll" type="button">🎲 New name</button></div>
-    <div class="controls-hint controls-help"></div>
+    <p class="controls-short" id="start-keys"></p>
     <p class="fineprint" id="start-progress"></p>
     <button class="btn" id="btn-play" type="button">Play</button>
     <p class="site-footer">offcuts.buildbyjai.workers.dev</p>
@@ -105,10 +107,12 @@
   <div class="card scrollable">
     <span class="tag-inline">noticeboard</span>
     <h2>Welcome to <span class="game-name">Chapterlands</span></h2>
-    <p class="lede">This is <b>Library Square</b>. Each of the seven roads leading out of it is one part of the library — Fantasy, Adventure, Animals &amp; Nature, Friends &amp; Family, Mystery, Sci-Fi and Life Skills. Every book is a district along its road: the easiest books sit nearest the square, the hardest at the far end.</p>
-    <p class="lede"><b>Reading opens doors.</b> Read a chapter in the <b>Reading Room</b> (the building with the columns), answer three quick questions, and that chapter's street opens. Finish a whole book to earn its <b>Key</b> and a stamp on your library card.</p>
-    <p class="lede">The roads are foggy. Climb the <b>Lookout Tower</b> on the Fantasy road to see what's coming. The Librarian has lost some books, and someone small and white is in a terrible hurry near the café…</p>
-    <p class="lede" style="margin-bottom:18px">There are <span id="notice-coins">63</span> coins dotted around town and <span id="notice-gold">8</span> golden ones in sneaky spots. The market stall sells new moves.</p>
+    <ul class="notice-list">
+      <li><span>📖</span>Read a chapter in the <b>Reading Room</b>.</li>
+      <li><span>✏️</span>Answer 3 questions. A street opens!</li>
+      <li><span>🔭</span>Climb a <b>Lookout Tower</b> to clear the fog.</li>
+      <li><span>🪙</span>Find <span id="notice-coins">63</span> coins and <span id="notice-gold">8</span> gold ones.</li>
+    </ul>
     <button class="btn" id="btn-notice-close" type="button">Got it</button>
   </div>
 </div>

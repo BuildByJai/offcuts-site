@@ -80,8 +80,10 @@ async function play() {
   const ch = def.chapters ? (def.chapters.length === 1 ? `${kit.chapterWord || 'Chapter'} ${def.chapters[0]}` : `${kit.chapterWord || 'Chapter'}s ${def.chapters[0]}–${def.chapters[def.chapters.length - 1]}`) : '';
   $('start-tag').textContent = isSky ? 'sky run · optional' : `${book.title}${ch ? ' · ' + ch : ''}`;
   $('start-title').textContent = title;
-  $('start-lede').textContent = def.blurb || '';
-  $('start-how').innerHTML = `<b>${esc(def.game || def.template)}</b><br>${esc(def.how || def.objective || '')}`;
+  // kids read as little as possible here: the goal in one line, big
+  $('start-lede').textContent = '';
+  $('start-lede').hidden = true;
+  $('start-how').innerHTML = `<span class="how-big">🎯 ${esc(def.objective || def.game || def.template)}</span>`;
   $('pause-title').textContent = title;
   document.documentElement.style.setProperty('--qc', (Catalogue.getQuarter(book.quarter) || {}).colour || '#ffd23f');
 
@@ -357,7 +359,14 @@ function play3D(T) {
   A.state = () => state;
   window.__pauseForHelp = () => setState('panel');
   window.__resume = () => setState('playing');
-  function renderControls() { document.querySelectorAll('.controls-help').forEach((el) => { el.innerHTML = controlsHelpHTML(input.touchMode, Save.unlocks()); }); }
+  function renderControls() {
+    // the start card shows one short line; the full list stays in the pause menu
+    document.querySelectorAll('.controls-help').forEach((el) => {
+      el.innerHTML = el.id === 'start-controls'
+        ? (input.touchMode ? 'Left side: move · Big button: jump · ✋: use' : 'WASD: move · Space: jump · E: use')
+        : controlsHelpHTML(input.touchMode, Save.unlocks());
+    });
+  }
   input.onTouchModeChange = renderControls;
   renderControls();
   $('btn-start').addEventListener('click', () => {
