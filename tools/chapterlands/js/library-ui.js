@@ -12,6 +12,7 @@ import { Sfx } from './audio.js';
 import { toast, awardBadge, confetti } from './hud.js';
 import { track } from './track.js';
 import { libraryLinks } from './grownups.js';
+import { LightsOut } from './lightsout.js';
 
 export function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 const TEMPLATE_ICON = { CLIMB: '🧗', CHASE: '🏃', COLLECT: '🔎', SNEAK: '🤫', PUZZLE: '🧩', ARCADE: '🕹️', BUILD: '🧱', VAULT: '🗝️' };
@@ -204,7 +205,9 @@ export async function openDistrict(bookId, hooks) {
       const S = streetState(book, kit, i);
       const lab = chapterLabel(s, kit);
       let action = '';
-      if (S.open) {
+      if (S.open && LightsOut.isOn()) {
+        action = '<span class="st-lock">🌙 Asleep till morning</span>';
+      } else if (S.open) {
         action = `<button class="btn mini-btn" data-play="${i}" type="button">${templateIcon(s.template)} ${S.played ? 'Play again' : 'Play'}</button>`;
       } else if (!S.prevOpen) {
         action = '<span class="st-lock">🔒 Open the street before this one first</span>';
@@ -225,7 +228,7 @@ export async function openDistrict(bookId, hooks) {
     if (kit.skyRun) {
       const best = Save.skyRun(book.id);
       html += `<h3>Sky Run</h3><div class="d-extra"><span>☁️ <b>${esc(kit.skyRun.name)}</b> — ${esc(kit.skyRun.blurb || 'an optional climb high above the district, for coins and a badge.')}${best ? ` Best: ${fmtMs(best)}.` : ''}</span>
-        ${firstOpen ? '<button class="btn mini-btn" data-sky="1" type="button">Climb</button>' : '<span class="st-lock">🔒 Opens with the first street</span>'}</div>`;
+        ${LightsOut.isOn() ? '<span class="st-lock">🌙 Asleep</span>' : firstOpen ? '<button class="btn mini-btn" data-sky="1" type="button">Climb</button>' : '<span class="st-lock">🔒 Opens with the first street</span>'}</div>`;
     }
     if (kit.sideQuest) {
       const st = Save.quest(kit.sideQuest.id);
@@ -233,7 +236,7 @@ export async function openDistrict(bookId, hooks) {
     }
     if (kit.vault) {
       html += `<h3>The Vault</h3><div class="d-extra"><span>🗝️ <b>${esc(kit.vault.name)}</b> — ${esc(kit.vault.blurb || 'an escape room about the whole book.')} Crack it to earn the <b>Key</b> and your library card stamp.</span>
-        ${allDone ? '<button class="btn mini-btn gold" data-vault="1" type="button">Enter the Vault</button>' : '<span class="st-lock">🔒 Finish every street first</span>'}</div>`;
+        ${LightsOut.isOn() ? '<span class="st-lock">🌙 Asleep</span>' : allDone ? '<button class="btn mini-btn gold" data-vault="1" type="button">Enter the Vault</button>' : '<span class="st-lock">🔒 Finish every street first</span>'}</div>`;
     }
     html += `<button class="btn ghost" type="button" data-close="1" style="margin-top:14px">Back to the road</button></div>`;
     el.innerHTML = html;
@@ -282,19 +285,12 @@ export function fmtMs(ms) {
 }
 
 /* =============== Reading Room: shelves + reader =============== */
-let lightsOutCheck = () => false;   // Lights Out (separate brief) plugs in here
-export function setLightsOutCheck(fn) { lightsOutCheck = fn; }
 
 export async function openReadingRoom({ onOpenBook, onClose } = {}) {
   const el = overlay('reading-room', 'reading-room');
-  if (lightsOutCheck()) {
-    el.innerHTML = `<div class="card"><span class="tag-inline">reading room</span><h2>The Reading Room is closed</h2><p class="lede">It's Lights Out. Read tonight, and you'll wake up rested.</p><button class="btn" type="button" data-close="1">OK</button></div>`;
-    el.hidden = false;
-    el.querySelector('[data-close]').onclick = () => { el.hidden = true; onClose && onClose(); };
-    return;
-  }
-  let html = `<div class="card scrollable rr-card"><span class="tag-inline">library square</span><h2>The Reading Room</h2>
-    <p class="lede">Pick a book from the shelves. Read a chapter, then answer three questions to open its street out on the roads.</p>`;
+  const bed = LightsOut.isOn();
+  let html = `<div class="card scrollable rr-card ${bed ? 'bedtime' : ''}"><span class="tag-inline">${bed ? '🌙 lights out' : 'library square'}</span><h2>The Reading Room</h2>
+    <p class="lede">${bed ? 'Bedtime reading! Finish a chapter tonight for a bonus in the morning.' : 'Pick a book. Read a chapter. Answer 3 questions to open a street.'}</p>`;
   for (const q of Catalogue.quarters) {
     const books = Catalogue.booksInQuarter(q.id).filter((b) => b.readable);
     html += `<div class="rr-shelf" style="--qc:${q.colour}"><div class="rr-label">${quarterIcon(q)} ${esc(q.name)}</div><div class="rr-books">`;
@@ -395,6 +391,7 @@ export async function openReader(book, kit, n, { onClose, onCheck } = {}) {
   art.querySelectorAll('[data-n]').forEach((b) => b.onclick = () => openReader(book, kit, Number(b.dataset.n), { onClose, onCheck }));
   art.querySelector('[data-done]').onclick = () => {
     if (Save.markRead(book.id, ch.n)) track('chapter-read', { book: book.id, chapter: ch.n });
+    if (LightsOut.noteReading()) toast('🌙 Lovely bedtime reading. Come back in the morning for a bonus!', { ms: 3600 });
     Sfx.click();
     const after = art.querySelector('.reader-after');
     after.hidden = false;

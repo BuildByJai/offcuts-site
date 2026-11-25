@@ -483,3 +483,13 @@ body.touch #help-btn { left: 50%; transform: translateX(-50%); bottom: auto; top
 body.touch #quest-tracker { top: auto; bottom: max(200px, calc(env(safe-area-inset-bottom) + 200px)); left: max(12px, env(safe-area-inset-left)); right: auto; max-width: 52vw; }
 body.touch .objective { top: max(96px, calc(env(safe-area-inset-top) + 96px)); max-width: 80vw; }
 body.touch #help-btn { left: auto; transform: none; right: max(12px, env(safe-area-inset-right)); top: max(86px, calc(env(safe-area-inset-top) + 86px)); bottom: auto; }
+
+/* Lights Out (bedtime) */
+.rr-card.bedtime { background: #1e2340; color: #eef0ff; }
+.rr-card.bedtime h2, .rr-card.bedtime .lede { color: #eef0ff; }
+.rr-card.bedtime .rr-shelf { background: rgba(255,255,255,0.06); }
+#lights-out .card { background: #1e2340; color: #eef0ff; text-align: center; }
+#lights-out h2 { color: #fff; font-size: 30px; margin: 6px 0 8px; }
+#lights-out .lede { color: #d8dcff; }
+#lights-out .moon { font-size: 64px; line-height: 1; }
+#lights-out .btn.ghost { color: #eef0ff; border-color: rgba(238,240,255,0.5); background: transparent; }

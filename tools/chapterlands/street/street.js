@@ -4,6 +4,7 @@
 //   street/?demo=<TEMPLATE>                   a sample of any template
 // The template and its params come from content/<quarter>/<book>/book.json;
 // no per-book code lives here.
+import { LightsOut } from '../js/lightsout.js';
 import * as THREE from 'three';
 import { CONFIG } from '../config.js';
 import { World, Batcher } from '../js/world.js';
@@ -59,7 +60,8 @@ const theme = (kit && kit.theme) || {};
 // a street can tweak the book's palette (a garden street in a nursery book, a night scene…)
 const P = Object.assign(pal(theme), (def && def.params && def.params.palette) || {});
 let allowed = true;
-if (!def) { stop("We couldn't find that street", 'Head back to the district and pick a street from the list.'); allowed = false; }
+if (!demo && LightsOut.isOn()) { stop('🌙 It’s Lights Out', 'The games are asleep till morning. Only the Reading Room is open, so go and read!'); allowed = false; }
+else if (!def) { stop("We couldn't find that street", 'Head back to the district and pick a street from the list.'); allowed = false; }
 else if (!demo && !isSky && !Save.isStreetOpen(book.id, def.id) && !DEBUG) {
   stop(`${def.name} isn't open yet`, `Read ${book.readable ? 'the chapter in the Reading Room' : 'the chapter in your own copy'}, then answer its three questions to open this street.`);
   allowed = false;

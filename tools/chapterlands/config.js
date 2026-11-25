@@ -86,6 +86,17 @@ export const CONFIG = {
      props and characters read as one family. */
   palette: PALETTE,
 
+  /* ---------------- Lights Out (bedtime) ----------------
+     The device's own clock decides. During these hours the town goes dark
+     and the games sleep; only the Reading Room is lit and open. */
+  lightsOut: {
+    enabled: true,
+    start: '21:00',
+    end: '07:00',
+    warnMinutes: 5,          // "Lights Out soon" toast this long before start
+    restedCoins: 20          // morning bonus for reading during Lights Out
+  },
+
   /* ---------------- graphics ---------------- */
   graphics: {
     exposure: 1.05,
@@ -550,6 +561,7 @@ export const CONFIG = {
     { id: 'shelver',        name: 'Shelver',         desc: 'Return all seven lost books to their shelves.', icon: '📚' },
     { id: 'rabbit-chaser',  name: 'Rabbit Chaser',   desc: 'Catch the White Rabbit and help him home.',    icon: '🐇' },
     { id: 'lookout',        name: 'Lookout',         desc: 'Climb a Lookout Tower and lift the fog.',      icon: '🔭' },
+    { id: 'night-owl',      name: 'Bedtime Reader',  desc: 'Read a chapter at Lights Out, then wake up rested.', icon: '🌙' },
     { id: 'eagle-eye',      name: 'Eagle Eye',       desc: 'Climb all seven Lookout Towers.',              icon: '🦅' },
     { id: 'first-check',    name: 'Good Reader',     desc: 'Pass your first reading check.',               icon: '✅' },
     { id: 'sky-runner',     name: 'Sky Runner',      desc: 'Finish a Sky Run.',                            icon: '☁️' },

@@ -11,6 +11,7 @@
 //   quiz: { object, label, lock, lesson }   ← the questions.json vault questions
 //   outro
 // }
+import { LightsOut } from '../js/lightsout.js';
 import * as THREE from 'three';
 import { CONFIG } from '../config.js';
 import { World, Batcher, canvasTexture } from '../js/world.js';
@@ -52,7 +53,8 @@ function locked(title, text) {
   fadeIn();
 }
 let ok = true;
-if (!V) { locked('No vault here', 'This district has no Vault yet.'); ok = false; }
+if (LightsOut.isOn()) { locked('🌙 It’s Lights Out', 'The games are asleep till morning. Only the Reading Room is open, so go and read!'); ok = false; }
+else if (!V) { locked('No vault here', 'This district has no Vault yet.'); ok = false; }
 else if (!districtDone(book, kit) && !DEBUG) { locked(`${V.name} is locked`, 'Finish every street in this district first (read, answer the questions, play the game).'); ok = false; }
 if (ok) start();
 
