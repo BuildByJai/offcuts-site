@@ -1,6 +1,10 @@
 # Chapterlands: anonymous event counts (Gate A)
 
-The game sends small anonymous events to `/api/chapterlands/events`. The Worker stores them in **Cloudflare Workers Analytics Engine** (binding `CHAPTERLANDS_EVENTS`, dataset `chapterlands_events`, set in `wrangler.jsonc`). The dataset is created on the first write, so collecting needs no setup. Free plan: 100,000 events a day.
+The game sends small anonymous events to `/api/chapterlands/events`. The Worker stores them in **Cloudflare Workers Analytics Engine** (binding `CHAPTERLANDS_EVENTS`, dataset `chapterlands_events`). Free plan: 100,000 events a day.
+
+**Status: switched off for now.** The Workers build failed with the binding in `wrangler.jsonc` (Analytics Engine isn't enabled on the account yet), so the binding is commented out and `/api/chapterlands/events` returns 204. To switch it on:
+1. Cloudflare dashboard → Storage & databases (or Workers & Pages) → **Analytics Engine** → enable / set up.
+2. In `wrangler.jsonc`, un-comment the `analytics_engine_datasets` block (and add a comma after the `kv_namespaces` array). Push; the Workers build should pass.
 
 ## What is sent
 
