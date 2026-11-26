@@ -4,6 +4,7 @@
 //   street/?demo=<TEMPLATE>                   a sample of any template
 // The template and its params come from content/<quarter>/<book>/book.json;
 // no per-book code lives here.
+import { LightsOut } from '../js/lightsout.js';
 import * as THREE from 'three';
 import { CONFIG } from '../config.js';
 import { World, Batcher } from '../js/world.js';
@@ -23,6 +24,18 @@ import { pal, rng, seedOf, groundTexture, hex, decorate } from '../kit/props.js'
 import { DEMO } from '../kit/demo.js';
 import { TEMPLATES } from '../kit/templates/index.js';
 import { runArcade } from '../kit/arcade.js';
+import { skyDome, buildSet } from '../kit/scenery.js';
+
+
+// Lights Out can start while this page is open: send the player back to town.
+if (!new URLSearchParams(location.search).get('demo')) {
+  setInterval(() => {
+    if (!LightsOut.isOn() || window.__lightsOutLeaving) return;
+    window.__lightsOutLeaving = true;
+    toast('🌙 Lights Out! Back to town…', { ms: 3000 });
+    setTimeout(() => location.replace('../'), 3000);
+  }, 20000);
+}
 
 const $ = (id) => document.getElementById(id);
 const qs = new URLSearchParams(location.search);
@@ -59,7 +72,8 @@ const theme = (kit && kit.theme) || {};
 // a street can tweak the book's palette (a garden street in a nursery book, a night scene…)
 const P = Object.assign(pal(theme), (def && def.params && def.params.palette) || {});
 let allowed = true;
-if (!def) { stop("We couldn't find that street", 'Head back to the district and pick a street from the list.'); allowed = false; }
+if (!demo && LightsOut.isOn()) { stop('🌙 It’s Lights Out', 'The games are asleep till morning. Only the Reading Room is open, so go and read!'); allowed = false; }
+else if (!def) { stop("We couldn't find that street", 'Head back to the district and pick a street from the list.'); allowed = false; }
 else if (!demo && !isSky && !Save.isStreetOpen(book.id, def.id) && !DEBUG) {
   stop(`${def.name} isn't open yet`, `Read ${book.readable ? 'the chapter in the Reading Room' : 'the chapter in your own copy'}, then answer its three questions to open this street.`);
   allowed = false;
@@ -77,8 +91,10 @@ async function play() {
   const ch = def.chapters ? (def.chapters.length === 1 ? `${kit.chapterWord || 'Chapter'} ${def.chapters[0]}` : `${kit.chapterWord || 'Chapter'}s ${def.chapters[0]}–${def.chapters[def.chapters.length - 1]}`) : '';
   $('start-tag').textContent = isSky ? 'sky run · optional' : `${book.title}${ch ? ' · ' + ch : ''}`;
   $('start-title').textContent = title;
-  $('start-lede').textContent = def.blurb || '';
-  $('start-how').innerHTML = `<b>${esc(def.game || def.template)}</b><br>${esc(def.how || def.objective || '')}`;
+  // kids read as little as possible here: the goal in one line, big
+  $('start-lede').textContent = '';
+  $('start-lede').hidden = true;
+  $('start-how').innerHTML = `<span class="how-big">🎯 ${esc(def.objective || def.game || def.template)}</span>`;
   $('pause-title').textContent = title;
   document.documentElement.style.setProperty('--qc', (Catalogue.getQuarter(book.quarter) || {}).colour || '#ffd23f');
 
@@ -106,7 +122,7 @@ function rewardAndFinish({ ms = null, text = '' } = {}) {
     } else {
       const first = Save.playStreet(book.id, def.id);
       if (first) pay = CONFIG.rewards.streetGame;
-      track('street-played', { book: book.id, street: def.id });
+      track('street-played', { book: book.id, street: def.id, index: kit.streets.findIndex((x) => x.id === def.id) });
     }
     if (pay) Save.earn(pay);
   }
@@ -192,6 +208,8 @@ function play3D(T) {
   scene.fog = new THREE.Fog(new THREE.Color(P.fog), 40, (def.params && def.params.fogFar) || 150);
   const camera = new THREE.PerspectiveCamera(CONFIG.camera.fov, innerWidth / innerHeight, 0.1, 400);
   const dark = def.params && def.params.dark;
+  const skyD = skyDome(scene, P, { dark: !!dark });
+  scene.fog.color.copy(skyD.uniforms.horizonColor.value);
   scene.add(new THREE.HemisphereLight(dark ? 0x8a9ad0 : 0xeaf4ff, 0x5a6a4a, dark ? 0.85 : 1.2));
   const sun = new THREE.DirectionalLight(dark ? 0xc8d4ff : 0xfff3dc, dark ? 1.1 : 2.0);
   sun.castShadow = true; sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.03;
@@ -219,6 +237,7 @@ function play3D(T) {
 
   const interactables = [];
   const updates = [];
+  const idles = [];
   let state = 'start';
   let lives = null, startT = 0, timeLeft = null, checkpoint = { x: 0, y: 0, z: 0, facing: Math.PI };
   const A = {
@@ -228,6 +247,7 @@ function play3D(T) {
     interactables,
     killY: -6,
     onUpdate(fn) { updates.push(fn); },
+    onIdle(fn) { idles.push(fn); },          // also runs on the start screen / when paused
     setObjective(text, sub = '') {
       $('objective').hidden = false;
       $('ob-name').textContent = def.name;
@@ -297,6 +317,7 @@ function play3D(T) {
         A.groundMesh = m;
       }
       if (floor !== 'water' && floor !== 'none') world.add(cx - w / 2 - 60, cx + w / 2 + 60, -1, 0, cz - d / 2 - 60, cz + d / 2 + 60);
+      if (walls && floor !== 'none' && A.set !== false) buildSet(A, { w, d, cx, cz, floor, dark: !!dark });
       if (walls) {
         world.add(cx - w / 2 - 1, cx - w / 2, -2, wallH, cz - d / 2 - 1, cz + d / 2 + 1, false);
         world.add(cx + w / 2, cx + w / 2 + 1, -2, wallH, cz - d / 2 - 1, cz + d / 2 + 1, false);
@@ -305,6 +326,9 @@ function play3D(T) {
       }
     },
     decorate(opts) { decorate(B, world, Object.assign({ P, props: theme.props, seed: seedOf(def.id || 'x') }, opts)); },
+    // the visible set round a play area (see kit/scenery.js); templates that
+    // build their own floor call this themselves
+    scenery(opts) { buildSet(A, Object.assign({ dark: !!dark }, opts)); },
     interact(o) { interactables.push(o); return o; },
     help(opts) { helpButton(opts); },
     hex
@@ -346,7 +370,14 @@ function play3D(T) {
   A.state = () => state;
   window.__pauseForHelp = () => setState('panel');
   window.__resume = () => setState('playing');
-  function renderControls() { document.querySelectorAll('.controls-help').forEach((el) => { el.innerHTML = controlsHelpHTML(input.touchMode, Save.unlocks()); }); }
+  function renderControls() {
+    // the start card shows one short line; the full list stays in the pause menu
+    document.querySelectorAll('.controls-help').forEach((el) => {
+      el.innerHTML = el.id === 'start-controls'
+        ? (input.touchMode ? 'Left side: move · Big button: jump · ✋: use' : 'WASD: move · Space: jump · E: use')
+        : controlsHelpHTML(input.touchMode, Save.unlocks());
+    });
+  }
   input.onTouchModeChange = renderControls;
   renderControls();
   $('btn-start').addEventListener('click', () => {
@@ -401,7 +432,9 @@ function play3D(T) {
       if (run.idle) run.idle(dt, t);
       cam.update(dt, player.pos, null);
     }
+    if (state !== 'playing') for (const f of idles) f(dt, t);
     followShadow(sun, player.pos, SUN_DIR, gfx.tierCfg.shadowRange || 0, 60);
+    skyD.update(dt, camera.position);
     juice.update(dt);
     moveHud.update(dt);
     gfx.monitor(dt, state === 'playing');

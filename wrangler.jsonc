@@ -31,6 +31,13 @@
       "id": "1c9df72099cb484190a70d2417a16481"
     }
   ]
+  // Chapterlands anonymous event counts (Gate A) are held back until Analytics
+  // Engine is enabled on the Cloudflare account; the Workers build fails with
+  // the binding until then. To turn them on, put this back (see
+  // docs/chapterlands/tracking.md). Until then /api/chapterlands/events returns 204.
+  // "analytics_engine_datasets": [
+  //   { "binding": "CHAPTERLANDS_EVENTS", "dataset": "chapterlands_events" }
+  // ]
   // The Study (tools/the-study/) wants a STUDY_LEADERBOARD KV namespace for
   // its global leaderboard. It's not provisioned yet — a placeholder id here
   // previously broke deploys (Cloudflare rejects a kv_namespaces id that

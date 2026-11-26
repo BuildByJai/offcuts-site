@@ -25,8 +25,9 @@ export class MoveHud {
     this.boostBox = el('div', 'boosts', document.body);
     this.boostBox.id = 'boosts';
     this.boostEls = {};
-    for (const b of CONFIG.shop.boosts) {
-      const e = el('div', 'boost-pill', this.boostBox, `<span class="bi">${b.icon}</span><b>0</b>`);
+    this.boostList = CONFIG.shop.boosts.concat(CONFIG.cafe ? [CONFIG.cafe.drink] : []);
+    for (const b of this.boostList) {
+      const e = el('div', 'boost-pill' + (b.id === 'matcha' ? ' fizz' : ''), this.boostBox, `<span class="bi">${b.icon}</span><b>0</b>`);
       e.hidden = true;
       this.boostEls[b.id] = e;
     }
@@ -52,7 +53,8 @@ export class MoveHud {
     this.stam.classList.toggle('charging', charging);
     this.stam.classList.toggle('full', charging && c >= 1);
     this.stamLabel.textContent = charging ? (c >= 1 ? 'SUPER!' : 'charge') : (p.gliding ? 'glide' : '');
-    for (const b of CONFIG.shop.boosts) {
+    this.stam.classList.toggle('fizz', !!p.fizz);
+    for (const b of this.boostList) {
       const left = p.boosts[b.id] || 0, e = this.boostEls[b.id];
       e.hidden = left <= 0;
       if (left > 0) { e.querySelector('b').textContent = Math.ceil(left) + 's'; e.classList.toggle('ending', left < 5); }

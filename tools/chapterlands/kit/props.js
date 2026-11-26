@@ -20,22 +20,48 @@ export function rng(seed = 1) {
 }
 export function seedOf(str) { let h = 2166136261; for (const c of String(str)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
 
+// Shared low-poly shapes (faceted, like the town). Batcher.geom bakes them in.
+const ICO = new THREE.IcosahedronGeometry(1, 0);
+const ICO1 = new THREE.IcosahedronGeometry(1, 1);
+const DODE = new THREE.DodecahedronGeometry(1, 0);
+const CYL8 = new THREE.CylinderGeometry(1, 1, 1, 8);
+const CYL12 = new THREE.CylinderGeometry(1, 1, 1, 12);
+const CONE7 = new THREE.ConeGeometry(1, 1, 7);
+const SPH = new THREE.SphereGeometry(1, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2);
+const tint = (c, k) => new THREE.Color(c).multiplyScalar(k).getHex();
+
 const PROPS = {
-  tree(B, W, x, z, s, P) {
-    B.box(x - 0.3 * s, x + 0.3 * s, 0, 2.4 * s, z - 0.3 * s, z + 0.3 * s, hex(P.wood));
-    B.box(x - 1.4 * s, x + 1.4 * s, 2.0 * s, 3.6 * s, z - 1.4 * s, z + 1.4 * s, hex(P.leaf));
-    B.box(x - 0.9 * s, x + 0.9 * s, 3.6 * s, 4.5 * s, z - 0.9 * s, z + 0.9 * s, new THREE.Color(P.leaf).multiplyScalar(1.12).getHex());
-    W && W.add(x - 0.35 * s, x + 0.35 * s, 0, 2.4 * s, z - 0.35 * s, z + 0.35 * s, false);
+  tree(B, W, x, z, s, P, r = Math.random) {
+    // tapered trunk + three faceted canopy blobs
+    const h = (2.2 + r() * 0.6) * s;
+    B.geom(CYL8, hex(P.wood), { x, y: h / 2, z, sx: 0.32 * s, sy: h, sz: 0.32 * s });
+    const L = hex(P.leaf), L2 = tint(P.leaf, 1.14), L3 = tint(P.leaf, 0.88);
+    B.geom(ICO, L, { x, y: h + 0.9 * s, z, sx: 1.55 * s, sy: 1.25 * s, sz: 1.55 * s, ry: r() * 3 });
+    B.geom(ICO, L2, { x: x + 0.55 * s, y: h + 1.55 * s, z: z - 0.25 * s, sx: 1.05 * s, sy: 0.9 * s, sz: 1.05 * s, ry: r() * 3 });
+    B.geom(ICO, L3, { x: x - 0.6 * s, y: h + 0.65 * s, z: z + 0.45 * s, sx: 0.95 * s, sy: 0.8 * s, sz: 0.95 * s, ry: r() * 3 });
+    W && W.add(x - 0.35 * s, x + 0.35 * s, 0, h, z - 0.35 * s, z + 0.35 * s, false);
   },
-  bush(B, W, x, z, s, P) { B.box(x - 0.9 * s, x + 0.9 * s, 0, 1.1 * s, z - 0.9 * s, z + 0.9 * s, hex(P.leaf)); },
-  flower(B, W, x, z, s, P, r) {
+  pine(B, W, x, z, s, P, r = Math.random) {
+    B.geom(CYL8, hex(P.wood), { x, y: 0.6 * s, z, sx: 0.25 * s, sy: 1.2 * s, sz: 0.25 * s });
+    const L = tint(P.leaf, 0.8);
+    for (let i = 0; i < 3; i++) B.geom(CONE7, i % 2 ? L : tint(L, 1.12), { x, y: (1.6 + i * 1.05) * s, z, sx: (1.5 - i * 0.38) * s, sy: 1.7 * s, sz: (1.5 - i * 0.38) * s, ry: r() * 3 });
+    W && W.add(x - 0.3 * s, x + 0.3 * s, 0, 2 * s, z - 0.3 * s, z + 0.3 * s, false);
+  },
+  bush(B, W, x, z, s, P, r = Math.random) {
+    B.geom(ICO, hex(P.leaf), { x, y: 0.55 * s, z, sx: 0.95 * s, sy: 0.7 * s, sz: 0.95 * s, ry: r() * 3 });
+    B.geom(ICO, tint(P.leaf, 1.12), { x: x + 0.45 * s, y: 0.45 * s, z: z + 0.2 * s, sx: 0.6 * s, sy: 0.5 * s, sz: 0.6 * s, ry: r() * 3 });
+  },
+  flower(B, W, x, z, s, P, r = Math.random) {
     const c = [P.accent, P.accent2, '#ffffff', '#e94f6a'][Math.floor(r() * 4)];
-    B.box(x - 0.04, x + 0.04, 0, 0.5 * s, z - 0.04, z + 0.04, hex(P.leaf), { cast: false });
-    B.box(x - 0.16 * s, x + 0.16 * s, 0.45 * s, 0.65 * s, z - 0.16 * s, z + 0.16 * s, hex(c), { cast: false });
+    for (let i = 0; i < 3; i++) {
+      const a = x + (r() - 0.5) * 0.5, b = z + (r() - 0.5) * 0.5, h = (0.35 + r() * 0.25) * s;
+      B.box(a - 0.025, a + 0.025, 0, h, b - 0.025, b + 0.025, hex(P.leaf), { cast: false });
+      B.geom(ICO, hex(c), { x: a, y: h + 0.05, z: b, sx: 0.12 * s, sy: 0.08 * s, sz: 0.12 * s, cast: false });
+    }
   },
-  rock(B, W, x, z, s, P) {
-    B.box(x - 0.8 * s, x + 0.8 * s, 0, 0.7 * s, z - 0.6 * s, z + 0.7 * s, hex(P.stone));
-    B.box(x - 0.5 * s, x + 0.5 * s, 0.7 * s, 1.0 * s, z - 0.4 * s, z + 0.4 * s, new THREE.Color(P.stone).multiplyScalar(1.08).getHex());
+  rock(B, W, x, z, s, P, r = Math.random) {
+    B.geom(DODE, hex(P.stone), { x, y: 0.4 * s, z, sx: 0.85 * s, sy: 0.6 * s, sz: 0.75 * s, ry: r() * 3, rx: (r() - 0.5) * 0.3 });
+    B.geom(DODE, tint(P.stone, 1.1), { x: x + 0.5 * s, y: 0.25 * s, z: z + 0.3 * s, sx: 0.4 * s, sy: 0.3 * s, sz: 0.4 * s, ry: r() * 3 });
     W && W.add(x - 0.8 * s, x + 0.8 * s, 0, 1.0 * s, z - 0.6 * s, z + 0.7 * s);
   },
   crate(B, W, x, z, s) {
@@ -44,9 +70,9 @@ const PROPS = {
     W && W.add(x - 0.5 * s, x + 0.5 * s, 0, 1 * s, z - 0.5 * s, z + 0.5 * s);
   },
   barrel(B, W, x, z, s) {
-    B.box(x - 0.4 * s, x + 0.4 * s, 0, 1.1 * s, z - 0.4 * s, z + 0.4 * s, 0x8a5a3a);
-    B.box(x - 0.43 * s, x + 0.43 * s, 0.25 * s, 0.33 * s, z - 0.43 * s, z + 0.43 * s, 0x444444);
-    B.box(x - 0.43 * s, x + 0.43 * s, 0.8 * s, 0.88 * s, z - 0.43 * s, z + 0.43 * s, 0x444444);
+    B.geom(CYL12, 0x8a5a3a, { x, y: 0.55 * s, z, sx: 0.42 * s, sy: 1.1 * s, sz: 0.42 * s });
+    B.geom(CYL12, 0x9a6a3a, { x, y: 0.55 * s, z, sx: 0.46 * s, sy: 0.5 * s, sz: 0.46 * s });
+    for (const y of [0.18, 0.92]) B.geom(CYL12, 0x444444, { x, y: y * s, z, sx: 0.445 * s, sy: 0.07 * s, sz: 0.445 * s, cast: false });
     W && W.add(x - 0.4 * s, x + 0.4 * s, 0, 1.1 * s, z - 0.4 * s, z + 0.4 * s);
   },
   block(B, W, x, z, s, P, r) {    // toy block
@@ -56,13 +82,15 @@ const PROPS = {
     W && W.add(x - 0.45 * s, x + 0.45 * s, 0, 0.9 * s, z - 0.45 * s, z + 0.45 * s);
   },
   lamp(B, W, x, z, s) {
-    B.box(x - 0.08, x + 0.08, 0, 3 * s, z - 0.08, z + 0.08, 0x2f3b3a);
+    B.geom(CYL8, 0x2f3b3a, { x, y: 1.5 * s, z, sx: 0.07, sy: 3 * s, sz: 0.07 });
+    B.geom(CYL8, 0x2f3b3a, { x, y: 0.1, z, sx: 0.22, sy: 0.2, sz: 0.22 });
     B.box(x - 0.25, x + 0.25, 3 * s, 3.4 * s, z - 0.25, z + 0.25, 0xffe9a8, { bucket: 'glow', shade: false });
+    B.geom(CONE7, 0x2f3b3a, { x, y: 3.55 * s, z, sx: 0.36, sy: 0.3, sz: 0.36 });
   },
   mushroom(B, W, x, z, s, P) {
-    B.box(x - 0.2 * s, x + 0.2 * s, 0, 0.9 * s, z - 0.2 * s, z + 0.2 * s, 0xf3ead6);
-    B.box(x - 0.8 * s, x + 0.8 * s, 0.9 * s, 1.3 * s, z - 0.8 * s, z + 0.8 * s, hex(P.hazard));
-    B.box(x - 0.15 * s, x + 0.15 * s, 1.3 * s, 1.34 * s, z + 0.3 * s, z + 0.6 * s, 0xffffff, { cast: false });
+    B.geom(CYL8, 0xf3ead6, { x, y: 0.45 * s, z, sx: 0.2 * s, sy: 0.9 * s, sz: 0.2 * s });
+    B.geom(SPH, hex(P.hazard), { x, y: 0.85 * s, z, sx: 0.85 * s, sy: 0.55 * s, sz: 0.85 * s });
+    for (const [a, b] of [[0.3, 0.2], [-0.25, 0.35], [0.05, -0.4]]) B.geom(ICO, 0xffffff, { x: x + a * s, y: (0.85 + 0.42) * s, z: z + b * s, sx: 0.1 * s, sy: 0.05 * s, sz: 0.1 * s, cast: false });
   },
   fence(B, W, x, z, s, P) {
     for (const d of [-1, 0, 1]) B.box(x + d * 0.8 - 0.06, x + d * 0.8 + 0.06, 0, 1 * s, z - 0.06, z + 0.06, 0xffffff);
@@ -98,16 +126,23 @@ const PROPS = {
     W && W.add(x - 1 * s, x + 1 * s, 0, 2.6 * s, z - 0.5 * s, z + 0.5 * s);
   },
   column(B, W, x, z, s, P) {
-    B.box(x - 0.45 * s, x + 0.45 * s, 0, 4 * s, z - 0.45 * s, z + 0.45 * s, hex(P.stone));
+    B.box(x - 0.6 * s, x + 0.6 * s, 0, 0.3 * s, z - 0.6 * s, z + 0.6 * s, hex(P.stone));
+    B.geom(CYL12, tint(P.stone, 1.06), { x, y: 2.15 * s, z, sx: 0.42 * s, sy: 3.7 * s, sz: 0.42 * s });
     B.box(x - 0.6 * s, x + 0.6 * s, 4 * s, 4.3 * s, z - 0.6 * s, z + 0.6 * s, hex(P.stone));
     W && W.add(x - 0.45 * s, x + 0.45 * s, 0, 4.3 * s, z - 0.45 * s, z + 0.45 * s);
   },
   hedge(B, W, x, z, s, P) {
-    B.box(x - 1.5 * s, x + 1.5 * s, 0, 1.6 * s, z - 0.6, z + 0.6, new THREE.Color(P.leaf).multiplyScalar(0.85).getHex());
+    const c = tint(P.leaf, 0.85);
+    B.box(x - 1.5 * s, x + 1.5 * s, 0, 1.3 * s, z - 0.55, z + 0.55, c);
+    for (const u of [-1, 0, 1]) B.geom(ICO, tint(P.leaf, 0.95), { x: x + u * s, y: 1.35 * s, z, sx: 0.75 * s, sy: 0.45 * s, sz: 0.62, ry: u });
     W && W.add(x - 1.5 * s, x + 1.5 * s, 0, 1.6 * s, z - 0.6, z + 0.6);
   },
   reeds(B, W, x, z, s, P, r) {
-    for (let i = 0; i < 6; i++) { const a = x + (r() - 0.5), b = z + (r() - 0.5); B.box(a - 0.04, a + 0.04, 0, (1 + r()) * s, b - 0.04, b + 0.04, hex(P.leaf), { cast: false }); }
+    for (let i = 0; i < 7; i++) {
+      const a = x + (r() - 0.5), b = z + (r() - 0.5), h = (1 + r()) * s;
+      B.geom(CYL8, hex(P.leaf), { x: a, y: h / 2, z: b, sx: 0.035, sy: h, sz: 0.035, rz: (r() - 0.5) * 0.25, cast: false });
+      if (i % 3 === 0) B.geom(CYL8, 0x6a4a2a, { x: a, y: h - 0.1, z: b, sx: 0.07, sy: 0.3, sz: 0.07, cast: false });
+    }
   },
   tent(B, W, x, z, s, P) {
     for (let i = 0; i < 4; i++) B.box(x - (1.4 - i * 0.35) * s, x + (1.4 - i * 0.35) * s, i * 0.5 * s, (i + 1) * 0.5 * s, z - 1.4 * s, z + 1.4 * s, hex(i % 2 ? P.accent : P.wall));

@@ -28,6 +28,8 @@ import { buildLookout } from './lookout.js';
 import { SideQuests } from './sidequests.js';
 import { posterTexture } from './posters.js';
 import { track } from './track.js';
+import { LightsOut } from './lightsout.js';
+import { Matcha, matchaCup } from './matcha.js';
 import { grownUps, guardLinks } from './grownups.js';
 import { renderLibraryCard, renderQuestLog, openDistrict, openReadingRoom, districtDone } from './library-ui.js';
 
@@ -1268,6 +1270,7 @@ function goTo(url) {
   fadeOut().then(() => { location.href = url; });
 }
 function enterDistrict(book) {
+  if (lightsOn) { sleepyToast(); return; }
   if (book.entry) { goTo(book.entry); return; }
   if (book.requiresKey && !Save.hasKey(book.requiresKey)) {
     const prev = Catalogue.getBook(book.requiresKey);
@@ -1310,9 +1313,125 @@ function openReading() {
   });
 }
 
+/* ---------- Lights Out (bedtime): dark town, only the Reading Room lit ---------- */
+let lightsOn = false, lightsWarned = false;
+const RR = CONFIG.buildings.find((b) => b.id === 'reading');
+const rrDoor = { x: RR.door.at, z: RR.z1 };
+const rrLight = new THREE.PointLight(0xffc874, 0, 34, 1.4);
+rrLight.position.set(rrDoor.x, 4.5, rrDoor.z + 3.5); scene.add(rrLight);
+// a soft column of light over the Reading Room so it's easy to find in the dark
+const rrBeam = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 4.5, 60, 24, 1, true),
+  new THREE.MeshBasicMaterial({ color: 0xffd98a, transparent: true, opacity: 0.16, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, fog: false }));
+rrBeam.position.set((RR.x0 + RR.x1) / 2, 30 + RR.h, (RR.z0 + RR.z1) / 2); rrBeam.visible = false; scene.add(rrBeam);
+const rrGlow = new THREE.Mesh(new THREE.PlaneGeometry(RR.x1 - RR.x0 - 1, RR.h - 1.5),
+  new THREE.MeshBasicMaterial({ color: 0xffd27a, transparent: true, opacity: 0.0, depthWrite: false, blending: THREE.AdditiveBlending }));
+rrGlow.position.set((RR.x0 + RR.x1) / 2, RR.h / 2, RR.z1 + 0.06); scene.add(rrGlow);
+function sleepyToast() { toast('🌙 Everything’s asleep. Only the Reading Room is open!', { ms: 3000 }); }
+function setLightsOut(on, { announce = true } = {}) {
+  if (on === lightsOn) return;
+  lightsOn = on;
+  rrBeam.visible = on;
+  if (on) {
+    day.setLock(23.4);
+    track('lights-out');
+    if (announce) showLightsOutCard();
+  } else {
+    day.setLock(Save.timeOfDay());
+    if (announce) toast('☀️ Good morning! Everything’s open again.', { ms: 3200 });
+  }
+}
+function showLightsOutCard() {
+  let el = document.getElementById('lights-out');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'lights-out'; el.className = 'overlay';
+    el.innerHTML = `<div class="card"><div class="moon">🌙</div><h2>Lights Out</h2>
+      <p class="lede">The games are asleep.<br>Time to read!</p>
+      <button class="btn gold" type="button" data-go="1">📖 Go to the Reading Room</button>
+      <button class="btn ghost" type="button" data-close="1" style="margin-top:8px">Walk there myself</button></div>`;
+    document.body.appendChild(el);
+    el.querySelector('[data-close]').onclick = () => { el.hidden = true; setState('playing'); };
+    el.querySelector('[data-go]').onclick = () => {
+      el.hidden = true;
+      const sp = CONFIG.spawns.reading;
+      player.teleport(sp.x, 0.05, sp.z, Math.PI); cam.snapBehind(player.facing);
+      openReading();
+    };
+  }
+  el.hidden = false;
+  setState('sign');
+}
+function checkLightsOut() {
+  const on = LightsOut.isOn();
+  if (on !== lightsOn) setLightsOut(on);
+  if (!on) {
+    const m = LightsOut.minutesUntil();
+    if (m <= CONFIG.lightsOut.warnMinutes && !lightsWarned) { lightsWarned = true; toast(`🌙 Lights Out in ${Math.ceil(m)} minute${Math.ceil(m) === 1 ? '' : 's'}. Finish up!`, { ms: 4200 }); }
+    if (m > CONFIG.lightsOut.warnMinutes) lightsWarned = false;
+  }
+}
+setInterval(() => { if (state !== 'loading' && state !== 'start') checkLightsOut(); }, 15000);
+function morningCheck() {
+  if (LightsOut.claimRested()) {
+    const n = CONFIG.lightsOut.restedCoins;
+    earnWithFlight(n, new THREE.Vector3(player.pos.x, player.pos.y + 1.6, player.pos.z), null);
+    setTimeout(() => toast(`☀️ Rested bonus! You read at bedtime: +${n} coins`, { badge: true, ms: 4000 }), 600);
+    awardBadge('night-owl');
+    track('rested');
+  }
+}
+function darkFrame() {
+  // runs after the day cycle each frame
+  if (!lightsOn) { rrLight.intensity = 0; rrGlow.material.opacity = 0; return; }
+  sun.intensity *= 0.22;
+  hemi.intensity *= 0.3;
+  scene.fog.near = 8; scene.fog.far = 55;
+  scene.fog.color.multiplyScalar(0.55);
+  if (scene.background && scene.background.isColor) scene.background.multiplyScalar(0.55);
+  Batcher.glowMaterial().emissiveIntensity = 0.25;
+  for (const s of nightSigns) s.material.emissiveIntensity = 0.05;
+  rrLight.intensity = 60;
+  rrGlow.material.opacity = 0.5;
+}
+
+/* ---------- Matcha Orange: drinks from the café, hidden cups in town ---------- */
+function drinkMatcha(where) {
+  Matcha.drink(player, awardBadge);
+  player.stretchTimer = 0.3;
+  juice.sparkle(player.pos.x, player.pos.y + 1.4, player.pos.z, 24, 0x7fdc6a, { speed: 3.5, life: 0.7 });
+  Sfx.boost();
+  toast(`🥤 Glug! <b>Focus Fizz</b>: free stamina for ${CONFIG.cafe.drink.secs}s`, { ms: 3200 });
+  track(where === 'pickup' ? 'matcha-pickup' : 'matcha-free-claimed');
+}
+function drinkWaiting() { if (Matcha.takeReady() > 0) setTimeout(() => drinkMatcha('cafe'), 700); }
+const matchaCups = [];
+for (const P of CONFIG.cafe.pickups) {
+  if (Matcha.pickupTaken(P.id)) continue;
+  const cup = matchaCup(0.55);
+  cup.position.set(P.x, P.y, P.z);
+  const halo = new THREE.Mesh(new THREE.SphereGeometry(0.55, 14, 10), new THREE.MeshBasicMaterial({ color: 0x9be86b, transparent: true, opacity: 0.22, depthWrite: false, blending: THREE.AdditiveBlending }));
+  halo.position.y = 0.4; cup.add(halo);
+  scene.add(cup);
+  matchaCups.push({ P, cup, y0: P.y });
+}
+function updateMatchaCups(t) {
+  for (let i = matchaCups.length - 1; i >= 0; i--) {
+    const m = matchaCups[i];
+    m.cup.position.y = m.y0 + Math.sin(t * 2 + i) * 0.15;
+    m.cup.rotation.y = t * 1.2;
+    if (Math.hypot(player.pos.x - m.P.x, player.pos.z - m.P.z) < 1.3 && Math.abs(player.pos.y + 0.9 - m.y0) < 1.6) {
+      Matcha.takePickup(m.P.id);
+      scene.remove(m.cup);
+      matchaCups.splice(i, 1);
+      drinkMatcha('pickup');
+    }
+  }
+}
+
 /* ---------- Lookout Tower telescope: camera sweep, fog lifts, banner ---------- */
 let sweep = null;
 function useTelescope(T) {
+  if (lightsOn) { toast('🌙 Too dark to see anything now. Come back in the morning!'); return; }
   const q = T.road.Q;
   const first = !Save.towerClimbed(q.id);
   setState('sweep');
@@ -1334,7 +1453,10 @@ function updateSweep(dt) {
   if (!S.lifted && S.t > 1.2) {
     S.lifted = true;
     ROADS.mist.set('q:' + road.Q.id, false);
-    if (S.first) { Save.climbTower(road.Q.id); track('tower-climbed', { quarter: road.Q.id }); track('fog-lifted', { quarter: road.Q.id }); }
+    if (S.first) {
+      Save.climbTower(road.Q.id); track('tower-climbed', { quarter: road.Q.id }); track('fog-lifted', { quarter: road.Q.id });
+      earnWithFlight(25, new THREE.Vector3(S.T.top.x, S.T.top.y + 1.6, S.T.top.z), null);
+    }
   }
   if (S.t >= S.dur) {
     sweep = null;
@@ -1357,6 +1479,7 @@ $('btn-banner-close').addEventListener('click', () => {
   $('banner').hidden = true;
   setState('playing');
   awardBadge('lookout');
+  if (CONFIG.lookoutTowers.every((t) => Save.towerClimbed(t.quarter))) awardBadge('eagle-eye');
 });
 
 /* =============== interaction markers (ring + floating icon) =============== */
@@ -1421,8 +1544,9 @@ function updateInteract() {
 
 let leaving = false;
 async function enterBuilding(b) {
-  if (typeof b.open === 'function') { b.open(); return; }
   if (b.open === 'reading') { openReading(); return; }
+  if (lightsOn) { sleepyToast(); return; }
+  if (typeof b.open === 'function') { b.open(); return; }
   if (leaving) return;
   leaving = true;
   input.setPlaying(false);
@@ -1470,15 +1594,22 @@ const titleOrbit = { center: new THREE.Vector3(0, 5, -2), dist: 62, pitch: 0.36,
 
 function renderControls() {
   document.querySelectorAll('.controls-help').forEach((el) => { el.innerHTML = controlsHelpHTML(input.touchMode, Save.unlocks()); });
+  const k = document.getElementById('start-keys');
+  if (k) k.textContent = input.touchMode ? 'Left side: move · Big button: jump · ✋: use' : 'WASD: move · Space: jump · E: use';
 }
 input.onTouchModeChange = renderControls;
 renderControls();
 
+let sessionTracked = false;
 function startPlaying() {
+  if (!sessionTracked) { sessionTracked = true; track('session-start'); }
   Sfx.unlock();
   $('start-screen').hidden = true;
   cam.snapBehind(player.facing);
   setState('playing');
+  if (LightsOut.isOn()) { setLightsOut(true, { announce: false }); showLightsOutCard(); }
+  else morningCheck();
+  drinkWaiting();
 }
 $('btn-play').addEventListener('click', startPlaying);
 
@@ -1678,6 +1809,8 @@ function tick() {
   const night = day.night;
   Batcher.glowMaterial().emissiveIntensity = night * 1.15;
   for (const s of nightSigns) s.material.emissiveIntensity = night * 0.55;
+  if (!lightsOn && scene.fog.near !== CONFIG.graphics.fog.near) { scene.fog.near = CONFIG.graphics.fog.near; scene.fog.far = CONFIG.graphics.fog.far; }
+  darkFrame();
   for (const m of interiorMats) m.emissiveIntensity = 0.05 + night * 0.75;
   for (const b of adSpots) b.material.opacity = Math.max(0, night - 0.3) * 0.35;
   coinMat.emissiveIntensity = 0.55 + night * 0.4;
@@ -1686,6 +1819,7 @@ function tick() {
   quests.update(state === 'playing' ? dt : 0);
   ROADS.mist.update(dt, t, scene.fog.color);
   for (const T of lookouts) T.update(dt, t, player);
+  if (state === 'playing') updateMatchaCups(t);
   updateCoins(t, dt);
   updatePops(dt);
   updateDoors(dt);
@@ -1719,6 +1853,7 @@ $('start-gold').textContent = goldens.length;
 const finishLoading = () => {
   if (state !== 'loading') return;
   $('loading').hidden = true;
+  setLightsOut(LightsOut.isOn(), { announce: false });
   if (spawnKey !== 'default') {
     // coming back from a building — straight into play
     $('start-screen').hidden = true;
@@ -1727,6 +1862,9 @@ const finishLoading = () => {
     fadeIn();
     toast(spawnKey.startsWith('plot:') ? 'Back on the road.' : 'Welcome back to Library Square!');
     Save.takeToasts().forEach((m, i) => setTimeout(() => toast(m, { badge: true, ms: 3600 }), 400 + i * 600));
+    if (!lightsOn) morningCheck();
+    drinkWaiting();
+    if (params.get('open') === 'reading') setTimeout(() => openReading(), 600);
     checkBookBadges();
     if (spawnKey.startsWith('plot:') && params.get('panel') === '1') {
       const b = Catalogue.getBook(spawnKey.slice(5));
@@ -1737,7 +1875,7 @@ const finishLoading = () => {
     setState('start');
     $('start-screen').hidden = false;
     const n = Save.coinCount() + Save.goldenCount();
-    if (n > 0 || Save.card().stamps.length) $('start-progress').textContent = `Your progress: ${Save.card().stamps.length} stamp${Save.card().stamps.length === 1 ? '' : 's'} · ${Save.coinCount()}/${coins.length} coins · ${Save.goldenCount()}/${goldens.length} golden · ${Object.keys(Save.get().badges).length}/${CONFIG.badges.length} badges · 🪙 ${Save.wallet()} to spend`;
+    if (n > 0 || Save.card().stamps.length) $('start-progress').textContent = `✅ ${Save.card().stamps.length} · 🪙 ${Save.wallet()} · 🏅 ${Object.keys(Save.get().badges).length}`;
     checkBookBadges();
   }
 };

@@ -11,6 +11,7 @@
 //   quiz: { object, label, lock, lesson }   ← the questions.json vault questions
 //   outro
 // }
+import { LightsOut } from '../js/lightsout.js';
 import * as THREE from 'three';
 import { CONFIG } from '../config.js';
 import { World, Batcher, canvasTexture } from '../js/world.js';
@@ -29,6 +30,18 @@ import { openQuiz, districtDone } from '../js/library-ui.js';
 import { renderSolve } from '../kit/solve.js';
 import { pal, hex, prop, emojiSprite } from '../kit/props.js';
 import { guardLinks } from '../js/grownups.js';
+import { vaultObject } from '../kit/vaultobjects.js';
+
+
+// Lights Out can start while this page is open: send the player back to town.
+if (!new URLSearchParams(location.search).get('demo')) {
+  setInterval(() => {
+    if (!LightsOut.isOn() || window.__lightsOutLeaving) return;
+    window.__lightsOutLeaving = true;
+    toast('🌙 Lights Out! Back to town…', { ms: 3000 });
+    setTimeout(() => location.replace('../'), 3000);
+  }, 20000);
+}
 
 const $ = (id) => document.getElementById(id);
 const qs = new URLSearchParams(location.search);
@@ -52,7 +65,8 @@ function locked(title, text) {
   fadeIn();
 }
 let ok = true;
-if (!V) { locked('No vault here', 'This district has no Vault yet.'); ok = false; }
+if (LightsOut.isOn()) { locked('🌙 It’s Lights Out', 'The games are asleep till morning. Only the Reading Room is open, so go and read!'); ok = false; }
+else if (!V) { locked('No vault here', 'This district has no Vault yet.'); ok = false; }
 else if (!districtDone(book, kit) && !DEBUG) { locked(`${V.name} is locked`, 'Finish every street in this district first (read, answer the questions, play the game).'); ok = false; }
 if (ok) start();
 
@@ -63,7 +77,6 @@ document.title = `${V.name} — ${book.title} — ${CONFIG.gameName}`;
 $('crumb').textContent = `${CONFIG.gameName.toLowerCase()} / ${Catalogue.placeName(book).toLowerCase()} / vault`;
 $('start-tag').textContent = `${book.title} · the vault`;
 $('start-title').textContent = V.name;
-$('start-lede').textContent = V.intro || V.blurb || '';
 $('pause-title').textContent = V.name;
 
 /* =============== locks (data) =============== */
@@ -72,19 +85,20 @@ const QUIZ = V.quiz && questions && questions.vault && questions.vault.length
   ? Object.assign({ object: 'desk', label: 'The reading desk', _quiz: true }, V.quiz) : null;
 if (QUIZ) LOCKS.push({ kind: 'quiz', s: QUIZ, name: QUIZ.lock || 'The last lock', lesson: QUIZ.lesson });
 const NL = LOCKS.length;
+$('start-lede').textContent = `🔒 ${NL} locks. Solve the room to get out!`;
 
 /* =============== renderer / scene (from The Study) =============== */
 const canvas = $('game-canvas');
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x120e0b);
 const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.05, 60);
-const ambient = new THREE.AmbientLight(0x8a9bc4, ROOM.dark ? 0.4 : 0.85);
+const ambient = new THREE.AmbientLight(0x8a9bc4, ROOM.dark ? 0.6 : 0.95);
 scene.add(ambient);
 const moon = new THREE.DirectionalLight(0xfff0dc, ROOM.dark ? 0.35 : 0.9);
 moon.position.set(-2, 6, 6);
 scene.add(moon);
 const lampLight = new THREE.PointLight(0xffc77a, ROOM.dark ? 6 : 8, 18, 1.6);
-lampLight.position.set(0, 3.4, 0);
+lampLight.position.set(0, 4.2, 0);
 lampLight.castShadow = true;
 scene.add(lampLight);
 const gfx = createGfx({ canvas, scene, camera, extraShadowLights: [lampLight], exposure: 1.2, post: false });
@@ -92,7 +106,7 @@ const gfx = createGfx({ canvas, scene, camera, extraShadowLights: [lampLight], e
 /* =============== room (The Study's shell, resized + recoloured) =============== */
 const world = new World();
 const B = new Batcher();
-const HX = 7, HZ = 6, WH = 4, DOOR_HW = 1.05;
+const HX = 7, HZ = 6, WH = 5.2, DOOR_HW = 1.05;
 world.add(-20, 20, -1, 0, -20, 20);
 world.add(-20, 20, WH, WH + 1, -20, 20);
 world.add(-HX - 1, HX + 1, 0, WH, -HZ - 1, -HZ);
@@ -137,6 +151,25 @@ const doorBlocker = world.add(-DOOR_HW, DOOR_HW, 0, 2.7, HZ - 0.05, HZ + 0.2);
   outside.position.set(0, 1.6, HZ + 2.95); outside.rotation.y = Math.PI; scene.add(outside);
   B.box(-2.4, 2.4, 0, 0.02, -1.4, 2.0, hex(ROOM.rug || P.accent), { cast: false });
   B.box(-2.1, 2.1, 0.02, 0.025, -1.1, 1.7, new THREE.Color(ROOM.rug || P.accent).multiplyScalar(1.15).getHex(), { cast: false });
+  // wood panelling, a dado rail and a crown moulding round the walls
+  const PANEL = new THREE.Color(hex(P.trim)).multiplyScalar(1.15).getHex(), RAIL = hex(P.trim);
+  for (const [a, b, c, d] of [[-HX, HX, -HZ, -HZ + 0.06], [-HX, -HX + 0.06, -HZ, HZ], [HX - 0.06, HX, -HZ, HZ], [-HX, -DOOR_HW, HZ - 0.06, HZ], [DOOR_HW, HX, HZ - 0.06, HZ]]) {
+    B.box(a, b, 0, 1.15, c, d, PANEL, { cast: false });
+    B.box(a - 0.02, b + 0.02, 1.15, 1.25, c - 0.02, d + 0.02, RAIL, { cast: false });
+    B.box(a - 0.03, b + 0.03, WH - 0.25, WH, c - 0.03, d + 0.03, RAIL, { cast: false });
+  }
+  // two tall moonlit windows on the back wall
+  for (const x of [-HX * 0.55, HX * 0.55]) {
+    B.box(x - 0.85, x + 0.85, 1.6, 4.3, -HZ, -HZ + 0.1, RAIL);
+    const glass = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 2.5), new THREE.MeshBasicMaterial({ color: ROOM.dark ? 0x3a4c7a : 0xbfdcf2 }));
+    glass.position.set(x, 2.95, -HZ + 0.12); scene.add(glass);
+    B.box(x - 0.03, x + 0.03, 1.7, 4.2, -HZ + 0.1, -HZ + 0.15, RAIL, { cast: false });
+    B.box(x - 0.75, x + 0.75, 2.9, 2.96, -HZ + 0.1, -HZ + 0.15, RAIL, { cast: false });
+  }
+  // chandelier
+  B.box(-0.03, 0.03, WH - 1.0, WH, -0.03, 0.03, 0x333333, { cast: false });
+  B.geom(new THREE.TorusGeometry(0.7, 0.05, 6, 20), 0xc9a24a, { x: 0, y: WH - 1.0, z: 0, rx: Math.PI / 2, cast: false });
+  for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2; B.box(Math.cos(a) * 0.7 - 0.05, Math.cos(a) * 0.7 + 0.05, WH - 0.95, WH - 0.75, Math.sin(a) * 0.7 - 0.05, Math.sin(a) * 0.7 + 0.05, 0xffe2a0, { bucket: 'glow', shade: false, cast: false }); }
   // themed props round the edges (no colliders near stations)
   (kit.theme.vaultProps || kit.theme.props || []).slice(0, 4).forEach((n, i) => prop(n, B, null, i % 2 ? HX - 1.2 : -HX + 1.2, i < 2 ? HZ - 1.5 : 1.5, 0.7, P));
 }
@@ -165,6 +198,7 @@ doorLabel.position.set(0, 3.28, HZ - 0.03); doorLabel.rotation.y = Math.PI; scen
 /* =============== stations round the walls =============== */
 const ICON = { desk: '🗄️', shelf: '📚', clock: '🕰️', chair: '🪑', box: '📦', picture: '🖼️', window: '🪟', table: '🍽️', bed: '🛏️', chest: '🧰', plant: '🪴', statue: '🗿', sign: '🪧', mirror: '🪞', book: '📖', map: '🗺️', note: '📝', lamp: '🪔', safe: '🔐', toy: '🧸', board: '♟️', scales: '⚖️', telescope: '🔭', trunk: '🧳', rock: '🪨' };
 const stations = (V.stations || []).slice();
+const bobbers = [];
 if (QUIZ) stations.push(QUIZ);
 const interactables = [];
 const spots = [];
@@ -181,11 +215,10 @@ const spots = [];
 }
 stations.forEach((S, i) => {
   const { x, z, face } = spots[i];
-  B.box(x - 0.55, x + 0.55, 0, 0.95, z - 0.55, z + 0.55, hex(S._quiz || S.solve ? P.accent : P.wood));
-  B.box(x - 0.6, x + 0.6, 0.95, 1.02, z - 0.6, z + 0.6, hex(P.trim));
-  world.add(x - 0.6, x + 0.6, 0, 1.02, z - 0.6, z + 0.6);
-  const sp = emojiSprite(ICON[S.object] || '❓', 0.9);
-  sp.position.set(x, 1.75, z); scene.add(sp);
+  vaultObject(S._quiz ? 'desk' : S.object, B, world, x, z, face, P);
+  const sp = emojiSprite(ICON[S.object] || '❓', 0.6);
+  sp.position.set(x, 2.75, z); scene.add(sp);
+  bobbers.push(sp);
   interactables.push({ id: i, S, x: x + Math.sin(face) * 1.35, z: z + Math.cos(face) * 1.35, r: 1.6, label: S.label || S.object });
 });
 interactables.push({ id: 'door', x: 0, z: HZ - 1.0, r: 1.6, label: 'Examine the vault door' });
@@ -196,12 +229,12 @@ const input = new Input(canvas);
 const player = new Player(scene, world);
 player.setUnlocks(Save.unlocks());
 input.setMoves(Save.unlocks());
-const cam = new FollowCamera(camera, world, { distance: 4.6, minDistance: 1.8, maxDistance: 6.5, pitch: 0.48, maxPitch: 1.0, speedPullBack: 0.6 });
+const cam = new FollowCamera(camera, world, { distance: 5.2, minDistance: 2.8, maxDistance: 6.5, pitch: 0.62, maxPitch: 1.1, speedPullBack: 0.6 });
 cam.player = player;
 const juice = attachJuice({ scene, player, cam, camera, renderer: gfx.renderer });
 const moveHud = new MoveHud(player);
 moveHud.show(false);
-player.teleport(0, 0, 3.6, Math.PI);
+player.teleport(0, 0, 1.2, Math.PI);
 cam.snapBehind(Math.PI);
 player.onJump = () => Sfx.jump();
 
@@ -388,6 +421,7 @@ function tick() {
   if (state === 'playing' || state === 'panel' || state === 'paused') $('hud-timer').textContent = fmtTime(elapsed());
   doorAngle += ((doorOpen ? -1.7 : 0) - doorAngle) * Math.min(1, dt * 3);
   doorPivot.rotation.y = doorAngle;
+  for (let i = 0; i < bobbers.length; i++) bobbers[i].position.y = 2.75 + Math.sin(clock.elapsedTime * 2 + i) * 0.08;
   juice.update(dt);
   moveHud.update(dt);
   gfx.monitor(dt, state === 'playing');

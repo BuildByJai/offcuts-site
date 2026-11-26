@@ -25,6 +25,7 @@ export function build(A) {
   const kinds = p.obstacles || ['hurdle', 'block'];
   const dens = p.density == null ? 0.5 : p.density;
   A.ground(W, L + 30, 'none', { cz: -L / 2 + 5, walls: true, wallH: 10 });
+  A.scenery({ w: W + 2.4, d: L + 30, cz: -L / 2 + 5, floor: 'track', edge: false });
   const floorCols = { grass: [P.ground, P.ground2], floor: ['#a0764e', '#8a6440'], snow: ['#f4f7fb', '#dfe7f0'], sand: ['#e8d3a0', '#d8c08a'], stone: ['#b9b2a5', '#a49d90'] }[p.floor || 'grass'] || [P.ground, P.ground2];
   // obstacles every few metres
   const obs = [];

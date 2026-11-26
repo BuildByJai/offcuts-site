@@ -86,6 +86,17 @@ export const CONFIG = {
      props and characters read as one family. */
   palette: PALETTE,
 
+  /* ---------------- Lights Out (bedtime) ----------------
+     The device's own clock decides. During these hours the town goes dark
+     and the games sleep; only the Reading Room is lit and open. */
+  lightsOut: {
+    enabled: true,
+    start: '21:00',
+    end: '07:00',
+    warnMinutes: 5,          // "Lights Out soon" toast this long before start
+    restedCoins: 20          // morning bonus for reading during Lights Out
+  },
+
   /* ---------------- graphics ---------------- */
   graphics: {
     exposure: 1.05,
@@ -173,6 +184,27 @@ export const CONFIG = {
     speedSprintMult: 1.4,
     magnetRadius: 7
   },
+  /* ---------------- The Chapter Café + Matcha Orange ----------------
+     The drink was designed by a young guest artist. Her real name must never
+     appear anywhere: the credit comes ONLY from guestArt.matcha.credit. */
+  cafe: {
+    name: 'The Chapter Café',
+    drink: { id: 'matcha', name: 'Matcha Orange', icon: '🥤', price: 10, secs: 45, sprintMult: 1.15,
+             desc: 'Focus Fizz: 45 seconds of free stamina and a faster sprint.' },
+    // hidden cups in town, each found once (next to three golden coins)
+    pickups: [
+      { id: 'matcha-roof',     x: 40, y: 7.5, z: -20,  hint: 'arcade roof' },
+      { id: 'matcha-alley',    x: -42, y: 2.0, z: 0,   hint: 'back alley' },
+      { id: 'matcha-fountain', x: 0,  y: 2.0, z: -5.6, hint: 'behind the fountain' }
+    ]
+  },
+  guestArt: {
+    matcha: {
+      file: 'assets/guest-art/matcha-drawing.jpg',      // relative to tools/chapterlands/
+      credit: 'Guest artist: Captain M',
+      alt: "A child's marker drawing of a green matcha drink with a teal straw and an orange slice."
+    }
+  },
   economy: {
     coin: 1,                   // wallet value of a regular coin (collected once)
     golden: 25,                // wallet value of a golden coin
@@ -216,6 +248,7 @@ export const CONFIG = {
     default: { x: 0, y: 0, z: 34, facing: Math.PI },   // south entrance, facing the square
     study:   { plot: 'life-atomic' },                    // outside the Atomic Habits district (Life Skills road)
     reading: { x: -18, y: 0, z: -26.5, facing: 0 },     // outside the Reading Room door, facing the square
+    cafe:    { x: 27.8, y: 0, z: 11, facing: -Math.PI / 2 }, // outside the Chapter Café door, facing the square
     tower:   { x: -26.6, y: 0, z: -16, facing: Math.PI / 2 } // outside the Habit Tower door, facing the square
   },
 
@@ -329,8 +362,8 @@ export const CONFIG = {
 
     { id: 'e-house',  name: 'House',      status: 'filler',
       x0: 30,  x1: 44,  z0: -30, z1: -3,   h: 5.5, wall: P.grape, trim: P.gold, roof: P.navy, style: 'house' },
-    // The café is open: it's where the White Rabbit quest starts.
-    { id: 'cafe',     name: 'Café',       sign: 'Café', status: 'open',
+    // The Chapter Café: walk in to buy Matcha Orange (cafe/).
+    { id: 'cafe',     name: 'The Chapter Café', sign: 'Chapter Café', status: 'live', href: 'cafe/', icon: '☕',
       x0: 30,  x1: 44,  z0: 3,   z1: 16,  h: 4,   wall: P.peach, trim: P.darkWood, roof: P.wood, style: 'cafe',
       door: { face: 'west', at: 11 } },
     { id: 'se-house', name: 'House',      status: 'filler',
@@ -379,7 +412,15 @@ export const CONFIG = {
      its road past `out`, `side` is which side of the road (±1). Presets live in
      js/lookout.js. `requiresKey` (a book id) puts a gate round the base. */
   lookoutTowers: [
-    { id: 'fantasy', quarter: 'fantasy', at: 4, side: -1, height: 24, preset: 'spiral', requiresKey: null }
+    // One per road. `preset` is the level design (js/lookout.js); `offset` is
+    // how far the tower's centre sits from the middle of the road (default 13).
+    { id: 'fantasy',   quarter: 'fantasy',   at: 4, side: -1, height: 24, preset: 'spiral',    requiresKey: null },
+    { id: 'family',    quarter: 'family',    at: 4, side: 1,  height: 20, preset: 'treehouse', requiresKey: null },
+    { id: 'life',      quarter: 'life',      at: 4, side: -1, height: 22, preset: 'books',     requiresKey: null },
+    { id: 'animals',   quarter: 'animals',   at: 4, side: -1, height: 21, preset: 'stumps',    requiresKey: null, offset: 16 },
+    { id: 'adventure', quarter: 'adventure', at: 4, side: -1, height: 24, preset: 'mast',      requiresKey: null },
+    { id: 'scifi',     quarter: 'scifi',     at: 6, side: -1, height: 27, preset: 'pylon',     requiresKey: null },
+    { id: 'mystery',   quarter: 'mystery',   at: 4, side: -1, height: 26, preset: 'zigzag',    requiresKey: null }
   ],
   // Only built with ?debug=1: tests the requiresKey gate message.
   debugTowers: [
@@ -402,7 +443,7 @@ export const CONFIG = {
       steps: [
         { type: 'talk', params: { npc: 'librarian' },
           text: 'Talk to the Librarian on the Reading Room steps.',
-          say: 'Oh, what a muddle! Seven books have wandered off. Every road out of the square is one part of the library — Fantasy, Adventure, Mystery and the rest — and each road has a little shelf under its arch. Could you find the books and put each one back on its own shelf? Match the colour and the picture on the cover.' },
+          say: 'Oh, what a muddle! Seven books have run off. Find them, then put each one on the little shelf under its road\'s arch. Match the colours!' },
         { type: 'collect', params: { items: [
             { id: 'lb-fantasy',   quarter: 'fantasy',   at: [-16, 0.7, 10] },
             { id: 'lb-adventure', quarter: 'adventure', at: [18, 0.7, -7] },
@@ -421,7 +462,7 @@ export const CONFIG = {
           text: 'Put each book on the shelf under its own road\'s arch.' },
         { type: 'talk', params: { npc: 'librarian' },
           text: 'Tell the Librarian the shelves are tidy.',
-          say: 'Every book back where it belongs! Now you know how the library works: pick a road for the kind of story you like, and the easier books are nearest the square.' }
+          say: 'All back where they belong! Each road is a kind of story. Easier books are nearest the square.' }
       ],
       reward: { coins: 40, badge: 'shelver' } },
     { id: 'white-rabbit', title: 'The White Rabbit', giver: 'rabbit',
@@ -431,12 +472,12 @@ export const CONFIG = {
           say: 'Oh dear! Oh dear! I shall be too late!' },
         { type: 'talk', params: { npc: 'rabbit' },
           text: 'Talk to the White Rabbit.',
-          say: 'Oh my ears and whiskers, how late it\'s getting! I\'ve lost my way home — it\'s somewhere up the Fantasy road, past all that fog. Will you walk with me?' },
+          say: 'Oh my ears and whiskers, how late it\'s getting! My home is up the Fantasy road. Will you walk with me?' },
         { type: 'reach', params: { actor: 'rabbit', lead: true, radius: 4, points: [[-5, -29], [-5, -50], 'plot:fan-alice-1'] },
           text: 'Follow the White Rabbit up the Fantasy road.' },
         { type: 'talk', params: { npc: 'rabbit' },
           text: 'Talk to the White Rabbit at the edge of Wonderland.',
-          say: 'Here we are — Wonderland! But the way is still shut. Come back when the way opens! And thank you — you\'re much quicker than I am.' }
+          say: 'Here we are: Wonderland! Read chapter 1 in the Reading Room, answer 3 questions, and the first street opens. Thank you, you\'re much quicker than I am!' }
       ],
       reward: { coins: 30, badge: 'rabbit-chaser' } }
   ],
@@ -542,6 +583,10 @@ export const CONFIG = {
     { id: 'shelver',        name: 'Shelver',         desc: 'Return all seven lost books to their shelves.', icon: '📚' },
     { id: 'rabbit-chaser',  name: 'Rabbit Chaser',   desc: 'Catch the White Rabbit and help him home.',    icon: '🐇' },
     { id: 'lookout',        name: 'Lookout',         desc: 'Climb a Lookout Tower and lift the fog.',      icon: '🔭' },
+    { id: 'night-owl',      name: 'Bedtime Reader',  desc: 'Read a chapter at Lights Out, then wake up rested.', icon: '🌙' },
+    { id: 'first-sip',      name: 'First Sip',       desc: 'Drink your first Matcha Orange.',             icon: '🥤' },
+    { id: 'regular',        name: 'Regular',         desc: 'Drink Matcha Orange on 5 different days.',     icon: '☕' },
+    { id: 'eagle-eye',      name: 'Eagle Eye',       desc: 'Climb all seven Lookout Towers.',              icon: '🦅' },
     { id: 'first-check',    name: 'Good Reader',     desc: 'Pass your first reading check.',               icon: '✅' },
     { id: 'sky-runner',     name: 'Sky Runner',      desc: 'Finish a Sky Run.',                            icon: '☁️' },
     { id: 'vault-cracker',  name: 'Vault Cracker',   desc: 'Crack a district Vault.',                      icon: '🗝️' }
