@@ -85,11 +85,12 @@ export const Matcha = {
   freeReady() { return Save.cafe().lastFreeDate !== today(); },
   // Puts a drink "to go" in the player's hand; it fizzes up back in town.
   claimFree() {
-    if (!this.freeReady()) return false;
+    if (!this.freeReady() || this.hasReady()) return false;
     Save.updateCafe((c) => { c.lastFreeDate = today(); c.ready = (c.ready || 0) + 1; });
     return true;
   },
   buy() {
+    if (this.hasReady()) return false;            // one drink to go at a time
     if (!Save.spend(DRINK().price)) return false;
     Save.updateCafe((c) => { c.ready = (c.ready || 0) + 1; });
     return true;
@@ -105,9 +106,10 @@ export const Matcha = {
     award('first-sip');
     if ((Save.cafe().daysDrunk || []).length >= 5) award('regular');
   },
+  // takes one drink to go (there is never more than one waiting)
   takeReady() {
     let n = 0;
-    Save.updateCafe((c) => { n = c.ready || 0; c.ready = 0; });
+    Save.updateCafe((c) => { n = Math.min(1, c.ready || 0); c.ready = Math.max(0, (c.ready || 0) - n); });
     return n;
   },
   pickupTaken(id) { return !!(Save.cafe().pickups || {})[id]; },

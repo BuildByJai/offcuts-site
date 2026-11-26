@@ -26,6 +26,17 @@ import { TEMPLATES } from '../kit/templates/index.js';
 import { runArcade } from '../kit/arcade.js';
 import { skyDome, buildSet } from '../kit/scenery.js';
 
+
+// Lights Out can start while this page is open: send the player back to town.
+if (!new URLSearchParams(location.search).get('demo')) {
+  setInterval(() => {
+    if (!LightsOut.isOn() || window.__lightsOutLeaving) return;
+    window.__lightsOutLeaving = true;
+    toast('🌙 Lights Out! Back to town…', { ms: 3000 });
+    setTimeout(() => location.replace('../'), 3000);
+  }, 20000);
+}
+
 const $ = (id) => document.getElementById(id);
 const qs = new URLSearchParams(location.search);
 const demo = qs.get('demo');

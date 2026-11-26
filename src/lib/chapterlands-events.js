@@ -77,14 +77,20 @@ export async function handleChapterlandsStats(request, env) {
       sql(env, `SELECT blob1 AS e, SUM(_sample_interval) AS n, COUNT(DISTINCT blob2) AS players FROM ${DATASET} WHERE ${since} GROUP BY e ORDER BY n DESC`),
       sql(env, `SELECT blob2 AS p FROM ${DATASET} WHERE ${since} AND blob1 = 'street-unlocked' AND double1 = 0 GROUP BY p`),
       sql(env, `SELECT blob2 AS p FROM ${DATASET} WHERE ${since} AND blob1 = 'street-unlocked' AND double1 >= 2 GROUP BY p`),
-      sql(env, `SELECT blob2 AS p, MIN(double2) AS first, MAX(double2) AS last FROM ${DATASET} WHERE timestamp > NOW() - INTERVAL '90' DAY AND blob1 = 'session-start' GROUP BY p`),
+      // every (player, day) pair with a session, so week 2 can be checked exactly
+      sql(env, `SELECT blob2 AS p, double2 AS d FROM ${DATASET} WHERE timestamp > NOW() - INTERVAL '90' DAY AND blob1 = 'session-start' GROUP BY p, d`),
       sql(env, `SELECT blob3 AS b, COUNT(DISTINCT blob2) AS players, SUM(IF(blob1 = 'street-unlocked', _sample_interval, 0)) AS streets, SUM(IF(blob1 = 'vault', _sample_interval, 0)) AS vaults FROM ${DATASET} WHERE ${since} AND blob3 != '' GROUP BY b ORDER BY players DESC`),
     ]);
     const s1 = new Set(firstStreet.map((r) => r.p)), s3 = thirdStreet.filter((r) => s1.has(r.p)).length;
     const funnel = s1.size ? Math.round((s3 / s1.size) * 100) : 0;
+    // week 2 = days 7–13 after a player's first session. Only players whose
+    // first session was 14+ days ago count, so everyone had a full week 2.
     const today = Math.floor(Date.now() / 86400000);
-    const eligible = sessions.filter((r) => today - Number(r.first) >= 14);
-    const back = eligible.filter((r) => Number(r.last) - Number(r.first) >= 7).length;
+    const days = new Map();
+    for (const r of sessions) { const list = days.get(r.p) || []; list.push(Number(r.d)); days.set(r.p, list); }
+    const players = [...days.values()].map((d) => { const first = Math.min(...d); return { first, week2: d.some((x) => x - first >= 7 && x - first <= 13) }; });
+    const eligible = players.filter((r) => today - r.first >= 14);
+    const back = eligible.filter((r) => r.week2).length;
     const ret = eligible.length ? Math.round((back / eligible.length) * 100) : 0;
     const row = (cells) => `<tr>${cells.map((c) => `<td>${c}</td>`).join("")}</tr>`;
     return page(`Chapterlands: last ${days} days`, `
@@ -92,7 +98,7 @@ export async function handleChapterlandsStats(request, env) {
 <table><tr><th>Check</th><th>Now</th><th>Target</th></tr>
 ${row([`Players who opened street 1 and went on to open street 3`, `<span class="big ${funnel >= 50 ? "ok" : "no"}">${funnel}%</span> (${s3} of ${s1.size})`, "50%+"])}
 ${row([`Players who came back in week 2 (first played 14+ days ago)`, `<span class="big">${ret}%</span> (${back} of ${eligible.length})`, "kids return on their own"])}
-${row([`Players in total`, `<span class="big">${sessions.length}</span>`, "10–20 for the playtest"])}
+${row([`Players in total`, `<span class="big">${days.size}</span>`, "10–20 for the playtest"])}
 </table>
 <h2>Events</h2><table><tr><th>Event</th><th>Count</th><th>Players</th></tr>${totals.map((r) => row([r.e, r.n, r.players])).join("")}</table>
 <h2>Books</h2><table><tr><th>Book</th><th>Players</th><th>Streets opened</th><th>Vaults cracked</th></tr>${books.map((r) => row([r.b, r.players, r.streets, r.vaults])).join("")}</table>

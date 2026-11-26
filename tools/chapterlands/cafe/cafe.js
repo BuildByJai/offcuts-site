@@ -26,6 +26,17 @@ const D = CONFIG.cafe.drink, ART = CONFIG.guestArt.matcha;
 guardLinks();
 if (LightsOut.isOn()) { location.replace('../?spawn=cafe'); }
 
+// Lights Out can start while this page is open: send the player back to town.
+if (!new URLSearchParams(location.search).get('demo')) {
+  setInterval(() => {
+    if (!LightsOut.isOn() || window.__lightsOutLeaving) return;
+    window.__lightsOutLeaving = true;
+    toast('🌙 Lights Out! Back to town…', { ms: 3000 });
+    setTimeout(() => location.replace('../?spawn=cafe'), 3000);
+  }, 20000);
+}
+
+
 /* =============== scene =============== */
 const canvas = $('game-canvas');
 const scene = new THREE.Scene();
@@ -238,6 +249,13 @@ function sip() {
   Sfx.boost();
 }
 function counter() {
+  if (Matcha.hasReady()) {
+    $('counter-text').innerHTML = 'Your <b>Matcha Orange</b> is ready to go! It fizzes up when you step outside. 🥤';
+    $('counter-actions').innerHTML = '<div class="btn-row"><button class="btn" type="button" data-a="no">OK</button></div>';
+    $('counter-actions').querySelector('[data-a]').onclick = () => { $('counter').hidden = true; setState('playing'); };
+    $('counter').hidden = false; setState('panel');
+    return;
+  }
   const free = Matcha.freeReady();
   $('counter-text').innerHTML = free
     ? 'Your free <b>Matcha Orange</b> is ready! 🥤'
