@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Mushaira Mode — Offcuts</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Noto+Nastaliq+Urdu:wght@500&family=Noto+Sans+Devanagari:wght@600&display=swap');
+
+  :root {
+    --bg: #0B0B0C; --panel: #141416; --ink: #F3F1EC; --ink-soft: #9C9A94;
+    --line: #2A2A2D; --accent: #E8B45A; --accent-ink: #1A1408; --rec: #E5484D;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); }
+  body { font-family: 'Inter', system-ui, sans-serif; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  button, input, textarea, select { font: inherit; color: inherit; }
+
+  /* ---------- layout ---------- */
+  .app { display: grid; grid-template-columns: 1fr 400px; height: 100dvh; }
+  .stage {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    background: #000; overflow: hidden; min-height: 0;
+  }
+  #view {
+    display: block; height: 100%; max-width: 100%; aspect-ratio: 9 / 16;
+    width: auto; background: #000;
+  }
+  .panel {
+    background: var(--panel); border-left: 1px solid var(--line);
+    overflow-y: auto; padding: 22px 22px 40px;
+  }
+  @media (max-width: 860px) {
+    .app { grid-template-columns: 1fr; grid-template-rows: 48dvh auto; height: auto; min-height: 100dvh; }
+    .stage { height: 48dvh; }
+    .panel { border-left: 0; border-top: 1px solid var(--line); overflow: visible; }
+  }
+
+  /* performing: stage takes the whole screen */
+  body.performing .panel { display: none; }
+  body.performing .app { grid-template-columns: 1fr; grid-template-rows: 1fr; height: 100dvh; }
+  body.performing .stage { height: 100dvh; cursor: pointer; }
+
+  /* ---------- panel ---------- */
+  .crumb { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft); margin: 0 0 14px; }
+  .crumb a { color: var(--accent); text-decoration: none; }
+  h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 6px; }
+  .lede { color: var(--ink-soft); font-size: 14px; margin: 0 0 20px; }
+  .sec { border-top: 1px solid var(--line); padding: 16px 0 4px; }
+  .lbl { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .04em;
+         text-transform: uppercase; color: var(--ink-soft); margin: 0 0 8px; }
+  textarea, input[type=text] {
+    width: 100%; background: #0E0E10; border: 1px solid var(--line); border-radius: 10px;
+    padding: 11px 12px; font-size: 15px; outline: none;
+  }
+  textarea { min-height: 190px; resize: vertical; line-height: 1.55; }
+  textarea:focus, input[type=text]:focus { border-color: var(--accent); }
+  .hint { font-size: 12.5px; color: var(--ink-soft); margin: 6px 0 10px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .chip {
+    border: 1px solid var(--line); background: transparent; border-radius: 999px;
+    padding: 6px 12px; font-size: 12.5px; cursor: pointer; color: var(--ink-soft);
+  }
+  .chip:hover { border-color: var(--accent); color: var(--ink); }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .row { display: flex; align-items: center; gap: 10px; margin: 4px 0 10px; }
+  input[type=range] { flex: 1; accent-color: var(--accent); }
+  .val { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft); width: 44px; text-align: right; }
+  .btn {
+    border: 1px solid var(--line); background: transparent; border-radius: 12px;
+    padding: 12px 16px; font-weight: 600; font-size: 15px; cursor: pointer;
+  }
+  .btn:hover { border-color: var(--ink-soft); }
+  .btn.primary { background: var(--rec); border-color: var(--rec); color: #fff; }
+  .btn.gold { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .actions { display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px; margin-top: 18px; }
+  .err { color: #FF8A8A; font-size: 13px; margin: 8px 0 0; min-height: 1em; }
+  .small { font-size: 12px; color: var(--ink-soft); margin-top: 18px; line-height: 1.6; }
+
+  /* ---------- performing overlays ---------- */
+  .prompter {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+    width: min(94%, 560px); background: rgba(0,0,0,.62); backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,.12); border-radius: 14px; padding: 10px 14px 12px;
+    display: none; pointer-events: none; text-align: center;
+  }
+  body.performing .prompter { display: block; }
+  .prompter .k { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: .08em; color: var(--accent); }
+  .prompter .t { font-size: clamp(17px, 4.6vw, 24px); font-weight: 700; line-height: 1.3; margin-top: 2px; }
+  .prompter .t2 { font-size: 13px; color: var(--ink-soft); margin-top: 4px; }
+
+  .hud {
+    position: absolute; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+    display: none; justify-content: center; align-items: center; gap: 10px; pointer-events: none;
+  }
+  body.performing .hud { display: flex; }
+  .hud > * { pointer-events: auto; }
+  .pill {
+    background: rgba(0,0,0,.6); border: 1px solid rgba(255,255,255,.14); border-radius: 999px;
+    padding: 9px 14px; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--rec); animation: blink 1s infinite; }
+  .dot.off { background: var(--ink-soft); animation: none; }
+  @keyframes blink { 50% { opacity: .3; } }
+  .hud button { cursor: pointer; }
+
+  .count {
+    position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+    font-size: 120px; font-weight: 800; color: #fff; text-shadow: 0 4px 30px rgba(0,0,0,.6);
+    pointer-events: none;
+  }
+  .count.on { display: flex; animation: pop .9s ease-out; }
+  @keyframes pop { from { transform: scale(1.4); opacity: 0; } 30% { opacity: 1; } to { transform: scale(1); } }
+
+  /* ---------- review ---------- */
+  .review {
+    position: fixed; inset: 0; background: rgba(0,0,0,.92); display: none;
+    flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 20px; z-index: 10;
+  }
+  .review.on { display: flex; }
+  .review video { max-height: 70dvh; max-width: 100%; aspect-ratio: 9/16; border-radius: 14px; background: #000; }
+  .review .acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .review .meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="stage" id="stage">
+    <canvas id="view" width="720" height="1280"></canvas>
+    <div class="prompter" id="prompter">
+      <div class="k" id="pk">TAP TO SHOW YOUR FIRST LINE</div>
+      <div class="t" id="pt"></div>
+      <div class="t2" id="pt2"></div>
+    </div>
+    <div class="count" id="count"></div>
+    <div class="hud">
+      <div class="pill"><span class="dot" id="recdot"></span><span id="clock">0:00</span></div>
+      <button class="pill" id="btnFinish">Finish</button>
+      <button class="pill" id="btnCancel">✕</button>
+    </div>
+  </div>
+
+  <aside class="panel">
+    <p class="crumb"><a href="../../">offcuts</a> / mushaira mode</p>
+    <h1>Mushaira Mode</h1>
+    <p class="lede">Recite like a poet. Paste a poem, pick a mood, then tap through it line by line. Music plays underneath and each line appears on screen as you say it. You get a 9:16 video ready for Reels or TikTok.</p>
+
+    <div class="sec">
+      <span class="lbl">The poem</span>
+      <div class="chips" id="samples"></div>
+      <textarea id="poem" spellcheck="false"></textarea>
+      <p class="hint">One line per line. A blank line starts a new verse. Urdu, Hindi and English scripts all work.</p>
+    </div>
+
+    <div class="sec">
+      <span class="lbl">On screen</span>
+      <div class="two">
+        <input type="text" id="name" placeholder="Your name" maxlength="28">
+        <input type="text" id="handle" placeholder="@handle (optional)" maxlength="28">
+      </div>
+      <p class="hint"></p>
+      <span class="lbl">Look</span>
+      <div class="chips" id="looks"></div>
+      <span class="lbl">Lettering</span>
+      <div class="chips" id="fonts"></div>
+      <span class="lbl">Camera</span>
+      <div class="chips">
+        <button class="chip" id="btnCam">Turn camera on</button>
+      </div>
+    </div>
+
+    <div class="sec">
+      <span class="lbl">Mood music</span>
+      <div class="chips" id="moods"></div>
+      <input type="file" id="track" accept="audio/*" hidden>
+      <div class="row"><span class="hint" style="margin:0;width:70px">Volume</span>
+        <input type="range" id="vol" min="0" max="100" value="55"><span class="val" id="volv">55%</span></div>
+      <p class="hint">The music is made live in your browser, so it's never the same twice. Use earphones while recording and your voice stays clean, with no speaker echo.</p>
+    </div>
+
+    <div class="sec">
+      <span class="lbl">Line timing</span>
+      <div class="chips" id="pace"></div>
+      <div class="row" id="speedRow"><span class="hint" style="margin:0;width:70px">Speed</span>
+        <input type="range" id="speed" min="60" max="160" value="100"><span class="val" id="speedv">1.0×</span></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="btnRehearse">Rehearse</button>
+      <button class="btn primary" id="btnRecord">● Record</button>
+    </div>
+    <p class="err" id="err"></p>
+
+    <p class="small">
+      <b>While you perform:</b> tap anywhere (or press Space / → / a Bluetooth clicker) to show the next line. The prompt at the top shows what's coming, so keep your eyes up near the camera. Tap once more after the last line to finish, and the music fades out by itself.<br><br>
+      Everything stays on your device. Nothing is uploaded.
+    </p>
+  </aside>
+</div>
+
+<div class="review" id="review">
+  <video id="out" controls playsinline></video>
+  <div class="meta" id="outmeta"></div>
+  <div class="acts">
+    <button class="btn gold" id="btnSave">Save video</button>
+    <button class="btn" id="btnShare" hidden>Share…</button>
+    <button class="btn" id="btnRetake">Retake</button>
+    <button class="btn" id="btnClose">Edit poem</button>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+/* ================= data ================= */
+const SAMPLES = [
+  { id: 'ghalib', label: 'Ghalib', name: 'Mirza Ghalib', text:
+`Hazaron khwahishen aisi ke har khwahish pe dam nikle
+Bahut nikle mere armaan lekin phir bhi kam nikle
+
+Nikalna khuld se Adam ka sunte aaye hain lekin
+Bahut be-aabru hokar tere kooche se hum nikle
+
+Mohabbat mein nahin hai farq jeene aur marne ka
+Usi ko dekh kar jeete hain jis kafir pe dam nikle` },
+  { id: 'ghalib2', label: 'Dil-e-nadan', name: 'Mirza Ghalib', text:
+`Dil-e-nadan tujhe hua kya hai
+Aakhir is dard ki dawa kya hai
+
+Hum hain mushtaq aur woh bezaar
+Ya Ilahi yeh maajra kya hai
+
+Main bhi munh mein zabaan rakhta hoon
+Kaash poocho ke muddaa kya hai` },
+  { id: 'mir', label: 'Mir', name: 'Mir Taqi Mir', text:
+`Patta patta boota boota haal hamara jaane hai
+Jaane na jaane gul hi na jaane, baagh to saara jaane hai
+
+Aage us mutakabbir ke hum khuda khuda kiya karte hain
+Kab maujood khuda ko woh maghroor-e-khud-aara jaane hai` },
+  { id: 'bulleh', label: 'Bulleh Shah', name: 'Bulleh Shah', text:
+`Na main momin vich maseet aan
+Na main vich kufar diyan reet aan
+Na main paakan vich paleet aan
+
+Na main Moosa na Firaun
+Bulleya, ki jaana main kaun` },
+  { id: 'rossetti', label: 'Rossetti (English)', name: 'Christina Rossetti', text:
+`Remember me when I am gone away,
+Gone far away into the silent land;
+When you can no more hold me by the hand,
+Nor I half turn to go yet turning stay.
+
+Better by far you should forget and smile
+Than that you should remember and be sad.` },
+  { id: 'own', label: 'Write my own', name: '', text: '' },
+];
+
+const MOODS = {
+  dard:   { label: 'Dard · ache',        tint: '#5A1F33', tonic: 146.83, scale: [0,1,3,5,7,8,10], gap: [1.0, 2.4], drone: .9, rain: 0,   pad: 0 },
+  ishq:   { label: 'Ishq · longing',     tint: '#6A3A16', tonic: 164.81, scale: [0,2,4,6,7,9,11], gap: [0.7, 1.8], drone: .8, rain: 0,   pad: .35 },
+  raat:   { label: 'Raat · night rain',  tint: '#14264A', tonic: 130.81, scale: [0,3,5,7,10],     gap: [1.4, 3.2], drone: .6, rain: 1,   pad: .25 },
+  sukoon: { label: 'Sukoon · calm',      tint: '#143F33', tonic: 174.61, scale: [0,2,4,7,9],      gap: [1.1, 2.6], drone: .4, rain: 0,   pad: .7 },
+  silent: { label: 'No music',           tint: '#1A1A1A' },
+  own:    { label: 'My own track…',      tint: '#2A2238' },
+};
+const LOOKS = { card: 'Poet card', face: 'Face + captions' };
+const FONTS = { clean: 'Clean', classic: 'Classic serif' };
+const PACES = { tap: 'I tap each line', auto: 'Auto-scroll' };
+
+/* ================= state ================= */
+const saved = JSON.parse(localStorage.getItem('mushaira:v1') || '{}');
+const S = {
+  sample: saved.sample || 'ghalib',
+  poem: saved.poem ?? SAMPLES[0].text,
+  name: saved.name || '', handle: saved.handle || '',
+  look: saved.look || 'card', font: saved.font || 'clean',
+  mood: saved.mood === 'own' ? 'dard' : (saved.mood || 'dard'),
+  pace: saved.pace || 'tap', speed: saved.speed || 100, vol: saved.vol ?? 55,
+};
+const persist = () => localStorage.setItem('mushaira:v1', JSON.stringify(S));
+
+let phase = 'setup';            // setup | countdown | perform | finishing
+let recording = false;
+let lines = [];                 // {text, stanza, rtl}
+let revealed = 0;               // how many lines are showing
+let revealAt = [];              // ms timestamps
+let stanzaSwapAt = 0, prevStanza = -1;
+let scrollY = 0;
+let camStream = null, micStream = null;
+const camVideo = document.createElement('video');
+camVideo.muted = true; camVideo.playsInline = true; camVideo.setAttribute('playsinline', '');
+
+const $ = id => document.getElementById(id);
+const cv = $('view'), g = cv.getContext('2d');
+const W = cv.width, H = cv.height;
+
+/* ================= UI wiring ================= */
+function chips(el, map, key, onPick) {
+  el.innerHTML = '';
+  Object.entries(map).forEach(([k, v]) => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (S[key] === k ? ' on' : '');
+    b.textContent = typeof v === 'string' ? v : v.label;
+    b.onclick = () => { onPick ? onPick(k) : (S[key] = k); persist(); chips(el, map, key, onPick); refresh(); };
+    el.appendChild(b);
+  });
+}
+function renderSamples() {
+  const el = $('samples'); el.innerHTML = '';
+  SAMPLES.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (S.sample === s.id ? ' on' : '');
+    b.textContent = s.label;
+    b.onclick = () => {
+      S.sample = s.id;
+      if (s.id === 'own') { if (SAMPLES.some(x => x.text === S.poem)) S.poem = ''; }
+      else S.poem = s.text;
+      $('poem').value = S.poem;
+      persist(); renderSamples(); refresh();
+      if (s.id === 'own') $('poem').focus();
+    };
+    el.appendChild(b);
+  });
+}
+renderSamples();
+chips($('looks'), LOOKS, 'look');
+chips($('fonts'), FONTS, 'font');
+chips($('pace'), PACES, 'pace');
+chips($('moods'), MOODS, 'mood', k => {
+  if (k === 'own') { $('track').click(); return; }
+  S.mood = k; if (phase === 'setup') Music.preview();
+});
+
+$('poem').value = S.poem;
+$('name').value = S.name; $('handle').value = S.handle;
+$('poem').oninput = e => { S.poem = e.target.value; S.sample = 'own'; persist(); renderSamples(); refresh(); };
+$('name').oninput = e => { S.name = e.target.value; persist(); };
+$('handle').oninput = e => { S.handle = e.target.value; persist(); };
+$('vol').value = S.vol; $('volv').textContent = S.vol + '%';
+$('vol').oninput = e => { S.vol = +e.target.value; $('volv').textContent = S.vol + '%'; Music.setVol(); persist(); };
+$('speed').value = S.speed;
+const speedLabel = () => $('speedv').textContent = (S.speed / 100).toFixed(1) + '×';
+speedLabel();
+$('speed').oninput = e => { S.speed = +e.target.value; speedLabel(); persist(); };
+
+$('track').onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  Music.setOwnTrack(f); S.mood = 'own';
+  chips($('moods'), MOODS, 'mood', k => { if (k === 'own') { $('track').click(); return; } S.mood = k; if (phase === 'setup') Music.preview(); });
+  const ownBtn = [...$('moods').children].find(b => b.textContent.startsWith('My own'));
+  if (ownBtn) ownBtn.textContent = '♪ ' + f.name.slice(0, 22);
+  Music.preview();
+};
+
+function refresh() {
+  parsePoem();
+  $('speedRow').style.display = S.pace === 'auto' ? 'flex' : 'none';
+}
+
+/* ================= poem parsing ================= */
+const RTL = /[֐-ࣿ]/;
+function parsePoem() {
+  lines = [];
+  const stanzas = S.poem.replace(/\r/g, '').split(/\n\s*\n/).map(s => s.split('\n').map(l => l.trim()).filter(Boolean)).filter(s => s.length);
+  stanzas.forEach((st, si) => st.forEach(t => lines.push({ text: t, stanza: si, rtl: RTL.test(t) })));
+  // make sure fallback script fonts are fetched before we draw with them
+  const sample = lines.map(l => l.text).join(' ').slice(0, 400);
+  if (sample) [fontSpec(36), fontSpec(36, true)].forEach(f => document.fonts.load(f, sample).catch(() => {}));
+}
+
+/* ================= camera / mic ================= */
+$('btnCam').onclick = async () => {
+  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; $('btnCam').textContent = 'Turn camera on'; $('btnCam').classList.remove('on'); return; }
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+    camVideo.srcObject = camStream; await camVideo.play();
+    $('btnCam').textContent = 'Camera on ✓ (tap to turn off)'; $('btnCam').classList.add('on');
+    err('');
+  } catch (e) { err('The camera didn\'t start (' + e.name + '). You can still record a voice-only poet card.'); }
+};
+async function getMic() {
+  if (micStream) return micStream;
+  micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+  return micStream;
+}
+function err(m) { $('err').textContent = m; }
+
+/* ================= music engine (Web Audio, generated) ================= */
+const Music = (() => {
+  let ac, bus, out, recDest, verb, timer, ownEl, ownSrc, ownURL, rainNode, padNodes = [];
+  let nextDrone = 0, droneStep = 0, nextNote = 0, degree = 0, phraseLeft = 0, running = null;
+  const ksCache = new Map();
+
+  function ensure() {
+    if (ac) { if (ac.state === 'suspended') ac.resume(); return ac; }
+    ac = new (window.AudioContext || window.webkitAudioContext)();
+    out = ac.createGain(); out.gain.value = 1;
+    bus = ac.createGain(); bus.gain.value = 0;
+    const comp = ac.createDynamicsCompressor();
+    comp.threshold.value = -18; comp.ratio.value = 3;
+    bus.connect(comp); comp.connect(out);
+    out.connect(ac.destination);
+    recDest = ac.createMediaStreamDestination();
+    out.connect(recDest);
+    verb = ac.createConvolver(); verb.buffer = impulse(3.2);
+    const wet = ac.createGain(); wet.gain.value = .55;
+    verb.connect(wet); wet.connect(bus);
+    return ac;
+  }
+  function impulse(sec) {
+    const len = ac.sampleRate * sec, b = ac.createBuffer(2, len, ac.sampleRate);
+    for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6); }
+    return b;
+  }
+  // Karplus–Strong plucked string, cached per pitch
+  function ks(freq, bright) {
+    const key = freq.toFixed(2) + bright;
+    if (ksCache.has(key)) return ksCache.get(key);
+    const sr = ac.sampleRate, len = Math.floor(sr * 3.2), b = ac.createBuffer(1, len, sr), d = b.getChannelData(0);
+    const p = Math.max(2, Math.round(sr / freq)), ring = new Float32Array(p);
+    for (let i = 0; i < p; i++) ring[i] = Math.random() * 2 - 1;
+    let idx = 0, decay = bright ? .996 : .993;
+    for (let i = 0; i < len; i++) {
+      const nx = (idx + 1) % p, v = ring[idx];
+      ring[idx] = decay * .5 * (v + ring[nx]);
+      d[i] = v; idx = nx;
+    }
+    ksCache.set(key, b); return b;
+  }
+  function pluck(t, freq, vol, bright, pan = 0) {
+    const s = ac.createBufferSource(); s.buffer = ks(freq, bright);
+    const gn = ac.createGain(); gn.gain.setValueAtTime(vol, t); gn.gain.exponentialRampToValueAtTime(.0001, t + 3.1);
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = bright ? 5200 : 2600;
+    const pn = ac.createStereoPanner ? ac.createStereoPanner() : null;
+    s.connect(lp); lp.connect(gn);
+    if (pn) { pn.pan.value = pan; gn.connect(pn); pn.connect(bus); pn.connect(verb); }
+    else { gn.connect(bus); gn.connect(verb); }
+    s.start(t); s.stop(t + 3.2);
+  }
+  function startRain(level) {
+    const len = ac.sampleRate * 4, b = ac.createBuffer(1, len, ac.sampleRate), d = b.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < len; i++) { const w = Math.random() * 2 - 1; last = (last + .02 * w) / 1.02; d[i] = last * 3.5 + (Math.random() < .0009 ? (Math.random() - .5) * .8 : 0); }
+    const s = ac.createBufferSource(); s.buffer = b; s.loop = true;
+    const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 1400;
+    const gn = ac.createGain(); gn.gain.value = .22 * level;
+    s.connect(f); f.connect(gn); gn.connect(bus); s.start();
+    rainNode = s;
+  }
+  function startPad(m) {
+    [0, 7, 12 + (m.scale.includes(4) ? 4 : 3)].forEach((semi, i) => {
+      const o = ac.createOscillator(); o.type = 'triangle';
+      o.frequency.value = m.tonic / 2 * Math.pow(2, semi / 12);
+      o.detune.value = (i - 1) * 6;
+      const gn = ac.createGain(); gn.gain.value = 0;
+      gn.gain.setTargetAtTime(.05 * m.pad, ac.currentTime, 2.5);
+      const lfo = ac.createOscillator(); lfo.frequency.value = .07 + i * .03;
+      const lg = ac.createGain(); lg.gain.value = .02 * m.pad;
+      lfo.connect(lg); lg.connect(gn.gain); lfo.start();
+      const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900;
+      o.connect(lp); lp.connect(gn); gn.connect(bus); gn.connect(verb); o.start();
+      padNodes.push(o, lfo);
+    });
+  }
+  const hz = (m, deg) => {
+    const n = m.scale.length, oct = Math.floor(deg / n), i = ((deg % n) + n) % n;
+    return m.tonic * Math.pow(2, oct + m.scale[i] / 12);
+  };
+  function tick() {
+    const m = MOODS[running]; if (!m || !m.scale) return;
+    const now = ac.currentTime;
+    // tanpura-style drone: Pa – Sa – Sa – Sa(low), round and round
+    while (nextDrone < now + .3) {
+      const pat = [m.tonic * .75, m.tonic, m.tonic, m.tonic / 2];
+      pluck(nextDrone, pat[droneStep % 4] / 2, .16 * m.drone, false, (droneStep % 2 ? -.3 : .3));
+      nextDrone += 1.15; droneStep++;
+    }
+    // wandering melody in phrases, with rests between them
+    while (nextNote < now + .3) {
+      if (phraseLeft <= 0) { phraseLeft = 3 + Math.floor(Math.random() * 4); nextNote += m.gap[1] * (1 + Math.random()); continue; }
+      const step = [-2, -1, -1, 0, 1, 1, 2][Math.floor(Math.random() * 7)];
+      degree = Math.max(-2, Math.min(m.scale.length + 4, degree + step));
+      if (phraseLeft === 1 && Math.random() < .6) degree = Math.random() < .5 ? 0 : m.scale.length; // land home
+      pluck(nextNote, hz(m, degree) * 2, .28, true, Math.random() * .6 - .3);
+      if (Math.random() < .25) pluck(nextNote + .09, hz(m, degree + 2) * 2, .14, true, .2); // grace note
+      nextNote += m.gap[0] + Math.random() * (m.gap[1] - m.gap[0]);
+      phraseLeft--;
+    }
+  }
+  function stopVoices() {
+    clearInterval(timer); timer = null;
+    if (rainNode) { try { rainNode.stop(); } catch (e) {} rainNode = null; }
+    padNodes.forEach(n => { try { n.stop(); } catch (e) {} }); padNodes = [];
+    if (ownEl) ownEl.pause();
+    running = null;
+  }
+  function start(mood) {
+    ensure(); stopVoices();
+    const t = ac.currentTime;
+    bus.gain.cancelScheduledValues(t); bus.gain.setValueAtTime(bus.gain.value, t);
+    bus.gain.linearRampToValueAtTime(S.vol / 100, t + 1.2);
+    running = mood;
+    if (mood === 'own' && ownEl) { ownEl.currentTime = 0; ownEl.play(); return; }
+    const m = MOODS[mood]; if (!m || !m.scale) return;
+    nextDrone = t + .05; nextNote = t + 1.6; droneStep = 0; degree = 0; phraseLeft = 0;
+    if (m.rain) startRain(m.rain);
+    if (m.pad) startPad(m);
+    tick(); timer = setInterval(tick, 60);
+  }
+  function fadeOut(sec = 2.5) {
+    if (!ac) return;
+    const t = ac.currentTime;
+    bus.gain.cancelScheduledValues(t); bus.gain.setValueAtTime(bus.gain.value, t);
+    bus.gain.linearRampToValueAtTime(0, t + sec);
+    setTimeout(stopVoices, sec * 1000 + 100);
+  }
+  let previewTimer;
+  return {
+    ensure, start, fadeOut,
+    get recStream() { return recDest.stream; },
+    get ctx() { return ac; },
+    setVol() { if (ac && running) bus.gain.setTargetAtTime(S.vol / 100, ac.currentTime, .1); },
+    preview() {           // short taste of the mood while choosing
+      clearTimeout(previewTimer);
+      start(S.mood);
+      previewTimer = setTimeout(() => { if (phase === 'setup') fadeOut(1.5); }, 7000);
+    },
+    setOwnTrack(file) {
+      ensure();
+      if (ownURL) URL.revokeObjectURL(ownURL);
+      ownURL = URL.createObjectURL(file);
+      if (!ownEl) {
+        ownEl = new Audio(); ownEl.loop = true; ownEl.crossOrigin = 'anonymous';
+        ownSrc = ac.createMediaElementSource(ownEl); ownSrc.connect(bus);
+      }
+      ownEl.src = ownURL;
+    },
+    connectMic(stream) {
+      const src = ac.createMediaStreamSource(stream);
+      const gn = ac.createGain(); gn.gain.value = 1.15;
+      src.connect(gn); gn.connect(recDest);       // into the recording only, never the speakers
+      return () => { try { src.disconnect(); gn.disconnect(); } catch (e) {} };
+    },
+  };
+})();
+
+/* ================= drawing ================= */
+function fontSpec(size, bold) {
+  const fam = S.font === 'classic'
+    ? `"Cormorant Garamond", "Noto Nastaliq Urdu", "Noto Sans Devanagari", Georgia, serif`
+    : `"Inter", "Noto Nastaliq Urdu", "Noto Sans Devanagari", system-ui, sans-serif`;
+  return `${S.font === 'classic' ? '600' : (bold ? '700' : '600')} ${size}px ${fam}`;
+}
+function wrap(text, maxW) {
+  const words = text.split(/\s+/), rows = []; let cur = '';
+  for (const w of words) {
+    const t = cur ? cur + ' ' + w : w;
+    if (g.measureText(t).width > maxW && cur) { rows.push(cur); cur = w; } else cur = t;
+  }
+  if (cur) rows.push(cur);
+  return rows;
+}
+// lay out a set of line indices; returns rows with y offsets
+function layout(idxs, size, maxW, lineGap, stanzaGap) {
+  g.font = fontSpec(size, true);
+  const out = []; let y = 0, prevSt = null;
+  idxs.forEach(i => {
+    const L = lines[i];
+    if (prevSt !== null && L.stanza !== prevSt) y += stanzaGap;
+    prevSt = L.stanza;
+    const rows = wrap(L.text, maxW);
+    rows.forEach((r, k) => { out.push({ i, text: r, y, rtl: L.rtl }); y += k < rows.length - 1 ? size * 1.28 : 0; });
+    y += lineGap;
+  });
+  return { rows: out, h: Math.max(0, y - lineGap + size) };
+}
+const ease = x => 1 - Math.pow(1 - Math.min(1, Math.max(0, x)), 3);
+function lineAlpha(i, now) {
+  if (phase === 'setup') return 1;
+  if (i >= revealed) return 0;
+  return ease((now - revealAt[i]) / 550);
+}
+function drawCover(x, y, w, h, mirror = true) {
+  const vw = camVideo.videoWidth, vh = camVideo.videoHeight; if (!vw) return false;
+  const s = Math.max(w / vw, h / vh), dw = vw * s, dh = vh * s;
+  g.save();
+  if (mirror) { g.translate(x + w, y); g.scale(-1, 1); g.drawImage(camVideo, (w - dw) / 2, (h - dh) / 2, dw, dh); }
+  else g.drawImage(camVideo, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+  g.restore(); return true;
+}
+function background(now) {
+  const tint = MOODS[S.mood]?.tint || '#111';
+  g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+  const r = g.createRadialGradient(W * .5, H * (.35 + .03 * Math.sin(now / 4000)), 40, W * .5, H * .45, H * .8);
+  r.addColorStop(0, tint + 'AA'); r.addColorStop(1, '#000000');
+  g.globalAlpha = .55; g.fillStyle = r; g.fillRect(0, 0, W, H); g.globalAlpha = 1;
+}
+const camOn = () => camStream && camVideo.videoWidth;
+const displayName = () => S.name.trim() || 'Your name';
+const displayHandle = () => { const h = S.handle.trim(); return h ? (h[0] === '@' ? h : '@' + h) : ''; };
+
+function avatar(cx, cy, r) {
+  g.save(); g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.clip();
+  if (camOn()) drawCover(cx - r, cy - r, r * 2, r * 2);
+  else {
+    g.fillStyle = '#2B2B2F'; g.fillRect(cx - r, cy - r, r * 2, r * 2);
+    g.fillStyle = '#E8B45A'; g.font = `700 ${r}px Inter, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(displayName()[0].toUpperCase(), cx, cy + 2);
+  }
+  g.restore();
+  g.lineWidth = 3; g.strokeStyle = 'rgba(255,255,255,.18)'; g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.stroke();
+}
+
+function drawCard(now, dt) {
+  background(now);
+  const size = S.font === 'classic' ? 42 : 35, X = 56, maxW = W - X * 2;
+  const L = layout(lines.map((_, i) => i), size, maxW, size * 1.62, size * 1.2);
+  const headH = 150, gap = 64, total = headH + gap + L.h, room = H - 260;
+  let target;
+  if (total <= room) target = -((H - total) * .46);
+  else {
+    const cur = Math.max(0, revealed - 1);
+    const row = L.rows.find(r => r.i === cur) || { y: 0 };
+    const anchor = 130 + headH + gap + row.y;
+    target = phase === 'setup' ? -130 : Math.min(Math.max(-130, anchor - H * .6), total - H + 200);
+  }
+  scrollY += (target - scrollY) * Math.min(1, dt / 260);
+  const top = -scrollY;
+  // header
+  avatar(X + 75, top + 75, 75);
+  g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillStyle = '#fff';
+  g.font = `800 46px Inter, "Noto Nastaliq Urdu", sans-serif`;
+  g.fillText(displayName(), X + 178, top + (displayHandle() ? 70 : 88), W - X - 178 - 20);
+  if (displayHandle()) { g.font = `500 27px Inter, sans-serif`; g.fillStyle = '#A9A7A2'; g.fillText(displayHandle(), X + 178, top + 112); }
+  // poem
+  g.font = fontSpec(size, true); g.textBaseline = 'top';
+  const y0 = top + headH + gap;
+  L.rows.forEach(r => {
+    const a = lineAlpha(r.i, now); if (a <= 0) return;
+    const yy = y0 + r.y + (1 - a) * 14;
+    if (yy < -80 || yy > H + 40) return;
+    g.globalAlpha = a; g.fillStyle = '#fff';
+    g.direction = r.rtl ? 'rtl' : 'ltr';
+    g.textAlign = r.rtl ? 'right' : 'left';
+    g.fillText(r.text, r.rtl ? W - X : X, yy);
+  });
+  g.globalAlpha = 1; g.direction = 'ltr';
+}
+
+function drawFace(now) {
+  if (!(camOn() && drawCover(0, 0, W, H))) background(now);
+  const grad = g.createLinearGradient(0, H * .38, 0, H);
+  grad.addColorStop(0, 'rgba(0,0,0,0)'); grad.addColorStop(1, 'rgba(0,0,0,.86)');
+  g.fillStyle = grad; g.fillRect(0, H * .38, W, H * .62);
+  const tg = g.createLinearGradient(0, 0, 0, 220);
+  tg.addColorStop(0, 'rgba(0,0,0,.55)'); tg.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = tg; g.fillRect(0, 0, W, 220);
+  // name tag
+  g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillStyle = '#fff';
+  g.font = `800 34px Inter, "Noto Nastaliq Urdu", sans-serif`; g.fillText(displayName(), 44, 92, W - 88);
+  if (displayHandle()) { g.font = `500 22px Inter, sans-serif`; g.fillStyle = 'rgba(255,255,255,.75)'; g.fillText(displayHandle(), 44, 126); }
+
+  const cur = phase === 'setup' ? 0 : revealed - 1;
+  const st = cur >= 0 && lines[cur] ? lines[cur].stanza : (phase === 'setup' && lines[0] ? lines[0].stanza : -1);
+  if (st !== prevStanza) { stanzaSwapAt = now; drawFace.old = prevStanza; prevStanza = st; }
+  const size = S.font === 'classic' ? 46 : 39, maxW = W - 100;
+  const drawSt = (s, alphaMul) => {
+    if (s < 0) return;
+    const idxs = lines.map((l, i) => l.stanza === s ? i : -1).filter(i => i >= 0);
+    const L = layout(idxs, size, maxW, size * 1.45, 0);
+    const y0 = H - 190 - L.h;
+    g.font = fontSpec(size, true); g.textBaseline = 'top'; g.textAlign = 'center';
+    g.shadowColor = 'rgba(0,0,0,.7)'; g.shadowBlur = 18; g.shadowOffsetY = 2;
+    L.rows.forEach(r => {
+      const a = (alphaMul < 1 ? 1 : lineAlpha(r.i, now)) * alphaMul; if (a <= 0) return;
+      g.globalAlpha = a; g.fillStyle = '#fff';
+      g.direction = r.rtl ? 'rtl' : 'ltr';
+      g.fillText(r.text, W / 2, y0 + r.y + (1 - Math.min(1, a / Math.max(alphaMul, .001))) * 12);
+    });
+    g.shadowColor = 'transparent'; g.shadowBlur = 0; g.globalAlpha = 1; g.direction = 'ltr';
+  };
+  const k = (now - stanzaSwapAt) / 380;
+  if (k < 1 && drawFace.old >= 0 && phase !== 'setup') drawSt(drawFace.old, 1 - k);
+  drawSt(st, 1);
+}
+drawFace.old = -1;
+
+let lastT = performance.now();
+function frame(now) {
+  const dt = now - lastT; lastT = now;
+  if (S.look === 'face') drawFace(now); else drawCard(now, dt);
+  if (lines.length === 0 && phase === 'setup') {
+    g.fillStyle = 'rgba(255,255,255,.5)'; g.font = '500 28px Inter'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('Paste a poem to begin', W / 2, H / 2);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ================= performing ================= */
+let recorder, chunks = [], unplugMic, autoTimer, clockTimer, startedAt = 0, wakeLock, lastBlob, lastExt;
+
+function prompter() {
+  const nxt = lines[revealed];
+  if (phase === 'countdown') { $('pk').textContent = 'GET READY'; $('pt').textContent = nxt ? nxt.text : ''; $('pt2').textContent = ''; return; }
+  if (!nxt) { $('pk').textContent = 'THAT\'S THE LAST LINE'; $('pt').textContent = S.pace === 'auto' ? 'Finishing…' : 'Tap to finish'; $('pt2').textContent = ''; return; }
+  $('pk').textContent = revealed === 0 ? (S.pace === 'auto' ? 'FIRST LINE' : 'TAP TO SHOW YOUR FIRST LINE') : (S.pace === 'auto' ? 'NEXT' : 'NEXT · TAP');
+  $('pt').textContent = nxt.text;
+  const after = lines[revealed + 1];
+  $('pt2').textContent = after ? (after.stanza !== nxt.stanza ? '— new verse — ' : '') + after.text : '';
+}
+function advance() {
+  if (phase !== 'perform') return;
+  if (revealed >= lines.length) { finish(); return; }
+  revealAt[revealed] = performance.now(); revealed++;
+  prompter();
+  if (S.pace === 'auto') scheduleAuto();
+}
+function scheduleAuto() {
+  clearTimeout(autoTimer);
+  const L = lines[revealed - 1];
+  const words = L ? L.text.split(/\s+/).length : 0;
+  const ms = (1500 + words * 420 + (lines[revealed] && L && lines[revealed].stanza !== L.stanza ? 900 : 0)) / (S.speed / 100);
+  autoTimer = setTimeout(() => { if (revealed >= lines.length) finish(); else advance(); }, revealed >= lines.length ? ms + 600 : ms);
+}
+
+async function begin(record) {
+  err('');
+  parsePoem();
+  if (!lines.length) { err('Add at least one line first.'); return; }
+  if (S.mood === 'own' && !$('track').files.length) { S.mood = 'dard'; }
+  Music.ensure();
+  try { if (navigator.audioSession) navigator.audioSession.type = record ? 'play-and-record' : 'playback'; } catch (e) {}
+  if (record) {
+    if (!window.MediaRecorder || !cv.captureStream) { err('This browser can\'t record video. Try Chrome, or Safari on iOS 15 or later.'); return; }
+    try { await getMic(); } catch (e) { err('We need your microphone to record your voice (' + e.name + ').'); return; }
+  }
+  recording = record;
+  revealed = 0; revealAt = []; prevStanza = -1; drawFace.old = -1; scrollY = 0;
+  document.body.classList.add('performing');
+  $('recdot').className = 'dot' + (record ? '' : ' off');
+  $('btnFinish').textContent = 'Finish';
+  try { wakeLock = await navigator.wakeLock?.request('screen'); } catch (e) {}
+  if (document.documentElement.requestFullscreen && matchMedia('(max-width: 860px)').matches) document.documentElement.requestFullscreen().catch(() => {});
+
+  phase = 'countdown'; prompter();
+  Music.start(S.mood);
+  if (record) startRecorder();
+  startedAt = performance.now();
+  clockTimer = setInterval(() => {
+    const s = Math.floor((performance.now() - startedAt) / 1000);
+    $('clock').textContent = (record ? '' : 'rehearsal · ') + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }, 250);
+  for (const n of ['3', '2', '1']) {
+    if (phase !== 'countdown') return;
+    const c = $('count'); c.textContent = n; c.classList.remove('on'); void c.offsetWidth; c.classList.add('on');
+    await new Promise(r => setTimeout(r, 900));
+  }
+  $('count').classList.remove('on');
+  if (phase !== 'countdown') return;
+  phase = 'perform'; prompter();
+  if (S.pace === 'auto') advance();
+}
+
+function pickMime() {
+  const opts = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
+  return opts.find(m => MediaRecorder.isTypeSupported(m)) || '';
+}
+function startRecorder() {
+  unplugMic = Music.connectMic(micStream);
+  const vs = cv.captureStream(30);
+  const stream = new MediaStream([...vs.getVideoTracks(), ...Music.recStream.getAudioTracks()]);
+  const mime = pickMime();
+  recorder = new MediaRecorder(stream, { mimeType: mime || undefined, videoBitsPerSecond: 6_000_000, audioBitsPerSecond: 160_000 });
+  lastExt = (recorder.mimeType || mime).includes('mp4') ? 'mp4' : 'webm';
+  chunks = [];
+  recorder.ondataavailable = e => e.data.size && chunks.push(e.data);
+  recorder.onstop = () => {
+    vs.getTracks().forEach(t => t.stop());
+    if (!chunks.length) return;
+    lastBlob = new Blob(chunks, { type: recorder.mimeType || 'video/' + lastExt });
+    showReview();
+  };
+  recorder.start(1000);
+}
+
+function finish() {
+  if (phase !== 'perform') return;
+  phase = 'finishing'; clearTimeout(autoTimer);
+  $('pk').textContent = ''; $('pt').textContent = '…'; $('pt2').textContent = '';
+  Music.fadeOut(2.6);
+  setTimeout(() => wrapUp(true), 3000);
+}
+function wrapUp(keep) {
+  clearTimeout(autoTimer); clearInterval(clockTimer);
+  if (!keep) Music.fadeOut(.4);
+  if (recorder && recorder.state !== 'inactive') {
+    if (!keep) { recorder.onstop = null; }
+    recorder.stop();
+  }
+  recorder = null;
+  if (unplugMic) { unplugMic(); unplugMic = null; }
+  if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+  try { wakeLock?.release(); } catch (e) {} wakeLock = null;
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  phase = 'setup'; recording = false;
+  document.body.classList.remove('performing');
+  $('count').classList.remove('on');
+}
+
+/* ================= review ================= */
+function showReview() {
+  const url = URL.createObjectURL(lastBlob);
+  const v = $('out'); if (v.src) URL.revokeObjectURL(v.src);
+  v.src = url;
+  $('outmeta').textContent = `${(lastBlob.size / 1048576).toFixed(1)} MB · ${lastExt.toUpperCase()} · 720×1280`;
+  const file = new File([lastBlob], fname(), { type: lastBlob.type });
+  $('btnShare').hidden = !(navigator.canShare && navigator.canShare({ files: [file] }));
+  $('review').classList.add('on');
+}
+const fname = () => `mushaira-${(S.name.trim() || 'recital').replace(/[^\w]+/g, '-').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.${lastExt}`;
+$('btnSave').onclick = () => { const a = document.createElement('a'); a.href = $('out').src; a.download = fname(); a.click(); };
+$('btnShare').onclick = async () => {
+  try { await navigator.share({ files: [new File([lastBlob], fname(), { type: lastBlob.type })], title: 'My recital' }); } catch (e) {}
+};
+$('btnRetake').onclick = () => { $('review').classList.remove('on'); $('out').pause(); begin(true); };
+$('btnClose').onclick = () => { $('review').classList.remove('on'); $('out').pause(); };
+
+/* ================= controls ================= */
+$('btnRecord').onclick = () => begin(true);
+$('btnRehearse').onclick = () => begin(false);
+$('btnFinish').onclick = e => { e.stopPropagation(); if (phase === 'perform') finish(); else if (phase === 'countdown') wrapUp(false); };
+$('btnCancel').onclick = e => { e.stopPropagation(); wrapUp(false); };
+$('stage').addEventListener('pointerdown', e => {
+  if (!document.body.classList.contains('performing') || e.target.closest('button')) return;
+  if (S.pace === 'tap') advance();
+});
+addEventListener('keydown', e => {
+  if (!document.body.classList.contains('performing')) return;
+  if ([' ', 'ArrowRight', 'ArrowDown', 'PageDown', 'Enter'].includes(e.key)) { e.preventDefault(); if (S.pace === 'tap') advance(); }
+  if (e.key === 'Escape') wrapUp(false);
+});
+
+refresh();
+document.fonts.ready.then(() => requestAnimationFrame(frame));
+})();
+</script>
+</body>
+</html>

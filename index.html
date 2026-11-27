@@ -148,6 +148,7 @@
 
 <script>
   const tools = [
+    { name: "Mushaira Mode",           desc: "Recite a poem like a poet — teleprompter, mood music and a 9:16 video with each line appearing as you say it.", tag: "create", date: "Nov 2026", href: "tools/mushaira/" },
     { name: "Sudoku Shudoku",          desc: "Daily puzzles, combos, challenges and badges — play in Eastern Arabic, Roman, emoji or colours.", tag: "puzzle", date: "Nov 2026", href: "tools/sudoku/" },
     { name: "Chapterlands",            desc: "A world that grows as you read. Climb lookout towers, find lost books and unlock new districts.", tag: "adventure", date: "Nov 2026", href: "tools/chapterlands/" },
     { name: "Wave Runner",             desc: "Third-person space dodge-and-shoot — clear 10 escalating waves of asteroids and enemy ships.", tag: "arcade", date: "Sep 2026", href: "tools/wave-runner/" },
@@ -179,8 +180,8 @@
     { name: "VAT Calculator UK",       href: "tools/vat-calculator/",         was: "finance" }
   ];
 
-  const CATS = ['all', 'adventure', 'arcade', 'puzzle', 'word', 'family', 'quick'];
-  const CAT_LABELS = { all: 'All', adventure: 'Adventure', arcade: 'Arcade', puzzle: 'Puzzle', word: 'Word', family: 'Family', quick: 'Quick Fun' };
+  const CATS = ['all', 'create', 'adventure', 'arcade', 'puzzle', 'word', 'family', 'quick'];
+  const CAT_LABELS = { all: 'All', create: 'Create', adventure: 'Adventure', arcade: 'Arcade', puzzle: 'Puzzle', word: 'Word', family: 'Family', quick: 'Quick Fun' };
   let activeCat = 'all';
 
   const listEl  = document.getElementById('tool-list');
